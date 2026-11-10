@@ -9,3 +9,8 @@ Status: local only. No remote. Implementation has not started.
 
 The research notes, the reference pins, and the lab measurements are in
 `/home/pleb/research/projects/neuronte`.
+
+## Licence
+
+MIT. See [LICENSE](LICENSE). The weights are part of the project and are
+under the same licence.

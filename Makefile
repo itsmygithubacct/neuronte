@@ -30,6 +30,20 @@ build/%: tools/%.c build/libneuronte.a
 build/test_%: tests/test_%.c build/libneuronte.a
 	$(CC) $(NRT_CFLAGS) -o $@ $< build/libneuronte.a $(LDLIBS)
 
+# The terminal demo links kitty-framebuffer (MIT), compiled from its source
+# tree into build/ so that tree is left untouched. Needs zlib and pthreads.
+KITTYFB_DIR ?= $(HOME)/gpu_terminal/kilix-modules/kitty-framebuffer
+
+demo: build/neuronte-demo
+
+build/kitty_framebuffer.o: $(KITTYFB_DIR)/src/kitty_framebuffer.c | build
+	$(CC) -std=c11 -O2 -fPIC -pthread -D_POSIX_C_SOURCE=200809L -D_DEFAULT_SOURCE \
+		-I$(KITTYFB_DIR)/include -c -o $@ $<
+
+build/neuronte-demo: demo/neuronte-demo.c build/libneuronte.a build/kitty_framebuffer.o
+	$(CC) $(NRT_CFLAGS) -pthread -I$(KITTYFB_DIR)/include -o $@ $< build/kitty_framebuffer.o \
+		build/libneuronte.a $(LDLIBS) -lz
+
 # Rebuild the packed weights from the JSON the trainer writes.
 pack: $(WEIGHTS).json
 	$(PYTHON) train/pack.py $(WEIGHTS).json $(WEIGHTS).nrt
@@ -47,4 +61,4 @@ bench: build/neuronte-bench
 clean:
 	rm -rf build
 
-.PHONY: all pack test bench clean
+.PHONY: all demo pack test bench clean

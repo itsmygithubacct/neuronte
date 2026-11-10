@@ -25,6 +25,7 @@ ASCII characters. Other scalars get a mark of their own, not a letter.
 | `tools/neuronte-render.c` | Draws lines of text into a PPM file |
 | `tools/neuronte-bench.c` | Times the net per cell |
 | `tests/` | UTF-8 cases, API and loader checks, and a cross-check against numpy |
+| `demo/neuronte-demo.c` | Shows the font in a Kilix terminal through `kitty-framebuffer`, with typing |
 
 ## Build and test
 
@@ -49,6 +50,19 @@ inner loops twice, plain and AVX2, and picks one by CPU when it loads.
 - the C library agrees with an independent float64 numpy evaluation of
   the JSON weights to 1e-3 in coverage, and the packed file is exactly
   what `train/pack.py` makes from the JSON.
+
+## Demo
+
+```sh
+make demo
+./build/neuronte-demo                 # in a Kilix terminal
+./build/neuronte-demo --snapshot out.ppm 1280 800
+```
+
+Every glyph on the demo's screen, its labels included, is drawn by the
+net and shown through `kitty-framebuffer`, which `make demo` compiles from
+`KITTYFB_DIR` (default `$HOME/gpu_terminal/kilix-modules/kitty-framebuffer`).
+Type to draw text, Tab changes its size, Esc quits. It needs zlib.
 
 ## Use
 

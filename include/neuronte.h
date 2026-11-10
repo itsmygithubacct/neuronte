@@ -40,10 +40,15 @@ enum {
 #define NEURONTE_MAX_CELL 4096
 #define NEURONTE_MAX_SAMPLES 8
 
-/* Load weights from memory (the bytes are copied) or from a file. */
+/* Load weights from memory (the bytes are copied) or from a file. The
+ * same calls load any of the weight files: they differ in hidden width,
+ * which the file states, and in which characters were trained. */
 int neuronte_open(const void *data, size_t len, neuronte **out);
 int neuronte_open_file(const char *path, neuronte **out);
 void neuronte_close(neuronte *n);
+
+/* The number of weights and biases in the loaded net, or 0 for NULL. */
+size_t neuronte_parameters(const neuronte *n);
 
 /* Decode one Unicode scalar from the front of s. Returns the number of
  * bytes consumed, which is at least 1 when len > 0, and 0 when len is 0.

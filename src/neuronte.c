@@ -3,7 +3,7 @@
  * The net is four dense layers. Input is 26 position features of a point
  * (x, y) in the 1 x 2 design cell and 64 features of the character's
  * scalar (its 21 bits and 43 parity bits, each -1 or +1). Three hidden
- * layers of 128 use ReLU. The output f is a clamped signed distance to the
+ * layers use ReLU; their width is read from the weights file. The output f is a clamped signed distance to the
  * ink edge, scaled by 1/tau. A sample's coverage is a ramp one sample wide:
  * clamp(0.5 + f * tau * cell_w * samples, 0, 1).
  *
@@ -24,11 +24,9 @@
 #define CODE 64
 #define NMASK (CODE - 21)
 #define IN (POS + CODE)
-#define H 128
 #define LAYERS 3
 #define HEADER (8 + 5 * 4 + 4 + NMASK * 4)
-#define NFLOAT (H * IN + H + 2 * (H * H + H) + H + 1)
-#define FILE_LEN ((size_t)HEADER + 4 * (size_t)NFLOAT)
+#define MAX_H 1024 /* hidden widths are multiples of 8 up to this */
 #define CACHE 256
 
 /* On x86-64 with GCC or Clang, build the inner loops twice, plain and
@@ -49,20 +47,34 @@ struct entry {
 };
 
 struct neuronte {
-    float w1_pos[POS][H]; /* column i of l1, as a row */
-    float w1_code[CODE][H];
-    float b1[H];
-    float w2[H][H]; /* w2[i][o] = l2 weight (o, i) */
-    float b2[H];
-    float w3[H][H];
-    float b3[H];
-    float w4[H];
+    int h;          /* hidden width */
+    float *w1_pos;  /* POS rows of h: column i of l1, as a row */
+    float *w1_code; /* CODE rows of h */
+    float *b1;
+    float *w2; /* h rows of h: w2[i * h + o] = l2 weight (o, i) */
+    float *b2;
+    float *w3;
+    float *b3;
+    float *w4;
     float b4;
     float tau;
     uint32_t masks[NMASK];
     int samples;
     struct entry cache[CACHE];
+    float mem[]; /* the arrays above point into this */
 };
+
+/* Weights and biases in a net of hidden width h. */
+static size_t params(size_t h)
+{
+    return h * IN + h + 2 * (h * h + h) + h + 1;
+}
+
+/* The length of a weights file of hidden width h, or 0 if no such width. */
+static size_t file_len(uint32_t h)
+{
+    return h >= 8 && h <= MAX_H && h % 8 == 0 ? HEADER + 4 * params(h) : 0;
+}
 
 static uint32_t rd32(const unsigned char *p)
 {
@@ -81,8 +93,9 @@ int neuronte_open(const void *data, size_t len, neuronte **out)
 {
     const unsigned char *p = data;
     neuronte *n;
-    size_t off;
-    int i, o;
+    size_t off, len_want;
+    float *m;
+    int i, o, h;
 
     if (!out)
         return NEURONTE_ERR_ARG;
@@ -91,14 +104,26 @@ int neuronte_open(const void *data, size_t len, neuronte **out)
         return NEURONTE_ERR_ARG;
     if (len < 28 || memcmp(p, "NEURONTE", 8) != 0 || rd32(p + 8) != 1)
         return NEURONTE_ERR_FORMAT;
-    if (rd32(p + 12) != OCT || rd32(p + 16) != CODE || rd32(p + 20) != H || rd32(p + 24) != LAYERS)
+    len_want = file_len(rd32(p + 20));
+    if (rd32(p + 12) != OCT || rd32(p + 16) != CODE || len_want == 0 || rd32(p + 24) != LAYERS)
         return NEURONTE_ERR_SHAPE;
-    if (len != FILE_LEN)
+    if (len != len_want)
         return NEURONTE_ERR_FORMAT;
 
-    n = calloc(1, sizeof *n);
+    h = (int)rd32(p + 20);
+    n = calloc(1, sizeof *n + (params((size_t)h) - 1) * sizeof *n->mem);
     if (!n)
         return NEURONTE_ERR_NOMEM;
+    m = n->mem;
+    n->h = h;
+    n->w1_pos = m;
+    n->w1_code = m += POS * h;
+    n->b1 = m += CODE * h;
+    n->w2 = m += h;
+    n->b2 = m += (size_t)h * h;
+    n->w3 = m += h;
+    n->b3 = m += (size_t)h * h;
+    n->w4 = m += h;
     n->tau = rdf(p + 28);
     if (!isfinite(n->tau) || n->tau <= 0)
         goto bad;
@@ -107,33 +132,33 @@ int neuronte_open(const void *data, size_t len, neuronte **out)
         if (n->masks[i] == 0 || n->masks[i] >= 1u << 21)
             goto bad;
     }
-    for (off = HEADER; off < FILE_LEN; off += 4)
+    for (off = HEADER; off < len; off += 4)
         if (!isfinite(rdf(p + off)))
             goto bad;
 
     off = HEADER;
 #define NEXT() (off += 4, rdf(p + off - 4))
-    for (o = 0; o < H; o++)
+    for (o = 0; o < h; o++)
         for (i = 0; i < IN; i++) {
             float v = NEXT();
             if (i < POS)
-                n->w1_pos[i][o] = v;
+                n->w1_pos[(size_t)i * h + o] = v;
             else
-                n->w1_code[i - POS][o] = v;
+                n->w1_code[(size_t)(i - POS) * h + o] = v;
         }
-    for (o = 0; o < H; o++)
+    for (o = 0; o < h; o++)
         n->b1[o] = NEXT();
-    for (o = 0; o < H; o++)
-        for (i = 0; i < H; i++)
-            n->w2[i][o] = NEXT();
-    for (o = 0; o < H; o++)
+    for (o = 0; o < h; o++)
+        for (i = 0; i < h; i++)
+            n->w2[(size_t)i * h + o] = NEXT();
+    for (o = 0; o < h; o++)
         n->b2[o] = NEXT();
-    for (o = 0; o < H; o++)
-        for (i = 0; i < H; i++)
-            n->w3[i][o] = NEXT();
-    for (o = 0; o < H; o++)
+    for (o = 0; o < h; o++)
+        for (i = 0; i < h; i++)
+            n->w3[(size_t)i * h + o] = NEXT();
+    for (o = 0; o < h; o++)
         n->b3[o] = NEXT();
-    for (i = 0; i < H; i++)
+    for (i = 0; i < h; i++)
         n->w4[i] = NEXT();
     n->b4 = NEXT();
 #undef NEXT
@@ -146,8 +171,8 @@ bad:
 
 int neuronte_open_file(const char *path, neuronte **out)
 {
-    unsigned char *buf;
-    size_t got;
+    unsigned char head[28], *buf;
+    size_t got, want;
     FILE *f;
     int rc;
 
@@ -159,16 +184,31 @@ int neuronte_open_file(const char *path, neuronte **out)
     f = fopen(path, "rb");
     if (!f)
         return NEURONTE_ERR_IO;
-    buf = malloc(FILE_LEN + 1);
+    got = fread(head, 1, sizeof head, f);
+    want = got == sizeof head ? file_len(rd32(head + 20)) : 0;
+    if (ferror(f) || want == 0) {
+        /* Too short or an unknown width: let neuronte_open say which. */
+        rc = ferror(f) ? NEURONTE_ERR_IO : neuronte_open(head, got, out);
+        fclose(f);
+        return rc;
+    }
+    buf = malloc(want + 1);
     if (!buf) {
         fclose(f);
         return NEURONTE_ERR_NOMEM;
     }
-    got = fread(buf, 1, FILE_LEN + 1, f); /* one byte more shows a file too long */
+    memcpy(buf, head, sizeof head);
+    /* One byte more than the width needs shows a file too long. */
+    got = sizeof head + fread(buf + sizeof head, 1, want + 1 - sizeof head, f);
     rc = ferror(f) ? NEURONTE_ERR_IO : neuronte_open(buf, got, out);
     fclose(f);
     free(buf);
     return rc;
+}
+
+size_t neuronte_parameters(const neuronte *n)
+{
+    return n ? params((size_t)n->h) : 0;
 }
 
 void neuronte_close(neuronte *n)
@@ -207,13 +247,14 @@ static int parity(uint32_t v)
 /* l1 bias plus the character's columns of l1. */
 static void char_part(const neuronte *n, uint32_t s, float *c)
 {
-    int i, o;
-    memcpy(c, n->b1, sizeof n->b1);
+    int i, o, h = n->h;
+    memcpy(c, n->b1, (size_t)h * sizeof *c);
     for (i = 0; i < CODE; i++) {
         int bit = i < 21 ? (int)((s >> i) & 1) : parity(s & n->masks[i - 21]);
         float v = bit ? 1.0f : -1.0f;
-        for (o = 0; o < H; o++)
-            c[o] += v * n->w1_code[i][o];
+        const float *w = n->w1_code + (size_t)i * h;
+        for (o = 0; o < h; o++)
+            c[o] += v * w[o];
     }
 }
 
@@ -225,47 +266,51 @@ static void axis_part(const neuronte *n, int axis, double t, float *out)
 {
     const double two_pi = 6.283185307179586476925286766559;
     float v = axis == 0 ? (float)(2.0 * t - 1.0) : (float)(t - 1.0);
-    int k, o;
-    for (o = 0; o < H; o++)
-        out[o] = v * n->w1_pos[axis][o];
+    int k, o, h = n->h;
+    for (o = 0; o < h; o++)
+        out[o] = v * n->w1_pos[(size_t)axis * h + o];
     for (k = 0; k < OCT; k++) {
         double w = two_pi * (double)(1 << k);
         float sv = (float)sin(w * t), cv = (float)cos(w * t);
-        const float *ws = n->w1_pos[2 + 4 * k + axis], *wc = n->w1_pos[4 + 4 * k + axis];
-        for (o = 0; o < H; o++)
+        const float *ws = n->w1_pos + (size_t)(2 + 4 * k + axis) * h;
+        const float *wc = n->w1_pos + (size_t)(4 + 4 * k + axis) * h;
+        for (o = 0; o < h; o++)
             out[o] += sv * ws[o] + cv * wc[o];
     }
 }
 
-HOT static void dense(const float (*w)[H], const float *b, const float *in, float *out)
+HOT static void dense(const float *restrict w, const float *restrict b, const float *restrict in,
+                      float *restrict out, int h)
 {
     int i, o;
-    memcpy(out, b, H * sizeof *out);
-    for (i = 0; i < H; i++) {
+    memcpy(out, b, (size_t)h * sizeof *out);
+    for (i = 0; i < h; i++) {
         float a = in[i];
         if (a != 0.0f) {
-            const float *row = w[i];
-            for (o = 0; o < H; o++)
+            const float *restrict row = w + (size_t)i * h;
+            for (o = 0; o < h; o++)
                 out[o] += a * row[o];
         }
     }
-    for (o = 0; o < H; o++)
+    for (o = 0; o < h; o++)
         if (!(out[o] > 0.0f))
             out[o] = 0.0f;
 }
 
-HOT static float field(const neuronte *n, const float *c, const float *xp, const float *yp)
+/* The field at one sample. scratch holds 3 h floats. */
+HOT static float field(const neuronte *n, const float *c, const float *xp, const float *yp,
+                       float *scratch)
 {
-    float h1[H], h2[H], h3[H], f;
-    int o;
-    for (o = 0; o < H; o++) {
+    int o, h = n->h;
+    float *h1 = scratch, *h2 = scratch + h, *h3 = scratch + 2 * h, f;
+    for (o = 0; o < h; o++) {
         float v = c[o] + xp[o] + yp[o];
         h1[o] = v > 0.0f ? v : 0.0f;
     }
-    dense((const float (*)[H])n->w2, n->b2, h1, h2);
-    dense((const float (*)[H])n->w3, n->b3, h2, h3);
+    dense(n->w2, n->b2, h1, h2, h);
+    dense(n->w3, n->b3, h2, h3, h);
     f = n->b4;
-    for (o = 0; o < H; o++)
+    for (o = 0; o < h; o++)
         f += n->w4[o] * h3[o];
     return f;
 }
@@ -278,8 +323,9 @@ static int auto_samples(int cell_w)
 int neuronte_coverage(const neuronte *n, uint32_t scalar, int cell_w, int cell_h,
                       int samples_per_axis, float *coverage)
 {
-    float c[H], *xp, *yp, slope;
+    float *mem, *c, *scratch, *xp, *yp, slope;
     int ss = samples_per_axis, sw, sh, i, j, px, py;
+    size_t h;
 
     if (!n || !coverage || cell_w <= 0 || cell_h <= 0 || cell_w > NEURONTE_MAX_CELL ||
         cell_h > NEURONTE_MAX_CELL || ss < 0 || ss > NEURONTE_MAX_SAMPLES)
@@ -288,32 +334,32 @@ int neuronte_coverage(const neuronte *n, uint32_t scalar, int cell_w, int cell_h
         ss = auto_samples(cell_w);
     sw = cell_w * ss;
     sh = cell_h * ss;
-    xp = malloc((size_t)sw * H * sizeof *xp);
-    yp = malloc((size_t)sh * H * sizeof *yp);
-    if (!xp || !yp) {
-        free(xp);
-        free(yp);
+    h = (size_t)n->h;
+    mem = malloc(((size_t)sw + (size_t)sh + 4) * h * sizeof *mem);
+    if (!mem)
         return NEURONTE_ERR_NOMEM;
-    }
+    c = mem;
+    scratch = c + h;
+    xp = scratch + 3 * h;
+    yp = xp + (size_t)sw * h;
     char_part(n, normalize(scalar), c);
     for (i = 0; i < sw; i++)
-        axis_part(n, 0, (i + 0.5) / sw, xp + (size_t)i * H);
+        axis_part(n, 0, (i + 0.5) / sw, xp + (size_t)i * h);
     for (j = 0; j < sh; j++)
-        axis_part(n, 1, (j + 0.5) / sh * 2.0, yp + (size_t)j * H);
+        axis_part(n, 1, (j + 0.5) / sh * 2.0, yp + (size_t)j * h);
     slope = n->tau * (float)cell_w * (float)ss;
     for (py = 0; py < cell_h; py++)
         for (px = 0; px < cell_w; px++) {
             float acc = 0.0f;
             for (j = 0; j < ss; j++)
                 for (i = 0; i < ss; i++) {
-                    float v = 0.5f + slope * field(n, c, xp + (size_t)(px * ss + i) * H,
-                                                   yp + (size_t)(py * ss + j) * H);
+                    float v = 0.5f + slope * field(n, c, xp + (size_t)(px * ss + i) * h,
+                                                   yp + (size_t)(py * ss + j) * h, scratch);
                     acc += v < 0.0f ? 0.0f : v > 1.0f ? 1.0f : v;
                 }
             coverage[(size_t)py * cell_w + px] = acc / (float)(ss * ss);
         }
-    free(xp);
-    free(yp);
+    free(mem);
     return NEURONTE_OK;
 }
 

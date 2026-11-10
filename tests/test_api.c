@@ -1,5 +1,7 @@
 /* Loader refusals, drawing, clipping and blending. MIT licence.
- * usage: test_api WEIGHTS.nrt */
+ * usage: test_api WEIGHTS.nrt [--full]
+ * --full adds checks of box drawing, blocks and Braille, for weights
+ * trained on them. */
 #include "neuronte.h"
 
 #include <math.h>
@@ -49,6 +51,87 @@ static void put32(unsigned char *p, uint32_t v)
     p[3] = v >> 24;
 }
 
+static float sum_of(const float *c, int n)
+{
+    float s = 0;
+    int i;
+    for (i = 0; i < n; i++)
+        s += c[i];
+    return s;
+}
+
+/* The most ink in column x (or row y, if x < 0) of a cw x ch cell. */
+static float most_in(const float *c, int cw, int ch, int x, int y)
+{
+    float m = 0;
+    int i;
+    for (i = 0; i < (x >= 0 ? ch : cw); i++) {
+        float v = x >= 0 ? c[i * cw + x] : c[y * cw + i];
+        m = v > m ? v : m;
+    }
+    return m;
+}
+
+/* A net of hidden width 8 with every weight 0: f is 0, coverage 0.5. */
+static unsigned char *zero_net(const unsigned char *like, size_t *len)
+{
+    size_t params = 8 * 90 + 8 + 2 * (8 * 8 + 8) + 8 + 1;
+    unsigned char *p = calloc(1, 204 + 4 * params);
+    if (p) {
+        memcpy(p, like, 204);
+        put32(p + 20, 8);
+    }
+    *len = 204 + 4 * params;
+    return p;
+}
+
+static void full_checks(neuronte *n)
+{
+    enum { W = 16, H = 32 };
+    float c[W * H], d[W * H];
+    int i;
+
+    /* Box lines reach the cell edges, so neighbouring cells join. */
+    neuronte_coverage(n, 0x2500, W, H, 0, c);
+    if (most_in(c, W, H, 0, 0) < 0.9f || most_in(c, W, H, W - 1, 0) < 0.9f)
+        FAIL("U+2500 does not reach both sides");
+    if (most_in(c, W, H, -1, 0) > 0.1f || most_in(c, W, H, -1, H - 1) > 0.1f)
+        FAIL("U+2500 has ink at the top or bottom");
+    neuronte_coverage(n, 0x2502, W, H, 0, c);
+    if (most_in(c, W, H, -1, 0) < 0.9f || most_in(c, W, H, -1, H - 1) < 0.9f)
+        FAIL("U+2502 does not reach the top and bottom");
+    neuronte_coverage(n, 0x253C, W, H, 0, c);
+    if (most_in(c, W, H, 0, 0) < 0.9f || most_in(c, W, H, W - 1, 0) < 0.9f ||
+        most_in(c, W, H, -1, 0) < 0.9f || most_in(c, W, H, -1, H - 1) < 0.9f)
+        FAIL("U+253C does not reach all four sides");
+
+    /* Blocks. */
+    neuronte_coverage(n, 0x2588, W, H, 0, c);
+    for (i = 0; i < W * H; i++)
+        if (c[i] < 0.97f) {
+            FAIL("U+2588 has a gap of %g at %d", c[i], i);
+            break;
+        }
+    neuronte_coverage(n, 0x2580, W, H, 0, c);
+    if (sum_of(c, W * H / 2) < 0.95f * W * H / 2 || sum_of(c + W * H / 2, W * H / 2) > 0.05f * W * H / 2)
+        FAIL("U+2580 is not the upper half");
+
+    /* Blank characters. */
+    neuronte_coverage(n, 0x2800, W, H, 0, c);
+    neuronte_coverage(n, 0x00A0, W, H, 0, d);
+    for (i = 0; i < W * H; i++)
+        if (c[i] > 0.05f || d[i] > 0.05f) {
+            FAIL("U+2800 or U+00A0 has ink at %d", i);
+            break;
+        }
+
+    /* Eight Braille dots carry about eight times the ink of one. */
+    neuronte_coverage(n, 0x28FF, W, H, 0, c);
+    neuronte_coverage(n, 0x2801, W, H, 0, d);
+    if (!(sum_of(c, W * H) > 6.5f * sum_of(d, W * H) && sum_of(c, W * H) < 9.5f * sum_of(d, W * H)))
+        FAIL("U+28FF has %g ink against %g for U+2801", sum_of(c, W * H), sum_of(d, W * H));
+}
+
 int main(int argc, char **argv)
 {
     unsigned char *data, *copy;
@@ -59,8 +142,8 @@ int main(int argc, char **argv)
     uint32_t buf[BW * BH], ref[BW * BH];
     int i, rc;
 
-    if (argc != 2) {
-        fprintf(stderr, "usage: %s WEIGHTS.nrt\n", argv[0]);
+    if (argc < 2 || argc > 3 || (argc == 3 && strcmp(argv[2], "--full") != 0)) {
+        fprintf(stderr, "usage: %s WEIGHTS.nrt [--full]\n", argv[0]);
         return 2;
     }
     data = slurp(argv[1], &len);
@@ -84,7 +167,31 @@ int main(int argc, char **argv)
     expect_open("version 2", copy, len, NEURONTE_ERR_FORMAT);
     memcpy(copy, data, len);
     put32(copy + 20, 64);
-    expect_open("hidden width 64", copy, len, NEURONTE_ERR_SHAPE);
+    expect_open("hidden width 64 in a file of another width", copy, len, NEURONTE_ERR_FORMAT);
+    put32(copy + 20, 100);
+    expect_open("hidden width 100", copy, len, NEURONTE_ERR_SHAPE);
+    put32(copy + 20, 0);
+    expect_open("hidden width 0", copy, len, NEURONTE_ERR_SHAPE);
+    put32(copy + 20, 2048);
+    expect_open("hidden width 2048", copy, len, NEURONTE_ERR_SHAPE);
+    {
+        size_t zlen;
+        unsigned char *z = zero_net(data, &zlen);
+        if (!z || neuronte_open(z, zlen, &n) != NEURONTE_OK) {
+            FAIL("width 8 net refused");
+        } else {
+            if (neuronte_parameters(n) != 881)
+                FAIL("width 8 net has %zu parameters, want 881", neuronte_parameters(n));
+            neuronte_coverage(n, 'A', CW, CH, 0, cov);
+            for (i = 0; i < CW * CH; i++)
+                if (cov[i] != 0.5f) {
+                    FAIL("zero net gives coverage %g", cov[i]);
+                    break;
+                }
+            neuronte_close(n);
+        }
+        free(z);
+    }
     memcpy(copy, data, len);
     put32(copy + 12, 4);
     expect_open("4 octaves", copy, len, NEURONTE_ERR_SHAPE);
@@ -103,6 +210,20 @@ int main(int argc, char **argv)
     if (rc != NEURONTE_OK) {
         printf("cannot open weights (%d)\n", rc);
         return 1;
+    }
+    if (neuronte_parameters(n) != (len - 204) / 4)
+        FAIL("parameters %zu for a file of %zu bytes", neuronte_parameters(n), len);
+    {
+        neuronte *f;
+        if (neuronte_open_file(argv[1], &f) != NEURONTE_OK) {
+            FAIL("open_file refused the file open took");
+        } else {
+            neuronte_coverage(n, 'g', CW, CH, 0, cov);
+            neuronte_coverage(f, 'g', CW, CH, 0, cov2);
+            if (memcmp(cov, cov2, sizeof cov) != 0)
+                FAIL("open_file and open draw g differently");
+            neuronte_close(f);
+        }
     }
 
     /* The same character twice gives the same cell, bit for bit. */
@@ -216,6 +337,9 @@ int main(int argc, char **argv)
 
     if (neuronte_set_samples(n, 9) != NEURONTE_ERR_ARG || neuronte_set_samples(n, 1) != NEURONTE_OK)
         FAIL("set_samples bounds");
+
+    if (argc == 3)
+        full_checks(n);
 
     neuronte_close(n);
     free(copy);

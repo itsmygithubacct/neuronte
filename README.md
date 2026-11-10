@@ -50,6 +50,8 @@ It has no accented letters yet. Text with é gets a mark in that cell.
 | `tools/neuronte-bench.c` | Times the net per cell |
 | `tests/` | UTF-8 cases, API and loader checks, and a cross-check against numpy |
 | `demo/neuronte-demo.c` | Shows the font in a Kilix terminal through `kitty-framebuffer`, with typing |
+| `demo/neuronte-compare.c` | Two weight files side by side, on examples that show where they differ |
+| `demo/common.c` | What the two demos share: text, typing, snapshots and the terminal |
 
 ## Build and test
 
@@ -101,6 +103,21 @@ changes its size, Esc quits. It needs zlib.
 The first screen takes about 5 seconds with the full weights, since
 every cell is new. The demo shows each part as it is done. After that
 a frame takes about a millisecond.
+
+```sh
+./build/neuronte-compare                      # neuronte-ascii left, neuronte-full right
+./build/neuronte-compare LEFT.nrt RIGHT.nrt   # any two weight files
+./build/neuronte-compare --snapshot out.ppm 1280 800
+```
+
+`neuronte-compare` splits the screen in two, and each half is drawn only
+by its own net, labels included. The rows are ASCII at three sizes, a
+TUI panel and file tree in box drawing with a spinner, a progress bar,
+sparkline and Braille wave, punctuation beyond ASCII next to the ASCII
+it stands in for, and characters neither set was trained on. Each row
+says, in that net's own drawing, whether the net was trained on it.
+Typing goes to both halves. Each half shows its net's size and how long
+it took to draw one cell, the whole half, and the last keypress.
 
 ## Use
 

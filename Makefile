@@ -35,14 +35,19 @@ build/test_%: tests/test_%.c build/libneuronte.a
 # tree into build/ so that tree is left untouched. Needs zlib and pthreads.
 KITTYFB_DIR ?= $(HOME)/gpu_terminal/kilix-modules/kitty-framebuffer
 
-demo: build/neuronte-demo
+DEMOS = build/neuronte-demo build/neuronte-compare
+
+demo: $(DEMOS)
 
 build/kitty_framebuffer.o: $(KITTYFB_DIR)/src/kitty_framebuffer.c | build
 	$(CC) -std=c11 -O2 -fPIC -pthread -D_POSIX_C_SOURCE=200809L -D_DEFAULT_SOURCE \
 		-I$(KITTYFB_DIR)/include -c -o $@ $<
 
-build/neuronte-demo: demo/neuronte-demo.c build/libneuronte.a build/kitty_framebuffer.o
-	$(CC) $(NRT_CFLAGS) -pthread -I$(KITTYFB_DIR)/include -o $@ $< build/kitty_framebuffer.o \
+build/demo-common.o: demo/common.c demo/common.h include/neuronte.h | build
+	$(CC) $(NRT_CFLAGS) -pthread -I$(KITTYFB_DIR)/include -c -o $@ $<
+
+$(DEMOS): build/%: demo/%.c demo/common.h build/demo-common.o build/libneuronte.a build/kitty_framebuffer.o
+	$(CC) $(NRT_CFLAGS) -pthread -Idemo -o $@ $< build/demo-common.o build/kitty_framebuffer.o \
 		build/libneuronte.a $(LDLIBS) -lz
 
 # Rebuild the packed weights from the JSON the trainer writes.

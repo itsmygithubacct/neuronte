@@ -9,14 +9,19 @@ Games, the OS and `soft-raster` link the library and pass in the buffer.
 The same buffer can be shown in a Kilix terminal or in a GUI window. The
 library does not open the window or take the terminal.
 
-Status: local only. No remote. There are two weight files for the one
+Status: local only. No remote. There are three weight files for the one
 library. Scalars a file was not trained on get a mark of their own, not
 a letter.
 
 | Weights | Characters | Hidden width | Parameters | File |
 |---|---|---:|---:|---:|
 | `neuronte-ascii-v0` | the 95 printable ASCII characters | 128 | 44,801 | 179,408 bytes |
-| `neuronte-full-v0` | 557: ASCII, box drawing, blocks, Braille and 49 symbols | 256 | 155,137 | 620,752 bytes |
+| `neuronte-full-v1` | 560: ASCII, box drawing, blocks, Braille and 49 symbols | 256 | 155,137 | 620,752 bytes |
+| `neuronte-split-v0` | the same 560, split over three nets and a router | 3 × 128 | 136,582 | 547,656 bytes |
+
+`neuronte-split` draws the same characters as `neuronte-full` about three
+times faster, at the same quality to within a few thousandths. See
+[Split nets and the router](#split-nets-and-the-router).
 
 `neuronte-full` is for terminals and TUIs. Its characters beyond ASCII
 were picked from what Kilix terminals actually showed:
@@ -24,8 +29,9 @@ were picked from what Kilix terminals actually showed:
 - **Box drawing**, U+2500..U+257F: all 128. Light, heavy, double, dashed,
   arcs, diagonals and half lines. Lines run to the cell edges, so
   neighbouring cells join.
-- **Block elements**, U+2580..U+259F, apart from the shades ░▒▓, which
-  are dither patterns and do not scale.
+- **Block elements**, U+2580..U+259F: all 32. The shades ░▒▓ are squares
+  a quarter of a cell wide, on a lattice that tiles across cells, at 25,
+  50 and 75 percent ink.
 - **Braille**, U+2800..U+28FF: all 256, with dots on a lattice of half a
   cell width, so Braille graphics keep one pitch across cells.
 - **Symbols**: `… · ⋅ • — – ‘ ’ “ ” › ❯ × ° ½ © ≡ ≈ ※ ⁙ ⸬ ◆ ◈ ● ◉ ◯ ◐ ◑
@@ -41,13 +47,14 @@ It has no accented letters yet. Text with é gets a mark in that cell.
 | `font/symbols.txt` | The symbols of the full set, in the same form |
 | `font/code-masks.txt` | The 43 parity masks that turn a scalar into the net's 64 character inputs |
 | `train/strokes.py` | Reads the two stroke files |
-| `train/glyphs.py` | The two character sets. Makes box drawing and blocks from their Unicode names, Braille from the dot bits, and the target the net learns |
-| `train/train.py` | Trains the net. Needs torch, and wants a GPU |
-| `train/pack.py` | Packs the weights JSON into the binary file the C library loads. Documents the layout |
-| `weights/` | The trained weights, as JSON and packed, with scores and `SHA256SUMS` |
+| `train/glyphs.py` | The character sets. Makes box drawing and blocks from their Unicode names, Braille from the dot bits, and the target the net learns |
+| `train/train.py` | Trains a net on one set. Needs torch, and wants a GPU |
+| `train/gate.py` | Trains the router's gate for a bundle of nets. Needs torch; a CPU is enough |
+| `train/pack.py` | Packs weights JSON into the binary file the C library loads, one net or a bundle. Documents both layouts |
+| `weights/` | The trained weights as JSON, the packed files, the scores and `SHA256SUMS`. `neuronte-draw-v0`, `neuronte-symbol-v0` and `neuronte-gate-v0` are the parts of `neuronte-split-v0` |
 | `include/neuronte.h`, `src/` | The C library |
 | `tools/neuronte-render.c` | Draws lines of text into a PPM file |
-| `tools/neuronte-bench.c` | Times the net per cell |
+| `tools/neuronte-bench.c` | Times a net per cell, or a full net against a bundle per class of character |
 | `tests/` | UTF-8 cases, API and loader checks, and a cross-check against numpy |
 | `demo/neuronte-demo.c` | Shows the font in a Kilix terminal through `kitty-framebuffer`, with typing |
 | `demo/neuronte-compare.c` | Two weight files side by side, on examples that show where they differ |
@@ -59,53 +66,60 @@ It has no accented letters yet. Text with é gets a mark in that cell.
 make          # build/libneuronte.a, build/libneuronte.so and the tools
 make test     # needs python3 with numpy
 make bench
-./build/neuronte-render weights/neuronte-full-v0.nrt 16 out.ppm 'Hello.' '╭──╮ ⣿⣶⣤⣀ ✔'
+./build/neuronte-render weights/neuronte-split-v0.nrt 16 out.ppm 'Hello.' '╭──╮ ⣿⣶⣤⣀ ░▒▓ ✔'
 ```
 
 The library is C11 with libm and nothing else. On x86-64 it builds its
 inner loops twice, plain and AVX2, and picks one by CPU when it loads.
 `CFLAGS=-DNEURONTE_NO_CLONES` builds the plain path only.
 
-`make test` checks, for both weight files, that:
+`make test` checks, for every weight file, that:
 
 - the weights match `weights/SHA256SUMS`;
 - UTF-8 decoding follows Unicode's maximal-subpart rule, so a bad byte
   becomes one U+FFFD and never swallows the next character;
 - the loader refuses a short, long or damaged file, or one of a shape it
-  does not know;
+  does not know, and the same for bundles: overlapping or unsorted
+  ranges, a range to a net that is not there, a damaged gate, and a net
+  in the bundle that is itself bad;
 - drawing clips at every edge and blends correctly, and the draw cache
   gives the same cell after it has turned over;
 - the C library agrees with an independent float64 numpy evaluation of
   the JSON weights to 1e-3 in coverage, and the packed file is exactly
-  what `train/pack.py` makes from the JSON.
+  what `train/pack.py` makes from the JSON. For the bundle, the C router
+  must also send each of about 1,800 scalars to the net a Python router
+  picks, with the gate evaluated in numpy.
 
-For `neuronte-full` it also checks that box lines reach the cell edges,
-that █ fills its cell and ▀ the top half, that U+2800 and U+00A0 are
-blank, and that ⣿ carries about eight times the ink of ⠁.
+For `neuronte-full` and `neuronte-split` it also checks that box lines
+reach the cell edges, that █ fills its cell and ▀ the top half, that
+U+2800 and U+00A0 are blank, and that ⣿ carries about eight times the
+ink of ⠁.
 
 ## Demo
 
 ```sh
 make demo
 ./build/neuronte-demo                 # in a Kilix terminal
-./build/neuronte-demo weights/neuronte-ascii-v0.nrt
+./build/neuronte-demo weights/neuronte-full-v1.nrt
 ./build/neuronte-demo --snapshot out.ppm 1280 800
 ```
 
 Every glyph on the demo's screen, its labels included, is drawn by the
 net and shown through `kitty-framebuffer`, which `make demo` compiles from
 `KITTYFB_DIR` (default `$HOME/gpu_terminal/kilix-modules/kitty-framebuffer`).
-It loads `neuronte-full` if it can, else `neuronte-ascii`. With the full
-weights it adds a panel of box drawing, blocks, Braille and symbols, and
-two spinners that turn while it waits for keys. Type to draw text, Tab
-changes its size, Esc quits. It needs zlib.
+It loads `neuronte-split` if it can, else `neuronte-full`, else
+`neuronte-ascii`. With weights that know box drawing it adds a panel of
+box drawing, blocks, Braille and symbols, and two spinners that turn
+while it waits for keys. Type to draw text, Tab changes its size, Esc
+quits. It needs zlib.
 
-The first screen takes about 5 seconds with the full weights, since
-every cell is new. The demo shows each part as it is done. After that
-a frame takes about a millisecond.
+The first screen takes about 1.4 seconds with `neuronte-split` and about
+5 with `neuronte-full`, since every cell is new. The demo shows each part
+as it is done. After that a frame takes about a millisecond.
 
 ```sh
 ./build/neuronte-compare                      # neuronte-ascii left, neuronte-full right
+./build/neuronte-compare weights/neuronte-full-v1.nrt weights/neuronte-split-v0.nrt
 ./build/neuronte-compare LEFT.nrt RIGHT.nrt   # any two weight files
 ./build/neuronte-compare --snapshot out.ppm 1280 800
 ```
@@ -125,7 +139,7 @@ it took to draw one cell, the whole half, and the last keypress.
 #include "neuronte.h"
 
 neuronte *font;
-if (neuronte_open_file("neuronte-full-v0.nrt", &font) != NEURONTE_OK)
+if (neuronte_open_file("neuronte-split-v0.nrt", &font) != NEURONTE_OK)
     return 1;
 /* pixels: row-major 0xAARRGGBB, stride in pixels. */
 neuronte_draw_utf8(font, pixels, stride, width, height,
@@ -133,9 +147,11 @@ neuronte_draw_utf8(font, pixels, stride, width, height,
 neuronte_close(font);
 ```
 
-Either weight file works with the same calls. The file states its
-hidden width, and `neuronte_parameters()` reports the size of the net
-that was loaded. `neuronte_coverage()` returns a cell's coverage without
+Every weight file works with the same calls. The file states its
+hidden width, or for a bundle its nets and router, and
+`neuronte_parameters()` reports the size of what was loaded.
+`neuronte_nets()` and `neuronte_route()` say how many nets a file holds
+and which one draws a given scalar. `neuronte_coverage()` returns a cell's coverage without
 drawing it. `neuronte_open()` takes the weights from memory instead of a
 file. The draw calls keep up to 1,024 cells, dropping the least recently
 used, so a handle should not be shared between threads without a lock.
@@ -158,7 +174,7 @@ shapes applied in order: pen strokes, filled polygons, and cuts, which
 open the channel of a double line.
 
 ```sh
-python3 train/train.py out.json --set full --width 256   # 24 minutes on a shared RTX 3070
+python3 train/train.py out.json --set full --width 256   # 20 to 24 minutes on a shared RTX 3070
 python3 train/pack.py out.json out.nrt
 ```
 
@@ -166,6 +182,84 @@ python3 train/pack.py out.json out.nrt
 which measured the exact distance to each stroke. Retrained with the
 grid at width 128 it scores 0.953, 0.990 and 0.993 at 8, 16 and 48
 pixels, against 0.948, 0.990 and 0.992 for the shipped file.
+
+## Split nets and the router
+
+`neuronte-split-v0` is `neuronte-full` broken into nets that each know one
+part of it, each 128 wide, with a router in front:
+
+| Net | Characters | Parameters |
+|---|---|---:|
+| `neuronte-ascii-v0` | the 95 printable ASCII characters | 44,801 |
+| `neuronte-draw-v0` | 416: box drawing, blocks with the shades, Braille | 44,801 |
+| `neuronte-symbol-v0` | the 49 symbols | 44,801 |
+| `neuronte-gate-v0` | the router's gate, 64 inputs, 32 hidden, 3 outputs | 2,179 |
+
+The router is in the file. It first looks the scalar up in a table of
+ranges, made from the characters each net was trained on: 42 ranges, a
+binary search. A scalar no net was trained on goes to the gate, a small
+net over the same 64 code features the font nets take, which picks the
+net trained on most of the characters in that scalar's Unicode block,
+or the ASCII net for blocks none of them knows. So é, in Latin-1, is
+drawn by the net that knows ×, ½ and ©, and 中 by the ASCII net. The
+gate agrees with that rule on all 560 trained characters, on all 1,520
+others in their blocks, and on 99.989% of a sample of 199,250 from the
+rest. It learns from Unicode's `Blocks.txt` (15.1), which
+`train/gate.py` reads at training time; the block list is not in the
+repository.
+
+Language-model routers were set aside: the smallest considered had 45
+million parameters, hundreds of times the font, and routing is a
+function of the code point that a table answers exactly.
+
+```sh
+python3 train/train.py draw.json --set draw --width 128     # also ascii, symbol
+python3 train/gate.py gate.json ascii.json draw.json symbol.json
+python3 train/pack.py --bundle split.nrt ascii.json draw.json symbol.json --gate gate.json
+```
+
+`make bench` runs `neuronte-bench FULL BUNDLE`, which times each class of
+characters drawn by `neuronte-full` alone and by the bundle, whose time
+includes its router. One thread, no cache, on a machine with a load
+average of 10 to 20 from other work, so the times move by about 20
+percent from run to run and the ratio by less. Milliseconds per cell,
+one run:
+
+| Class | Drawn in the bundle by | Cell | `full` | `split` | Faster |
+|---|---|---|---:|---:|---:|
+| ASCII, 95 | `ascii` | 8 × 16, 2 × 2 samples | 4.65 | 1.30 | 3.6× |
+| | | 16 × 32, 2 × 2 | 17.7 | 6.1 | 2.9× |
+| | | 48 × 96, 1 | 41.8 | 12.9 | 3.2× |
+| drawing, 416 | `draw` | 8 × 16, 2 × 2 | 4.59 | 1.41 | 3.3× |
+| | | 16 × 32, 2 × 2 | 18.3 | 5.6 | 3.3× |
+| | | 48 × 96, 1 | 39.8 | 11.9 | 3.3× |
+| symbols, 49 | `symbol` | 8 × 16, 2 × 2 | 4.33 | 1.49 | 2.9× |
+| | | 16 × 32, 2 × 2 | 17.9 | 5.9 | 3.0× |
+| | | 48 × 96, 1 | 46.7 | 12.8 | 3.6× |
+
+Across runs the bundle was 2.7 to 4.2 times faster, about 3.3 in the
+middle. A net half as wide does about a quarter of the work in its
+hidden layers. The router takes about 25 nanoseconds per call through
+the table, and about 1.1 microseconds when the gate has to answer, both
+far under a millisecond cell, and the draw calls only route on a cache
+miss.
+
+The trainer's scores, with 2 × 2 samples per pixel, for each class drawn
+by the net the bundle sends it to and by `neuronte-full`:
+
+| Class | Net in the bundle | 8 px | 16 px | 48 px | `full` 8 px | 16 px | 48 px |
+|---|---|---:|---:|---:|---:|---:|---:|
+| ASCII | `ascii` | 0.9477 | 0.9900 | 0.9921 | 0.9512 | 0.9901 | 0.9884 |
+| box drawing | `draw` | 0.9359 | 0.9986 | 0.9939 | 0.9342 | 0.9995 | 0.9959 |
+| blocks and shades | `draw` | 0.9972 | 0.9964 | 0.9948 | 1.0000 | 1.0000 | 0.9995 |
+| Braille | `draw` | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| symbols | `symbol` | 0.9828 | 0.9908 | 0.9952 | 0.9793 | 0.9867 | 0.9869 |
+
+The symbol net beats `full` on symbols at every size, and the ASCII net
+at 48 pixels. `full` is ahead on box drawing at 16 and 48 pixels and on
+the shades, where the medium shade ▒, a checkerboard of 4-pixel squares
+in a 16-pixel cell, is the draw net's weakest character. A draw net 64
+wide was tried and is not good enough: 0.754 on box drawing at 8 pixels.
 
 ## Speed
 
@@ -191,28 +285,33 @@ The draw calls' cache does that.
 against the target's ink, mean over the characters, 1.0 being exact,
 with 2 × 2 samples per pixel. With 2 × 2 samples every character is
 closer to its own target than to any other at every size scored; with
-one sample at 8 pixels, 2 of the 557 in `full` are not. Characters whose
+one sample at 8 pixels, 2 of the 560 in `full` are not. Characters whose
 targets are all but the same, such as space, U+00A0 and U+2800, count
 as one.
 
 | Weights | 8 px | 16 px | 48 px |
 |---|---:|---:|---:|
 | `ascii` | 0.948 | 0.990 | 0.992 |
-| `full`, all 557 | 0.976 | 0.997 | 0.996 |
-| `full`, its ASCII | 0.952 | 0.989 | 0.988 |
-| `full`, box drawing | 0.940 | 0.999 | 0.997 |
-| `full`, blocks and Braille | 1.000 | 1.000 | 1.000 |
-| `full`, symbols | 0.976 | 0.987 | 0.986 |
+| `full`, all 560 | 0.975 | 0.997 | 0.996 |
+| `full`, its ASCII | 0.951 | 0.990 | 0.988 |
+| `full`, box drawing | 0.934 | 1.000 | 0.996 |
+| `full`, blocks, shades and Braille | 1.000 | 1.000 | 1.000 |
+| `full`, symbols | 0.979 | 0.987 | 0.987 |
 
 The weakest in `ascii` is `"` at 8 pixels, whose two marks are about one
-pixel wide there. In `full` the weakest at 8 pixels are `├`, `"` and
-`~`, and at 16 and 48 the asterisks `✳ ✶ ✽` and the dashed lines `┇ ┈`.
+pixel wide there. In `full` the weakest at 8 pixels are `┊`, `"` and
+`╞`, and at 16 and 48 the dashes `– ┈`, `▸` and the asterisks `✳ ✽`.
+For the split nets see the table above.
 
-A width-384 net trained the same way scored 0.993 on its ASCII at 48
-pixels, level with `ascii`, and 0.998 over all 557. The difference from
-256 could not be seen in renders at 40 pixels, while 384 measured about
-1.6 times slower per cell and makes a file twice the size, so `full` is
-256.
+`neuronte-full-v1` is `neuronte-full-v0` retrained with the shades. With
+2 × 2 samples it scores within 0.006 of v0 on each class at every size;
+with one sample at 8 pixels its box drawing is 0.018 lower.
+
+A width-384 net trained the same way as v0 scored 0.993 on its ASCII at
+48 pixels, level with `ascii`, and 0.998 over all 557. The difference
+from 256 could not be seen in renders at 40 pixels, while 384 measured
+about 1.6 times slower per cell and makes a file twice the size, so
+`full` is 256.
 
 Box lines are not snapped to pixels. A line's centre falls on a pixel
 edge at even cell sizes, so at 8 pixels a light line is two grey rows,

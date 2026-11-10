@@ -11,6 +11,12 @@
  * so those are computed once per sample column, sample row and cell. The
  * other layers are stored transposed so each multiply is an axpy over the
  * outputs, which skips the inputs ReLU set to zero.
+ *
+ * A weights file holds one net (version 1) or a bundle of several
+ * (version 2) with a router: a table of scalar ranges, each drawn by one
+ * net, and for scalars outside the table either a gate, a small net over
+ * the same 64 code features that picks a net, or a fallback net. The
+ * handle is the same either way; one net is a bundle of one.
  */
 #include "neuronte.h"
 
@@ -27,6 +33,10 @@
 #define LAYERS 3
 #define HEADER (8 + 5 * 4 + 4 + NMASK * 4)
 #define MAX_H 1024 /* hidden widths are multiples of 8 up to this */
+#define MAX_NETS 16
+#define MAX_RANGES 65536
+#define MAX_GATE 256 /* gate hidden width */
+#define BUNDLE_HEAD 28
 #define SETS 256 /* the draw cache: SETS x WAYS cells, least recently used out */
 #define WAYS 4
 
@@ -48,7 +58,7 @@ struct entry {
     unsigned long used;
 };
 
-struct neuronte {
+struct net {
     int h;          /* hidden width */
     float *w1_pos;  /* POS rows of h: column i of l1, as a row */
     float *w1_code; /* CODE rows of h */
@@ -61,10 +71,25 @@ struct neuronte {
     float b4;
     float tau;
     uint32_t masks[NMASK];
+    float mem[]; /* the arrays above point into this */
+};
+
+struct range {
+    uint32_t first, last, net;
+};
+
+struct neuronte {
+    int nets;
+    struct net *net[MAX_NETS];
+    struct range *ranges; /* sorted, not overlapping */
+    size_t nranges;
+    uint32_t fallback; /* the net for scalars outside the table, with no gate */
+    int gate_h;        /* the gate's hidden width, 0 for no gate */
+    uint32_t gate_masks[NMASK];
+    float *gate; /* CODE rows of gate_h (l1, transposed), gate_h bias, nets rows of gate_h, nets bias */
     int samples;
     unsigned long tick;
     struct entry cache[SETS][WAYS];
-    float mem[]; /* the arrays above point into this */
 };
 
 /* Weights and biases in a net of hidden width h. */
@@ -73,10 +98,15 @@ static size_t params(size_t h)
     return h * IN + h + 2 * (h * h + h) + h + 1;
 }
 
-/* The length of a weights file of hidden width h, or 0 if no such width. */
+/* The length of a one-net file of hidden width h, or 0 if no such width. */
 static size_t file_len(uint32_t h)
 {
     return h >= 8 && h <= MAX_H && h % 8 == 0 ? HEADER + 4 * params(h) : 0;
+}
+
+static size_t gate_params(size_t g, size_t k)
+{
+    return g * CODE + g + k * g + k;
 }
 
 static uint32_t rd32(const unsigned char *p)
@@ -92,19 +122,23 @@ static float rdf(const unsigned char *p)
     return f;
 }
 
-int neuronte_open(const void *data, size_t len, neuronte **out)
+static int finite_run(const unsigned char *p, size_t count)
 {
-    const unsigned char *p = data;
-    neuronte *n;
+    size_t i;
+    for (i = 0; i < count; i++)
+        if (!isfinite(rdf(p + 4 * i)))
+            return 0;
+    return 1;
+}
+
+/* One net from a version 1 image. */
+static int net_open(const unsigned char *p, size_t len, struct net **out)
+{
+    struct net *n;
     size_t off, len_want;
     float *m;
     int i, o, h;
 
-    if (!out)
-        return NEURONTE_ERR_ARG;
-    *out = NULL;
-    if (!data)
-        return NEURONTE_ERR_ARG;
     if (len < 28 || memcmp(p, "NEURONTE", 8) != 0 || rd32(p + 8) != 1)
         return NEURONTE_ERR_FORMAT;
     len_want = file_len(rd32(p + 20));
@@ -114,7 +148,7 @@ int neuronte_open(const void *data, size_t len, neuronte **out)
         return NEURONTE_ERR_FORMAT;
 
     h = (int)rd32(p + 20);
-    n = calloc(1, sizeof *n + (params((size_t)h) - 1) * sizeof *n->mem);
+    n = malloc(sizeof *n + (params((size_t)h) - 1) * sizeof *n->mem);
     if (!n)
         return NEURONTE_ERR_NOMEM;
     m = n->mem;
@@ -135,9 +169,8 @@ int neuronte_open(const void *data, size_t len, neuronte **out)
         if (n->masks[i] == 0 || n->masks[i] >= 1u << 21)
             goto bad;
     }
-    for (off = HEADER; off < len; off += 4)
-        if (!isfinite(rdf(p + off)))
-            goto bad;
+    if (!finite_run(p + HEADER, (len - HEADER) / 4))
+        goto bad;
 
     off = HEADER;
 #define NEXT() (off += 4, rdf(p + off - 4))
@@ -172,10 +205,137 @@ bad:
     return NEURONTE_ERR_FORMAT;
 }
 
+/* The bytes a bundle needs before its nets, or 0 if the header is bad. */
+static size_t bundle_prefix(const unsigned char *p)
+{
+    uint32_t k = rd32(p + 12), r = rd32(p + 16), fb = rd32(p + 20), g = rd32(p + 24);
+    if (k < 1 || k > MAX_NETS || r > MAX_RANGES || fb >= k || g > MAX_GATE)
+        return 0;
+    return BUNDLE_HEAD + 4 * (size_t)k + 12 * (size_t)r + (g ? 4 * (NMASK + gate_params(g, k)) : 0);
+}
+
+/* The length of a bundle from its first bundle_prefix() bytes, or 0. */
+static size_t bundle_len(const unsigned char *p)
+{
+    size_t total = bundle_prefix(p), i;
+    for (i = 0; total && i < rd32(p + 12); i++) {
+        uint32_t len = rd32(p + BUNDLE_HEAD + 4 * i);
+        if (len < HEADER || len > file_len(MAX_H))
+            return 0;
+        total += len;
+    }
+    return total;
+}
+
+static void free_handle(neuronte *n)
+{
+    int i, j;
+    for (i = 0; i < n->nets; i++)
+        free(n->net[i]);
+    for (i = 0; i < SETS; i++)
+        for (j = 0; j < WAYS; j++)
+            free(n->cache[i][j].cov);
+    free(n->ranges);
+    free(n->gate);
+    free(n);
+}
+
+static int bundle_open(const unsigned char *p, size_t len, neuronte *n)
+{
+    size_t prefix, off, i;
+    uint32_t k;
+    int rc;
+
+    if (len < BUNDLE_HEAD || (prefix = bundle_prefix(p)) == 0 || len < prefix || bundle_len(p) != len)
+        return NEURONTE_ERR_FORMAT;
+    k = rd32(p + 12);
+    n->nranges = rd32(p + 16);
+    n->fallback = rd32(p + 20);
+    n->gate_h = (int)rd32(p + 24);
+    off = BUNDLE_HEAD + 4 * (size_t)k;
+    if (n->nranges) {
+        n->ranges = malloc(n->nranges * sizeof *n->ranges);
+        if (!n->ranges)
+            return NEURONTE_ERR_NOMEM;
+    }
+    for (i = 0; i < n->nranges; i++, off += 12) {
+        struct range *r = &n->ranges[i];
+        r->first = rd32(p + off);
+        r->last = rd32(p + off + 4);
+        r->net = rd32(p + off + 8);
+        if (r->first > r->last || r->last > 0x10FFFF || r->net >= k ||
+            (i > 0 && r->first <= n->ranges[i - 1].last))
+            return NEURONTE_ERR_FORMAT;
+    }
+    if (n->gate_h) {
+        size_t g = (size_t)n->gate_h, count = gate_params(g, k), c, o;
+        const unsigned char *w;
+        for (i = 0; i < NMASK; i++, off += 4) {
+            n->gate_masks[i] = rd32(p + off);
+            if (n->gate_masks[i] == 0 || n->gate_masks[i] >= 1u << 21)
+                return NEURONTE_ERR_FORMAT;
+        }
+        if (!finite_run(p + off, count))
+            return NEURONTE_ERR_FORMAT;
+        n->gate = malloc(count * sizeof *n->gate);
+        if (!n->gate)
+            return NEURONTE_ERR_NOMEM;
+        /* l1 is stored g rows of CODE; keep it as CODE rows of g. */
+        w = p + off;
+        for (o = 0; o < g; o++)
+            for (c = 0; c < CODE; c++)
+                n->gate[c * g + o] = rdf(w + 4 * (o * CODE + c));
+        for (i = g * CODE; i < count; i++)
+            n->gate[i] = rdf(w + 4 * i);
+        off += 4 * count;
+    }
+    for (i = 0; i < k; i++) {
+        size_t nl = rd32(p + BUNDLE_HEAD + 4 * i);
+        rc = net_open(p + off, nl, &n->net[i]);
+        if (rc != NEURONTE_OK)
+            return rc;
+        n->nets++;
+        off += nl;
+    }
+    return NEURONTE_OK;
+}
+
+int neuronte_open(const void *data, size_t len, neuronte **out)
+{
+    const unsigned char *p = data;
+    neuronte *n;
+    int rc;
+
+    if (!out)
+        return NEURONTE_ERR_ARG;
+    *out = NULL;
+    if (!data)
+        return NEURONTE_ERR_ARG;
+    if (len < 12 || memcmp(p, "NEURONTE", 8) != 0 || (rd32(p + 8) != 1 && rd32(p + 8) != 2))
+        return NEURONTE_ERR_FORMAT;
+    n = calloc(1, sizeof *n);
+    if (!n)
+        return NEURONTE_ERR_NOMEM;
+    if (rd32(p + 8) == 1) {
+        rc = net_open(p, len, &n->net[0]);
+        n->nets = rc == NEURONTE_OK;
+    } else {
+        rc = bundle_open(p, len, n);
+    }
+    if (rc != NEURONTE_OK) {
+        free_handle(n);
+        return rc;
+    }
+    *out = n;
+    return NEURONTE_OK;
+}
+
+/* Read exactly the bytes the file's header says it has, and one more,
+ * which shows a file too long; never more than that. */
 int neuronte_open_file(const char *path, neuronte **out)
 {
-    unsigned char head[28], *buf;
-    size_t got, want;
+    unsigned char head[BUNDLE_HEAD], *buf = NULL;
+    size_t got, want = 0, prefix = 0;
     FILE *f;
     int rc;
 
@@ -188,21 +348,47 @@ int neuronte_open_file(const char *path, neuronte **out)
     if (!f)
         return NEURONTE_ERR_IO;
     got = fread(head, 1, sizeof head, f);
-    want = got == sizeof head ? file_len(rd32(head + 20)) : 0;
+    if (got == sizeof head && rd32(head + 8) == 1)
+        want = file_len(rd32(head + 20));
+    else if (got == sizeof head && rd32(head + 8) == 2)
+        prefix = bundle_prefix(head);
+    if (prefix) {
+        buf = malloc(prefix);
+        if (!buf) {
+            fclose(f);
+            return NEURONTE_ERR_NOMEM;
+        }
+        memcpy(buf, head, sizeof head);
+        got = sizeof head + fread(buf + sizeof head, 1, prefix - sizeof head, f);
+        want = got == prefix ? bundle_len(buf) : 0;
+        if (want == 0) {
+            rc = ferror(f) ? NEURONTE_ERR_IO : NEURONTE_ERR_FORMAT;
+            fclose(f);
+            free(buf);
+            return rc;
+        }
+    }
     if (ferror(f) || want == 0) {
-        /* Too short or an unknown width: let neuronte_open say which. */
+        /* Too short or a bad header: let neuronte_open say which. */
         rc = ferror(f) ? NEURONTE_ERR_IO : neuronte_open(head, got, out);
         fclose(f);
+        free(buf);
         return rc;
     }
-    buf = malloc(want + 1);
-    if (!buf) {
-        fclose(f);
-        return NEURONTE_ERR_NOMEM;
+    {
+        unsigned char *all = realloc(buf, want + 1);
+        if (!all) {
+            free(buf);
+            fclose(f);
+            return NEURONTE_ERR_NOMEM;
+        }
+        buf = all;
     }
-    memcpy(buf, head, sizeof head);
-    /* One byte more than the width needs shows a file too long. */
-    got = sizeof head + fread(buf + sizeof head, 1, want + 1 - sizeof head, f);
+    if (!prefix) {
+        memcpy(buf, head, sizeof head);
+        prefix = sizeof head;
+    }
+    got = prefix + fread(buf + prefix, 1, want + 1 - prefix, f);
     rc = ferror(f) ? NEURONTE_ERR_IO : neuronte_open(buf, got, out);
     fclose(f);
     free(buf);
@@ -211,18 +397,24 @@ int neuronte_open_file(const char *path, neuronte **out)
 
 size_t neuronte_parameters(const neuronte *n)
 {
-    return n ? params((size_t)n->h) : 0;
+    size_t total = 0;
+    int i;
+    if (!n)
+        return 0;
+    for (i = 0; i < n->nets; i++)
+        total += params((size_t)n->net[i]->h);
+    return total + (n->gate_h ? gate_params((size_t)n->gate_h, (size_t)n->nets) : 0);
+}
+
+int neuronte_nets(const neuronte *n)
+{
+    return n ? n->nets : 0;
 }
 
 void neuronte_close(neuronte *n)
 {
-    int i, j;
-    if (!n)
-        return;
-    for (i = 0; i < SETS; i++)
-        for (j = 0; j < WAYS; j++)
-            free(n->cache[i][j].cov);
-    free(n);
+    if (n)
+        free_handle(n);
 }
 
 int neuronte_set_samples(neuronte *n, int per_axis)
@@ -248,8 +440,58 @@ static int parity(uint32_t v)
     return (int)(v & 1);
 }
 
+/* The 64 code features of s, each -1 or +1. */
+static void code_of(uint32_t s, const uint32_t *masks, float *v)
+{
+    int i;
+    for (i = 0; i < CODE; i++)
+        v[i] = (i < 21 ? (s >> i) & 1 : (uint32_t)parity(s & masks[i - 21])) ? 1.0f : -1.0f;
+}
+
+/* The net the gate picks for s: the first of the highest outputs. */
+static int gate_pick(const neuronte *n, uint32_t s)
+{
+    float v[CODE], hid[MAX_GATE], best = 0.0f;
+    const float *b1, *w2, *b2;
+    int g = n->gate_h, i, o, pick = 0;
+
+    code_of(s, n->gate_masks, v);
+    b1 = n->gate + (size_t)g * CODE;
+    w2 = b1 + g;
+    b2 = w2 + (size_t)n->nets * g;
+    memcpy(hid, b1, (size_t)g * sizeof *hid);
+    for (i = 0; i < CODE; i++)
+        for (o = 0; o < g; o++)
+            hid[o] += v[i] * n->gate[(size_t)i * g + o];
+    for (i = 0; i < n->nets; i++) {
+        float z = b2[i];
+        for (o = 0; o < g; o++)
+            z += w2[(size_t)i * g + o] * (hid[o] > 0.0f ? hid[o] : 0.0f);
+        if (i == 0 || z > best) {
+            best = z;
+            pick = i;
+        }
+    }
+    return pick;
+}
+
+static int route(const neuronte *n, uint32_t s)
+{
+    size_t lo = 0, hi = n->nranges;
+    while (lo < hi) {
+        size_t mid = lo + (hi - lo) / 2;
+        if (n->ranges[mid].last < s)
+            lo = mid + 1;
+        else
+            hi = mid;
+    }
+    if (lo < n->nranges && n->ranges[lo].first <= s)
+        return (int)n->ranges[lo].net;
+    return n->gate_h ? gate_pick(n, s) : (int)n->fallback;
+}
+
 /* l1 bias plus the character's columns of l1. */
-static void char_part(const neuronte *n, uint32_t s, float *c)
+static void char_part(const struct net *n, uint32_t s, float *c)
 {
     int i, o, h = n->h;
     memcpy(c, n->b1, (size_t)h * sizeof *c);
@@ -266,7 +508,7 @@ static void char_part(const neuronte *n, uint32_t s, float *c)
  * is y in 0..2. Feature 0 is 2x - 1 and feature 1 is y - 1. For octave k
  * features 2+4k and 3+4k are sin(w x) and sin(w y), 4+4k and 5+4k are
  * cos(w x) and cos(w y), with w = 2 pi 2^k. */
-static void axis_part(const neuronte *n, int axis, double t, float *out)
+static void axis_part(const struct net *n, int axis, double t, float *out)
 {
     const double two_pi = 6.283185307179586476925286766559;
     float v = axis == 0 ? (float)(2.0 * t - 1.0) : (float)(t - 1.0);
@@ -302,7 +544,7 @@ HOT static void dense(const float *restrict w, const float *restrict b, const fl
 }
 
 /* The field at one sample. scratch holds 3 h floats. */
-HOT static float field(const neuronte *n, const float *c, const float *xp, const float *yp,
+HOT static float field(const struct net *n, const float *c, const float *xp, const float *yp,
                        float *scratch)
 {
     int o, h = n->h;
@@ -324,18 +566,26 @@ static int auto_samples(int cell_w)
     return cell_w < 24 ? 2 : 1;
 }
 
-int neuronte_coverage(const neuronte *n, uint32_t scalar, int cell_w, int cell_h,
+int neuronte_route(const neuronte *n, uint32_t scalar)
+{
+    return n ? route(n, normalize(scalar)) : NEURONTE_ERR_ARG;
+}
+
+int neuronte_coverage(const neuronte *hd, uint32_t scalar, int cell_w, int cell_h,
                       int samples_per_axis, float *coverage)
 {
+    const struct net *n;
     float *mem, *c, *scratch, *xp, *yp, slope;
     int ss = samples_per_axis, sw, sh, i, j, px, py;
     size_t h;
 
-    if (!n || !coverage || cell_w <= 0 || cell_h <= 0 || cell_w > NEURONTE_MAX_CELL ||
+    if (!hd || !coverage || cell_w <= 0 || cell_h <= 0 || cell_w > NEURONTE_MAX_CELL ||
         cell_h > NEURONTE_MAX_CELL || ss < 0 || ss > NEURONTE_MAX_SAMPLES)
         return NEURONTE_ERR_ARG;
     if (ss == 0)
         ss = auto_samples(cell_w);
+    scalar = normalize(scalar);
+    n = hd->net[route(hd, scalar)];
     sw = cell_w * ss;
     sh = cell_h * ss;
     h = (size_t)n->h;
@@ -346,7 +596,7 @@ int neuronte_coverage(const neuronte *n, uint32_t scalar, int cell_w, int cell_h
     scratch = c + h;
     xp = scratch + 3 * h;
     yp = xp + (size_t)sw * h;
-    char_part(n, normalize(scalar), c);
+    char_part(n, scalar, c);
     for (i = 0; i < sw; i++)
         axis_part(n, 0, (i + 0.5) / sw, xp + (size_t)i * h);
     for (j = 0; j < sh; j++)

@@ -6,7 +6,14 @@ LDLIBS = -lm
 PYTHON ?= python3
 
 ASCII = weights/neuronte-ascii-v0
-FULL = weights/neuronte-full-v0
+FULL = weights/neuronte-full-v1
+# The bundle: the ASCII net and the subset nets, with the gate the router
+# asks about characters none of them was trained on.
+DRAW = weights/neuronte-draw-v0
+SYMBOL = weights/neuronte-symbol-v0
+GATE = weights/neuronte-gate-v0.json
+SPLIT = weights/neuronte-split-v0.nrt
+NETS = $(ASCII).json $(DRAW).json $(SYMBOL).json
 OBJS = build/neuronte.o build/utf8.o
 TOOLS = build/neuronte-render build/neuronte-bench
 TESTS = build/test_utf8 build/test_api
@@ -50,24 +57,27 @@ $(DEMOS): build/%: demo/%.c demo/common.h build/demo-common.o build/libneuronte.
 	$(CC) $(NRT_CFLAGS) -pthread -Idemo -o $@ $< build/demo-common.o build/kitty_framebuffer.o \
 		build/libneuronte.a $(LDLIBS) -lz
 
-# Rebuild the packed weights from the JSON the trainer writes.
-pack: $(ASCII).json $(FULL).json
+# Rebuild the packed weights from the JSON the trainers write.
+pack: $(ASCII).json $(FULL).json $(NETS) $(GATE)
 	$(PYTHON) train/pack.py $(ASCII).json $(ASCII).nrt
 	$(PYTHON) train/pack.py $(FULL).json $(FULL).nrt
-	cd weights && sha256sum $(notdir $(ASCII)).json $(notdir $(ASCII)).nrt \
-		$(notdir $(FULL)).json $(notdir $(FULL)).nrt > SHA256SUMS
+	$(PYTHON) train/pack.py --bundle $(SPLIT) $(NETS) --gate $(GATE)
+	cd weights && sha256sum *.json *.nrt > SHA256SUMS
 
 test: all $(TESTS)
 	cd weights && sha256sum -c --quiet SHA256SUMS
 	./build/test_utf8
 	./build/test_api $(ASCII).nrt
 	./build/test_api $(FULL).nrt --full
+	./build/test_api $(SPLIT) --full
 	$(PYTHON) tests/check_reference.py build/libneuronte.so $(ASCII).json $(ASCII).nrt
 	$(PYTHON) tests/check_reference.py build/libneuronte.so $(FULL).json $(FULL).nrt
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --bundle $(SPLIT) $(NETS) --gate $(GATE)
 
 bench: build/neuronte-bench
 	./build/neuronte-bench $(ASCII).nrt
 	./build/neuronte-bench $(FULL).nrt
+	./build/neuronte-bench $(FULL).nrt $(SPLIT)
 
 clean:
 	rm -rf build

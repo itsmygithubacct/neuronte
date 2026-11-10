@@ -24,7 +24,7 @@ import strokes  # noqa: E402
 
 p = argparse.ArgumentParser()
 p.add_argument("out")
-p.add_argument("--set", default="ascii", choices=["ascii", "full"])
+p.add_argument("--set", default="ascii", choices=list(glyphs.SETS))
 p.add_argument("--width", type=int, default=128, help="hidden layer width")
 p.add_argument("--steps", type=int, default=20000)
 p.add_argument("--device", default="cuda")
@@ -36,6 +36,14 @@ a = p.parse_args()
 torch.manual_seed(a.seed)
 torch.set_default_device(a.device)
 
+
+def sha(rel):
+    with open(os.path.join(strokes.ROOT, rel), "rb") as fh:
+        return hashlib.sha256(fh.read()).hexdigest()
+
+
+# Taken now, so the record names the files the targets were made from.
+SOURCES = {f: sha(f) for f in glyphs.sources(a.set)}
 TAU, OCT, W, N = 0.15, 6, a.width, a.grid
 SET = glyphs.charset(a.set)
 CHARS = [c for c, _, _ in SET]
@@ -177,11 +185,6 @@ def ranges(scalars):
     return " ".join(out)
 
 
-def sha(rel):
-    with open(os.path.join(strokes.ROOT, rel), "rb") as fh:
-        return hashlib.sha256(fh.read()).hexdigest()
-
-
 lin = [m for m in net if isinstance(m, torch.nn.Linear)]
 
 
@@ -195,7 +198,7 @@ doc = {
     "shape": {"position_octaves": OCT, "code_bits": 64, "hidden_width": W, "hidden_layers": 3,
               "tau": TAU, "parity_masks": [f"0x{m:06X}" for m in MASKS]},
     "training": {"set": a.set, "labelled": ranges(ord(c) for c in CHARS),
-                 "sources_sha256": {f: sha(f) for f in glyphs.sources(a.set)},
+                 "sources_sha256": SOURCES,
                  "pen_radius": a.pen, "grid": N, "steps": a.steps, "seed": a.seed,
                  "unlabelled_weight": a.unlabelled},
     "layers": {name: {"rows": l.weight.shape[0], "cols": l.weight.shape[1],

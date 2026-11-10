@@ -7,7 +7,7 @@
  * Type to draw text. Tab changes the size of the typed text, Backspace
  * deletes, Enter starts a new line, Esc or Ctrl-C quits. --snapshot draws
  * the first screen into a PPM file with no terminal. The default weights
- * are neuronte-full, else neuronte-ascii. With weights that know box
+ * are neuronte-split, else neuronte-full, else neuronte-ascii. With weights that know box
  * drawing, a panel of it, blocks, Braille and symbols is shown, with two
  * spinners that turn while the demo waits for keys. MIT licence. */
 #define _POSIX_C_SOURCE 200809L
@@ -40,7 +40,7 @@ static const char *panel[] = {
     "┗━━━━┻━━━━┛ "
     "╚════╩════╝ "
     "└┄┄┄┄┘  ▀▔▐▕ ╱╲╳╱╲  "
-    "⎿ done ✔ ☐ ☒",
+    "⎿ done ✔ ☐ ☒  ░░▒▒▓▓",
     "● ◆ ◈ ◐ ◑ ◉ ◯ ▲ ▼ ▾ ▸ ⏵ ❯ › "
     "← → ↑ ↓ ↗ ⇣ ✻ ✢ ✶ ✽ ✳ · • "
     "… — – ‘’ “” × ≡ ≈ ° ½ © "
@@ -64,10 +64,15 @@ static void draw_static(neuronte *n, const struct screen *s, const struct state 
     int small = s->w >= 1100 ? 10 : 8;
 
     fill(s, 0, 0, s->w, s->h, BG);
-    y = line(n, s, m, y, s->w >= 1100 ? 40 : 28, st->full ? "Neuronte full" : "Neuronte", INK);
+    y = line(n, s, m, y, s->w >= 1100 ? 40 : 28,
+             neuronte_nets(n) > 1 ? "Neuronte split" : st->full ? "Neuronte full" : "Neuronte", INK);
     thousands(neuronte_parameters(n), count);
-    snprintf(buf, sizeof buf, "Every glyph on this screen is drawn by a %s-weight neural net. No font file.",
-             count);
+    if (neuronte_nets(n) > 1)
+        snprintf(buf, sizeof buf, "Every glyph on this screen is drawn by %d neural nets, %s weights in all. No font file.",
+                 neuronte_nets(n), count);
+    else
+        snprintf(buf, sizeof buf, "Every glyph on this screen is drawn by a %s-weight neural net. No font file.",
+                 count);
     y = line(n, s, m, y, small, buf, DIM);
     y += small;
     fill(s, m, y, s->w - m, y + 1, RULE);
@@ -223,19 +228,19 @@ static int run(neuronte *n)
     return rc;
 }
 
-/* Open the named weights, or by default the full set, else ASCII. */
+/* Open the named weights, or by default the first of these that loads. */
 static int open_weights(const char *path, neuronte **n)
 {
-    int rc;
-    if (path) {
+    static const char *const defaults[] = {"weights/neuronte-split-v0.nrt", "weights/neuronte-full-v1.nrt",
+                                           "weights/neuronte-ascii-v0.nrt"};
+    int rc = NEURONTE_ERR_ARG;
+    size_t i;
+    if (path)
         rc = neuronte_open_file(path, n);
-    } else {
-        path = "weights/neuronte-full-v0.nrt";
-        rc = neuronte_open_file(path, n);
-        if (rc != NEURONTE_OK) {
-            path = "weights/neuronte-ascii-v0.nrt";
-            rc = neuronte_open_file(path, n);
-        }
+    for (i = 0; !path && i < sizeof defaults / sizeof defaults[0]; i++) {
+        rc = neuronte_open_file(defaults[i], n);
+        if (rc == NEURONTE_OK || i + 1 == sizeof defaults / sizeof defaults[0])
+            path = defaults[i];
     }
     if (rc != NEURONTE_OK)
         fprintf(stderr, "%s: cannot load weights (%d)\n", path, rc);

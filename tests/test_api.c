@@ -1,13 +1,17 @@
-/* Loader refusals, drawing, clipping and blending. MIT licence.
+/* Loader refusals, drawing, clipping, blending and bundles. MIT licence.
  * usage: test_api WEIGHTS.nrt [--full]
  * --full adds checks of box drawing, blocks and Braille, for weights
- * trained on them. */
+ * trained on them. Given a one-net file, it also checks the loader's
+ * refusals by damaging that file, and builds bundles from it to check the
+ * router. Given a bundle, it checks the drawing only. */
+#define _POSIX_C_SOURCE 200809L
 #include "neuronte.h"
 
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 static int failed;
 #define FAIL(...) (printf("FAIL " __VA_ARGS__), putchar('\n'), failed = 1)
@@ -85,6 +89,214 @@ static unsigned char *zero_net(const unsigned char *like, size_t *len)
     return p;
 }
 
+/* A bundle of nets a and b, with the ranges given as (first, last, net)
+ * triples, a fallback net and, when g > 0, a gate of hidden width g whose
+ * parameters are gate (g x 64 l1 weight, g bias, 2 x g out weight, 2 bias). */
+static unsigned char *bundle(const unsigned char *a, size_t alen, const unsigned char *b, size_t blen,
+                             const uint32_t *ranges, uint32_t nranges, uint32_t fallback, uint32_t g,
+                             const float *gate, const unsigned char *masks_from, size_t *len)
+{
+    size_t gp = g ? 43 + (size_t)g * 64 + g + 2 * g + 2 : 0, off = 28, i;
+    unsigned char *p;
+    *len = 28 + 8 + 12 * (size_t)nranges + 4 * gp + alen + blen;
+    p = malloc(*len);
+    if (!p)
+        return NULL;
+    memcpy(p, "NEURONTE", 8);
+    put32(p + 8, 2);
+    put32(p + 12, 2);
+    put32(p + 16, nranges);
+    put32(p + 20, fallback);
+    put32(p + 24, g);
+    put32(p + off, (uint32_t)alen);
+    put32(p + off + 4, (uint32_t)blen);
+    off += 8;
+    for (i = 0; i < 3 * (size_t)nranges; i++, off += 4)
+        put32(p + off, ranges[i]);
+    if (g) {
+        memcpy(p + off, masks_from + 32, 43 * 4);
+        off += 43 * 4;
+        for (i = 0; i < gp - 43; i++, off += 4) {
+            uint32_t u;
+            memcpy(&u, &gate[i], 4);
+            put32(p + off, u);
+        }
+    }
+    memcpy(p + off, a, alen);
+    memcpy(p + off + alen, b, blen);
+    return p;
+}
+
+static void bundle_checks(const unsigned char *data, size_t len)
+{
+    enum { W = 16, H = 32, G = 8 };
+    static const uint32_t az[] = {0x41, 0x5A, 1};
+    float c[W * H], d[W * H], gate[G * 64 + G + 2 * G + 2];
+    size_t zlen, blen, i;
+    unsigned char *z = zero_net(data, &zlen), *b;
+    neuronte *n, *one;
+
+    if (!z || neuronte_open(data, len, &one) != NEURONTE_OK) {
+        FAIL("bundle checks: cannot open the net");
+        free(z);
+        return;
+    }
+
+    /* Net 1, all zeros, draws A..Z; the real net draws the rest. */
+    b = bundle(data, len, z, zlen, az, 1, 0, 0, NULL, data, &blen);
+    if (!b || neuronte_open(b, blen, &n) != NEURONTE_OK) {
+        FAIL("a bundle of two nets refused");
+    } else {
+        if (neuronte_nets(n) != 2 || neuronte_nets(one) != 1)
+            FAIL("nets: %d in the bundle, %d in the one-net file", neuronte_nets(n), neuronte_nets(one));
+        if (neuronte_route(n, 'A') != 1 || neuronte_route(n, 'Z') != 1 || neuronte_route(n, '@') != 0 ||
+            neuronte_route(n, '[') != 0 || neuronte_route(n, 0x4E2D) != 0 || neuronte_route(one, 'A') != 0)
+            FAIL("table routes wrong");
+        if (neuronte_parameters(n) != neuronte_parameters(one) + 881)
+            FAIL("bundle has %zu parameters", neuronte_parameters(n));
+        neuronte_coverage(n, 'A', W, H, 0, c);
+        for (i = 0; i < W * H; i++)
+            if (c[i] != 0.5f) {
+                FAIL("A in the bundle is not drawn by the zero net");
+                break;
+            }
+        neuronte_coverage(n, 'g', W, H, 0, c);
+        neuronte_coverage(one, 'g', W, H, 0, d);
+        if (memcmp(c, d, sizeof c) != 0)
+            FAIL("g in the bundle differs from the net alone");
+        {
+            uint32_t px[W * H], q[W * H];
+            for (i = 0; i < W * H; i++)
+                px[i] = q[i] = 0xFF000000u;
+            neuronte_draw_scalar(n, px, W, W, H, 0, 0, W, H, 'g', 0xFFFFFFFFu);
+            neuronte_draw_scalar(one, q, W, W, H, 0, 0, W, H, 'g', 0xFFFFFFFFu);
+            if (memcmp(px, q, sizeof px) != 0)
+                FAIL("draw g in the bundle differs from the net alone");
+        }
+        /* The same bytes from a file. */
+        {
+            char path[] = "/tmp/neuronte-test-XXXXXX";
+            int fd = mkstemp(path);
+            neuronte *f;
+            if (fd < 0 || write(fd, b, blen) != (ssize_t)blen) {
+                FAIL("cannot write a bundle file");
+            } else {
+                if (neuronte_open_file(path, &f) != NEURONTE_OK) {
+                    FAIL("open_file refused a bundle");
+                } else {
+                    neuronte_coverage(f, 'g', W, H, 0, c);
+                    if (memcmp(c, d, sizeof c) != 0 || neuronte_route(f, 'Q') != 1)
+                        FAIL("bundle from a file differs");
+                    neuronte_close(f);
+                }
+                if (write(fd, "", 1) != 1 || neuronte_open_file(path, &f) != NEURONTE_ERR_FORMAT)
+                    FAIL("a bundle file one byte long accepted");
+                if (ftruncate(fd, (off_t)blen - 1) != 0 || neuronte_open_file(path, &f) != NEURONTE_ERR_FORMAT)
+                    FAIL("a bundle file one byte short accepted");
+                if (ftruncate(fd, 30) != 0 || neuronte_open_file(path, &f) != NEURONTE_ERR_FORMAT)
+                    FAIL("a bundle file cut in its header accepted");
+            }
+            if (fd >= 0) {
+                close(fd);
+                unlink(path);
+            }
+        }
+        neuronte_close(n);
+    }
+    free(b);
+
+    b = bundle(data, len, z, zlen, az, 1, 1, 0, NULL, data, &blen);
+    if (!b || neuronte_open(b, blen, &n) != NEURONTE_OK) {
+        FAIL("a bundle with fallback 1 refused");
+    } else {
+        if (neuronte_route(n, 'a') != 1 || neuronte_route(n, 'A') != 1)
+            FAIL("fallback 1 not taken");
+        neuronte_close(n);
+    }
+    free(b);
+
+    /* A gate whose hidden unit 3 is code bit 5 of the scalar (+1 or -1):
+     * net 1 when bit 5 is set, net 0 when clear. */
+    memset(gate, 0, sizeof gate);
+    gate[3 * 64 + 5] = 1.0f;          /* l1 row 3, column 5 */
+    gate[G * 64 + G + 1 * G + 3] = 2.0f; /* out row 1, column 3 */
+    gate[G * 64 + G + 2 * G] = 1.0f;     /* out bias of net 0 */
+    b = bundle(data, len, z, zlen, az, 1, 0, G, gate, data, &blen);
+    if (!b || neuronte_open(b, blen, &n) != NEURONTE_OK) {
+        FAIL("a bundle with a gate refused");
+    } else {
+        /* 0x40 and 0x80 have bit 5 clear, 0x60 and 0x7E set; A..Z by table. */
+        if (neuronte_route(n, 0x40) != 0 || neuronte_route(n, 0x80) != 0 || neuronte_route(n, 0x60) != 1 ||
+            neuronte_route(n, 0x7E) != 1 || neuronte_route(n, 'A') != 1 || neuronte_route(n, 'Z') != 1)
+            FAIL("gate routes wrong");
+        if (neuronte_parameters(n) != neuronte_parameters(one) + 881 + G * 64 + G + 2 * G + 2)
+            FAIL("bundle with a gate has %zu parameters", neuronte_parameters(n));
+        neuronte_close(n);
+    }
+    free(b);
+
+    /* Refusals. */
+    {
+        static const uint32_t overlap[] = {0x41, 0x5A, 1, 0x50, 0x60, 0};
+        static const uint32_t unsorted[] = {0x61, 0x7A, 1, 0x41, 0x5A, 0};
+        static const uint32_t bad_net[] = {0x41, 0x5A, 2};
+        static const uint32_t past[] = {0x41, 0x110000, 1};
+        static const uint32_t reversed[] = {0x5A, 0x41, 1};
+        struct { const char *name; const uint32_t *r; uint32_t nr, fb, g; } cases[] = {
+            {"overlapping ranges", overlap, 2, 0, 0},  {"unsorted ranges", unsorted, 2, 0, 0},
+            {"a range to net 2 of 2", bad_net, 1, 0, 0}, {"a range past U+10FFFF", past, 1, 0, 0},
+            {"a range ending before it starts", reversed, 1, 0, 0}, {"fallback 2 of 2", az, 1, 2, 0},
+            {"gate width 257", az, 1, 0, 257},
+        };
+        unsigned char *gb;
+        size_t gl;
+        for (i = 0; i < sizeof cases / sizeof cases[0]; i++) {
+            float *big = calloc(257 * 64 + 257 + 2 * 257 + 2, sizeof *big);
+            b = bundle(data, len, z, zlen, cases[i].r, cases[i].nr, cases[i].fb, cases[i].g, big, data, &blen);
+            if (b)
+                expect_open(cases[i].name, b, blen, NEURONTE_ERR_FORMAT);
+            free(b);
+            free(big);
+        }
+        b = bundle(data, len, z, zlen, az, 1, 0, 0, NULL, data, &blen);
+        expect_open("bundle one byte short", b, blen - 1, NEURONTE_ERR_FORMAT);
+        put32(b + 12, 0);
+        expect_open("bundle of 0 nets", b, blen, NEURONTE_ERR_FORMAT);
+        put32(b + 12, 17);
+        expect_open("bundle of 17 nets", b, blen, NEURONTE_ERR_FORMAT);
+        put32(b + 12, 2);
+        /* The two lengths moved by 4 each way: the total is right, the
+         * nets are not. */
+        put32(b + 28, (uint32_t)len - 4);
+        put32(b + 32, (uint32_t)zlen + 4);
+        expect_open("net lengths shifted", b, blen, NEURONTE_ERR_FORMAT);
+        put32(b + 28, (uint32_t)len);
+        put32(b + 32, (uint32_t)zlen);
+        expect_open("bundle restored", b, blen, NEURONTE_OK);
+        put32(b + 28 + 8 + 12 + len + 20, 100); /* net 1 hidden width */
+        expect_open("a net of width 100 in a bundle", b, blen, NEURONTE_ERR_SHAPE);
+        free(b);
+
+        gb = bundle(data, len, z, zlen, az, 1, 0, G, gate, data, &gl);
+        put32(gb + 28 + 8 + 12, 0);
+        expect_open("gate with a zero mask", gb, gl, NEURONTE_ERR_FORMAT);
+        free(gb);
+        gb = bundle(data, len, z, zlen, az, 1, 0, G, gate, data, &gl);
+        put32(gb + 28 + 8 + 12 + 43 * 4 + 4 * 7, 0x7FC00000u);
+        expect_open("gate with a NaN", gb, gl, NEURONTE_ERR_FORMAT);
+        free(gb);
+    }
+    {
+        unsigned char *v1 = malloc(len);
+        memcpy(v1, data, len);
+        put32(v1 + 8, 2);
+        expect_open("a one-net file marked version 2", v1, len, NEURONTE_ERR_FORMAT);
+        free(v1);
+    }
+    neuronte_close(one);
+    free(z);
+}
+
 static void full_checks(neuronte *n)
 {
     enum { W = 16, H = 32 };
@@ -140,7 +352,7 @@ int main(int argc, char **argv)
     enum { CW = 16, CH = 32, BW = 64, BH = 48 };
     float cov[CW * CH], cov2[CW * CH];
     uint32_t buf[BW * BH], ref[BW * BH];
-    int i, rc;
+    int i, rc, bundled;
 
     if (argc < 2 || argc > 3 || (argc == 3 && strcmp(argv[2], "--full") != 0)) {
         fprintf(stderr, "usage: %s WEIGHTS.nrt [--full]\n", argv[0]);
@@ -152,6 +364,9 @@ int main(int argc, char **argv)
         return 2;
     }
     copy = malloc(len + 1);
+    bundled = len >= 12 && data[8] == 2;
+    if (bundled)
+        goto drawing;
 
     /* Refusals. */
     expect_open("good file", data, len, NEURONTE_OK);
@@ -163,8 +378,8 @@ int main(int argc, char **argv)
     copy[0] = 'X';
     expect_open("bad magic", copy, len, NEURONTE_ERR_FORMAT);
     memcpy(copy, data, len);
-    put32(copy + 8, 2);
-    expect_open("version 2", copy, len, NEURONTE_ERR_FORMAT);
+    put32(copy + 8, 3);
+    expect_open("version 3", copy, len, NEURONTE_ERR_FORMAT);
     memcpy(copy, data, len);
     put32(copy + 20, 64);
     expect_open("hidden width 64 in a file of another width", copy, len, NEURONTE_ERR_FORMAT);
@@ -206,13 +421,17 @@ int main(int argc, char **argv)
     if (neuronte_open_file("/nonexistent/neuronte.nrt", &n) != NEURONTE_ERR_IO)
         FAIL("missing file not reported as IO");
 
+drawing:
     rc = neuronte_open(data, len, &n);
     if (rc != NEURONTE_OK) {
         printf("cannot open weights (%d)\n", rc);
         return 1;
     }
-    if (neuronte_parameters(n) != (len - 204) / 4)
+    if (!bundled && neuronte_parameters(n) != (len - 204) / 4)
         FAIL("parameters %zu for a file of %zu bytes", neuronte_parameters(n), len);
+    if (bundled && (neuronte_nets(n) < 2 || neuronte_parameters(n) == 0 ||
+                    4 * neuronte_parameters(n) >= len))
+        FAIL("bundle of %d nets, %zu parameters, %zu bytes", neuronte_nets(n), neuronte_parameters(n), len);
     {
         neuronte *f;
         if (neuronte_open_file(argv[1], &f) != NEURONTE_OK) {
@@ -356,6 +575,8 @@ int main(int argc, char **argv)
 
     if (argc == 3)
         full_checks(n);
+    if (!bundled)
+        bundle_checks(data, len);
 
     neuronte_close(n);
     free(copy);

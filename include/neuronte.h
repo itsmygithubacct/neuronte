@@ -42,13 +42,23 @@ enum {
 
 /* Load weights from memory (the bytes are copied) or from a file. The
  * same calls load any of the weight files: they differ in hidden width,
- * which the file states, and in which characters were trained. */
+ * which the file states, and in which characters were trained. A file
+ * may also be a bundle of several nets with a router that sends each
+ * scalar to one of them; the calls below work the same on it. */
 int neuronte_open(const void *data, size_t len, neuronte **out);
 int neuronte_open_file(const char *path, neuronte **out);
 void neuronte_close(neuronte *n);
 
-/* The number of weights and biases in the loaded net, or 0 for NULL. */
+/* The number of weights and biases, over all nets and the router's gate,
+ * or 0 for NULL. */
 size_t neuronte_parameters(const neuronte *n);
+
+/* How many nets the file holds: 1, or more for a bundle. 0 for NULL. */
+int neuronte_nets(const neuronte *n);
+
+/* Which net draws the scalar, from 0, after the same replacement the draw
+ * calls make. NEURONTE_ERR_ARG for NULL. */
+int neuronte_route(const neuronte *n, uint32_t scalar);
 
 /* Decode one Unicode scalar from the front of s. Returns the number of
  * bytes consumed, which is at least 1 when len > 0, and 0 when len is 0.

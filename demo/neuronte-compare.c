@@ -54,7 +54,7 @@ static const char *tree[] = {
     "└── README.md",
 };
 static const char bar[] =
-    "▕████████▍   ▏ 70%  "
+    "▕██████▍  ▏ 70% ░▒▓█ "
     "▁▂▃▄▅▆▇█▇▆▅▄▃▂▁";
 /* ASCII beside the characters it stands in for. */
 static const char punct[] = "- – — ─  ' ’  \" “ ”  ... …  * •";
@@ -62,7 +62,7 @@ static const char symbols[] =
     "← → ↑ ↓  ✔ ☐ ☒  ● ◆ ▲ ▼  "
     "× ½ © °  ✻ ✢ ✶ ✽ ✳";
 static const char neither[] =
-    "é ü ñ  中 文  ∑ ∞  ░ ▒ ▓  \U0001F600";
+    "é ü ñ  中 文  ∑ ∞  \U0001F600";
 
 /* A sine wave two Braille cells high and `cells` wide, as two UTF-8 rows. */
 static void braille_wave(int cells, char rows[2][256])
@@ -120,7 +120,10 @@ static void draw_column(struct side *d, const struct screen *whole, int (*show)(
     y = line(n, s, 0, y, 16, d->name, INK);
     thousands(neuronte_parameters(n), a);
     thousands(204 + 4 * neuronte_parameters(n), b);
-    snprintf(buf, sizeof buf, "%s weights, %s bytes. Draws all of this column.", a, b);
+    if (neuronte_nets(n) > 1)
+        snprintf(buf, sizeof buf, "%s weights in %d nets, one picked per character.", a, neuronte_nets(n));
+    else
+        snprintf(buf, sizeof buf, "%s weights, %s bytes. Draws all of this column.", a, b);
     y = line(n, s, 0, y, small, buf, DIM);
     y = line(n, s, 0, y, small,
              d->full ? "Trained on ASCII, box drawing, blocks, Braille, symbols."
@@ -327,7 +330,7 @@ static int open_side(struct side *d, const char *path)
 
 int main(int argc, char **argv)
 {
-    const char *left = "weights/neuronte-ascii-v0.nrt", *right = "weights/neuronte-full-v0.nrt";
+    const char *left = "weights/neuronte-ascii-v0.nrt", *right = "weights/neuronte-full-v1.nrt";
     struct side d[2];
     int snap = argc >= 3 && strcmp(argv[1], "--snapshot") == 0, w = 1280, h = 800, rc;
 

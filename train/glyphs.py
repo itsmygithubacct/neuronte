@@ -7,14 +7,17 @@ A glyph is a list of shapes in cell units, x 0..1 across the cell and y
     ("poly", [(x, y), ...])      add a filled polygon
     ("cut", shape)               take a shape away
 
-Sets:
+Tiers:
 
-    ascii  U+0020..U+007E, from font/strokes.txt.
-    full   ascii; box drawing U+2500..U+257F and block elements
-           U+2580..U+259F except the shades U+2591..U+2593, made here
-           from their Unicode names; Braille U+2800..U+28FF, made here
-           from the dot bits; the symbols in font/symbols.txt; and five
-           asterisks made here.
+    ascii    U+0020..U+007E, from font/strokes.txt.
+    box      box drawing U+2500..U+257F, made here from the Unicode names.
+    block    block elements U+2580..U+259F, from the names, and the
+             shades U+2591..U+2593 as dither patterns.
+    braille  U+2800..U+28FF, made here from the dot bits.
+    symbol   the symbols in font/symbols.txt and five asterisks made here.
+
+Sets, each a list of tiers: ascii; draw (box, block, braille); symbol;
+and full, which is all of them.
 
 field() gives the target: the signed distance to the ink edge, positive
 inside, divided by tau and clamped to -1..1, at grid nodes 1/n cell width
@@ -216,6 +219,27 @@ def block(ch):
              "RIGHT": rect(1 - frac, -PAD, 1 + PAD, 2 + PAD)}[words[0]]]
 
 
+def shade(ch):
+    """Light, medium and dark shade: squares a quarter cell width across
+    on a lattice that tiles across cells, 25, 50 and 75 percent ink."""
+    q = 0.25
+    level = {0x2591: 1, 0x2592: 2, 0x2593: 3}[ord(ch)]
+
+    def square(x0, y0):
+        x1, y1 = x0 + q, y0 + q
+        # a square on the cell edge runs past it, so neighbours join
+        return rect(-PAD if x0 <= 0 else x0, -PAD if y0 <= 0 else y0,
+                    1 + PAD if x1 >= 1 else x1, 2 + PAD if y1 >= 2 else y1)
+
+    if level == 2:
+        return [square(i * q, j * q) for i in range(4) for j in range(8) if (i + j) % 2 == 0]
+    holes = [rect(0.125 + 0.5 * i, 0.125 + 0.5 * j, 0.375 + 0.5 * i, 0.375 + 0.5 * j)
+             for i in range(2) for j in range(4)]
+    if level == 1:
+        return holes
+    return [rect(-PAD, -PAD, 1 + PAD, 2 + PAD)] + [("cut", h) for h in holes]
+
+
 SHADES = (0x2591, 0x2592, 0x2593)
 
 
@@ -272,25 +296,42 @@ def asterisks():
     }
 
 
+SETS = {
+    "ascii": ["ascii"],
+    "draw": ["box", "block", "braille"],
+    "symbol": ["symbol"],
+    "full": ["ascii", "box", "block", "braille", "symbol"],
+}
+
+
+def tier(name):
+    """[(char, shapes)] for one tier, in code point order."""
+    if name == "ascii":
+        g = strokes.parse(strokes.STROKES)
+        if sorted(g) != [chr(c) for c in range(32, 127)]:
+            raise ValueError("strokes.txt must hold exactly U+0020..U+007E")
+        return [(c, g[c]) for c in sorted(g)]
+    if name == "box":
+        return [(chr(c), box(chr(c))) for c in range(0x2500, 0x2580)]
+    if name == "block":
+        return [(chr(c), shade(chr(c)) if c in SHADES else block(chr(c))) for c in range(0x2580, 0x25A0)]
+    if name == "braille":
+        return [(chr(c), braille(c - 0x2800)) for c in range(0x2800, 0x2900)]
+    if name == "symbol":
+        sym = strokes.parse(strokes.SYMBOLS)
+        made = asterisks()
+        if set(sym) & set(made):
+            raise ValueError("symbols.txt draws an asterisk glyphs.py makes")
+        sym.update(made)
+        return [(c, sym[c]) for c in sorted(sym)]
+    raise ValueError(f"no tier {name!r}")
+
+
 def charset(name):
     """[(char, tier, shapes)] for the set, in a fixed order."""
-    ascii_glyphs = strokes.parse(strokes.STROKES)
-    if sorted(ascii_glyphs) != [chr(c) for c in range(32, 127)]:
-        raise ValueError("strokes.txt must hold exactly U+0020..U+007E")
-    out = [(c, "ascii", ascii_glyphs[c]) for c in sorted(ascii_glyphs)]
-    if name == "ascii":
-        return out
-    if name != "full":
-        raise ValueError(f"no set {name!r}")
-    out += [(chr(c), "box", box(chr(c))) for c in range(0x2500, 0x2580)]
-    out += [(chr(c), "block", block(chr(c))) for c in range(0x2580, 0x25A0) if c not in SHADES]
-    out += [(chr(c), "braille", braille(c - 0x2800)) for c in range(0x2800, 0x2900)]
-    sym = strokes.parse(strokes.SYMBOLS)
-    made = asterisks()
-    if set(sym) & set(made):
-        raise ValueError("symbols.txt draws an asterisk glyphs.py makes")
-    sym.update(made)
-    out += [(c, "symbol", sym[c]) for c in sorted(sym)]
+    if name not in SETS:
+        raise ValueError(f"no set {name!r}; sets are {', '.join(SETS)}")
+    out = [(c, t, g) for t in SETS[name] for c, g in tier(t)]
     seen = [c for c, _, _ in out]
     if len(set(seen)) != len(seen):
         raise ValueError("a character is in two tiers")
@@ -348,25 +389,28 @@ def field(shapes, n, pen, tau):
 
 def sources(name):
     """The files the set is made from, for the weights' record."""
-    files = ["font/strokes.txt", "train/strokes.py", "train/glyphs.py"]
-    if name == "full":
-        files.insert(1, "font/symbols.txt")
-    return files
+    tiers = SETS[name]
+    files = ["font/strokes.txt"] if "ascii" in tiers else []
+    if "symbol" in tiers:
+        files.append("font/symbols.txt")
+    return files + ["train/strokes.py", "train/glyphs.py"]
 
 
 if __name__ == "__main__":
     full = charset("full")
     junctions = {}
-    for ch, tier, shapes in full:
-        if tier == "box":
+    for ch, t, shapes in full:
+        if t == "box":
             words = unicodedata.name(ch).split()[2:]
             if not ({"DASH", "ARC", "DIAGONAL"} & set(words)):
                 key = tuple(sorted(arms_of(words).items()))
                 if key in junctions:
                     raise SystemExit(f"U+{ord(ch):04X} and U+{ord(junctions[key]):04X} have the same arms")
                 junctions[key] = ch
-    tiers = {}
-    for _, tier, _ in full:
-        tiers[tier] = tiers.get(tier, 0) + 1
-    print(len(full), "characters:", ", ".join(f"{k} {v}" for k, v in tiers.items()),
+    counts = {}
+    for _, t, _ in full:
+        counts[t] = counts.get(t, 0) + 1
+    print(len(full), "characters:", ", ".join(f"{k} {v}" for k, v in counts.items()),
           f"({len(junctions)} distinct box junctions)")
+    for name in SETS:
+        print(f"  {name}: {len(charset(name))}")

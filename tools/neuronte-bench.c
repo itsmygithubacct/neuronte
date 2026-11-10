@@ -6,7 +6,7 @@
  *
  * With two, compares a net trained on everything with a bundle that
  * routes each character to a smaller net: for each class of characters
- * (ASCII, drawing, symbols), the time per cell from each file, where the
+ * (ASCII, drawing, symbols, accented letters), the time per cell from each file, where the
  * bundle's time includes its router, and then the router's own time per
  * call. One thread. MIT licence. */
 #define _POSIX_C_SOURCE 199309L
@@ -118,7 +118,7 @@ static double route_ns(neuronte *n, const uint32_t *s, int count)
 static int compare(const char *full_path, const char *bundle_path)
 {
     static const int sizes[][3] = {{8, 2, 3}, {16, 2, 2}, {48, 1, 1}}; /* width, samples, passes */
-    static struct cls classes[3];
+    static struct cls classes[4];
     uint32_t outside[256];
     neuronte *full, *b;
     float *cov;
@@ -138,12 +138,15 @@ static int compare(const char *full_path, const char *bundle_path)
     add_range(&classes[1], 0x2800, 0x28FF, 1);
     classes[2].name = "symbol";
     add_utf8(&classes[2], "\xc2\xa0©°·½×–—‘’“”•…›※⁙←↑→↓↗⇣≈≡⋅⎿⏵▲▸▼▾◆◈◉●◐◑◯☐☒✔✢✳✶✻✽❯⸬");
+    classes[3].name = "accent";
+    add_range(&classes[3], 0xC0, 0xD6, 1);
+    add_range(&classes[3], 0xD8, 0x17F, 1);
 
     printf("full:   %s, %zu parameters, nets %d\n", full_path, neuronte_parameters(full), neuronte_nets(full));
     printf("bundle: %s, %zu parameters, nets %d\n\n", bundle_path, neuronte_parameters(b), neuronte_nets(b));
     printf("%-7s %5s %4s  %-10s %13s %15s %8s\n", "class", "cells", "net", "cell", "full ms/cell",
            "bundle ms/cell", "speedup");
-    for (k = 0; k < 3; k++) {
+    for (k = 0; k < 4; k++) {
         const struct cls *c = &classes[k];
         int net = neuronte_route(b, c->s[0]);
         char netname[8];
@@ -168,7 +171,7 @@ static int compare(const char *full_path, const char *bundle_path)
     for (i = 0; i < 256; i++)
         outside[i] = 0x4E00 + 97u * (uint32_t)i;
     printf("\nrouter, ns per call:");
-    for (k = 0; k < 3; k++)
+    for (k = 0; k < 4; k++)
         printf("  %s %.1f", classes[k].name, route_ns(b, classes[k].s, classes[k].count));
     printf("  outside the table %.1f\n", route_ns(b, outside, 256));
     free(cov);

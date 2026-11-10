@@ -15,9 +15,14 @@ Tiers:
              shades U+2591..U+2593 as dither patterns.
     braille  U+2800..U+28FF, made here from the dot bits.
     symbol   the symbols in font/symbols.txt and five asterisks made here.
+    accent   Latin-1 letters U+00C0..U+00FF, Latin Extended-A
+             U+0100..U+017F and the spacing marks, made here from an
+             ASCII letter and the marks in font/marks.txt, by the Unicode
+             decomposition, or taken from font/letters.txt.
 
 Sets, each a list of tiers: ascii; draw (box, block, braille); symbol;
-and full, which is all of them.
+accent; and full (ascii, draw and symbol), the set the shipped full
+weights were trained on.
 
 field() gives the target: the signed distance to the ink edge, positive
 inside, divided by tau and clamped to -1..1, at grid nodes 1/n cell width
@@ -296,10 +301,127 @@ def asterisks():
     }
 
 
+# Composed letters.
+LETTERS = os.path.join(strokes.ROOT, "font", "letters.txt")
+MARKS = os.path.join(strokes.ROOT, "font", "marks.txt")
+ABOVE = {0x300, 0x301, 0x302, 0x303, 0x304, 0x306, 0x307, 0x308, 0x30A, 0x30B, 0x30C, 0x312}
+BELOW = {0x326, 0x327, 0x328}
+RAISE = 0.23           # how far marks above move up for a capital
+SHORT_TOP = 0.58       # where a capital, or an ascender, under a mark now starts
+BASELINE, XHEIGHT = 1.5, 0.8
+# Marks drawn differently on some letters, as fonts commonly do.
+CARON_BESIDE = {"d": 0.89, "l": 0.72, "t": 0.66, "L": 0.45}   # caron as a comma beside the stem, at x
+COMMA_BELOW = set("GKLNRknlr")                                # cedilla as a comma below
+TURNED_COMMA = {"g"}                                          # cedilla as a turned comma above
+DOTLESS = {"i": "\u0131", "j": "\u0237"}
+# The spacing marks, alone in the cell, and the mark each one is.
+SPACING = {0xA8: 0x308, 0xAF: 0x304, 0xB4: 0x301, 0xB8: 0x327, 0x2C6: 0x302, 0x2C7: 0x30C,
+           0x2D8: 0x306, 0x2D9: 0x307, 0x2DA: 0x30A, 0x2DB: 0x328, 0x2DC: 0x303, 0x2DD: 0x30B}
+CENTRE_X = {"\u0131": 0.5, "\u0237": 0.65, "J": 0.6, "l": 0.5}  # where marks above centre
+
+
+def points(shapes):
+    for sh in shapes:
+        sh = sh[1] if sh[0] == "cut" else sh
+        if sh[0] == "seg":
+            yield sh[1], sh[2]
+            yield sh[3], sh[4]
+        else:
+            yield from sh[1]
+
+
+def moved(shapes, f):
+    """The shapes with every point (x, y) sent to f(x, y)."""
+    out = []
+    for sh in shapes:
+        if sh[0] == "cut":
+            out.append(("cut", moved([sh[1]], f)[0]))
+        elif sh[0] == "seg":
+            (x0, y0), (x1, y1) = f(sh[1], sh[2]), f(sh[3], sh[4])
+            out.append(("seg", x0, y0, x1, y1, sh[5]))
+        else:
+            out.append(("poly", [f(x, y) for x, y in sh[1]]))
+    return out
+
+
+def shortened(shapes, capital):
+    """Room for a mark above: a capital is scaled down onto the baseline
+    from SHORT_TOP; a lowercase letter's ascender is squeezed into
+    SHORT_TOP..x-height and the rest left alone."""
+    top = min((y for _, y in points(shapes)), default=SHORT_TOP)
+    if top >= SHORT_TOP:
+        return shapes
+    if capital:
+        k = (BASELINE - SHORT_TOP) / (BASELINE - top)
+        return moved(shapes, lambda x, y: (x, BASELINE - (BASELINE - y) * k))
+    k = (XHEIGHT - SHORT_TOP) / (XHEIGHT - top)
+    return moved(shapes, lambda x, y: (x, XHEIGHT - (XHEIGHT - y) * k if y < XHEIGHT else y))
+
+
+def bottom_x(shapes, right=False):
+    """Where a mark below hangs: the middle of the lowest points, or the
+    rightmost of them."""
+    pts = list(points(shapes))
+    low = max(y for _, y in pts)
+    xs = [x for x, y in pts if y > low - 0.005]
+    return max(xs) if right else (min(xs) + max(xs)) / 2
+
+
+def accents():
+    """{char: shapes} for the accent tier."""
+    base = strokes.parse(strokes.STROKES)
+    letters = strokes.parse(LETTERS)
+    base.update(letters)
+    marks = {ord(c): m for c, m in strokes.parse(MARKS).items()}
+    out = dict(letters)
+    del out["\u0237"]  # dotless j is a base, not in the set: it is Latin Extended-B
+    wanted = [c for c in range(0xC0, 0x180) if c != 0xD7] + sorted(SPACING)
+    for c in wanted:
+        ch = chr(c)
+        if ch in out:
+            continue
+        nfd = unicodedata.normalize("NFD", ch)
+        if c in SPACING:
+            letter, mark = None, SPACING[c]
+        elif len(nfd) == 2 and nfd[0] in base and ord(nfd[1]) in marks:
+            letter, mark = nfd[0], ord(nfd[1])
+        else:
+            raise ValueError(f"U+{c:04X} {unicodedata.name(ch)}: no rule; draw it in letters.txt")
+        capital = letter is not None and letter.isupper()
+        if letter in CARON_BESIDE and mark == 0x30C:
+            mark, at = 0x315, CARON_BESIDE[letter]
+        elif letter in COMMA_BELOW and mark == 0x327:
+            mark = 0x326
+        elif letter in TURNED_COMMA and mark == 0x327:
+            mark = 0x312
+        if letter in DOTLESS and mark in ABOVE:
+            letter = DOTLESS[letter]
+        shapes = [] if letter is None else base[letter]
+        if mark in ABOVE:
+            shapes = shortened(shapes, capital)
+            if letter is None:
+                at = 0.5
+            elif letter in CENTRE_X:
+                at = CENTRE_X[letter]
+            else:
+                xs = [x for x, _ in points(shapes)]
+                at = (min(xs) + max(xs)) / 2
+            dy = -RAISE if capital else 0.0
+        elif mark in BELOW:
+            at = 0.5 if letter is None else bottom_x(shapes, right=mark == 0x328)
+            dy = 0.0
+        else:
+            dy = 0.0  # beside the stem, at the x chosen above
+        dx = at - 0.5
+        out[ch] = shapes + moved(marks[mark], lambda x, y: (x + dx, y + dy))
+    return out
+
+
 SETS = {
     "ascii": ["ascii"],
     "draw": ["box", "block", "braille"],
     "symbol": ["symbol"],
+    "accent": ["accent"],
     "full": ["ascii", "box", "block", "braille", "symbol"],
 }
 
@@ -324,6 +446,9 @@ def tier(name):
             raise ValueError("symbols.txt draws an asterisk glyphs.py makes")
         sym.update(made)
         return [(c, sym[c]) for c in sorted(sym)]
+    if name == "accent":
+        acc = accents()
+        return [(c, acc[c]) for c in sorted(acc)]
     raise ValueError(f"no tier {name!r}")
 
 
@@ -390,9 +515,11 @@ def field(shapes, n, pen, tau):
 def sources(name):
     """The files the set is made from, for the weights' record."""
     tiers = SETS[name]
-    files = ["font/strokes.txt"] if "ascii" in tiers else []
+    files = ["font/strokes.txt"] if "ascii" in tiers or "accent" in tiers else []
     if "symbol" in tiers:
         files.append("font/symbols.txt")
+    if "accent" in tiers:
+        files += ["font/letters.txt", "font/marks.txt"]
     return files + ["train/strokes.py", "train/glyphs.py"]
 
 

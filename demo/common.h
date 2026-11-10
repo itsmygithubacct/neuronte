@@ -54,6 +54,8 @@ void thousands(size_t v, char *out);       /* 44801 -> "44,801" */
 
 /* Whether the weights were trained on blocks: a full block fills its cell. */
 int knows_blocks(neuronte *n);
+/* Whether the weights draw é as e with a mark above. */
+int knows_accents(neuronte *n);
 
 /* Apply a chunk of terminal input. Tab steps through nsizes sizes.
  * Returns 1 for Esc or Ctrl-C. */

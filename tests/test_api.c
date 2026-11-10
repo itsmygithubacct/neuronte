@@ -1,7 +1,7 @@
 /* Loader refusals, drawing, clipping, blending and bundles. MIT licence.
- * usage: test_api WEIGHTS.nrt [--full]
- * --full adds checks of box drawing, blocks and Braille, for weights
- * trained on them. Given a one-net file, it also checks the loader's
+ * usage: test_api WEIGHTS.nrt [--full] [--accent]
+ * --full adds checks of box drawing, blocks and Braille, and --accent of
+ * accented letters, for weights trained on them. Given a one-net file, it also checks the loader's
  * refusals by damaging that file, and builds bundles from it to check the
  * router. Given a bundle, it checks the drawing only. */
 #define _POSIX_C_SOURCE 200809L
@@ -344,6 +344,58 @@ static void full_checks(neuronte *n)
         FAIL("U+28FF has %g ink against %g for U+2801", sum_of(c, W * H), sum_of(d, W * H));
 }
 
+/* The share of the inked pixels of two cells, over rows r0..r1, that
+ * both ink: 1 when they agree there. */
+static float agree(const float *a, const float *b, int w, int r0, int r1)
+{
+    int i, both = 0, either = 0;
+    for (i = r0 * w; i <= r1 * w + w - 1; i++) {
+        int x = a[i] > 0.5f, y = b[i] > 0.5f;
+        both += x && y;
+        either += x || y;
+    }
+    return either ? (float)both / (float)either : 1.0f;
+}
+
+static void accent_checks(neuronte *n)
+{
+    enum { W = 16, H = 32 };
+    /* Lowercase letters with a mark above, and the letter without it. In
+     * a 16 x 32 cell the x-height is row 12.8 and the baseline row 24. */
+    static const uint32_t above[][2] = {{0xE9, 'e'}, {0xE4, 'a'}, {0xF4, 'o'}, {0xF1, 'n'},
+                                        {0xFC, 'u'}, {0x161, 's'}, {0x17E, 'z'}, {0x107, 'c'}};
+    float a[W * H], b[W * H];
+    size_t k;
+    int i;
+
+    for (k = 0; k < sizeof above / sizeof above[0]; k++) {
+        float ink = 0, base_ink = 0;
+        neuronte_coverage(n, above[k][0], W, H, 0, a);
+        neuronte_coverage(n, above[k][1], W, H, 0, b);
+        if (agree(a, b, W, 14, 31) < 0.85f)
+            FAIL("U+%04X is not its letter below the x-height (%.2f)", (unsigned)above[k][0],
+                 agree(a, b, W, 14, 31));
+        for (i = 0; i < W * 11; i++) {
+            ink += a[i];
+            base_ink += b[i];
+        }
+        if (ink < 4.0f || base_ink > 1.0f)
+            FAIL("U+%04X has %.1f ink above its letter, which has %.1f", (unsigned)above[k][0], ink, base_ink);
+    }
+    /* A mark below: c with cedilla is c down to the baseline. */
+    neuronte_coverage(n, 0xE7, W, H, 0, a);
+    neuronte_coverage(n, 'c', W, H, 0, b);
+    {
+        float ink = 0, base_ink = 0;
+        for (i = W * 26; i < W * H; i++) {
+            ink += a[i];
+            base_ink += b[i];
+        }
+        if (agree(a, b, W, 12, 23) < 0.85f || ink < 4.0f || base_ink > 1.0f)
+            FAIL("U+00E7 is not c with a mark below (%.2f, %.1f, %.1f)", agree(a, b, W, 12, 23), ink, base_ink);
+    }
+}
+
 int main(int argc, char **argv)
 {
     unsigned char *data, *copy;
@@ -352,10 +404,18 @@ int main(int argc, char **argv)
     enum { CW = 16, CH = 32, BW = 64, BH = 48 };
     float cov[CW * CH], cov2[CW * CH];
     uint32_t buf[BW * BH], ref[BW * BH];
-    int i, rc, bundled;
+    int i, rc, bundled, full = 0, accent = 0;
 
-    if (argc < 2 || argc > 3 || (argc == 3 && strcmp(argv[2], "--full") != 0)) {
-        fprintf(stderr, "usage: %s WEIGHTS.nrt [--full]\n", argv[0]);
+    for (i = 2; i < argc; i++) {
+        if (strcmp(argv[i], "--full") == 0)
+            full = 1;
+        else if (strcmp(argv[i], "--accent") == 0)
+            accent = 1;
+        else
+            argc = 0;
+    }
+    if (argc < 2) {
+        fprintf(stderr, "usage: %s WEIGHTS.nrt [--full] [--accent]\n", argv[0]);
         return 2;
     }
     data = slurp(argv[1], &len);
@@ -573,8 +633,10 @@ drawing:
     if (neuronte_set_samples(n, 9) != NEURONTE_ERR_ARG || neuronte_set_samples(n, 1) != NEURONTE_OK)
         FAIL("set_samples bounds");
 
-    if (argc == 3)
+    if (full)
         full_checks(n);
+    if (accent)
+        accent_checks(n);
     if (!bundled)
         bundle_checks(data, len);
 

@@ -124,6 +124,22 @@ int knows_blocks(neuronte *n)
     return 1;
 }
 
+int knows_accents(neuronte *n)
+{
+    float e[16 * 32], a[16 * 32], above = 0;
+    int i, both = 0, either = 0;
+    if (neuronte_coverage(n, 'e', 16, 32, 2, e) != NEURONTE_OK ||
+        neuronte_coverage(n, 0xE9, 16, 32, 2, a) != NEURONTE_OK)
+        return 0;
+    for (i = 16 * 14; i < 16 * 32; i++) {
+        both += e[i] > 0.5f && a[i] > 0.5f;
+        either += e[i] > 0.5f || a[i] > 0.5f;
+    }
+    for (i = 0; i < 16 * 11; i++)
+        above += a[i];
+    return either > 0 && both >= 0.85f * either && above > 4.0f;
+}
+
 static void erase_last(struct typing *t)
 {
     while (t->len > 0) {

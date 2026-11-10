@@ -26,6 +26,7 @@ struct side {
     neuronte *n;
     char name[64];
     int full;          /* trained on box drawing, blocks and Braille */
+    int accents;       /* trained on accented letters */
     struct screen col; /* this side's column of the screen */
     int top, small;
     int info_y, spin_x, spin_y, dyn_y;
@@ -61,8 +62,9 @@ static const char punct[] = "- – — ─  ' ’  \" “ ”  ... …  * •";
 static const char symbols[] =
     "← → ↑ ↓  ✔ ☐ ☒  ● ◆ ▲ ▼  "
     "× ½ © °  ✻ ✢ ✶ ✽ ✳";
+static const char accented[] = "café naïve señor Ångström Łódź Dvořák ß";
 static const char neither[] =
-    "é ü ñ  中 文  ∑ ∞  \U0001F600";
+    "中 文  ∑ ∞  Ω Ж  \U0001F600";
 
 /* A sine wave two Braille cells high and `cells` wide, as two UTF-8 rows. */
 static void braille_wave(int cells, char rows[2][256])
@@ -126,8 +128,9 @@ static void draw_column(struct side *d, const struct screen *whole, int (*show)(
         snprintf(buf, sizeof buf, "%s weights, %s bytes. Draws all of this column.", a, b);
     y = line(n, s, 0, y, small, buf, DIM);
     y = line(n, s, 0, y, small,
-             d->full ? "Trained on ASCII, box drawing, blocks, Braille, symbols."
-                     : "Trained on the 95 ASCII characters.", DIM);
+             d->full && d->accents ? "Trained on ASCII, drawing, symbols, accented letters."
+             : d->full             ? "Trained on ASCII, box drawing, blocks, Braille, symbols."
+                                   : "Trained on the 95 ASCII characters.", DIM);
     d->info_y = y;
     y += 2 * small + small / 2;
     fill(s, 0, y, s->w, y + 1, RULE);
@@ -135,10 +138,10 @@ static void draw_column(struct side *d, const struct screen *whole, int (*show)(
     if (show)
         show(whole);
 
-    y = heading(d, y, "ASCII at 8, 16 and 24 px", 1);
+    y = heading(d, y, "ASCII at 8, 16 and 20 px", 1);
     y = row(n, s, 0, y, 8, "The quick brown fox jumps over the lazy dog. 0123456789", INK) + 4;
     y = row(n, s, 0, y, 16, "Sphinx of black quartz, judge my vow.", INK) + 4;
-    y = row(n, s, 0, y, 24, "Ag&@ Rxy? 1lI0O", INK) + small;
+    y = row(n, s, 0, y, 20, "Ag&@ Rxy? 1lI0O", INK) + small;
     if (show)
         show(whole);
 
@@ -167,8 +170,13 @@ static void draw_column(struct side *d, const struct screen *whole, int (*show)(
     if (show)
         show(whole);
 
+    y = heading(d, y, "Accented letters", d->accents);
+    y = row(n, s, 0, y, 12, accented, INK) + small;
+    if (show)
+        show(whole);
+
     y = line(n, s, 0, y, small, "In neither set: each net makes its own mark", DIM) + 3;
-    y = row(n, s, 0, y, 16, neither, INK) + small;
+    y = row(n, s, 0, y, 12, neither, INK) + small;
     d->dyn_y = y;
     d->column_ms = now_ms() - t0;
     if (show)
@@ -234,7 +242,7 @@ static int snapshot(struct side d[2], const char *out, int w, int h)
 {
     struct screen s = {malloc((size_t)w * h * sizeof(uint32_t)), w, h, w};
     struct state st = {.typed.size_index = 2, .frame = 2};
-    const char typed[] = "Typed in both: plain ASCII, é, ── and ✔.";
+    const char typed[] = "Typed in both: ASCII, é, ── and ✔.";
     int rc, i;
 
     if (!s.px)
@@ -320,6 +328,7 @@ static int open_side(struct side *d, const char *path)
     memcpy(d->name, base, len);
     d->name[len] = 0;
     d->full = knows_blocks(d->n);
+    d->accents = knows_accents(d->n);
     /* One 16 x 32 cell, timed without the cache. */
     t0 = now_ms();
     for (i = 0; i < 3; i++)

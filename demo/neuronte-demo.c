@@ -231,7 +231,7 @@ static int run(neuronte *n)
 /* Open the named weights, or by default the first of these that loads. */
 static int open_weights(const char *path, neuronte **n)
 {
-    static const char *const defaults[] = {"weights/neuronte-split-v0.nrt", "weights/neuronte-full-v1.nrt",
+    static const char *const defaults[] = {"weights/neuronte-split-v1.nrt", "weights/neuronte-full-v1.nrt",
                                            "weights/neuronte-ascii-v0.nrt"};
     int rc = NEURONTE_ERR_ARG;
     size_t i;

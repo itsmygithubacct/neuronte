@@ -9,11 +9,12 @@ ASCII = weights/neuronte-ascii-v0
 FULL = weights/neuronte-full-v1
 # The bundle: the ASCII net and the subset nets, with the gate the router
 # asks about characters none of them was trained on.
-DRAW = weights/neuronte-draw-v0
+DRAW = weights/neuronte-draw-v1
 SYMBOL = weights/neuronte-symbol-v0
-GATE = weights/neuronte-gate-v0.json
-SPLIT = weights/neuronte-split-v0.nrt
-NETS = $(ASCII).json $(DRAW).json $(SYMBOL).json
+ACCENT = weights/neuronte-accent-v0
+GATE = weights/neuronte-gate-v1.json
+SPLIT = weights/neuronte-split-v1.nrt
+NETS = $(ASCII).json $(DRAW).json $(SYMBOL).json $(ACCENT).json
 OBJS = build/neuronte.o build/utf8.o
 TOOLS = build/neuronte-render build/neuronte-bench
 TESTS = build/test_utf8 build/test_api
@@ -69,7 +70,7 @@ test: all $(TESTS)
 	./build/test_utf8
 	./build/test_api $(ASCII).nrt
 	./build/test_api $(FULL).nrt --full
-	./build/test_api $(SPLIT) --full
+	./build/test_api $(SPLIT) --full --accent
 	$(PYTHON) tests/check_reference.py build/libneuronte.so $(ASCII).json $(ASCII).nrt
 	$(PYTHON) tests/check_reference.py build/libneuronte.so $(FULL).json $(FULL).nrt
 	$(PYTHON) tests/check_reference.py build/libneuronte.so --bundle $(SPLIT) $(NETS) --gate $(GATE)

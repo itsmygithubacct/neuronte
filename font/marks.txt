@@ -1,0 +1,27 @@
+# Neuronte diacritic marks. Written for this project. No font was read.
+# The same grid as strokes.txt: x 0..10, y 0..20, cap top 4, x-height 8,
+# baseline 15. Each mark is keyed by its combining code point and drawn
+# for a lowercase letter, centred on x 5. train/glyphs.py moves it to the
+# letter's centre, and moves marks above up by 2.3 for a capital, which it
+# shortens to make room. Marks below sit on the baseline for every letter.
+#
+# Above:
+U+0300 P 3.9,3.3 5.9,5.6
+U+0301 P 4.1,5.6 6.1,3.3
+U+0302 P 2.8,5.6 5,3.3 7.2,5.6
+U+0303 E 3.6,4.6 1.4,1 180 360 | E 6.4,4.6 1.4,1 180 0
+U+0304 P 2.6,4.5 7.4,4.5
+U+0306 E 5,3.6 2.1,1.9 0 180
+U+0307 P 5,4.2 5,4.8
+U+0308 P 3.3,4.2 3.3,4.8 | P 6.7,4.2 6.7,4.8
+U+030A E 5,4.4 1.3,1.2 0 360
+U+030B P 3.3,5.6 4.8,3.3 | P 5.9,5.6 7.4,3.3
+U+030C P 2.8,3.3 5,5.6 7.2,3.3
+# A turned comma, for g with cedilla, whose tail would run into the next line.
+U+0312 P 5.8,3.3 5,4.8 5,5.5
+# Beside the stem instead: the caron of d, l, t and L. Not moved for capitals.
+U+0315 P 5,3.6 5,4.4 4.4,6.2
+# Below:
+U+0326 P 5,16.9 5,17.6 4.2,19.3
+U+0327 P 5,15 5,16.2 | E 5,17.1 1.4,0.9 270 510
+U+0328 E 5,16.8 1.3,1.8 270 40

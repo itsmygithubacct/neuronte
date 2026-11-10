@@ -27,7 +27,8 @@
 #define LAYERS 3
 #define HEADER (8 + 5 * 4 + 4 + NMASK * 4)
 #define MAX_H 1024 /* hidden widths are multiples of 8 up to this */
-#define CACHE 256
+#define SETS 256 /* the draw cache: SETS x WAYS cells, least recently used out */
+#define WAYS 4
 
 /* On x86-64 with GCC or Clang, build the inner loops twice, plain and
  * AVX2, and let the loader pick by CPU at run time. Built as ISO C, the
@@ -44,6 +45,7 @@ struct entry {
     float *cov;
     uint32_t scalar;
     int w, h, ss;
+    unsigned long used;
 };
 
 struct neuronte {
@@ -60,7 +62,8 @@ struct neuronte {
     float tau;
     uint32_t masks[NMASK];
     int samples;
-    struct entry cache[CACHE];
+    unsigned long tick;
+    struct entry cache[SETS][WAYS];
     float mem[]; /* the arrays above point into this */
 };
 
@@ -213,11 +216,12 @@ size_t neuronte_parameters(const neuronte *n)
 
 void neuronte_close(neuronte *n)
 {
-    int i;
+    int i, j;
     if (!n)
         return;
-    for (i = 0; i < CACHE; i++)
-        free(n->cache[i].cov);
+    for (i = 0; i < SETS; i++)
+        for (j = 0; j < WAYS; j++)
+            free(n->cache[i][j].cov);
     free(n);
 }
 
@@ -366,11 +370,19 @@ int neuronte_coverage(const neuronte *n, uint32_t scalar, int cell_w, int cell_h
 static const float *cached(neuronte *n, uint32_t s, int w, int h, int ss, int *rc)
 {
     uint32_t k = s * 2654435761u ^ (uint32_t)w * 40503u ^ (uint32_t)h * 9973u ^ (uint32_t)ss;
-    struct entry *e = &n->cache[k % CACHE];
+    struct entry *set = n->cache[(k >> 8) % SETS], *e = set;
     float *cov;
+    int i;
 
-    if (e->cov && e->scalar == s && e->w == w && e->h == h && e->ss == ss)
-        return e->cov;
+    for (i = 0; i < WAYS; i++) {
+        struct entry *c = &set[i];
+        if (c->cov && c->scalar == s && c->w == w && c->h == h && c->ss == ss) {
+            c->used = ++n->tick;
+            return c->cov;
+        }
+        if (!c->cov || (e->cov && c->used < e->used))
+            e = c; /* an empty way, else the least recently used */
+    }
     cov = malloc((size_t)w * h * sizeof *cov);
     if (!cov) {
         *rc = NEURONTE_ERR_NOMEM;
@@ -387,6 +399,7 @@ static const float *cached(neuronte *n, uint32_t s, int w, int h, int ss, int *r
     e->w = w;
     e->h = h;
     e->ss = ss;
+    e->used = ++n->tick;
     return cov;
 }
 

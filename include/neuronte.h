@@ -8,8 +8,8 @@
  * Neuronte never allocates the screen, opens a window or takes a terminal.
  *
  * A handle is not safe to share between threads without a lock: the draw
- * calls fill a small coverage cache inside it. neuronte_coverage() does not
- * touch the cache.
+ * calls keep up to 1,024 cells' coverage inside it, dropping the least
+ * recently used. neuronte_coverage() does not touch that cache.
  *
  * MIT licence. See LICENSE.
  */

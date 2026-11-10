@@ -335,6 +335,22 @@ int main(int argc, char **argv)
             break;
     }
 
+    /* The cache: a cell drawn after 1,100 others, which push it out, is
+     * drawn again the same. */
+    {
+        enum { SW = 4, SH = 8 };
+        uint32_t a[SW * SH], b[SW * SH], junk[SW * SH];
+        uint32_t k;
+        for (i = 0; i < SW * SH; i++)
+            a[i] = b[i] = 0xFF000000u;
+        neuronte_draw_scalar(n, a, SW, SW, SH, 0, 0, SW, SH, '&', 0xFFFFFFFFu);
+        for (k = 0x100; k < 0x100 + 1100; k++)
+            neuronte_draw_scalar(n, junk, SW, SW, SH, 0, 0, SW, SH, k, 0xFFFFFFFFu);
+        neuronte_draw_scalar(n, b, SW, SW, SH, 0, 0, SW, SH, '&', 0xFFFFFFFFu);
+        if (memcmp(a, b, sizeof a) != 0)
+            FAIL("a cell drawn after the cache turned over differs");
+    }
+
     if (neuronte_set_samples(n, 9) != NEURONTE_ERR_ARG || neuronte_set_samples(n, 1) != NEURONTE_OK)
         FAIL("set_samples bounds");
 

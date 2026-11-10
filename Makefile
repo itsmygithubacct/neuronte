@@ -5,7 +5,8 @@ NRT_CFLAGS = -std=c11 -Wall -Wextra -Wpedantic -fPIC -Iinclude $(CPPFLAGS) $(CFL
 LDLIBS = -lm
 PYTHON ?= python3
 
-WEIGHTS = weights/neuronte-ascii-v0
+ASCII = weights/neuronte-ascii-v0
+FULL = weights/neuronte-full-v0
 OBJS = build/neuronte.o build/utf8.o
 TOOLS = build/neuronte-render build/neuronte-bench
 TESTS = build/test_utf8 build/test_api
@@ -45,18 +46,23 @@ build/neuronte-demo: demo/neuronte-demo.c build/libneuronte.a build/kitty_frameb
 		build/libneuronte.a $(LDLIBS) -lz
 
 # Rebuild the packed weights from the JSON the trainer writes.
-pack: $(WEIGHTS).json
-	$(PYTHON) train/pack.py $(WEIGHTS).json $(WEIGHTS).nrt
-	cd weights && sha256sum neuronte-ascii-v0.json neuronte-ascii-v0.nrt > SHA256SUMS
+pack: $(ASCII).json $(FULL).json
+	$(PYTHON) train/pack.py $(ASCII).json $(ASCII).nrt
+	$(PYTHON) train/pack.py $(FULL).json $(FULL).nrt
+	cd weights && sha256sum $(notdir $(ASCII)).json $(notdir $(ASCII)).nrt \
+		$(notdir $(FULL)).json $(notdir $(FULL)).nrt > SHA256SUMS
 
 test: all $(TESTS)
 	cd weights && sha256sum -c --quiet SHA256SUMS
 	./build/test_utf8
-	./build/test_api $(WEIGHTS).nrt
-	$(PYTHON) tests/check_reference.py build/libneuronte.so $(WEIGHTS).json $(WEIGHTS).nrt
+	./build/test_api $(ASCII).nrt
+	./build/test_api $(FULL).nrt --full
+	$(PYTHON) tests/check_reference.py build/libneuronte.so $(ASCII).json $(ASCII).nrt
+	$(PYTHON) tests/check_reference.py build/libneuronte.so $(FULL).json $(FULL).nrt
 
 bench: build/neuronte-bench
-	./build/neuronte-bench $(WEIGHTS).nrt
+	./build/neuronte-bench $(ASCII).nrt
+	./build/neuronte-bench $(FULL).nrt
 
 clean:
 	rm -rf build

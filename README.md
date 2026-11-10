@@ -1,7 +1,9 @@
 # Neuronte
 
-A small neural net that draws a font character when it is asked for.
-The weights are the font. Drawing evaluates the net on a grid.
+A character goes in, as ASCII or as UTF-8. One cell of pixels comes out.
+The net is the font. It does not look up or copy a base face. Drawing
+samples the net inside the character field, for a graphical view or a
+terminal cell.
 
 Status: local only. No remote. Implementation has not started.
 

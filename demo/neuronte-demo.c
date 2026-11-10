@@ -6,7 +6,10 @@
  *
  * Type to draw text. Tab changes the size of the typed text, Backspace
  * deletes, Enter starts a new line, Esc or Ctrl-C quits. --snapshot draws
- * the first screen into a PPM file with no terminal. MIT licence. */
+ * the first screen into a PPM file with no terminal. The default weights
+ * are neuronte-full, else neuronte-ascii. With weights that know box
+ * drawing, a panel of it, blocks, Braille and symbols is shown, with two
+ * spinners that turn while the demo waits for keys. MIT licence. */
 #define _POSIX_C_SOURCE 200809L
 #include "neuronte.h"
 
@@ -42,6 +45,8 @@ struct state {
     size_t len;
     int size_index;
     double last_ms;
+    int full;  /* the weights draw box drawing, blocks and Braille */
+    int frame; /* spinner frame */
 };
 
 static double now_ms(void)
@@ -97,20 +102,82 @@ static int line(neuronte *n, struct screen *s, int x, int y, int cw, const char 
     return text(n, s, x, y, s->w, cw, t, strlen(t), color, NULL, NULL);
 }
 
-static void draw(neuronte *n, struct screen *s, const struct state *st)
+/* The n-th UTF-8 character of t, copied into out. */
+static void nth(const char *t, int k, char *out)
+{
+    size_t off = 0, len = strlen(t), step = 0;
+    uint32_t sc;
+    for (; k >= 0 && off < len; k--) {
+        step = neuronte_utf8_decode(t + off, len - off, &sc);
+        if (k > 0)
+            off += step;
+    }
+    memcpy(out, t + off, step);
+    out[step] = 0;
+}
+
+static const char *panel[] = {
+    "\u256D\u2500\u2500\u2500\u2500\u252C\u2500\u2500\u2500\u2500\u256E "
+    "\u250F\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2513 "
+    "\u2554\u2550\u2550\u2550\u2550\u2566\u2550\u2550\u2550\u2550\u2557 "
+    "\u250C\u2504\u2504\u2504\u2504\u2510  \u2581\u2582\u2583\u2584\u2585\u2586\u2587\u2588"
+    "\u2587\u2586\u2585\u2584\u2583\u2582\u2581  \u2880\u28C0\u28E4\u28F6\u28FF\u28FF\u28F6\u28E4\u28C0\u2840",
+    "\u2502 ab \u2502 cd \u2502 \u2503 ef \u2503 gh \u2503 \u2551 ij \u2551 kl \u2551 "
+    "\u2506 mn \u2506  \u258F\u258E\u258D\u258C\u258B\u258A\u2589\u2588  "
+    "\u2596\u2597\u2598\u2599\u259A\u259B\u259C\u259D\u259E\u259F  \u2801\u2803\u2807\u2847\u28C7\u28E7\u28F7\u28FF",
+    "\u2570\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u256F "
+    "\u2517\u2501\u2501\u2501\u2501\u253B\u2501\u2501\u2501\u2501\u251B "
+    "\u255A\u2550\u2550\u2550\u2550\u2569\u2550\u2550\u2550\u2550\u255D "
+    "\u2514\u2504\u2504\u2504\u2504\u2518  \u2580\u2594\u2590\u2595 \u2571\u2572\u2573\u2571\u2572  "
+    "\u23BF done \u2714 \u2610 \u2612",
+    "\u25CF \u25C6 \u25C8 \u25D0 \u25D1 \u25C9 \u25EF \u25B2 \u25BC \u25BE \u25B8 \u23F5 \u276F \u203A "
+    "\u2190 \u2192 \u2191 \u2193 \u2197 \u21E3 \u273B \u2722 \u2736 \u273D \u2733 \u00B7 \u2022 "
+    "\u2026 \u2014 \u2013 \u2018\u2019 \u201C\u201D \u00D7 \u2261 \u2248 \u00B0 \u00BD \u00A9 "
+    "\u203B \u2059 \u2E2C",
+};
+static const char braille_spin[] = "\u280B\u2819\u2839\u2838\u283C\u2834\u2826\u2827\u2807\u280F";
+static const char star_spin[] = "\u00B7\u2722\u2733\u2736\u273B\u273D\u273B\u2736\u2733\u2722";
+
+/* "44,801" */
+static void thousands(size_t v, char *out)
+{
+    char d[32];
+    int len = snprintf(d, sizeof d, "%zu", v), i, o = 0;
+    for (i = 0; i < len; i++) {
+        if (i > 0 && (len - i) % 3 == 0)
+            out[o++] = ',';
+        out[o++] = d[i];
+    }
+    out[o] = 0;
+}
+
+/* Where the parts that change are. */
+struct layout {
+    int m, small, spin_y, dyn_y;
+};
+
+/* Everything that stays put: drawn once, and again after a resize. The
+ * first time takes seconds, so show(), when given, presents each part as
+ * it is done. */
+static void draw_static(neuronte *n, struct screen *s, const struct state *st, struct layout *l,
+                        void (*show)(const struct screen *))
 {
     static const char sample[] = "The quick brown fox jumps over the lazy dog. 0123456789";
-    char buf[160];
-    int m = s->w / 40 < 12 ? 12 : s->w / 40, y = m, i, cx, cy, cw = sizes[st->size_index];
+    char buf[160], count[32];
+    int m = s->w / 40 < 12 ? 12 : s->w / 40, y = m, i;
     int small = s->w >= 1100 ? 10 : 8;
 
     fill(s, 0, 0, s->w, s->h, BG);
-    y = line(n, s, m, y, s->w >= 1100 ? 40 : 28, "Neuronte", INK);
-    y = line(n, s, m, y, small,
-             "Every glyph on this screen is drawn by a 44,801-weight neural net. No font file.", DIM);
+    y = line(n, s, m, y, s->w >= 1100 ? 40 : 28, st->full ? "Neuronte full" : "Neuronte", INK);
+    thousands(neuronte_parameters(n), count);
+    snprintf(buf, sizeof buf, "Every glyph on this screen is drawn by a %s-weight neural net. No font file.",
+             count);
+    y = line(n, s, m, y, small, buf, DIM);
     y += small;
     fill(s, m, y, s->w - m, y + 1, RULE);
     y += small;
+    if (show)
+        show(s);
 
     /* The same weights at four cell widths. */
     for (i = 0; i < 4; i++) {
@@ -119,12 +186,14 @@ static void draw(neuronte *n, struct screen *s, const struct state *st)
         /* No wrap: a line too long for the screen is cut at the edge. */
         y = text(n, s, m + 7 * small, y, 1 << 20, sizes[i], sample, sizeof sample - 1, INK, NULL, NULL);
         y += sizes[i] / 3;
+        if (show)
+            show(s);
     }
     y += small / 2;
     fill(s, m, y, s->w - m, y + 1, RULE);
     y += small;
 
-    /* All 95 trained characters. */
+    /* All 95 printable ASCII characters. */
     {
         char all[96];
         for (i = 0; i < 95; i++)
@@ -134,14 +203,49 @@ static void draw(neuronte *n, struct screen *s, const struct state *st)
     y += small;
     fill(s, m, y, s->w - m, y + 1, RULE);
     y += small;
+    if (show)
+        show(s);
 
-    /* What was typed, with a caret. */
+    /* Box drawing, blocks, Braille and symbols, cut at the screen edge. */
+    l->spin_y = -1;
+    if (st->full) {
+        for (i = 0; i < (int)(sizeof panel / sizeof panel[0]); i++) {
+            const char *row = panel[i];
+            y = text(n, s, m, y, 1 << 20, 16, row, strlen(row), ACCENT, NULL, NULL);
+            if (show)
+                show(s);
+        }
+        l->spin_y = y + 4;
+        y = line(n, s, m + 4 * 16, l->spin_y, 16, "these turn while the demo waits for keys", INK);
+        y += small;
+        fill(s, m, y, s->w - m, y + 1, RULE);
+        y += small;
+    }
+    l->m = m;
+    l->small = small;
+    l->dyn_y = y;
+}
+
+/* The spinners, the typed text and the footer. */
+static void draw_dynamic(neuronte *n, struct screen *s, const struct state *st, const struct layout *l)
+{
+    char buf[160];
+    int m = l->m, small = l->small, y = l->dyn_y, cx, cy, cw = sizes[st->size_index];
+
+    if (l->spin_y >= 0) {
+        char a[8], b[8];
+        nth(braille_spin, st->frame % 10, a);
+        nth(star_spin, st->frame % 10, b);
+        snprintf(buf, sizeof buf, "%s %s", a, b);
+        fill(s, m, l->spin_y, m + 3 * 16, l->spin_y + 32, BG);
+        line(n, s, m, l->spin_y, 16, buf, INK);
+    }
+    fill(s, 0, y, s->w, s->h, BG);
     snprintf(buf, sizeof buf, "Type here (%d px):", cw);
     y = line(n, s, m, y, small, buf, DIM) + small / 2;
     text(n, s, m, y, s->w - m, cw, st->text, st->len, INK, &cx, &cy);
     fill(s, cx, cy + 2 * cw - (cw > 12 ? 3 : 2), cx + cw, cy + 2 * cw, ACCENT);
 
-    /* Footer. */
     snprintf(buf, sizeof buf, "Tab: text size   Esc: quit   last frame %.1f ms", st->last_ms);
     line(n, s, m, s->h - 2 * small - m / 2, small, buf, DIM);
 }
@@ -200,12 +304,26 @@ static int input(struct state *st, const unsigned char *b, size_t n)
     return 0;
 }
 
+/* Whether the weights were trained on blocks: a full block fills its cell. */
+static int knows_blocks(neuronte *n)
+{
+    float c[8 * 16];
+    int i;
+    if (neuronte_coverage(n, 0x2588, 8, 16, 2, c) != NEURONTE_OK)
+        return 0;
+    for (i = 0; i < 8 * 16; i++)
+        if (c[i] < 0.9f)
+            return 0;
+    return 1;
+}
+
 static int snapshot(neuronte *n, const char *out, int w, int h)
 {
     struct screen s = {malloc((size_t)w * h * sizeof(uint32_t)), w, h};
-    struct state st = {.size_index = 3};
+    struct state st = {.size_index = 3, .full = knows_blocks(n), .frame = 2};
     const char typed[] = "Hello, Kilix!\nTyped text is drawn the same way.";
-    double t0;
+    struct layout l;
+    double t0, first;
     FILE *f;
     int i;
 
@@ -214,9 +332,14 @@ static int snapshot(neuronte *n, const char *out, int w, int h)
     memcpy(st.text, typed, sizeof typed - 1);
     st.len = sizeof typed - 1;
     t0 = now_ms();
-    draw(n, &s, &st);
+    draw_static(n, &s, &st, &l, NULL);
+    draw_dynamic(n, &s, &st, &l);
+    first = now_ms() - t0;
+    /* Again, as a keypress would, with the time of that frame shown. */
+    t0 = now_ms();
+    draw_dynamic(n, &s, &st, &l);
     st.last_ms = now_ms() - t0;
-    draw(n, &s, &st); /* again, with the cache warm and the time shown */
+    draw_dynamic(n, &s, &st, &l);
     f = fopen(out, "wb");
     if (!f) {
         perror(out);
@@ -229,13 +352,20 @@ static int snapshot(neuronte *n, const char *out, int w, int h)
         fwrite(rgb, 1, 3, f);
     }
     fclose(f);
-    printf("%s: %dx%d, first draw %.1f ms\n", out, w, h, st.last_ms);
+    printf("%s: %dx%d, first draw %.1f ms, next %.1f ms\n", out, w, h, first, st.last_ms);
     free(s.px);
     return 0;
 }
 
 #ifndef NEURONTE_DEMO_NO_TERMINAL
 static kittyfb_session session;
+static uint8_t *rgba; /* the frame as kitty-framebuffer takes it */
+
+static void show_now(const struct screen *s)
+{
+    to_rgba(s, rgba);
+    kittyfb_present(&session, rgba, s->w, s->h);
+}
 
 static void on_fatal(int sig)
 {
@@ -248,9 +378,9 @@ static int run(neuronte *n)
     kittyfb_options opt;
     struct sigaction sa;
     struct screen s;
-    struct state st = {.size_index = 2};
-    uint8_t *rgba;
-    int dirty = 1, rc = 0;
+    struct state st = {.size_index = 2, .full = knows_blocks(n)};
+    struct layout l;
+    int dirty = 1, fresh = 1, rc = 0;
 
     kittyfb_session_init(&session);
     kittyfb_options_init(&opt);
@@ -295,11 +425,14 @@ static int run(neuronte *n)
             rgba = rgba2;
             s.w = nw;
             s.h = nh;
-            dirty = 1;
+            dirty = fresh = 1;
         }
         if (dirty) {
             double t0 = now_ms();
-            draw(n, &s, &st);
+            if (fresh)
+                draw_static(n, &s, &st, &l, show_now);
+            fresh = 0;
+            draw_dynamic(n, &s, &st, &l);
             st.last_ms = now_ms() - t0;
             to_rgba(&s, rgba);
             if (!kittyfb_present(&session, rgba, s.w, s.h)) {
@@ -308,8 +441,13 @@ static int run(neuronte *n)
             }
             dirty = 0;
         }
-        if (poll(&p, 1, 100) <= 0)
+        if (poll(&p, 1, 100) <= 0) {
+            if (st.full) {
+                st.frame++;
+                dirty = 1;
+            }
             continue;
+        }
         got = read(STDIN_FILENO, b, sizeof b);
         if (got <= 0)
             continue;
@@ -325,9 +463,28 @@ out:
 }
 #endif
 
+/* Open the named weights, or by default the full set, else ASCII. */
+static int open_weights(const char *path, neuronte **n)
+{
+    int rc;
+    if (path) {
+        rc = neuronte_open_file(path, n);
+    } else {
+        path = "weights/neuronte-full-v0.nrt";
+        rc = neuronte_open_file(path, n);
+        if (rc != NEURONTE_OK) {
+            path = "weights/neuronte-ascii-v0.nrt";
+            rc = neuronte_open_file(path, n);
+        }
+    }
+    if (rc != NEURONTE_OK)
+        fprintf(stderr, "%s: cannot load weights (%d)\n", path, rc);
+    return rc;
+}
+
 int main(int argc, char **argv)
 {
-    const char *weights = "weights/neuronte-ascii-v0.nrt";
+    const char *weights = NULL;
     neuronte *n;
     int rc;
 
@@ -339,20 +496,16 @@ int main(int argc, char **argv)
             fprintf(stderr, "snapshot size must be 320x240 .. 4096x4096\n");
             return 2;
         }
-        if ((rc = neuronte_open_file(weights, &n)) != NEURONTE_OK) {
-            fprintf(stderr, "%s: cannot load weights (%d)\n", weights, rc);
+        if (open_weights(weights, &n) != NEURONTE_OK)
             return 1;
-        }
         rc = snapshot(n, argv[2], w, h);
         neuronte_close(n);
         return rc;
     }
     if (argc == 2)
         weights = argv[1];
-    if ((rc = neuronte_open_file(weights, &n)) != NEURONTE_OK) {
-        fprintf(stderr, "%s: cannot load weights (%d)\n", weights, rc);
+    if (open_weights(weights, &n) != NEURONTE_OK)
         return 1;
-    }
 #ifdef NEURONTE_DEMO_NO_TERMINAL
     fprintf(stderr, "built without kitty-framebuffer; only --snapshot works\n");
     rc = 2;

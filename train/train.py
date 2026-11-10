@@ -1,10 +1,12 @@
-"""Train the Neuronte net on the stroke lists.
+"""Train the Neuronte net.
 
-usage: python3 train/train.py OUT.json [--steps N] [--device cuda] [--seed S]
+usage: python3 train/train.py OUT.json [--set ascii|full] [--width W]
+                              [--steps N] [--device cuda] [--seed S]
 
-Needs torch. Writes the weights as JSON and prints one JSON line of
-scores. The target at a point is clamp((r - d) / tau, -1, 1), where d is
-the exact distance to the nearest stroke centre line. No bitmap is made.
+Needs torch and numpy. Writes the weights as JSON and prints one JSON
+line of scores. The target at a point is the field glyphs.py makes: the
+signed distance to the ink edge over tau, clamped to -1..1, held on a grid
+of nodes 1/256 cell width apart and read between them bilinearly.
 """
 import argparse
 import hashlib
@@ -17,42 +19,45 @@ import numpy as np
 import torch
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import glyphs  # noqa: E402
 import strokes  # noqa: E402
 
 p = argparse.ArgumentParser()
 p.add_argument("out")
+p.add_argument("--set", default="ascii", choices=["ascii", "full"])
+p.add_argument("--width", type=int, default=128, help="hidden layer width")
 p.add_argument("--steps", type=int, default=20000)
 p.add_argument("--device", default="cuda")
 p.add_argument("--seed", type=int, default=0)
-p.add_argument("--pen", type=float, default=0.075, help="pen radius in cell widths")
-p.add_argument("--unlabelled", type=float, default=1.0, help="weight of the term for scalars with no stroke list")
+p.add_argument("--pen", type=float, default=0.075, help="default pen radius in cell widths")
+p.add_argument("--grid", type=int, default=256, help="target grid nodes per cell width")
+p.add_argument("--unlabelled", type=float, default=1.0, help="weight of the term for scalars with no glyph")
 a = p.parse_args()
 torch.manual_seed(a.seed)
 torch.set_default_device(a.device)
 
-TAU, OCT, W, R = 0.15, 6, 128, a.pen
-CHARS = [chr(c) for c in range(32, 127)]
+TAU, OCT, W, N = 0.15, 6, a.width, a.grid
+SET = glyphs.charset(a.set)
+CHARS = [c for c, _, _ in SET]
+TIERS = [t for _, t, _ in SET]
 G = len(CHARS)
 MASKS = strokes.masks()
-glyphs = strokes.parse()
-S = max(len(glyphs[c]) for c in CHARS)
-seg = np.full((G, S, 4), 50.0, np.float32)  # padding segments lie far outside the cell
-for g, ch in enumerate(CHARS):
-    for i, s in enumerate(glyphs[ch]):
-        seg[g, i] = s
-SEG = torch.tensor(seg)
+FIELD = torch.tensor(np.stack([glyphs.field(s, N, a.pen, TAU) for _, _, s in SET]).astype(np.float16)).reshape(-1)
+NX, NY = N + 1, 2 * N + 1
+LAB = torch.tensor([ord(c) for c in CHARS])
 MB = torch.tensor([[(m >> i) & 1 for i in range(21)] for m in MASKS], dtype=torch.float32)
 SPAN = torch.tensor([1.0, 2.0])
 
 
 def target(gi, xy):
-    """Clamped signed field for characters gi at points xy (B, N, 2)."""
-    s = SEG[gi]
-    a0, ab = s[:, None, :, 0:2], s[:, None, :, 2:4] - s[:, None, :, 0:2]
-    q = xy[:, :, None, :]
-    t = ((q - a0) * ab).sum(-1) / (ab * ab).sum(-1).clamp_min(1e-12)
-    d = (q - (a0 + t.clamp(0, 1)[..., None] * ab)).norm(dim=-1).min(-1).values
-    return ((R - d) / TAU).clamp(-1, 1)
+    """The target field for characters gi at points xy (B, M, 2), read
+    bilinearly from the grid."""
+    u, v = xy[..., 0] * N, xy[..., 1] * N
+    i0, j0 = u.floor().clamp(0, N - 1), v.floor().clamp(0, 2 * N - 1)
+    fu, fv = u - i0, v - j0
+    k = gi[:, None] * (NX * NY) + j0.long() * NX + i0.long()
+    f00, f01, f10, f11 = (FIELD[k + d].float() for d in (0, 1, NX, NX + 1))
+    return (f00 * (1 - fu) + f01 * fu) * (1 - fv) + (f10 * (1 - fu) + f11 * fu) * fv
 
 
 def code(v):
@@ -79,7 +84,7 @@ def field(c, xy):
 
 
 gi = torch.arange(G)
-CF = code(torch.arange(32, 32 + G))
+CF = code(LAB)
 opt = torch.optim.Adam(net.parameters(), lr=2e-3)
 sched = torch.optim.lr_scheduler.CosineAnnealingLR(opt, a.steps)
 for step in range(a.steps):
@@ -92,7 +97,7 @@ for step in range(a.steps):
     if a.unlabelled > 0:
         U = 64
         v = torch.randint(0, 0x110000, (U,))
-        v = torch.where(((v >= 32) & (v < 32 + G)) | ((v >= 0xD800) & (v <= 0xDFFF)), v + 0x1000, v)
+        v = torch.where(torch.isin(v, LAB) | ((v >= 0xD800) & (v <= 0xDFFF)), v + 0x1000, v)
         pu = torch.rand(1, 256, 2) * SPAN
         su = torch.sigmoid(8 * field(code(v), pu.expand(U, -1, -1)))
         m = su.mean(1)
@@ -133,21 +138,50 @@ def truth(wpx, ss=8):
     return torch.cat(rows).reshape(G, 2 * wpx, ss, wpx, ss).mean((2, 4))
 
 
-res = {"steps": a.steps, "seed": a.seed, "pen": R, "unlabelled": a.unlabelled,
-       "params": sum(q.numel() for q in net.parameters()), "final_loss": float(loss.detach())}
+def label(i):
+    return f"U+{ord(CHARS[i]):04X} {CHARS[i]}"
+
+
+res = {"set": a.set, "chars": G, "width": W, "steps": a.steps, "seed": a.seed, "pen": a.pen,
+       "unlabelled": a.unlabelled, "params": sum(q.numel() for q in net.parameters()),
+       "final_loss": float(loss.detach())}
+tier_idx = {t: torch.tensor([i for i, x in enumerate(TIERS) if x == t]) for t in dict.fromkeys(TIERS)}
 for wpx in (8, 16, 48):
     t = truth(wpx).reshape(G, -1)
+    # Targets that differ by under half a pixel of ink at this size, such
+    # as space and U+00A0, count as one when checking the nearest.
+    twin = torch.cdist(t, t, p=1) < 0.5
     for ss in (1, 2):
         n = cover(CF, wpx, ss).reshape(G, -1)
         ti, ni = t > 0.5, n > 0.5
         u = (ti | ni).sum(1).float()
         iou = torch.where(u > 0, (ti & ni).sum(1).float() / u.clamp_min(1), torch.ones_like(u))
-        res[f"w{wpx}_s{ss}"] = {"iou_mean": round(float(iou.mean()), 4), "iou_min": round(float(iou.min()), 4),
-                                "worst": CHARS[int(iou.argmin())],
-                                "nearest_ok": int((torch.cdist(n, t, p=1).argmin(1) == gi).sum())}
+        nearest = torch.cdist(n, t, p=1).argmin(1)
+        r = {"iou_mean": round(float(iou.mean()), 4), "iou_min": round(float(iou.min()), 4),
+             "worst": [label(int(i)) for i in iou.argsort()[:3]],
+             "nearest_ok": int(twin[gi, nearest].sum())}
+        if len(tier_idx) > 1:
+            r["tiers"] = {k: round(float(iou[ix].mean()), 4) for k, ix in tier_idx.items()}
+        res[f"w{wpx}_s{ss}"] = r
 
-with open(strokes.STROKES, "rb") as fh:
-    strokes_sha = hashlib.sha256(fh.read()).hexdigest()
+
+def ranges(scalars):
+    out, s = [], sorted(scalars)
+    i = 0
+    while i < len(s):
+        j = i
+        while j + 1 < len(s) and s[j + 1] == s[j] + 1:
+            j += 1
+        out.append(f"U+{s[i]:04X}" + (f"..U+{s[j]:04X}" if j > i else ""))
+        i = j + 1
+    return " ".join(out)
+
+
+def sha(rel):
+    with open(os.path.join(strokes.ROOT, rel), "rb") as fh:
+        return hashlib.sha256(fh.read()).hexdigest()
+
+
 lin = [m for m in net if isinstance(m, torch.nn.Linear)]
 
 
@@ -160,12 +194,14 @@ doc = {
     "version": 1,
     "shape": {"position_octaves": OCT, "code_bits": 64, "hidden_width": W, "hidden_layers": 3,
               "tau": TAU, "parity_masks": [f"0x{m:06X}" for m in MASKS]},
-    "training": {"labelled": "U+0020..U+007E", "strokes_sha256": strokes_sha, "pen_radius": R,
-                 "steps": a.steps, "seed": a.seed, "unlabelled_weight": a.unlabelled},
+    "training": {"set": a.set, "labelled": ranges(ord(c) for c in CHARS),
+                 "sources_sha256": {f: sha(f) for f in glyphs.sources(a.set)},
+                 "pen_radius": a.pen, "grid": N, "steps": a.steps, "seed": a.seed,
+                 "unlabelled_weight": a.unlabelled},
     "layers": {name: {"rows": l.weight.shape[0], "cols": l.weight.shape[1],
                       "weight": f32(l.weight), "bias": f32(l.bias)}
                for name, l in zip(["l1", "l2", "l3", "out"], lin)},
 }
 with open(a.out, "w") as fh:
     json.dump(doc, fh)
-print(json.dumps(res))
+print(json.dumps(res, ensure_ascii=False))

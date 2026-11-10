@@ -1,32 +1,64 @@
-"""Read font/strokes.txt into line segments.
+"""Read Neuronte stroke files into shapes.
 
-Each character becomes a list of (x0, y0, x1, y1) segments in cell units:
-x runs 0..1 across the cell and y runs 0..2 down it. Arcs are cut into
-pieces of at most 10 degrees.
+Each character becomes a list of shapes in cell units, x 0..1 across the
+cell and y 0..2 down it:
+
+    ("seg", x0, y0, x1, y1, r)   a pen stroke of radius r, or None for the
+                                 default pen
+    ("poly", [(x, y), ...])      a filled polygon
+
+File syntax, one character per line, coordinates on a 10 x 20 grid:
+
+    P x,y x,y ...            polyline stroke
+    E cx,cy rx,ry a0 a1      elliptical arc stroke, degrees, 0 = east, 90 = down
+    F x,y x,y ...            filled polygon
+    O cx,cy rx,ry            filled ellipse
+    S cx,cy rx,ry a0 a1      filled sector of an ellipse
+    P@1.3 ...                any stroke with its own pen radius, in grid units
+
+The character is written first, or as U+XXXX, then a space, then shapes
+separated by " | ".
 """
 import math
 import os
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STROKES = os.path.join(ROOT, "font", "strokes.txt")
+SYMBOLS = os.path.join(ROOT, "font", "symbols.txt")
 MASKS = os.path.join(ROOT, "font", "code-masks.txt")
 
 
-def _points(part, ch):
+def _xy(tok):
+    x, y = tok.split(",")
+    return float(x) / 10, float(y) / 10
+
+
+def _arc(cx, cy, rx, ry, a0, a1):
+    n = max(2, int(abs(a1 - a0) / 10) + 1)
+    return [(cx + rx * math.cos(math.radians(a0 + (a1 - a0) * i / n)),
+             cy + ry * math.sin(math.radians(a0 + (a1 - a0) * i / n))) for i in range(n + 1)]
+
+
+def _shapes(part, ch):
     tok = part.split()
-    if tok[0] == "P":
-        pts = [tuple(float(v) / 10 for v in t.split(",")) for t in tok[1:]]
-        if len(pts) < 2:
-            raise ValueError(f"polyline with one point for {ch!r}")
-        return pts
-    if tok[0] == "E" and len(tok) == 5:
-        cx, cy = (float(v) / 10 for v in tok[1].split(","))
-        rx, ry = (float(v) / 10 for v in tok[2].split(","))
-        a0, a1 = float(tok[3]), float(tok[4])
-        n = max(2, int(abs(a1 - a0) / 10) + 1)
-        return [(cx + rx * math.cos(math.radians(a0 + (a1 - a0) * i / n)),
-                 cy + ry * math.sin(math.radians(a0 + (a1 - a0) * i / n))) for i in range(n + 1)]
-    raise ValueError(f"bad stroke {part!r} for {ch!r}")
+    kind, _, rad = tok[0].partition("@")
+    r = float(rad) / 10 if rad else None
+    args = tok[1:]
+    if kind == "P" and len(args) >= 2:
+        pts = [_xy(t) for t in args]
+    elif kind in ("E", "S") and len(args) == 4:
+        (cx, cy), (rx, ry) = _xy(args[0]), _xy(args[1])
+        pts = _arc(cx, cy, rx, ry, float(args[2]), float(args[3]))
+        if kind == "S":
+            return [("poly", [(cx, cy)] + pts)]
+    elif kind == "F" and len(args) >= 3:
+        return [("poly", [_xy(t) for t in args])]
+    elif kind == "O" and len(args) == 2:
+        (cx, cy), (rx, ry) = _xy(args[0]), _xy(args[1])
+        return [("poly", _arc(cx, cy, rx, ry, 0, 360)[:-1])]
+    else:
+        raise ValueError(f"bad shape {part!r} for {ch!r}")
+    return [("seg", *pts[i], *pts[i + 1], r) for i in range(len(pts) - 1)]
 
 
 def parse(path=STROKES):
@@ -41,14 +73,13 @@ def parse(path=STROKES):
                 ch = chr(int(head[2:], 16))
             else:
                 ch, rest = line[0], line[2:]
-            segs = []
+            shapes = []
             for part in (p.strip() for p in rest.split("|")):
                 if part:
-                    pts = _points(part, ch)
-                    segs += [(*pts[i], *pts[i + 1]) for i in range(len(pts) - 1)]
+                    shapes += _shapes(part, ch)
             if ch in glyphs:
-                raise ValueError(f"duplicate {ch!r}")
-            glyphs[ch] = segs
+                raise ValueError(f"duplicate {ch!r} in {path}")
+            glyphs[ch] = shapes
     return glyphs
 
 
@@ -61,6 +92,6 @@ def masks(path=MASKS):
 
 
 if __name__ == "__main__":
-    g = parse()
-    missing = [chr(c) for c in range(32, 127) if chr(c) not in g]
-    print(len(g), "characters, missing", missing, ", most segments", max(len(s) for s in g.values()))
+    for path in (STROKES, SYMBOLS):
+        g = parse(path)
+        print(os.path.basename(path), len(g), "characters, most shapes", max(len(s) for s in g.values()))

@@ -7,10 +7,10 @@ size exactly. No implicit resizing or cropping is performed.
 `python3 tools/neuronte-video.py --width 640 --height 384 --level two
 --mode portable --cell 8x16 --output ansi` writes cursor-addressed truecolour
 terminal cells. `--output rgb` writes reconstructed RGB24 frames. Full mode
-uses the trained scalar manifest of split-v4 and its actual C coverage masks;
+uses the loaded bundle’s explicit scalar ranges and its actual C coverage masks;
 portable mode uses the 328 ideal geometric masks. Full mode must be displayed
-with that same Neuronte bundle to reproduce the fitted image. The present
-manifest is fixed to split-v4: passing a different bundle is experimental.
+with that same Neuronte bundle to reproduce the fitted image. Full mode requires a bundle with explicit scalar ranges; split-v4 is the
+default. A standalone net without a manifest is rejected.
 
 `--level multi --cell 2x4 --output rgb` uses three cached C neural coverage
 masks (right half, middle half, lower half), eight RGB colours per cell,
@@ -45,3 +45,28 @@ Sources and generated experimental clips are kept in the research directory,
 not this repository. No source frames are retained in model assets. Video
 nets are retained only when held-out acceptance beats the exact-search
 baseline under the research plan's quality, stability and speed criteria.
+
+## Optional learned helpers
+
+`--level two --mode full --cell 8x16 --helper speed` proposes a compact
+candidate shortlist, then performs the same exact bounded RGB fit on it.
+`--helper quality` uses a learned temporal switch, then checks the proposed
+retained cells against the source image: local SSIM loss at most0.0001,
+whole-frame SSIM loss at most0.001. This is a hybrid model plus quality veto,
+not a model-only fidelity guarantee. Its goal is fewer character changes;
+it still performs exhaustive search. The two helpers are alternatives, not a
+combined mode that has never been measured.
+
+Both require the precise split-v4 weights they were trained against, zero
+`--margin`, and 8×16 cells. A mismatched bundle is rejected. The optional
+`--helper-model` explicitly selects another compatible, versioned model.
+The helper JSON records the bundle SHA256, model seed, training-frame digest,
+training source hash, inference policy and acceptance evidence. Playback uses
+NumPy/SciPy, not torch. Training and reproducible gates are in `train/video.py`
+and `train/evaluate_video_helpers.py`.
+
+The initial helpers failed on held-out data and were not adopted. The revised
+inference policy was chosen on validation clips and checked on fresh held-out
+clips, with both seeds retained in research. All footage is original synthetic
+material. Passing these clips does not establish general-purpose performance
+on natural footage; the exhaustive and multi-ink modes remain available.

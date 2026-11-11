@@ -4,6 +4,8 @@ from pathlib import Path
 import sys
 import unittest
 import io
+import subprocess
+import json
 import numpy as np
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools'))
@@ -69,6 +71,48 @@ class Video(unittest.TestCase):
         self.assertEqual(cli.read_frame(stream,12),bytes(range(12,24)))
         self.assertIsNone(cli.read_frame(stream,12))
         with self.assertRaises(ValueError): cli.read_frame(io.BytesIO(b'abc'),4)
+
+    def test_proposal_fit(self):
+        model=v.TwoInk(cell_w=2,cell_h=4)
+        image=np.random.default_rng(22).integers(0,256,(8,4,3),dtype=np.uint8)
+        exhaustive=model.fit(image)
+        restricted=model.fit(image,exhaustive['indices'][:,:,None])
+        np.testing.assert_allclose(restricted['sse'],exhaustive['sse'],atol=1e-7)
+        np.testing.assert_array_equal(restricted['colours'],exhaustive['colours'])
+        with self.assertRaises(ValueError):model.fit(image,np.full((2,2,1),-1))
+
+    def test_helper_numpy_reference(self):
+        from neuronte_video_helpers import Helper
+        for kind,n in [('speed',24),('quality',51)]:
+            path=ROOT/f'weights/neuronte-video-{kind}-v0.json'
+            model=Helper(path,kind);doc=json.loads(path.read_text())
+            x=np.random.default_rng(15).random((7,n)).astype(np.float32)
+            reference=x.astype(float)
+            for i,layer in enumerate(doc['layers']):
+                reference=reference@np.array(layer['weight']).T+np.array(layer['bias'])
+                if i==0:reference=np.maximum(reference,0)
+            np.testing.assert_allclose(model(x),reference,atol=2e-4,rtol=1e-5)
+
+    def test_temporal_guard_rejects_bad_retention(self):
+        from neuronte_video_helpers import quality_cells,ssim
+        model=v.TwoInk('full')
+        yy,xx=np.mgrid[:32,:32]
+        old=np.repeat((((xx//4)%2)*255)[:,:,None],3,2).astype(np.uint8)
+        new=np.repeat((((yy//4)%2)*255)[:,:,None],3,2).astype(np.uint8)
+        prior=model.fit(old);model.previous=None;best=model.fit(new)
+        keep_all=lambda x:np.tile([0,1],(len(x),1))
+        result=quality_cells(model,keep_all,new,old,prior,best)
+        self.assertGreaterEqual(ssim(new,model.decode(result)),ssim(new,model.decode(best))-.001)
+
+    def test_cli_exact_and_partial_stream(self):
+        raw=np.random.default_rng(15).integers(0,256,(8,4,3),dtype=np.uint8).tobytes()
+        cmd=[sys.executable,str(ROOT/'tools/neuronte-video.py'),'--width','4','--height','8','--level','multi','--cell','2x4','--require-exact']
+        good=subprocess.run(cmd,input=raw,capture_output=True)
+        self.assertEqual(good.returncode,0,good.stderr)
+        self.assertEqual(good.stdout,raw)
+        bad=subprocess.run(cmd,input=raw[:-1],capture_output=True)
+        self.assertEqual(bad.returncode,2)
+        self.assertIn(b'truncated frame',bad.stderr)
 
     def test_exact_video_asset(self):
         result=v.exactness()

@@ -8,6 +8,7 @@ from pathlib import Path
 import ctypes as C
 import json
 import sys
+import struct
 import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -125,17 +126,20 @@ def candidates(mode, width, height, weights=None, library=None):
         masks = np.stack([(glyphs.signed_distance(shape, points, .075) > 0).astype(np.float32) for _, _, shape in entries])
         return np.array([ord(ch) for ch, _, _ in entries], np.uint32), masks
     if mode != 'full': raise ValueError('mode must be portable or full')
-    # Read the actual trained scalar lists, rather than current drawing sets.
-    paths = ['ascii-v0', 'draw-v2', 'symbol-v0', 'accent-v1', 'pixel-v1', 'braille-v0']
-    cps = set()
-    for name in paths:
-        doc = json.loads((ROOT / f'weights/neuronte-{name}.json').read_text())
-        for span in doc['training']['labelled'].split():
-            ends = span.split('..')
-            low, high = int(ends[0][2:], 16), int(ends[-1][2:], 16)
-            cps.update(range(low, high + 1))
-    cps = np.array(sorted(cps), np.uint32)
-    with NeuralMasks(weights, library) as net:
+    # Use the loaded bundle's explicit routing ranges, so newly trained
+    # bundles cannot silently be searched with an obsolete scalar manifest.
+    path = Path(weights or ROOT / 'weights/neuronte-split-v4.nrt')
+    with NeuralMasks(path, library) as net:
+        data = path.read_bytes()
+        if len(data) < 28 or struct.unpack_from('<I', data, 8)[0] != 2:
+            raise ValueError('full video mode requires a bundle with explicit scalar ranges')
+        nets, ranges = struct.unpack_from('<II', data, 12)
+        offset = 28 + 4 * nets
+        cps = []
+        for i in range(ranges):
+            lo, hi, _ = struct.unpack_from('<III', data, offset + 12*i)
+            cps.extend(cp for cp in range(lo, min(hi, 0x10ffff)+1) if not 0xd800 <= cp <= 0xdfff)
+        cps = np.array(cps, np.uint32)
         masks = np.stack([net.mask(int(cp), width, height).ravel() for cp in cps])
     return cps, masks
 
@@ -148,21 +152,35 @@ class TwoInk:
         self.masks = self.masks.astype(np.float64)
         self.previous = None
 
-    def fit(self, rgb):
+    def fit(self, rgb, proposals=None):
         p = patches(rgb, self.width, self.height)
         grid = p.shape[:2]
         x = p.reshape(-1, self.width * self.height, 3).astype(np.float64)
-        m = self.masks
+        if proposals is not None:
+            proposals = np.asarray(proposals)
+            if proposals.ndim != 3 or proposals.shape[:2] != grid or proposals.shape[2] < 1:
+                raise ValueError('proposals must have shape rows x columns x candidates')
+            if proposals.dtype.kind not in 'iu' or np.any(proposals < 0) or np.any(proposals >= len(self.masks)):
+                raise ValueError('proposal index outside mask manifest')
+            proposals = proposals.reshape(-1, proposals.shape[2])
         # Design matrix [1-m, m]. Each channel's box-constrained quadratic
         # optimum is either interior or on one of the four box edges.
-        a = ((1-m)**2).sum(1)[None, :, None]
-        b = (m*(1-m)).sum(1)[None, :, None]
-        d = (m*m).sum(1)[None, :, None]
-        det = a*d-b*b
+        moments = np.stack([((1-self.masks)**2).sum(1),
+                            (self.masks*(1-self.masks)).sum(1),
+                            (self.masks*self.masks).sum(1)])
         ids, colours, losses = [], [], []
         for start in range(0, len(x), 64):
             chunk = x[start:start+64]
-            v = np.einsum('kp,bpc->bkc', m, chunk, optimize=True)
+            selected = proposals[start:start+len(chunk)] if proposals is not None else None
+            if selected is None:
+                a,b,d = [r[None,:,None] for r in moments]
+            else:
+                a,b,d = [r[selected][:,:,None] for r in moments]
+            det = a*d-b*b
+            if selected is None:
+                v = np.einsum('kp,bpc->bkc', self.masks, chunk, optimize=True)
+            else:
+                v = np.matmul(self.masks[selected], chunk)
             u = chunk.sum(1)[:, None, :] - v
             energy = (chunk*chunk).sum(1)[:, None, :]
             def divide(n, den): return np.divide(n, den, out=np.zeros_like(n), where=den > 1e-12)
@@ -179,10 +197,10 @@ class TwoInk:
             total = best.sum(2)
             choice = total.argmin(1)
             ix = np.arange(len(chunk))
-            if self.previous is not None and self.previous.shape == grid:
+            if proposals is None and self.previous is not None and self.previous.shape == grid:
                 old = self.previous.ravel()[start:start+len(chunk)]
                 choice = np.where(total[ix,old] <= total[ix,choice] + self.margin * self.width*self.height*3, old, choice)
-            ids.extend(choice); colours.extend(np.stack([cb[ix,choice],cf[ix,choice]],1)); losses.extend(total[ix,choice])
+            ids.extend(choice if selected is None else selected[ix, choice]); colours.extend(np.stack([cb[ix,choice],cf[ix,choice]],1)); losses.extend(total[ix,choice])
         idx = np.array(ids).reshape(grid)
         self.previous = idx.copy()
         return dict(indices=idx, colours=np.clip(np.rint(colours),0,255).astype(np.uint8).reshape(*grid,2,3),

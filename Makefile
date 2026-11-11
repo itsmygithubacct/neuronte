@@ -271,3 +271,14 @@ clean:
 	rm -rf build
 
 .PHONY: all demo pack test bench clean
+
+# Video is an optional Python/numpy/scipy tool; its tests are separate from
+# the dependency-light C/font acceptance suite.
+.PHONY: test-video
+test-video: build/libneuronte.so build/video-decoder-bench
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_video.py
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_video_decoder.py
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_reference.py build/libneuronte.so --bundle weights/neuronte-video-masks-v0.nrt weights/neuronte-video-pixel-v1.json weights/neuronte-video-ascii-v0.json --fallback 1
+
+build/video-decoder-bench: tools/neuronte-video-decoder-bench.c | build
+	$(CC) $(NRT_CFLAGS) -o $@ $< $(LDLIBS)

@@ -1,0 +1,72 @@
+# Neuronte video experiment
+
+This tool consumes RGB24 raw frames on standard input, usually from ffmpeg.
+Frame width and height are mandatory; dimensions must divide by the cell
+size exactly. No implicit resizing or cropping is performed.
+
+`python3 tools/neuronte-video.py --width 640 --height 384 --level two
+--mode portable --cell 8x16 --output ansi` writes cursor-addressed truecolour
+terminal cells. `--output rgb` writes reconstructed RGB24 frames. Full mode
+uses the loaded bundle’s explicit scalar ranges and its actual C coverage masks;
+portable mode uses the 328 ideal geometric masks. Full mode must be displayed
+with that same Neuronte bundle to reproduce the fitted image. Full mode requires a bundle with explicit scalar ranges; split-v4 is the
+default. A standalone net without a manifest is rejected.
+
+`--level multi --cell 2x4 --output rgb` uses three cached C neural coverage
+masks (right half, middle half, lower half), eight RGB colours per cell,
+and the Gray row order 0,1,3,2. The floating-point product of three masks
+chooses each ink's weight. There is no mask rounding. At 2x4 this is lossless
+only when the masks pass the exactness gate. `--require-exact` checks every
+one of 256 octants at all eight pixel centres and refuses output otherwise.
+The default video-only calibrated bundle passes this gate. The existing
+unmodified split-v4 does not; explicitly selecting it produces lossy output.
+The calibration doubles the coverage scale of the frozen pixel and ASCII nets.
+It narrows their continuous antialias transition, changes no learned layer,
+and is deliberately separate from normal text rendering. Check with `--check-exact` (JSON to stdout, exit 1 on failure).
+
+`--margin` is a nonnegative squared RGB error per channel allowed to retain
+the previous character. Colours are still refitted each frame. ANSI output
+sends only cells with a changed character or quantised RGB colours. The
+least-squares fit is exact for continuous RGB colours constrained to [0,255];
+rounding those colours to RGB8 introduces a small additional error. This is
+not an exhaustive search over all RGB8 pairs. Deterministic ties prefer the
+first character in the manifest. `--stats PATH` records frame count, time,
+cell dimensions and reconstructed PSNR, including RGB8 quantisation.
+
+No new library format or public C API is required. In-process multi-ink
+records have shape (rows, columns, 8, 3), uint8. Plane scalars are fixed by
+this version and not repeated in each cell: payload is 24 bytes/cell. A
+future persistent format would additionally require dimensions, version,
+weights SHA256 and length validation; this tool does not invent an implicit
+unversioned on-disk cell format. RGB streams follow ffmpeg's documented
+rawvideo convention. Model experiments use separate versioned JSON files.
+
+Sources and generated experimental clips are kept in the research directory,
+not this repository. No source frames are retained in model assets. Video
+nets are retained only when held-out acceptance beats the exact-search
+baseline under the research plan's quality, stability and speed criteria.
+
+## Optional learned helpers
+
+`--level two --mode full --cell 8x16 --helper speed` proposes a compact
+candidate shortlist, then performs the same exact bounded RGB fit on it.
+`--helper quality` uses a learned temporal switch, then checks the proposed
+retained cells against the source image: local SSIM loss at most0.0001,
+whole-frame SSIM loss at most0.001. This is a hybrid model plus quality veto,
+not a model-only fidelity guarantee. Its goal is fewer character changes;
+it still performs exhaustive search. The two helpers are alternatives, not a
+combined mode that has never been measured.
+
+Both require the precise split-v4 weights they were trained against, zero
+`--margin`, and 8×16 cells. A mismatched bundle is rejected. The optional
+`--helper-model` explicitly selects another compatible, versioned model.
+The helper JSON records the bundle SHA256, model seed, training-frame digest,
+training source hash, inference policy and acceptance evidence. Playback uses
+NumPy/SciPy, not torch. Training and reproducible gates are in `train/video.py`
+and `train/evaluate_video_helpers.py`.
+
+The initial helpers failed on held-out data and were not adopted. The revised
+inference policy was chosen on validation clips and checked on fresh held-out
+clips, with both seeds retained in research. All footage is original synthetic
+material. Passing these clips does not establish general-purpose performance
+on natural footage; the exhaustive and multi-ink modes remain available.

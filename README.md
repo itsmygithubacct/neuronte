@@ -17,6 +17,7 @@ letter. Desktop adapters fall back for unsupported strings and styles.
 | Weights | Use | Characters | Hidden width | Parameters | File |
 |---|---|---|---:|---:|---:|
 | `neuronte-split-v4` | the font to use | 1,061, over six nets and a router | 48, 128 and 192 | 329,356 | 1,319,616 bytes |
+| `neuronte-full-v3` | explicit RC9 monolithic font; [quality and baseline comparison](weights/neuronte-full-v3.md) | 878, including the Greek and Russian additions | 384 | 331,009 | 1,324,240 bytes |
 | `neuronte-full-v2` | the baseline `split` is measured against | 763 of them in one net, all but the sextants and octants | 320 | 234,881 | 939,728 bytes |
 | `neuronte-ascii-v0` | the smallest file | the 95 printable ASCII characters | 128 | 44,801 | 179,408 bytes |
 | `neuronte-ui1-v0`, `neuronte-ui2-v0`, `neuronte-ui3-v0`, `neuronte-ui4-v0`, `neuronte-ui5-v0`, `neuronte-ui6-v0`, `neuronte-ui7-v0` | the desktop face at an em of 1, 2, 3, 4, 5, 6 and 7 pixels | printable ASCII and the ellipsis, 96, with their advances | 96 | 27,457 | 110,864 bytes each |

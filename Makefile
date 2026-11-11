@@ -82,6 +82,7 @@ test: all $(TESTS)
 	$(PYTHON) tests/colour_fixture.py build/colour-fixture.nrt
 	./build/test_api build/colour-fixture.nrt --colour
 	$(PYTHON) tests/check_reference.py build/libneuronte.so build/colour-fixture.json build/colour-fixture.nrt
+	$(PYTHON) tests/check_advances.py build/libneuronte.so $(ASCII).json
 
 bench: build/neuronte-bench
 	./build/neuronte-bench $(ASCII).nrt

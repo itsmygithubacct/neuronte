@@ -244,11 +244,18 @@ def colour_drawings(doc):
     return strokes.parse_layers(os.path.join(ROOT, drawing), pal)
 
 
+# The original colour artifacts predate explicit parser/expanded-drawing hashes.
+# Their archived sources used this parser. Do not silently repack them with a
+# changed parser: a later parser needs recorded provenance or semantic hashes.
+LEGACY_STROKES_SHA256 = "31382edcb36b1286b2f56de05dfd2e22b998778abb1a93d68d07a277b47833a2"
+
+
 def check_sources(doc, path):
     """Bind packing to the labelled drawings, not an unrelated trainer edit.
 
     New nets record expanded per-glyph drawings as well as historical source
-    hashes. Legacy files retain their drawing-file and rule-module checks.
+    hashes. Legacy files retain their named drawing/palette, parser and rule
+    checks. A legacy file without a parser digest requires the original parser.
     Trainer hashes are evidence of how weights were made, not a requirement
     that future packers run from that same trainer revision.
     """
@@ -272,14 +279,19 @@ def check_sources(doc, path):
         if drawings.get("glyphs") != want:
             raise SystemExit(f"{path}: labelled drawings do not match training.drawings_sha256")
         return
+    required = set(colour_sources(doc)) | {"train/glyphs.py", "train/strokes.py"}
     for rel, digest in src.items():
-        if not rel.startswith("font/") and rel != "train/glyphs.py":
+        if not rel.startswith("font/") and rel not in required:
             continue
         fp = os.path.join(ROOT, rel)
         if not os.path.isfile(fp):
             raise SystemExit(f"{path}: {rel} is not in the tree")
         if sha256_file(fp) != digest:
             raise SystemExit(f"{path}: {rel} sha256 does not match training.sources_sha256")
+    if "train/strokes.py" not in src:
+        parser_path = os.path.join(ROOT, "train/strokes.py")
+        if not os.path.isfile(parser_path) or sha256_file(parser_path) != LEGACY_STROKES_SHA256:
+            raise SystemExit(f"{path}: legacy drawing has no parser digest and requires the original train/strokes.py")
 
 
 def labelled_scalars(doc, path):

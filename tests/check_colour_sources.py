@@ -1,7 +1,10 @@
 """Exercise colour drawing provenance across trainer and drawing changes."""
 import copy
 import os
+from pathlib import Path
+import shutil
 import sys
+import tempfile
 from unittest.mock import patch
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "train"))
@@ -33,6 +36,15 @@ pack.check_sources(old, "legacy icon")
 bad = copy.deepcopy(old)
 bad["training"]["sources_sha256"]["font/icons.txt"] = "0" * 64
 reject(bad)
+bad = copy.deepcopy(old)
+bad["training"]["sources_sha256"]["train/strokes.py"] = "0" * 64
+reject(bad)
+# Missing historical parser metadata is not permission to change the parser.
+original_sha256_file = pack.sha256_file
+def changed_parser_digest(path):
+    return "0" * 64 if str(path).endswith("/train/strokes.py") else original_sha256_file(path)
+with patch.object(pack, "sha256_file", side_effect=changed_parser_digest):
+    reject(old)
 
 icons = glyphs.colour_icons()
 scalars = pack.labelled_scalars(old, "legacy icon")
@@ -70,6 +82,29 @@ flame = {"training": {
         for rel in ("font/flame.txt", "font/flame-palette.txt")},
 }}
 pack.check_sources(flame, "legacy custom drawing")
+# The trainer permits named drawing/palette paths outside font/. Both must be
+# bound by their own hashes, irrespective of directory name.
+with tempfile.TemporaryDirectory(prefix="neuronte-custom-provenance-") as directory:
+    root = Path(directory)
+    (root / "assets").mkdir()
+    (root / "train").mkdir()
+    for source, destination in (("font/flame.txt", "assets/mark.txt"),
+                                ("font/flame-palette.txt", "assets/colours.txt"),
+                                ("train/strokes.py", "train/strokes.py")):
+        shutil.copyfile(Path(pack.ROOT) / source, root / destination)
+    custom = copy.deepcopy(flame)
+    custom["training"].update(drawing="assets/mark.txt", palette="assets/colours.txt")
+    custom["training"]["sources_sha256"] = {
+        rel: pack.sha256_file(root / rel) for rel in ("assets/mark.txt", "assets/colours.txt")}
+    with patch.object(pack, "ROOT", str(root)):
+        pack.check_sources(custom, "legacy external-directory drawing")
+        for rel in ("assets/mark.txt", "assets/colours.txt"):
+            bad = copy.deepcopy(custom)
+            bad["training"]["sources_sha256"][rel] = "0" * 64
+            reject(bad)
+        with (root / "assets/mark.txt").open("a") as handle:
+            handle.write("\n# changed drawing source\n")
+        reject(custom)
 flame["training"]["drawings_sha256"] = {
     "version": 1, "glyphs": drawing_hashes(pack.colour_drawings(flame), [0x100000])}
 pack.check_sources(flame, "semantic custom drawing")

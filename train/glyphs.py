@@ -95,7 +95,7 @@ UI_TOP = {em: _HAND_TOP.get(em, _desktop_top(em))
 # 8 px drawing rows: baseline 6, x-height 2. With UI_TOP 5 the baseline is cell row 11.
 UI = {em: os.path.join(strokes.ROOT, "font", f"ui-{em}.txt") for em in UI_TOP}
 UI_ITALIC = {em: os.path.join(strokes.ROOT, "font", f"ui-{em}-italic.txt")
-             for em in (10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32)}  # the ems drawn in italic
+             for em in range(3, 33)}  # 1/2 px cannot express a distinct slant
 PEN = 0.075                 # the pen radius, in cell widths
 PENS = {f"ui{em}": 0.55 / em for em in UI_TOP}  # sets drawn with another: 1.1 pixels wide at their em
 PENS.update({f"ui{em}i": 0.55 / em for em in UI_ITALIC})  # the italic uses the same pen

@@ -72,6 +72,8 @@ UI39 = weights/neuronte-ui39-v0
 UI43 = weights/neuronte-ui43-v0
 # Above 32 px, one scalable net for every em, drawn blended, with its advances.
 UILARGE = weights/neuronte-ui-large-v0
+# The Kilix flame: one colour net, version 3, drawn at U+100000.
+FLAME = weights/neuronte-flame-v0
 OBJS = build/neuronte.o build/utf8.o
 TOOLS = build/neuronte-render build/neuronte-bench
 TESTS = build/test_utf8 build/test_api
@@ -116,7 +118,7 @@ $(DEMOS): build/%: demo/%.c demo/common.h build/demo-common.o build/libneuronte.
 		build/libneuronte.a $(LDLIBS) -lz
 
 # Rebuild the packed weights from the JSON the trainers write.
-pack: $(ASCII).json $(FULL).json $(NETS) $(GATE) $(UI1).json $(UI2).json $(UI3).json $(UI4).json $(UI5).json $(UI6).json $(UI7).json $(UI8).json $(UI9).json $(UI10).json $(UI10I).json $(UI11).json $(UI11I).json $(UI12).json $(UI12I).json $(UI13).json $(UI14).json $(UI14I).json $(UI15).json $(UI16).json $(UI16I).json $(UI17).json $(UI18).json $(UI18I).json $(UI19).json $(UI20).json $(UI20I).json $(UI21).json $(UI22).json $(UI22I).json $(UI23).json $(UI24).json $(UI24I).json $(UI25).json $(UI26).json $(UI26I).json $(UI27).json $(UI28).json $(UI29).json $(UI30).json $(UI30I).json $(UI31).json $(UI32).json $(UI33).json $(UI34).json $(UI35).json $(UI36).json $(UI37).json $(UI38).json $(UI39).json $(UI43).json $(UILARGE).json
+pack: $(ASCII).json $(FULL).json $(NETS) $(GATE) $(UI1).json $(UI2).json $(UI3).json $(UI4).json $(UI5).json $(UI6).json $(UI7).json $(UI8).json $(UI9).json $(UI10).json $(UI10I).json $(UI11).json $(UI11I).json $(UI12).json $(UI12I).json $(UI13).json $(UI14).json $(UI14I).json $(UI15).json $(UI16).json $(UI16I).json $(UI17).json $(UI18).json $(UI18I).json $(UI19).json $(UI20).json $(UI20I).json $(UI21).json $(UI22).json $(UI22I).json $(UI23).json $(UI24).json $(UI24I).json $(UI25).json $(UI26).json $(UI26I).json $(UI27).json $(UI28).json $(UI29).json $(UI30).json $(UI30I).json $(UI31).json $(UI32).json $(UI33).json $(UI34).json $(UI35).json $(UI36).json $(UI37).json $(UI38).json $(UI39).json $(UI43).json $(UILARGE).json $(FLAME).json
 	$(PYTHON) train/pack.py $(ASCII).json $(ASCII).nrt
 	$(PYTHON) train/pack.py $(FULL).json $(FULL).nrt
 	$(PYTHON) train/pack.py --bundle $(SPLIT) $(NETS) --gate $(GATE)
@@ -172,9 +174,10 @@ pack: $(ASCII).json $(FULL).json $(NETS) $(GATE) $(UI1).json $(UI2).json $(UI3).
 	$(PYTHON) train/pack.py --drawing $(UI39).nrt $(UI39).json font/ui-39.txt
 	$(PYTHON) train/pack.py --drawing $(UI43).nrt $(UI43).json font/ui-43.txt
 	$(PYTHON) train/pack.py --drawing $(UILARGE).nrt $(UILARGE).json font/ui-large-advances.txt
+	$(PYTHON) train/pack.py $(FLAME).json $(FLAME).nrt
 	cd weights && sha256sum *.json *.nrt > SHA256SUMS
 	# A colour file is packed the same way: python3 train/pack.py colour.json colour.nrt
-	# make test builds a small synthetic one under build/. No icon net is trained here.
+	# make test builds a small synthetic one under build/; $(FLAME) is a trained one.
 
 test: all $(TESTS)
 	cd weights && sha256sum -c --quiet SHA256SUMS
@@ -189,6 +192,7 @@ test: all $(TESTS)
 	$(PYTHON) tests/colour_fixture.py build/colour-fixture.nrt
 	./build/test_api build/colour-fixture.nrt --colour
 	$(PYTHON) tests/check_reference.py build/libneuronte.so build/colour-fixture.json build/colour-fixture.nrt
+	$(PYTHON) tests/check_reference.py build/libneuronte.so $(FLAME).json $(FLAME).nrt
 	$(PYTHON) tests/check_advances.py build/libneuronte.so $(ASCII).json
 	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI1).nrt $(UI1).json font/ui-1.txt
 	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI2).nrt $(UI2).json font/ui-2.txt

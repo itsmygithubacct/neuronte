@@ -2,6 +2,8 @@
 
 usage: python3 train/colour.py OUT.json --form A|B [--layers K] [--width W]
                                [--steps N] [--device cuda] [--seed S]
+                               [--drawing FILE] [--palette FILE]
+                               [--blank U+XXXX[..U+YYYY],...]
 
 Form A is one net with K distance outputs, one per layer. Form B has one
 output and takes the layer number as an input, one-hot. At the same width
@@ -10,6 +12,17 @@ are trained on the same points with the same targets: for each icon, 128
 points anywhere in the cell and 384 of 1024 candidates near an edge,
 shared equally among the layers it uses. Layers an icon does not use are
 trained to "outside everywhere".
+
+The drawings are font/icons.txt and the palette font/palette.txt, unless
+--drawing and --palette name other files in the tree, such as the Kilix
+flame in font/flame.txt and font/flame-palette.txt. The weights record
+both files and their sha256, so the packer reads the same ones.
+
+--blank names scalars that are not drawn, trained with every layer
+"outside everywhere" and every entry 0. A net of one drawing, such as the
+flame, otherwise draws that drawing for every scalar it is asked for. The
+blanks together weigh as much in the loss as the drawings together. They
+are not labelled, so they have no edge record.
 
 Both carry the palette head: from the 64 code features to each layer's
 palette entry, as 5 bits a layer. It runs once per glyph, so it is not
@@ -22,7 +35,8 @@ Writes the weights as JSON and prints one JSON line of scores:
 - the composited icon against the composited target, on the dark and the
   light theme: mean error and the share of pixels off by more than 32
   of 255;
-- the palette head, which must return every written entry exactly.
+- the palette head, which must return every written entry exactly;
+- with --blank, any blank that draws a pixel or names an entry other than 0.
 """
 import argparse
 import hashlib
@@ -49,6 +63,9 @@ p.add_argument("--device", default="cuda")
 p.add_argument("--seed", type=int, default=0)
 p.add_argument("--pen", type=float, default=0.075, help="default pen radius in cell widths")
 p.add_argument("--grid", type=int, default=256, help="target grid nodes per cell width")
+p.add_argument("--drawing", default=strokes.ICONS, help="colour drawings, in the syntax of font/icons.txt")
+p.add_argument("--palette", default=strokes.PALETTE, help="their palette, in the syntax of font/palette.txt")
+p.add_argument("--blank", default="", help="scalars trained to draw nothing: U+XXXX or U+XXXX..U+YYYY, comma separated")
 a = p.parse_args()
 torch.manual_seed(a.seed)
 torch.set_default_device(a.device)
@@ -62,11 +79,23 @@ def sha(path):
         return hashlib.sha256(fh.read()).hexdigest()
 
 
-SOURCES = {os.path.relpath(f, strokes.ROOT): sha(f) for f in (strokes.ICONS, strokes.PALETTE)}
+DRAWING, PALETTE = (os.path.relpath(os.path.abspath(f), strokes.ROOT) for f in (a.drawing, a.palette))
+if any(f.startswith("..") for f in (DRAWING, PALETTE)):
+    raise SystemExit("the drawing and the palette must be files in the tree")
+SOURCES = {f: sha(os.path.join(strokes.ROOT, f)) for f in (DRAWING, PALETTE)}
 SOURCES["train/colour.py"] = sha(os.path.abspath(__file__))
 TAU, OCT, W, N, K = 0.15, 6, a.width, a.grid, a.layers
-PAL = strokes.palette()
-ICONS = strokes.parse_layers(pal=PAL)
+PAL = strokes.palette(os.path.join(strokes.ROOT, PALETTE))
+ICONS = strokes.parse_layers(os.path.join(strokes.ROOT, DRAWING), pal=PAL)
+LABELLED = list(ICONS)
+BLANK = []
+for tok in filter(None, a.blank.split(",")):
+    lo, _, hi = tok.partition("..")
+    BLANK += [chr(v) for v in range(int(lo[2:], 16), int((hi or lo)[2:], 16) + 1)]
+if set(BLANK) & set(ICONS) or len(set(BLANK)) != len(BLANK):
+    raise SystemExit("a blank scalar is drawn or repeated")
+ICONS.update({c: [] for c in BLANK})
+NL = len(LABELLED)
 CHARS = list(ICONS)
 G = len(CHARS)
 assert max(len(v) for v in ICONS.values()) <= K, "an icon has more layers than K"
@@ -134,6 +163,7 @@ def entries(c):
 gi = torch.arange(G)
 CF = code(LAB)
 EBITS = ((ENTRY[..., None] >> torch.arange(ENTRY_BITS)) & 1).float()
+GW = torch.cat([torch.full((NL,), 0.5 / NL), torch.full((G - NL,), 0.5 / max(1, G - NL))])
 params = list(net.parameters()) + list(head.parameters())
 opt = torch.optim.Adam(params, lr=2e-3)
 sched = torch.optim.lr_scheduler.CosineAnnealingLR(opt, a.steps)
@@ -146,9 +176,16 @@ for step in range(a.steps):
     rank = tc.abs().argsort(-1).argsort(-1).float().masked_fill(~USED[..., None], float("inf"))
     near = rank.amin(1).topk(384, dim=1, largest=False).indices
     xy = torch.cat([cand[:, :128], torch.gather(cand, 1, near[..., None].expand(-1, -1, 2))], 1)
-    loss = (field(CF, xy) - target(gi, xy)).abs().mean()
     bits, _ = entries(CF)
-    hloss = torch.nn.functional.binary_cross_entropy_with_logits(bits, EBITS)
+    if BLANK:
+        # The blanks together weigh as much as the drawings together, so a
+        # drawing of one glyph is not lost among many blanks.
+        err = (field(CF, xy) - target(gi, xy)).abs().mean((1, 2))
+        bce = torch.nn.functional.binary_cross_entropy_with_logits(bits, EBITS, reduction="none").mean((1, 2))
+        loss, hloss = (err * GW).sum(), (bce * GW).sum()
+    else:
+        loss = (field(CF, xy) - target(gi, xy)).abs().mean()
+        hloss = torch.nn.functional.binary_cross_entropy_with_logits(bits, EBITS)
     opt.zero_grad()
     (loss + 0.1 * hloss).backward()
     opt.step()
@@ -215,6 +252,9 @@ head_wrong = int(((pred != ENTRY) & USED).sum())
 res = {"form": a.form, "layers": K, "icons": G, "width": W, "steps": a.steps, "seed": a.seed,
        "params": sum(q.numel() for q in net.parameters()), "head_params": sum(q.numel() for q in head.parameters()),
        "final_loss": float(loss.detach()), "head_wrong": head_wrong}
+if BLANK:
+    res["blanks"] = len(BLANK)
+    res["blank_head_wrong"] = int((pred[NL:] != 0).sum())
 for wpx, ss in ((12, 2), (16, 2), (32, 1)):
     t, n = truth(wpx), cover(wpx, ss)
     ti, ni = t > 0.5, n > 0.5
@@ -225,8 +265,11 @@ for wpx, ss in ((12, 2), (16, 2), (32, 1)):
     r = {"iou_mean": round(float(used.mean()), 4), "iou_min": round(float(used.min()), 4),
          "worst": [label(int(i) // K, int(i) % K) for i in order],
          "stray_unused": int((ni & ~USED[..., None, None]).any(-1).any(-1).sum())}
+    if BLANK:
+        r["stray_blank"] = int(ni[NL:].any(-1).any(-1).any(-1).sum())
     for theme in THEMES:
-        err = (composite(n, pred, theme) - composite(t, ENTRY, theme)).abs() * 255
+        # The labelled glyphs only; a blank is scored by its stray pixels.
+        err = (composite(n[:NL], pred[:NL], theme) - composite(t[:NL], ENTRY[:NL], theme)).abs() * 255
         r[theme] = {"mean_err": round(float(err.mean()), 2), "off_gt32": round(float((err.amax(-1) > 32).float().mean()), 4)}
     res[f"w{wpx}_s{ss}"] = r
 
@@ -241,16 +284,19 @@ def layers_of(seq, names):
             for name, l in zip(names, lin)}
 
 
+# Form A is the form train/pack.py packs, as version 3. Form B stays the
+# experiment's file and is not packed.
 doc = {
-    "format": "neuronte-colour-weights-experimental",
-    "version": 0,
+    "format": "neuronte-colour-weights" if a.form == "A" else "neuronte-colour-weights-experimental",
+    "version": 1 if a.form == "A" else 0,
     "shape": {"form": a.form, "glyph_layers": K, "position_octaves": OCT, "code_bits": 64, "hidden_width": W,
               "hidden_layers": 3, "tau": TAU, "parity_masks": [f"0x{m:06X}" for m in MASKS],
               "entry_bits": ENTRY_BITS, "head_width": a.head_width},
     "palette": {name: {"entry": n, "dark": f"#{d[0]:02X}{d[1]:02X}{d[2]:02X}" if d else None,
                        "light": f"#{li[0]:02X}{li[1]:02X}{li[2]:02X}" if li else None}
                 for name, (n, d, li) in PAL.items()},
-    "training": {"set": "icons", "labelled": " ".join(f"U+{ord(c):04X}" for c in CHARS), "sources_sha256": SOURCES,
+    "training": {"set": os.path.splitext(os.path.basename(DRAWING))[0], "labelled": " ".join(f"U+{ord(c):04X}" for c in LABELLED), "sources_sha256": SOURCES,
+                 "drawing": DRAWING, "palette": PALETTE, "blank": a.blank,
                  "pen_radius": a.pen, "grid": N, "steps": a.steps, "seed": a.seed},
     "layers": layers_of(net, ["l1", "l2", "l3", "out"]),
     "head": layers_of(head, ["h1", "out"]),

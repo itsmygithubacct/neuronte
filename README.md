@@ -10,7 +10,7 @@ The same buffer can be shown in a Kilix terminal or in a GUI window. The
 library does not open the window or take the terminal.
 
 Status: public, at github.com/itsmygithubacct/neuronte. There are three weight files for the one
-library, and fifty-two for the desktop face: forty upright, eleven italic and one scalable. Scalars a file was not trained on get a mark of their own, not
+library, and fifty-two for the desktop face: forty upright, eleven italic and one scalable, plus a separate Kilix flame net. Scalars a file was not trained on get a mark of their own, not
 a letter.
 
 | Weights | Use | Characters | Hidden width | Parameters | File |
@@ -35,6 +35,7 @@ a letter.
 | `neuronte-ui22-italic-v0`, `neuronte-ui26-italic-v0` | the italic at 22 and 26 pixels | printable ASCII and the ellipsis, 96, with their advances | 256 | 155,137 | 621,584 bytes each |
 | `neuronte-ui24-italic-v0`, `neuronte-ui30-italic-v0` | the italic at 24 and 30 pixels | printable ASCII and the ellipsis, 96, with their advances | 384 | 331,009 | 1,325,072 bytes each |
 | `neuronte-ui-large-v0` | the desktop face at every em from 33 pixels up, drawn blended | printable ASCII and the ellipsis, 96, with their advances | 384 | 331,009 | 1,325,072 bytes |
+| `neuronte-flame-v0` | the Kilix flame, for the Start button at 16 px and the desktop icon at 32: a colour net, version 3, of three layers | one mark, at U+100000; the printable ASCII and U+FFFD draw nothing | 64 | 16,914 | 68,124 bytes |
 
 `neuronte-split` draws each character with one small net picked for it.
 It draws ASCII, symbols, blocks and the mosaics four to seven times
@@ -90,17 +91,18 @@ a letter and a mark, such as ß æ œ ð þ ø ł đ ħ ŋ ĳ, are drawn in
 | `font/ui-large.txt`, `font/ui-large-advances.txt` | The same face above 32 pixels: the first-pass strokes the pixel faces were fitted to, drawn once for every em with a pen 3/32 em wide, the 32 px drawing's three-pixel stem, and blended. The advances are the 32 px drawing's in em, bold 0.2 more. `train/train.py --set uilarge` trains the net and scores it by overlap at 32, 48, 64 and 96 pixels. The net is `neuronte-ui-large-v0` |
 | `font/icons.txt` | The icons, as colour layers back to front, each naming a palette entry. Not yet in any weights |
 | `font/palette.txt` | The palette for colour glyphs: entry 0 is the cell's foreground, 1 is clear, the rest have a dark-theme and a light-theme colour |
+| `font/flame.txt`, `font/flame-palette.txt` | The Kilix flame, three colour layers in the syntax of `font/icons.txt`, with its own palette of the desktop's red, yellow and white. Drawn in the middle square of the cell. `font/flame.md` says how it was drawn and trained. The net is `neuronte-flame-v0` |
 | `font/code-masks.txt` | The 43 parity masks that turn a scalar into the net's 64 character inputs |
 | `font/octants.txt` | Which cells each octant U+1CD00..U+1CDE5 fills. Made by `train/mosaics.py` from Unicode 16's `UnicodeData.txt`, whose version and sha256 it records |
 | `train/strokes.py` | Reads the stroke files |
 | `train/glyphs.py` | The character sets. Makes box drawing and blocks from their Unicode names, Braille from the dot bits, sextants and octants from the cells they fill, accented letters from a letter and a mark, and the target the net learns. `python3 train/glyphs.py` checks the sets |
 | `train/mosaics.py` | Makes `font/octants.txt`, and checks the sextants and the octant patterns encoded elsewhere against the same Unicode data |
 | `train/train.py` | Trains a net on one set. Needs torch, and wants a GPU |
-| `train/colour.py` | Trains a colour net. Needs torch, and wants a GPU. No icon net has been trained |
+| `train/colour.py` | Trains a colour net, on `font/icons.txt` or another drawing and palette named with `--drawing` and `--palette`, with `--blank` scalars trained to draw nothing. Needs torch, and wants a GPU. No icon net has been trained |
 | `train/snap.py` | The straight edges of a colour glyph, measured from the drawings when the weights are packed, and the warp that snaps them |
 | `train/gate.py` | Trains the router's gate for a bundle of nets. Needs torch; a CPU is enough |
 | `train/pack.py` | Packs weights JSON into the binary file the C library loads: a distance net, a colour net, a bundle, an advance table, or a drawing file. A pixel face such as `font/ui-10.txt` packs as an advance table, bold one pixel more. Documents the layouts |
-| `weights/` | The trained weights as JSON, the packed files, the scores and `SHA256SUMS`. `neuronte-draw-v2`, `neuronte-symbol-v0`, `neuronte-accent-v1`, `neuronte-pixel-v1`, `neuronte-braille-v0` and `neuronte-gate-v3` are the parts of `neuronte-split-v4`, with `neuronte-ascii-v0`. `neuronte-full-v2` is here so that `make test` and `make bench` run from a clone. `neuronte-ui1-v0` through `neuronte-ui39-v0`, one for every em, and `neuronte-ui43-v0` are the desktop face, each a drawing file of one net and its advances. `neuronte-ui10-italic-v0`, `ui11`, `ui12`, `ui14`, `ui16`, `ui18`, `ui20`, `ui22`, `ui24`, `ui26` and `ui30` are the italic of those sizes |
+| `weights/` | The trained weights as JSON, the packed files, the scores and `SHA256SUMS`. `neuronte-draw-v2`, `neuronte-symbol-v0`, `neuronte-accent-v1`, `neuronte-pixel-v1`, `neuronte-braille-v0` and `neuronte-gate-v3` are the parts of `neuronte-split-v4`, with `neuronte-ascii-v0`. `neuronte-full-v2` is here so that `make test` and `make bench` run from a clone. `neuronte-ui1-v0` through `neuronte-ui39-v0`, one for every em, and `neuronte-ui43-v0` are the desktop face, each a drawing file of one net and its advances. `neuronte-ui10-italic-v0`, `ui11`, `ui12`, `ui14`, `ui16`, `ui18`, `ui20`, `ui22`, `ui24`, `ui26` and `ui30` are the italic of those sizes. `neuronte-ui-large-v0` is the scalable upright face from 33 px; `neuronte-flame-v0` is a separate colour file |
 | `include/neuronte.h`, `src/` | The C library |
 | `tools/neuronte-render.c` | Draws lines of text into a PPM file |
 | `tools/neuronte-bench.c` | Times a net per cell, or a full net against a bundle per class of character |
@@ -291,6 +293,12 @@ No icon net has been trained. `make test` builds a small synthetic
 version 3 file, with a hand-written field and a palette head that
 remembers the labelled glyphs, and checks that. `font/icons.txt` is still
 waiting for a trained net.
+
+`neuronte-flame-v0` is a trained version 3 file of one mark, the Kilix
+flame, at U+100000, and `make test` checks it against numpy the same way.
+The mark is square, so draw it in a cell s wide and 2s tall and keep rows
+s/2 to 3s/2 - 1. Its palette is the desktop's red, yellow and white in
+both themes. It does not snap at 16 or 32 px, the sizes it is for.
 
 ## The net
 

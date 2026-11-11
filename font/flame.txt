@@ -1,0 +1,16 @@
+# The Kilix flame, the mark of the Start button and the desktop icon. Drawn
+# for this project from the desktop's own three polygons; no icon file was
+# read or traced. Same syntax as font/icons.txt (see train/strokes.py),
+# with its own palette, font/flame-palette.txt. Three layers, back to
+# front: the red outer flame, the yellow middle, the white core. Each
+# lower layer runs under the one above, so no seam shows.
+#
+# The teacher's 16 by 16 grid puts its vertices on pixel centres. A vertex
+# (x, y) there is (0.625 * (x + 0.5), 5 + 0.625 * (y + 0.5)) here, so the
+# mark fills the middle square of the cell, y 5 to 15. Draw it in a cell
+# s wide and 2 s tall and keep rows s/2 to 3s/2 - 1: a square of s pixels.
+#
+# No code point is assigned to the mark. U+100000, the first scalar of
+# Supplementary Private Use Area-B, which no Nerd Font uses, is the
+# scalar its net is trained and drawn at.
+U+100000 {red} F 4.6875,5.3125 7.1875,7.8125 8.4375,10.3125 7.8125,12.8125 5.9375,14.0625 3.4375,14.0625 1.5625,12.8125 1.5625,10.3125 2.8125,7.8125 || {yellow} F 4.6875,7.8125 6.5625,10.3125 6.5625,12.1875 5.3125,13.4375 4.0625,13.4375 2.8125,12.1875 3.4375,9.6875 || {white} F 4.6875,10.3125 5.9375,12.1875 4.6875,13.4375 3.4375,12.1875

@@ -102,8 +102,10 @@ One edge record per labelled glyph, sorted by scalar. A record is the
 scalar as u32, then K layer blocks. A block is an x-edge count and a
 y-edge count as u16, then that many x edges and that many y edges. An
 edge is an f32 position in design-cell widths and a u32 side, 1 for
-rising and 0 for falling. The edges come from font/icons.txt, and the
-packer refuses the file when that drawing's sha256 is not the one in
+rising and 0 for falling. The edges come from the drawing the weights
+name in training.drawing, font/icons.txt when they name none, with the
+palette in training.palette, font/palette.txt when none. The packer
+refuses the file when either file's sha256 is not the one in
 training.sources_sha256.
 
 An advance table, version 4. An advance is stored in steps of a tenth of
@@ -224,11 +226,18 @@ def sha256_file(path):
     return digest.hexdigest()
 
 
+def colour_sources(doc):
+    """The drawing and the palette a colour net was trained on, relative to the tree."""
+    training = doc.get("training", {})
+    return training.get("drawing", "font/icons.txt"), training.get("palette", "font/palette.txt")
+
+
 def check_sources(doc, path):
     """The drawings named in the weights are the files in this tree."""
     src = doc.get("training", {}).get("sources_sha256")
-    if not isinstance(src, dict) or "font/icons.txt" not in src:
-        raise SystemExit(f"{path}: training.sources_sha256 has no font/icons.txt")
+    for rel in colour_sources(doc):
+        if not isinstance(src, dict) or rel not in src:
+            raise SystemExit(f"{path}: training.sources_sha256 has no {rel}")
     for rel, digest in src.items():
         if not isinstance(rel, str) or os.path.isabs(rel) or ".." in rel.split("/"):
             raise SystemExit(f"{path}: sources_sha256 path {rel!r} is not inside the tree")
@@ -265,9 +274,10 @@ def labelled_scalars(doc, path):
 def palette_bytes(doc, path):
     """192 bytes: dark RGB, then light RGB. Entries 0 and 1 are zeros."""
     got = doc.get("palette")
-    file_pal = strokes.palette()
+    rel = colour_sources(doc)[1]
+    file_pal = strokes.palette(os.path.join(ROOT, rel))
     if not isinstance(got, dict) or set(got) != set(file_pal):
-        raise SystemExit(f"{path}: palette names do not match font/palette.txt")
+        raise SystemExit(f"{path}: palette names do not match {rel}")
     dark, light = bytearray(PALETTE_N * 3), bytearray(PALETTE_N * 3)
     for name, (n, fd, fl) in file_pal.items():
         ent = got[name]
@@ -283,7 +293,7 @@ def palette_bytes(doc, path):
                 raise SystemExit(f"{path}: palette entry {n} {side} is not #RRGGBB")
             rgb = bytes.fromhex(col[1:])
             if rgb != bytes(want):
-                raise SystemExit(f"{path}: palette entry {n} {side} does not match font/palette.txt")
+                raise SystemExit(f"{path}: palette entry {n} {side} does not match {rel}")
             buf[n * 3:n * 3 + 3] = rgb
     return bytes(dark), bytes(light)
 
@@ -301,12 +311,13 @@ def _layer_arrays(doc, group, name, rows, cols, path):
 
 def edge_records(doc, path, k):
     """One record per labelled glyph, sorted by scalar, padded out to K layers."""
-    icons = strokes.parse_layers()
+    drawing, pal = (os.path.join(ROOT, rel) for rel in colour_sources(doc))
+    icons = strokes.parse_layers(drawing, strokes.palette(pal))
     recs = []
     for s in sorted(labelled_scalars(doc, path)):
         ch = chr(s)
         if ch not in icons:
-            raise SystemExit(f"{path}: U+{s:04X} is labelled and is not in font/icons.txt")
+            raise SystemExit(f"{path}: U+{s:04X} is labelled and is not in {colour_sources(doc)[0]}")
         drawn = icons[ch]
         if len(drawn) > k:
             raise SystemExit(f"{path}: U+{s:04X} has {len(drawn)} layers and K is {k}")

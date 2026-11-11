@@ -1,0 +1,9 @@
+# Fixed colours of the in-house Kilix flame, in the order of its layers.
+# This palette belongs to the separate drawing mark, not the icon batch.
+# Entry 0 is foreground and 1 is clear, as in the form A colour format.
+# The flame uses neither: red, yellow and white stay the same on both themes.
+0 fg
+1 clear
+2 red #FF0000 #FF0000
+3 yellow #FFFF00 #FFFF00
+4 white #FFFFFF #FFFFFF

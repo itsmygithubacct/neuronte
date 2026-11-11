@@ -185,6 +185,28 @@ with tempfile.TemporaryDirectory() as tmp:
     if r.returncode == 0 or "Traceback" in r.stderr:
         fail("the packer did not refuse a net one byte short")
 
-print(f"check_advances: {len(want)} characters, a table and two drawing files")
+# The desktop face: every character drawn in font/ui.txt has an advance in
+# font/ui-advances.txt and no other does, the set is printable ASCII and
+# the ellipsis, the file packs, and no step is shorter than the ink.
+import strokes  # noqa: E402
+
+face = strokes.parse(os.path.join(ROOT, "font", "ui.txt"))
+steps = pack.read_advances(os.path.join(ROOT, "font", "ui-advances.txt"))
+if set(map(ord, face)) != set(steps) or set(steps) != set(range(0x20, 0x7F)) | {0x2026}:
+    fail("font/ui.txt and font/ui-advances.txt are not both printable ASCII and U+2026")
+else:
+    if len(pack.advances(steps)) != 800:
+        fail("font/ui-advances.txt does not pack to 800 bytes")
+    for ch, shapes in sorted(face.items()):
+        xs = [x for sh in shapes for x in (sh[1], sh[3])]
+        if any(sh[0] != "seg" for sh in shapes) or (xs and (min(xs) < 0.05 or max(xs) > 0.95)):
+            fail(f"U+{ord(ch):04X} in font/ui.txt is not pen strokes inside the cell")
+        for bold in (0, 1):
+            if xs and steps[ord(ch)][bold] < round(max(xs) * 100) + 5:
+                fail(f"U+{ord(ch):04X}: its advance, weight {bold}, ends inside its ink")
+        if steps[ord(ch)][1] < steps[ord(ch)][0]:
+            fail(f"U+{ord(ch):04X}: the bold advance is less than the regular one")
+
+print(f"check_advances: {len(want)} characters, a table and two drawing files; the desktop face, {len(face)}")
 print("check_advances: FAILED" if failed else "check_advances: passed")
 sys.exit(1 if failed else 0)

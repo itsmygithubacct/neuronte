@@ -456,7 +456,7 @@ if face_em:
                                        + [ctypes.c_char_p, ctypes.c_size_t, ctypes.c_uint32])
     lib.neuronte_set_binary(handle, 1)
     W, H, X, Y = 2 * em + 4, 2 * em + 4, 2, 2
-    for ch_, (adv, art) in sorted(glyphs.pixel_face(em).items()):
+    for ch_, (adv, art) in sorted(glyphs.pixel_face(em, face_path).items()):
         ink = np.array([[c == "#" for c in r] for r in art])
         for bold in (0, 1):
             want = np.zeros((H, W), bool)

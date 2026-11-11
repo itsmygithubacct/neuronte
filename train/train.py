@@ -10,10 +10,11 @@ of nodes 1/256 cell width apart and read between them bilinearly.
 
 The pen is the set's own (glyphs.PENS) unless --pen gives one. The
 scores at cell widths 8 to 32, and at a ui set's own em, also count
-pixels, for a face shown as binary letters at those sizes (each ui set
-judged at its own): how many characters are exactly their drawing's
-pixels, and which are not, over all pixels and over the firm ones,
-those whose drawing is not within 0.1 of half covered.
+pixels, for a face shown as binary letters at those sizes (each ui set,
+and each italic set ui10i to ui32i, judged at its own): how many
+characters are exactly their drawing's pixels, and which are not, over
+all pixels and over the firm ones, those whose drawing is not within
+0.1 of half covered.
 """
 import argparse
 import hashlib

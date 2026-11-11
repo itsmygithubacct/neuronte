@@ -8,7 +8,8 @@ the net, and opens both through the library. The steps the library reads
 must be the ones written, its pixels must be pack.pixels(), and a line of
 text must measure as the sum of its characters. The packer must also
 refuse what the library would refuse. Then the desktop face in
-the font/ui-EM.txt files is checked. Needs numpy.
+the font/ui-EM.txt files, and its italic in font/ui-EM-italic.txt, is
+checked. Needs numpy.
 """
 import ctypes
 import os
@@ -270,9 +271,9 @@ def pen_coverage(em, art, ink, ss=8):
     return table[mask], want
 
 
-for em in glyphs.UI:
-    name = f"font/ui-{em}.txt"
-    face = glyphs.pixel_face(em)
+for em, name, path in ([(e, f"font/ui-{e}.txt", None) for e in glyphs.UI]
+                         + [(e, f"font/ui-{e}-italic.txt", glyphs.UI_ITALIC[e]) for e in glyphs.UI_ITALIC]):
+    face = glyphs.pixel_face(em, path)
     steps, rows = pack.read_face(os.path.join(ROOT, name))
     if rows != em or set(map(ord, face)) != set(steps) or set(steps) != set(range(0x20, 0x7F)) | {0x2026}:
         fail(f"{name} is not printable ASCII and U+2026 at an em of {em}")
@@ -295,6 +296,6 @@ for em in glyphs.UI:
             fail(f"{name}: the strokes for U+{ord(ch):04X} are not firmly its pixels")
     lib.neuronte_close(h)
 
-print(f"check_advances: {len(want)} characters, a table and two drawing files; the desktop face at {len(glyphs.UI)} sizes")
+print(f"check_advances: {len(want)} characters, a table and two drawing files; the desktop face at {len(glyphs.UI)} sizes and its italic at {len(glyphs.UI_ITALIC)}")
 print("check_advances: FAILED" if failed else "check_advances: passed")
 sys.exit(1 if failed else 0)

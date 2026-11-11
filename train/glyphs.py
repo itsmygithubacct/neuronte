@@ -29,14 +29,18 @@ Tiers:
              through 26, and three from 27. Each inked pixel is a round
              dot, joined to the inked pixel beside it and the one below.
              The 8 px face: baseline row 6, x-height row 2, UI_TOP 5.
+    ui10i    the italic of that face, from font/ui-10-italic.txt and so
+    ...      on, at 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30 and 32
+    ui32i    pixels. The same pixels, sheared on the grid so the top sits
+             to the right of the bottom, with the advance widened to fit.
 
 Sets, each a list of tiers: ascii; draw (box, block, shade, braille);
 symbol; accent; full, which is all of those; and three sets for choosing
 how the mosaics join the bundle: pixel (block, mosaic), pixelbraille
 (block, mosaic, braille) and boxshade (box, shade). The sets ui1 to
-ui128, except ui44, are each their tier alone. They share their scalars
-with ascii and with each other, so they join no other set, and their
-nets no bundle.
+ui128, except ui44, and the italic sets ui10i to ui32i, are each their
+tier alone. They share their scalars with ascii and with each other, so
+they join no other set, and their nets no bundle.
 Each has a pen of its own, in PENS, a little over one pixel wide at its em.
 
 field() gives the target: the signed distance to the ink edge, positive
@@ -80,8 +84,11 @@ UI_TOP = {em: _HAND_TOP.get(em, _desktop_top(em))
           for em in range(1, 129) if em != 44}
 # 8 px drawing rows: baseline 6, x-height 2. With UI_TOP 5 the baseline is cell row 11.
 UI = {em: os.path.join(strokes.ROOT, "font", f"ui-{em}.txt") for em in UI_TOP}
+UI_ITALIC = {em: os.path.join(strokes.ROOT, "font", f"ui-{em}-italic.txt")
+             for em in (10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32)}  # the ems drawn in italic
 PEN = 0.075                 # the pen radius, in cell widths
 PENS = {f"ui{em}": 0.55 / em for em in UI_TOP}  # sets drawn with another: 1.1 pixels wide at their em
+PENS.update({f"ui{em}i": 0.55 / em for em in UI_ITALIC})  # the italic uses the same pen
 PAD = 0.25                  # how far edge lines and blocks run past the cell
 LIGHT, HEAVY = 0.06, 0.12   # half widths of box lines, in cell widths
 DOUBLE = 0.19               # offset of each line of a double line from its centre line
@@ -407,11 +414,13 @@ def asterisks():
 
 # The desktop face, drawn as pixels.
 
-def pixel_face(em):
-    """{char: (advance in pixels, rows)} from font/ui-EM.txt. A row is a
-    string of . and #, starting at the pen."""
+def pixel_face(em, path=None):
+    """{char: (advance in pixels, rows)} from a desktop-face file. A row
+    is a string of . and #, starting at the pen. path defaults to
+    font/ui-EM.txt; the italic files are font/ui-EM-italic.txt."""
+    src = UI[em] if path is None else path
     out, ch = {}, None
-    with open(UI[em], encoding="utf-8") as fh:
+    with open(src, encoding="utf-8") as fh:
         for num, raw in enumerate(fh, 1):
             line = raw.rstrip("\n")
             # A bare "#" before the first character is a comment. Once a
@@ -423,15 +432,15 @@ def pixel_face(em):
                 name, _, adv = line.partition(" ")
                 ch = chr(int(name[2:], 16)) if name.startswith("U+") else name
                 if len(ch) != 1 or ch in out or not adv.isdigit() or not 1 <= int(adv) < 2 * em:
-                    raise ValueError(f"{UI[em]}:{num}: bad or repeated character line {line!r}")
+                    raise ValueError(f"{src}:{num}: bad or repeated character line {line!r}")
                 out[ch] = (int(adv), [])
             elif ch is None or set(line) - set(".#") or len(line) > em:
-                raise ValueError(f"{UI[em]}:{num}: a row is . and #, at most {em} of them")
+                raise ValueError(f"{src}:{num}: a row is . and #, at most {em} of them")
             else:
                 out[ch][1].append(line)
     for ch, (adv, rows) in out.items():
         if len(rows) != em or len({len(r) for r in rows}) != 1:
-            raise ValueError(f"{UI[em]}: U+{ord(ch):04X} is not {em} rows of one length")
+            raise ValueError(f"{src}: U+{ord(ch):04X} is not {em} rows of one length")
     return out
 
 
@@ -581,6 +590,7 @@ SETS = {
     "boxshade": ["box", "shade"],
     "braille": ["braille"],
     **{f"ui{em}": [f"ui{em}"] for em in UI_TOP},
+    **{f"ui{em}i": [f"ui{em}i"] for em in UI_ITALIC},
 }
 
 
@@ -612,10 +622,13 @@ def tier(name):
         acc = accents()
         return [(c, acc[c]) for c in sorted(acc)]
     if name in PENS:
-        em = int(name[2:])
-        g = pixel_face(em)
+        body = name[2:]
+        italic = body.endswith("i")
+        em = int(body[:-1] if italic else body)
+        g = pixel_face(em, UI_ITALIC[em] if italic else None)
+        which = f"ui-{em}-italic.txt" if italic else f"ui-{em}.txt"
         if sorted(g) != [chr(c) for c in range(32, 127)] + ["\u2026"]:
-            raise ValueError(f"ui-{em}.txt must hold exactly U+0020..U+007E and U+2026")
+            raise ValueError(f"{which} must hold exactly U+0020..U+007E and U+2026")
         return [(c, traced(g[c][1], em)) for c in sorted(g)]
     raise ValueError(f"no tier {name!r}")
 
@@ -725,6 +738,8 @@ def sources(name):
     for em in UI:
         if f"ui{em}" in tiers:
             files.append(f"font/ui-{em}.txt")
+        if f"ui{em}i" in tiers:
+            files.append(f"font/ui-{em}-italic.txt")
     return files + ["train/strokes.py", "train/glyphs.py"]
 
 

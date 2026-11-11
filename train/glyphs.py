@@ -23,11 +23,21 @@ Tiers:
              U+0100..U+017F and the spacing marks, made here from an
              ASCII letter and the marks in font/marks.txt, by the Unicode
              decomposition, or taken from font/letters.txt.
+    ui10     the desktop face, printable ASCII and U+2026, from
+    ui11     font/ui-10.txt and so on: a proportional face for small
+    ui12     binary text, drawn as pixels once for each em, of 10, 11,
+    ...      12, 14, 16, 18, 20, 22, 24, 26, 28, 30 and 32 pixels.
+    ui32     Stems are one pixel wide to 16, two from 18 to 26, and
+             three from 28. Each inked pixel is a round dot, joined to
+             the inked pixel beside it and the one below.
 
 Sets, each a list of tiers: ascii; draw (box, block, shade, braille);
 symbol; accent; full, which is all of those; and three sets for choosing
 how the mosaics join the bundle: pixel (block, mosaic), pixelbraille
-(block, mosaic, braille) and boxshade (box, shade).
+(block, mosaic, braille) and boxshade (box, shade). The sets ui10 to
+ui32 are each their tier alone. They share their scalars with ascii and
+with each other, so they join no other set, and their nets no bundle.
+Each has a pen of its own, in PENS, a little over one pixel wide at its em.
 
 field() gives the target: the signed distance to the ink edge, positive
 inside, divided by tau and clamped to -1..1, at grid nodes 1/n cell width
@@ -53,6 +63,11 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import strokes  # noqa: E402
 
 OCTANTS = os.path.join(strokes.ROOT, "font", "octants.txt")
+UI_TOP = {10: 6, 11: 6, 12: 7, 14: 8, 16: 9, 18: 10, 20: 11, 22: 12,
+          24: 14, 26: 15, 28: 16, 30: 17, 32: 18}  # per em, the cell row of a desktop-face drawing's first row
+UI = {em: os.path.join(strokes.ROOT, "font", f"ui-{em}.txt") for em in UI_TOP}
+PEN = 0.075                 # the pen radius, in cell widths
+PENS = {f"ui{em}": 0.55 / em for em in UI_TOP}  # sets drawn with another: 1.1 pixels wide at their em
 PAD = 0.25                  # how far edge lines and blocks run past the cell
 LIGHT, HEAVY = 0.06, 0.12   # half widths of box lines, in cell widths
 DOUBLE = 0.19               # offset of each line of a double line from its centre line
@@ -374,6 +389,52 @@ def asterisks():
         "✻": spokes(6, 0.295, 0.085),
         "✽": spokes(8, 0.3, 0.08),
     }
+
+
+# The desktop face, drawn as pixels.
+
+def pixel_face(em):
+    """{char: (advance in pixels, rows)} from font/ui-EM.txt. A row is a
+    string of . and #, starting at the pen."""
+    out, ch = {}, None
+    with open(UI[em], encoding="utf-8") as fh:
+        for num, raw in enumerate(fh, 1):
+            line = raw.rstrip("\n")
+            if line.startswith("# ") or line == "#" or not line:
+                continue
+            if " " in line:
+                name, _, adv = line.partition(" ")
+                ch = chr(int(name[2:], 16)) if name.startswith("U+") else name
+                if len(ch) != 1 or ch in out or not adv.isdigit() or not 1 <= int(adv) < 2 * em:
+                    raise ValueError(f"{UI[em]}:{num}: bad or repeated character line {line!r}")
+                out[ch] = (int(adv), [])
+            elif ch is None or set(line) - set(".#") or len(line) > em:
+                raise ValueError(f"{UI[em]}:{num}: a row is . and #, at most {em} of them")
+            else:
+                out[ch][1].append(line)
+    for ch, (adv, rows) in out.items():
+        if len(rows) != em or len({len(r) for r in rows}) != 1:
+            raise ValueError(f"{UI[em]}: U+{ord(ch):04X} is not {em} rows of one length")
+    return out
+
+
+def traced(rows, em):
+    """Pen strokes for a pixel drawing, in cell units. Each inked pixel is
+    joined to the inked pixel on its right and the one below. A pixel with
+    neither is a dot. Pixels that touch only at a corner are not joined:
+    a slanted stroke would half cover the clear pixels beside it."""
+    ink = {(c, r) for r, row in enumerate(rows) for c, v in enumerate(row) if v == "#"}
+
+    def at(c, r):
+        return (c + 0.5) / em, (UI_TOP[em] + r + 0.5) / em
+
+    out, joined = [], set()
+    for c, r in sorted(ink):
+        for q in ((c + 1, r), (c, r + 1)):
+            if q in ink:
+                out.append(("seg", *at(c, r), *at(*q), None))
+                joined.update(((c, r), q))
+    return out + [("seg", *at(c, r), *at(c, r), None) for c, r in sorted(ink - joined)]
 
 
 # Composed letters.
@@ -739,6 +800,7 @@ SETS = {
     "pixelbraille": ["block", "mosaic", "braille"],
     "boxshade": ["box", "shade"],
     "braille": ["braille"],
+    **{f"ui{em}": [f"ui{em}"] for em in UI_TOP},
 }
 
 
@@ -769,6 +831,12 @@ def tier(name):
     if name == "accent":
         acc = accents()
         return [(c, acc[c]) for c in sorted(acc)]
+    if name in PENS:
+        em = int(name[2:])
+        g = pixel_face(em)
+        if sorted(g) != [chr(c) for c in range(32, 127)] + ["\u2026"]:
+            raise ValueError(f"ui-{em}.txt must hold exactly U+0020..U+007E and U+2026")
+        return [(c, traced(g[c][1], em)) for c in sorted(g)]
     raise ValueError(f"no tier {name!r}")
 
 
@@ -874,6 +942,9 @@ def sources(name):
         files += ["font/letters.txt", "font/marks.txt"]
     if "mosaic" in tiers:
         files.append("font/octants.txt")
+    for em in UI:
+        if f"ui{em}" in tiers:
+            files.append(f"font/ui-{em}.txt")
     return files + ["train/strokes.py", "train/glyphs.py"]
 
 

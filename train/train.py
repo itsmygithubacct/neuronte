@@ -1,12 +1,19 @@
 """Train the Neuronte net.
 
-usage: python3 train/train.py OUT.json [--set ascii|full] [--width W]
+usage: python3 train/train.py OUT.json [--set ascii|full|...] [--width W]
                               [--steps N] [--device cuda] [--seed S]
 
 Needs torch and numpy. Writes the weights as JSON and prints one JSON
 line of scores. The target at a point is the field glyphs.py makes: the
 signed distance to the ink edge over tau, clamped to -1..1, held on a grid
 of nodes 1/256 cell width apart and read between them bilinearly.
+
+The pen is the set's own (glyphs.PENS) unless --pen gives one. The
+scores at cell widths 10 to 32 also count pixels, for a
+face shown as binary letters at those sizes (sets ui10 to ui32, each
+judged at its own): how many characters are exactly their
+drawing's pixels, and which are not, over all pixels and over the firm
+ones, those whose drawing is not within 0.1 of half covered.
 """
 import argparse
 import hashlib
@@ -29,10 +36,12 @@ p.add_argument("--width", type=int, default=128, help="hidden layer width")
 p.add_argument("--steps", type=int, default=20000)
 p.add_argument("--device", default="cuda")
 p.add_argument("--seed", type=int, default=0)
-p.add_argument("--pen", type=float, default=0.075, help="default pen radius in cell widths")
+p.add_argument("--pen", type=float, default=None, help="pen radius in cell widths; default: the set's own")
 p.add_argument("--grid", type=int, default=256, help="target grid nodes per cell width")
 p.add_argument("--unlabelled", type=float, default=1.0, help="weight of the term for scalars with no glyph")
 a = p.parse_args()
+if a.pen is None:
+    a.pen = glyphs.PENS.get(a.set, glyphs.PEN)
 torch.manual_seed(a.seed)
 torch.set_default_device(a.device)
 
@@ -154,7 +163,8 @@ res = {"set": a.set, "chars": G, "width": W, "steps": a.steps, "seed": a.seed, "
        "unlabelled": a.unlabelled, "params": sum(q.numel() for q in net.parameters()),
        "final_loss": float(loss.detach())}
 tier_idx = {t: torch.tensor([i for i, x in enumerate(TIERS) if x == t]) for t in dict.fromkeys(TIERS)}
-for wpx in (4, 5, 8, 16, 48):
+PIXEL_SIZES = (10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32)  # where a face is shown as binary letters
+for wpx in (4, 5, 8) + PIXEL_SIZES + (48,):
     t = truth(wpx).reshape(G, -1)
     # Targets that differ by under half a pixel of ink at this size, such
     # as space and U+00A0, count as one when checking the nearest.
@@ -170,6 +180,15 @@ for wpx in (4, 5, 8, 16, 48):
              "nearest_ok": int(twin[gi, nearest].sum())}
         if len(tier_idx) > 1:
             r["tiers"] = {k: round(float(iou[ix].mean()), 4) for k, ix in tier_idx.items()}
+        if wpx in PIXEL_SIZES:
+            wrong = ti != ni
+            firm = wrong & ((t - 0.5).abs() >= 0.1)
+            r["exact"] = int((~wrong.any(1)).sum())
+            r["differ"] = [label(int(i)) for i in wrong.any(1).nonzero().flatten()]
+            r["wrong_pixels"] = int(wrong.sum())
+            r["firm_exact"] = int((~firm.any(1)).sum())
+            r["firm_differ"] = [label(int(i)) for i in firm.any(1).nonzero().flatten()]
+            r["firm_wrong_pixels"] = int(firm.sum())
         res[f"w{wpx}_s{ss}"] = r
 
 

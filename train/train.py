@@ -14,6 +14,8 @@ face shown as binary letters at those sizes (sets ui10 to ui32, each
 judged at its own): how many characters are exactly their
 drawing's pixels, and which are not, over all pixels and over the firm
 ones, those whose drawing is not within 0.1 of half covered.
+A set shown blended at large sizes (uilarge) is scored at its own
+sizes, in SOFT, by overlap only, and counts no pixels.
 """
 import argparse
 import hashlib
@@ -164,7 +166,8 @@ res = {"set": a.set, "chars": G, "width": W, "steps": a.steps, "seed": a.seed, "
        "final_loss": float(loss.detach())}
 tier_idx = {t: torch.tensor([i for i, x in enumerate(TIERS) if x == t]) for t in dict.fromkeys(TIERS)}
 PIXEL_SIZES = (10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32)  # where a face is shown as binary letters
-for wpx in (4, 5, 8) + PIXEL_SIZES + (48,):
+SOFT = {"uilarge": (32, 48, 64, 96)}  # sets shown blended, and the sizes they are judged at
+for wpx in SOFT.get(a.set, (4, 5, 8) + PIXEL_SIZES + (48,)):
     t = truth(wpx).reshape(G, -1)
     # Targets that differ by under half a pixel of ink at this size, such
     # as space and U+00A0, count as one when checking the nearest.
@@ -180,7 +183,7 @@ for wpx in (4, 5, 8) + PIXEL_SIZES + (48,):
              "nearest_ok": int(twin[gi, nearest].sum())}
         if len(tier_idx) > 1:
             r["tiers"] = {k: round(float(iou[ix].mean()), 4) for k, ix in tier_idx.items()}
-        if wpx in PIXEL_SIZES:
+        if wpx in PIXEL_SIZES and a.set not in SOFT:
             wrong = ti != ni
             firm = wrong & ((t - 0.5).abs() >= 0.1)
             r["exact"] = int((~wrong.any(1)).sum())

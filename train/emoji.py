@@ -317,7 +317,7 @@ def drawings():
     def add(cp,category,layers):
         if cp in out: raise ValueError(f'duplicate U+{cp:04X}')
         if not unicodedata.name(chr(cp),None): raise ValueError(f'unassigned {cp:X}')
-        out[cp]=layers; categories[cp]=category
+        out[cp]=[(c,s) for c,s in layers if s]; categories[cp]=category
     for row in FACE_RULES.strip().splitlines():
         code,eyes,mouth,extra=row.split()
         add(0x1f000+int(code,16),'faces',face(eyes,mouth,extra))

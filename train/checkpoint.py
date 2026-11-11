@@ -6,6 +6,7 @@ change when moving to a replacement rental. Checkpoints are never published
 as completed weight files.
 """
 import os
+import time
 from pathlib import Path
 import torch
 
@@ -15,12 +16,13 @@ def arguments(parser):
     parser.add_argument('--checkpoint-every', type=int, default=2000)
     parser.add_argument('--resume', help='resume a source-bound checkpoint from this trainer')
     parser.add_argument('--stop-after', type=int, help='stop with exit75 after this total step, saving a checkpoint')
+    parser.add_argument('--deadline', type=float, help='UTC Unix time to save and stop with exit75')
 
 
 def identity(args, sources):
     if args.checkpoint_every<1 or (args.stop_after is not None and args.stop_after<1):
         raise ValueError('checkpoint interval and stopping step must be positive')
-    ignored={'out','checkpoint','checkpoint_every','resume','scores_out','log_every','stop_after'}
+    ignored={'out','checkpoint','checkpoint_every','resume','scores_out','log_every','stop_after','deadline'}
     return {'arguments':{k:v for k,v in vars(args).items() if k not in ignored},'sources_sha256':sources}
 
 
@@ -50,9 +52,9 @@ def restore(path, models, optimizer, schedule, metadata, device):
 
 
 def tick(args, step, models, optimizer, schedule, metadata, metrics):
-    stopping=args.stop_after is not None and step>=args.stop_after
+    stopping=(args.stop_after is not None and step>=args.stop_after) or (args.deadline is not None and time.time()>=args.deadline)
     if args.checkpoint and (step%args.checkpoint_every==0 or step==args.steps or stopping):
         save(args.checkpoint,step,models,optimizer,schedule,metadata,metrics)
     if stopping and step<args.steps:
-        if not args.checkpoint:raise ValueError('--stop-after requires --checkpoint')
+        if not args.checkpoint:raise ValueError('--stop-after/--deadline requires --checkpoint')
         raise SystemExit(75)

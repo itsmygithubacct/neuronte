@@ -378,13 +378,13 @@
       "scalar": "U+1F44F",
       "name": "CLAPPING HANDS SIGN",
       "category": "hands",
-      "layers": 3
+      "layers": 2
     },
     {
       "scalar": "U+1F450",
       "name": "OPEN HANDS SIGN",
       "category": "hands",
-      "layers": 2
+      "layers": 1
     },
     {
       "scalar": "U+1F493",
@@ -1416,7 +1416,7 @@
       "scalar": "U+1F64C",
       "name": "PERSON RAISING BOTH HANDS IN CELEBRATION",
       "category": "hands",
-      "layers": 2
+      "layers": 1
     },
     {
       "scalar": "U+1F64F",
@@ -1734,7 +1734,7 @@
       "scalar": "U+1F932",
       "name": "PALMS UP TOGETHER",
       "category": "hands",
-      "layers": 2
+      "layers": 1
     },
     {
       "scalar": "U+1F970",

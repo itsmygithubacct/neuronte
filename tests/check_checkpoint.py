@@ -24,6 +24,9 @@ with tempfile.TemporaryDirectory(prefix='neuronte-checkpoint-') as directory:
         assert (work/'baseline.json').read_bytes()==(work/'resumed.json').read_bytes(),trainer+' differs after resume'
         run('finished',['--resume',str(ck)])
         assert (work/'baseline.json').read_bytes()==(work/'finished.json').read_bytes(),trainer+' differs after final checkpoint resume'
+        run('deadline',['--checkpoint',str(ck),'--deadline','0'],75)
+        run('deadline-resume',['--resume',str(ck)])
+        assert (work/'baseline.json').read_bytes()==(work/'deadline-resume.json').read_bytes(),trainer+' differs after deadline resume'
         bad=subprocess.run([sys.executable,str(ROOT/'train'/trainer),str(work/'bad.json'),*common,'--seed','8','--resume',str(ck)],cwd=ROOT,env=env,capture_output=True,text=True)
         assert bad.returncode!=0 and 'checkpoint source/arguments differ' in bad.stderr
         print(trainer+': interrupted/final resume byte-exact; incompatible resume rejected')

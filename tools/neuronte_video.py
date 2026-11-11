@@ -148,6 +148,12 @@ def candidates(mode, width, height, weights=None, library=None):
         if len(data) < 28 or struct.unpack_from('<I', data, 8)[0] != 2:
             raise ValueError('full video mode requires a bundle with explicit scalar ranges')
         nets, ranges = struct.unpack_from('<II', data, 12)
+        lengths = struct.unpack_from(f'<{nets}I', data, 28)
+        member = len(data) - sum(lengths)
+        for length in lengths:
+            if struct.unpack_from('<I', data, member + 8)[0] != 1:
+                raise ValueError('full two-ink mode requires monochrome nets; fixed-colour bundles cannot use arbitrary foreground/background fits')
+            member += length
         offset = 28 + 4 * nets
         cps = []
         for i in range(ranges):

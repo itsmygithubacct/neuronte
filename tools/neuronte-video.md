@@ -9,15 +9,20 @@ size exactly. No implicit resizing or cropping is performed.
 terminal cells. `--output rgb` writes reconstructed RGB24 frames. Full mode
 uses the loaded bundle’s explicit scalar ranges and its actual C coverage masks;
 portable mode uses the 328 ideal geometric masks. Full mode must be displayed
-with that same Neuronte bundle to reproduce the fitted image. Full mode requires a bundle with explicit scalar ranges; split-v4 is the
-default. A standalone net without a manifest is rejected.
+with that same Neuronte bundle to reproduce the fitted image. Full mode requires a monochrome bundle with explicit scalar ranges; split-v4 is the
+default. A standalone net without a manifest is rejected. Fixed-colour members are
+also rejected, including single-layer colour nets: their palette cannot be
+reproduced by an arbitrary foreground/background fit.
 
 `--level multi --cell 2x4 --output rgb` uses three cached C neural coverage
 masks (right half, middle half, lower half), eight RGB colours per cell,
 and the Gray row order 0,1,3,2. The floating-point product of three masks
 chooses each ink's weight. There is no mask rounding. At 2x4 this is lossless
-only when the masks pass the exactness gate. `--require-exact` checks every
+only when the masks pass the exactness gate. `--require-exact` is valid only with `--level multi`; it checks every
 one of 256 octants at all eight pixel centres and refuses output otherwise.
+It also requires the three actual masks at the selected cell size to be binary.
+The standalone `--check-exact` action checks the supplied weights, defaulting
+to the video calibration, and produces no frame stream.
 The default video-only calibrated bundle passes this gate. The existing
 unmodified split-v4 does not; explicitly selecting it produces lossy output.
 The calibration doubles the coverage scale of the frozen pixel and ASCII nets.
@@ -77,3 +82,7 @@ It is enabled only after exact binary equality is established; fractional
 masks use the continuous product blend. No mask is rounded. The reproducible
 benchmark reports full-HD encode/decode throughput and a plain-copy reference;
 the Python record-layout work still costs more than a single memory copy.
+
+Runtime helper models must include a valid inference policy; missing or malformed
+policies are rejected before the first frame is read. Policy-less training
+parents remain usable by the research evaluator, which supplies its own policy.

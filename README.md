@@ -37,7 +37,7 @@ letter. Desktop adapters fall back for unsupported strings and styles.
 | `neuronte-ui24-italic-v0`, `neuronte-ui30-italic-v0` | the italic at 24 and 30 pixels | printable ASCII and the ellipsis, 96, with their advances | 384 | 331,009 | 1,325,072 bytes each |
 | `neuronte-ui-large-v0` | the desktop face at every em from 33 pixels up, drawn blended | printable ASCII and the ellipsis, 96, with their advances | 384 | 331,009 | 1,325,072 bytes |
 | `neuronte-flame-v0` | the Kilix flame, for the Start button at 16 px and the desktop icon at 32: a colour net, version 3, of three layers | one mark, at U+100000; the printable ASCII and U+FFFD draw nothing | 64 | 16,914 | 68,124 bytes |
-| `neuronte-icon-v0` | the icons in colour, a version 3 file by itself, not in the bundle | 167: the 133 in `font/icons.txt` and 34 powerline and progress glyphs, up to 6 layers each | 256 | 159,492 | 650,216 bytes |
+| `neuronte-icon-v1` | the icons in colour, a version 3 file by itself, not in the bundle | 167: the 133 in `font/icons.txt` and 34 powerline and progress glyphs, up to 6 layers each | 256 | 159,492 | 650,216 bytes |
 | `neuronte-ui28-italic-v0` | the italic at 28 pixels, trained for 40,000 steps: at the default 20,000 no width from 384 to 768 had both seeds exact | printable ASCII and the ellipsis, 96, with their advances | 384 | 331,009 | 1,325,072 bytes |
 | `neuronte-ui32-italic-v0` | the italic at 32 pixels, trained for 40,000 steps; both seeds exact at width 512 | printable ASCII and the ellipsis, 96, with their advances | 512 | 572,417 | 2,290,704 bytes |
 
@@ -93,7 +93,7 @@ a letter and a mark, such as ß æ œ ð þ ø ł đ ħ ŋ ĳ, are drawn in
 | `font/letters.txt` | The Latin letters beyond ASCII that are not a letter plus a mark, and the Greek and Russian Cyrillic letters. The Greek and Cyrillic are not yet in any weights |
 | `font/ui-1.txt` to `font/ui-128.txt` | A proportional face for binary desktop text, printable ASCII and the ellipsis, drawn as pixels for every em from 1 to 128 except 44, each character with its advance in pixels. Stems are one pixel wide through 16, two from 17 through 26, and three from 27. Written for this project. `train/train.py --set ui10` and so on train one net each, and score it pixel by pixel at its size. `train/pack.py --advances` packs a file's advances, bold one pixel more. The nets so far are `neuronte-ui1-v0` through `neuronte-ui39-v0`, one for every em, and `neuronte-ui43-v0`. `font/ui-EM-italic.txt` is that face sheared on the grid so the top sits to the right of the bottom, trained as `uiEMi`, drawn at 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30 and 32 pixels. The italic nets packed so far are `neuronte-ui10-italic-v0`, `ui11`, `ui12`, `ui14`, `ui16`, `ui18`, `ui20`, `ui22`, `ui24`, `ui26`, `ui28`, `ui30` and `ui32` |
 | `font/ui-large.txt`, `font/ui-large-advances.txt` | The same face above 32 pixels: the first-pass strokes the pixel faces were fitted to, drawn once for every em with a pen 3/32 em wide, the 32 px drawing's three-pixel stem, and blended. The advances are the 32 px drawing's in em, bold 0.2 design units (0.02 em) more. `train/train.py --set uilarge` trains the net and scores it by overlap at 32, 48, 64 and 96 pixels. The net is `neuronte-ui-large-v0` |
-| `font/icons.txt` | The icons, as colour layers back to front, each naming a palette entry. Powerline and progress are made in `train/glyphs.py` and are not listed in the file. Trained in `neuronte-icon-v0` |
+| `font/icons.txt` | The icons, as colour layers back to front, each naming a palette entry. Powerline and progress are made in `train/glyphs.py` and are not listed in the file. Trained in `neuronte-icon-v1` |
 | `font/palette.txt` | The palette for colour glyphs: entry 0 is the cell's foreground, 1 is clear, the rest have a dark-theme and a light-theme colour |
 | `font/flame.txt`, `font/flame-palette.txt` | The Kilix flame, three colour layers in the syntax of `font/icons.txt`, with its own palette of the desktop's red, yellow and white. Drawn in the middle square of the cell. `font/flame.md` says how it was drawn and trained. The net is `neuronte-flame-v0` |
 | `font/code-masks.txt` | The 43 parity masks that turn a scalar into the net's 64 character inputs |
@@ -103,10 +103,11 @@ a letter and a mark, such as ß æ œ ð þ ø ł đ ħ ŋ ĳ, are drawn in
 | `train/mosaics.py` | Makes `font/octants.txt`, and checks the sextants and the octant patterns encoded elsewhere against the same Unicode data |
 | `train/train.py` | Trains a net on one set. Needs torch, and wants a GPU |
 | `train/colour.py` | Trains a colour net, on `font/icons.txt` or another drawing and palette named with `--drawing` and `--palette`, with `--blank` scalars trained to draw nothing. Needs torch, and wants a GPU. The default collection includes drawn icons and generated powerline/progress glyphs |
+| `train/calibrate_colour.py` | Applies a recorded uniform distance offset to a separate colour weight file, preserving the original training artifact |
 | `train/snap.py` | The straight edges of a colour glyph, measured from the drawings when the weights are packed, and the warp that snaps them |
 | `train/gate.py` | Trains the router's gate for a bundle of nets. Needs torch; a CPU is enough |
 | `train/pack.py` | Packs weights JSON into the binary file the C library loads: a distance net, a colour net, a bundle, an advance table, or a drawing file. A pixel face such as `font/ui-10.txt` packs as an advance table, bold one pixel more. Documents the layouts |
-| `weights/` | The trained weights as JSON, the packed files, the scores and `SHA256SUMS`. `neuronte-draw-v2`, `neuronte-symbol-v0`, `neuronte-accent-v1`, `neuronte-pixel-v1`, `neuronte-braille-v0` and `neuronte-gate-v3` are the parts of `neuronte-split-v4`, with `neuronte-ascii-v0`. `neuronte-full-v2` is here so that `make test` and `make bench` run from a clone. `neuronte-ui1-v0` through `neuronte-ui39-v0`, one for every em, and `neuronte-ui43-v0` are the desktop face, each a drawing file of one net and its advances. `neuronte-ui10-italic-v0`, `ui11`, `ui12`, `ui14`, `ui16`, `ui18`, `ui20`, `ui22`, `ui24`, `ui26`, `ui28`, `ui30` and `ui32` are the italic of those sizes. `neuronte-ui-large-v0` is the scalable upright face from 33 px; `neuronte-flame-v0` and `neuronte-icon-v0` are separate colour files |
+| `weights/` | The trained weights as JSON, the packed files, the scores and `SHA256SUMS`. `neuronte-draw-v2`, `neuronte-symbol-v0`, `neuronte-accent-v1`, `neuronte-pixel-v1`, `neuronte-braille-v0` and `neuronte-gate-v3` are the parts of `neuronte-split-v4`, with `neuronte-ascii-v0`. `neuronte-full-v2` is here so that `make test` and `make bench` run from a clone. `neuronte-ui1-v0` through `neuronte-ui39-v0`, one for every em, and `neuronte-ui43-v0` are the desktop face, each a drawing file of one net and its advances. `neuronte-ui10-italic-v0`, `ui11`, `ui12`, `ui14`, `ui16`, `ui18`, `ui20`, `ui22`, `ui24`, `ui26`, `ui28`, `ui30` and `ui32` are the italic of those sizes. `neuronte-ui-large-v0` is the scalable upright face from 33 px; `neuronte-flame-v0` and `neuronte-icon-v1` are separate colour files |
 | `include/neuronte.h`, `src/` | The C library |
 | `tools/neuronte-render.c` | Draws lines of text into a PPM file |
 | `tools/neuronte-bench.c` | Times a net per cell, or a full net against a bundle per class of character |
@@ -293,17 +294,31 @@ whole glyph. A pixel the glyph left clear is left as it was. Snapping
 applies to a colour glyph that has an edge record. Letters and box
 drawing have none, so a horizontal line still meets a vertical one.
 
-`neuronte-icon-v0` is the trained icon net: form A, 256 wide, K = 6. At 16 px its
-layers score a mean IoU of 0.985 and its composite is off by 0.68 of 255.
-The palette head is exact on all 167 icons. `make test` checks it the
-same way as a small synthetic version 3 file, which has a hand-written
-field and a palette head that remembers the labelled glyphs.
+`neuronte-icon-v1` is the 167-icon net: form A, 256 wide, K = 6, trained
+for 40,000 steps on the original drawings. A uniform distance offset of
+-0.008 in its six final biases reduces boundary overshoot; this moves a
+contour by about 0.0192 px at 16 px. Both seeds pass the mean 16 px IoU
+requirement of 0.990: **0.991793416 and 0.990362830**. Their palette heads
+are exact, and neither has positive unused coverage, a lost nonempty
+layer, or a used layer with zero coverage at 12, 16 or 32 px. Seed 0 is
+packed. The failed `neuronte-icon-v0` remains in history and research
+records, and is retired from the active weights and tests.
 
-`neuronte-flame-v0` is a trained version 3 file of one mark, the Kilix
-flame, at U+100000, and `make test` checks it against numpy the same way.
-The mark is square, so draw it in a cell s wide and 2s tall and keep rows
-s/2 to 3s/2 - 1. Its palette is the desktop's red, yellow and white in
-both themes. It does not snap at 16 or 32 px, the sizes it is for.
+Calibration raises seed 0's mean dark-theme composite error at 16 px
+from 0.48 to 0.67 on the 0–255 scale while reducing thresholded boundary
+errors. The raw runs, offset sweep and both seeds are retained in the
+research run. `train/calibrate_colour.py` writes a separate artifact,
+records the input weight hash and its own source hash, and refuses to
+overwrite a file. The palette head and all hidden weights are unchanged.
+
+`make test` checks the packed icon's quality gate, the C API, and numpy/C
+coverage, palette, snap and theme agreement. The gate rejects even faint
+unused masks. Expanded per-glyph drawing hashes bind the net's edge
+table to its labelled shapes; unrelated trainer or glyph additions do
+not invalidate that identity. Historical source hashes remain recorded
+without being rewritten. Legacy colour weights without expanded hashes
+still require their named drawing/palette and recorded parser/rule-module
+hashes. If parser metadata is absent, the original archived parser is required.
 
 ## The net
 

@@ -78,7 +78,7 @@ UILARGE = weights/neuronte-ui-large-v0
 FLAME = weights/neuronte-flame-v0
 # The icon net: a colour net, form A, a version 3 file by itself. It is not
 # in the bundle; neuronte-split-v4 stays the default font.
-ICON = weights/neuronte-icon-v0
+ICON = weights/neuronte-icon-v1
 OBJS = build/neuronte.o build/utf8.o
 TOOLS = build/neuronte-render build/neuronte-bench
 TESTS = build/test_utf8 build/test_api
@@ -199,10 +199,12 @@ test: all $(TESTS)
 	$(PYTHON) tests/check_reference.py build/libneuronte.so --bundle $(SPLIT) $(NETS) --gate $(GATE)
 	$(PYTHON) tests/colour_fixture.py build/colour-fixture.nrt
 	$(PYTHON) tests/check_colour_sources.py
+	$(PYTHON) tests/check_icon_gate.py
 	./build/test_api build/colour-fixture.nrt --colour
 	$(PYTHON) tests/check_reference.py build/libneuronte.so build/colour-fixture.json build/colour-fixture.nrt
 	$(PYTHON) tests/check_reference.py build/libneuronte.so $(FLAME).json $(FLAME).nrt
 	./build/test_api $(ICON).nrt --colour --trained
+	$(PYTHON) tests/check_icon_quality.py build/libneuronte.so $(ICON).json $(ICON).nrt
 	$(PYTHON) tests/check_reference.py build/libneuronte.so $(ICON).json $(ICON).nrt
 	$(PYTHON) tests/check_advances.py build/libneuronte.so $(ASCII).json
 	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI1).nrt $(UI1).json font/ui-1.txt

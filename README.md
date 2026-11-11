@@ -617,3 +617,12 @@ dashed lines can fade to almost nothing; the default there is 2 × 2.
 
 MIT. See [LICENSE](LICENSE). The weights are part of the project and are
 under the same licence.
+
+## Video experiments
+
+[The video tool](tools/neuronte-video.md) fits two-ink terminal cells or
+reconstructs multi-ink RGB cells with three cached neural masks. Its separate
+video-only coverage calibration preserves every source byte at 2×4; ordinary
+text weights and coverage remain unchanged. The exhaustive gate checks all
+256 octants at all 2,048 centres. `tools/benchmark-video.py` makes original
+synthetic footage, records search timings and generates a comparison clip.

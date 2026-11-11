@@ -128,6 +128,20 @@ int neuronte_advance(const neuronte *n, uint32_t scalar, int bold, int em_px);
  * rounded by itself, summed. Ill-formed bytes measure as U+FFFD does. */
 int neuronte_text_width(const neuronte *n, const char *text, size_t len, int bold, int em_px);
 
+/* Draw UTF-8 text in a proportional face, for a handle with a net and an
+ * advance table. Each character's cell is em_px wide and twice that
+ * high, with its top-left corner at the pen, which starts at (x, y) and
+ * moves by the character's pixel advance. Cells overlap where an advance
+ * is less than an em. A character with no advance is drawn as the
+ * table's fallback scalar. Bold is the regular letter struck twice, the
+ * second time one pixel to the right: each pixel takes the greater of
+ * the two coverages. Pixels outside the buffer are skipped. Returns how
+ * far the pen moved, which is neuronte_text_width() of the same text,
+ * or an error. */
+int neuronte_draw_text(neuronte *n, uint32_t *pixels, int stride, int width, int height,
+                       int x, int y, int em_px, int bold, const char *text, size_t len,
+                       uint32_t color);
+
 #ifdef __cplusplus
 }
 #endif

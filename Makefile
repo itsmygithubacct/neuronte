@@ -108,6 +108,7 @@ test: all $(TESTS)
 	$(PYTHON) tests/check_reference.py build/libneuronte.so $(FULL).json $(FULL).nrt
 	$(PYTHON) tests/check_reference.py build/libneuronte.so --bundle $(SPLIT) $(NETS) --gate $(GATE)
 	$(PYTHON) tests/colour_fixture.py build/colour-fixture.nrt
+	$(PYTHON) tests/check_colour_sources.py
 	./build/test_api build/colour-fixture.nrt --colour
 	$(PYTHON) tests/check_reference.py build/libneuronte.so build/colour-fixture.json build/colour-fixture.nrt
 	./build/test_api $(ICON).nrt --colour --trained

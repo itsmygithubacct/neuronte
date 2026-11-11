@@ -145,6 +145,7 @@ import numpy as np
 import glyphs
 import snap
 import strokes
+from colour_sources import drawing_hashes
 
 SHAPE = {"position_octaves": 6, "code_bits": 64, "hidden_layers": 3}
 COLOUR_FIXED = 420
@@ -227,13 +228,35 @@ def sha256_file(path):
 
 
 def check_sources(doc, path):
-    """The drawings named in the weights are the files in this tree."""
+    """Bind packing to the labelled drawings, not an unrelated trainer edit.
+
+    New nets record expanded per-glyph drawings as well as historical source
+    hashes. Legacy files retain their drawing-file and rule-module checks.
+    Trainer hashes are evidence of how weights were made, not a requirement
+    that future packers run from that same trainer revision.
+    """
     src = doc.get("training", {}).get("sources_sha256")
     if not isinstance(src, dict) or "font/icons.txt" not in src:
         raise SystemExit(f"{path}: training.sources_sha256 has no font/icons.txt")
     for rel, digest in src.items():
         if not isinstance(rel, str) or os.path.isabs(rel) or ".." in rel.split("/"):
             raise SystemExit(f"{path}: sources_sha256 path {rel!r} is not inside the tree")
+        if not isinstance(digest, str) or len(digest) != 64 or any(c not in "0123456789abcdef" for c in digest):
+            raise SystemExit(f"{path}: sources_sha256 digest for {rel} is not SHA256")
+    drawings = doc["training"].get("drawings_sha256")
+    if drawings is not None:
+        if not isinstance(drawings, dict) or drawings.get("version") != 1:
+            raise SystemExit(f"{path}: unsupported drawings_sha256 version")
+        try:
+            want = drawing_hashes(glyphs.colour_icons(), labelled_scalars(doc, path))
+        except KeyError as error:
+            raise SystemExit(f"{path}: a labelled drawing is missing: {error}") from None
+        if drawings.get("glyphs") != want:
+            raise SystemExit(f"{path}: labelled drawings do not match training.drawings_sha256")
+        return
+    for rel, digest in src.items():
+        if not rel.startswith("font/") and rel != "train/glyphs.py":
+            continue
         fp = os.path.join(ROOT, rel)
         if not os.path.isfile(fp):
             raise SystemExit(f"{path}: {rel} is not in the tree")

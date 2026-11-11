@@ -36,6 +36,7 @@ UI25 = weights/neuronte-ui25-v0
 UI24 = weights/neuronte-ui24-v0
 UI26 = weights/neuronte-ui26-v0
 UI28 = weights/neuronte-ui28-v0
+UI29 = weights/neuronte-ui29-v0
 UI30 = weights/neuronte-ui30-v0
 OBJS = build/neuronte.o build/utf8.o
 TOOLS = build/neuronte-render build/neuronte-bench
@@ -81,7 +82,7 @@ $(DEMOS): build/%: demo/%.c demo/common.h build/demo-common.o build/libneuronte.
 		build/libneuronte.a $(LDLIBS) -lz
 
 # Rebuild the packed weights from the JSON the trainers write.
-pack: $(ASCII).json $(FULL).json $(NETS) $(GATE) $(UI10).json $(UI11).json $(UI12).json $(UI13).json $(UI14).json $(UI15).json $(UI16).json $(UI18).json $(UI19).json $(UI20).json $(UI21).json $(UI22).json $(UI23).json $(UI25).json $(UI24).json $(UI26).json $(UI28).json $(UI30).json
+pack: $(ASCII).json $(FULL).json $(NETS) $(GATE) $(UI10).json $(UI11).json $(UI12).json $(UI13).json $(UI14).json $(UI15).json $(UI16).json $(UI18).json $(UI19).json $(UI20).json $(UI21).json $(UI22).json $(UI23).json $(UI25).json $(UI24).json $(UI26).json $(UI28).json $(UI29).json $(UI30).json
 	$(PYTHON) train/pack.py $(ASCII).json $(ASCII).nrt
 	$(PYTHON) train/pack.py $(FULL).json $(FULL).nrt
 	$(PYTHON) train/pack.py --bundle $(SPLIT) $(NETS) --gate $(GATE)
@@ -102,6 +103,7 @@ pack: $(ASCII).json $(FULL).json $(NETS) $(GATE) $(UI10).json $(UI11).json $(UI1
 	$(PYTHON) train/pack.py --drawing $(UI24).nrt $(UI24).json font/ui-24.txt
 	$(PYTHON) train/pack.py --drawing $(UI26).nrt $(UI26).json font/ui-26.txt
 	$(PYTHON) train/pack.py --drawing $(UI28).nrt $(UI28).json font/ui-28.txt
+	$(PYTHON) train/pack.py --drawing $(UI29).nrt $(UI29).json font/ui-29.txt
 	$(PYTHON) train/pack.py --drawing $(UI30).nrt $(UI30).json font/ui-30.txt
 	cd weights && sha256sum *.json *.nrt > SHA256SUMS
 
@@ -133,6 +135,7 @@ test: all $(TESTS)
 	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI24).nrt $(UI24).json font/ui-24.txt
 	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI26).nrt $(UI26).json font/ui-26.txt
 	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI28).nrt $(UI28).json font/ui-28.txt
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI29).nrt $(UI29).json font/ui-29.txt
 	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI30).nrt $(UI30).json font/ui-30.txt
 
 bench: build/neuronte-bench

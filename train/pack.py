@@ -586,8 +586,18 @@ def read_face(path):
     character or U+XXXX and its advance in pixels, then em rows of . and
     #. The steps come to that advance at that em, and bold to one more."""
     with open(path, encoding="utf-8") as fh:
-        lines = [(n, l.rstrip("\n")) for n, l in enumerate(fh, 1)]
-    lines = [(n, l) for n, l in lines if l and l != "#" and not l.startswith("# ")]
+        raw = [(n, l.rstrip("\n")) for n, l in enumerate(fh, 1)]
+    lines, seen = [], False
+    for n, l in raw:
+        if not l or l.startswith("# "):
+            continue
+        # A bare "#" before the first character is a comment. After it,
+        # "#" is a row of one inked pixel.
+        if l == "#" and not seen:
+            continue
+        if " " in l:
+            seen = True
+        lines.append((n, l))
     if len(lines) < 2 or " " in lines[1][1] or set(lines[1][1]) - set(".#"):
         return None
     blocks = []

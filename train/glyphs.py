@@ -23,21 +23,20 @@ Tiers:
              U+0100..U+017F and the spacing marks, made here from an
              ASCII letter and the marks in font/marks.txt, by the Unicode
              decomposition, or taken from font/letters.txt.
-    ui8      the desktop face, printable ASCII and U+2026, from
-    ui9      font/ui-8.txt and so on: a proportional face for small
-    ui10     binary text, drawn as pixels once for each em, of 8, 9,
-    ...      10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30 and 32 pixels.
-    ui32     The 8 px face: baseline row 6, x-height row 2, UI_TOP 5.
-             Stems are one pixel wide to 16, two from 18 to 26, and
-             three from 28. Each inked pixel is a round dot, joined to
-             the inked pixel beside it and the one below.
+    ui1      the desktop face, printable ASCII and U+2026, from
+    ...      font/ui-EM.txt, one file for every em from 1 to 128 except
+    ui128    44. Stems are one pixel wide through 16, two from 17
+             through 26, and three from 27. Each inked pixel is a round
+             dot, joined to the inked pixel beside it and the one below.
+             The 8 px face: baseline row 6, x-height row 2, UI_TOP 5.
 
 Sets, each a list of tiers: ascii; draw (box, block, shade, braille);
 symbol; accent; full, which is all of those; and three sets for choosing
 how the mosaics join the bundle: pixel (block, mosaic), pixelbraille
-(block, mosaic, braille) and boxshade (box, shade). The sets ui8 to
-ui32 are each their tier alone. They share their scalars with ascii and
-with each other, so they join no other set, and their nets no bundle.
+(block, mosaic, braille) and boxshade (box, shade). The sets ui1 to
+ui128, except ui44, are each their tier alone. They share their scalars
+with ascii and with each other, so they join no other set, and their
+nets no bundle.
 Each has a pen of its own, in PENS, a little over one pixel wide at its em.
 
 field() gives the target: the signed distance to the ink edge, positive
@@ -58,8 +57,27 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import strokes  # noqa: E402
 
 OCTANTS = os.path.join(strokes.ROOT, "font", "octants.txt")
-UI_TOP = {8: 5, 9: 6, 10: 6, 11: 6, 12: 7, 14: 8, 16: 9, 18: 10, 20: 11, 22: 12,
-          24: 14, 26: 15, 28: 16, 30: 17, 32: 18}  # per em, the cell row of a desktop-face drawing's first row
+
+
+def _desktop_top(em):
+    """Cell row of a desktop face's first pixel row.
+
+    The path baseline sits at round(7 * (em - stem) / 9), and the ink
+    baseline is stem - 1 rows below that. UI_TOP puts that ink baseline
+    on cell row (135 * em) // 100. Sizes 18 and 20 were fitted by hand,
+    one row higher than this rule. The 8 and 9 px faces were drawn on
+    their own and land where the rule puts them. 44 is drawn on a branch
+    of its own and is left out here.
+    """
+    stem = 1 if em <= 16 else 2 if em <= 26 else 3
+    k = (em - stem) / 9
+    baseline = round(7 * k) + stem - 1
+    return (135 * em) // 100 - baseline
+
+
+_HAND_TOP = {18: 10, 20: 11}  # hand-fitted; the rule above is one row lower
+UI_TOP = {em: _HAND_TOP.get(em, _desktop_top(em))
+          for em in range(1, 129) if em != 44}
 # 8 px drawing rows: baseline 6, x-height 2. With UI_TOP 5 the baseline is cell row 11.
 UI = {em: os.path.join(strokes.ROOT, "font", f"ui-{em}.txt") for em in UI_TOP}
 PEN = 0.075                 # the pen radius, in cell widths
@@ -396,7 +414,10 @@ def pixel_face(em):
     with open(UI[em], encoding="utf-8") as fh:
         for num, raw in enumerate(fh, 1):
             line = raw.rstrip("\n")
-            if line.startswith("# ") or line == "#" or not line:
+            # A bare "#" before the first character is a comment. Once a
+            # character is open it is a one-pixel row: the line "#" is
+            # the only way to write a row that is a single inked pixel.
+            if line.startswith("# ") or not line or (line == "#" and ch is None):
                 continue
             if " " in line:
                 name, _, adv = line.partition(" ")

@@ -19,21 +19,46 @@ SPLIT = weights/neuronte-split-v4.nrt
 NETS = $(ASCII).json $(DRAW).json $(SYMBOL).json $(ACCENT).json $(PIXEL).json $(BRAILLE).json
 # The desktop face: one drawing file for each em, a net and the advances
 # of that em's pixel face.
+UI1 = weights/neuronte-ui1-v0
+UI2 = weights/neuronte-ui2-v0
+UI3 = weights/neuronte-ui3-v0
+UI4 = weights/neuronte-ui4-v0
+UI5 = weights/neuronte-ui5-v0
+UI6 = weights/neuronte-ui6-v0
+UI7 = weights/neuronte-ui7-v0
 UI8 = weights/neuronte-ui8-v0
 UI9 = weights/neuronte-ui9-v0
 UI10 = weights/neuronte-ui10-v0
 UI11 = weights/neuronte-ui11-v0
 UI12 = weights/neuronte-ui12-v0
+UI13 = weights/neuronte-ui13-v0
 UI14 = weights/neuronte-ui14-v0
+UI15 = weights/neuronte-ui15-v0
 UI16 = weights/neuronte-ui16-v0
+UI17 = weights/neuronte-ui17-v0
 UI18 = weights/neuronte-ui18-v0
+UI19 = weights/neuronte-ui19-v0
 UI20 = weights/neuronte-ui20-v0
+UI21 = weights/neuronte-ui21-v0
 UI22 = weights/neuronte-ui22-v0
+UI23 = weights/neuronte-ui23-v0
 UI24 = weights/neuronte-ui24-v0
+UI25 = weights/neuronte-ui25-v0
 UI26 = weights/neuronte-ui26-v0
+UI27 = weights/neuronte-ui27-v0
 UI28 = weights/neuronte-ui28-v0
+UI29 = weights/neuronte-ui29-v0
 UI30 = weights/neuronte-ui30-v0
+UI31 = weights/neuronte-ui31-v0
 UI32 = weights/neuronte-ui32-v0
+UI33 = weights/neuronte-ui33-v0
+UI34 = weights/neuronte-ui34-v0
+UI35 = weights/neuronte-ui35-v0
+UI36 = weights/neuronte-ui36-v0
+UI37 = weights/neuronte-ui37-v0
+UI38 = weights/neuronte-ui38-v0
+UI39 = weights/neuronte-ui39-v0
+UI43 = weights/neuronte-ui43-v0
 OBJS = build/neuronte.o build/utf8.o
 TOOLS = build/neuronte-render build/neuronte-bench
 TESTS = build/test_utf8 build/test_api
@@ -78,25 +103,50 @@ $(DEMOS): build/%: demo/%.c demo/common.h build/demo-common.o build/libneuronte.
 		build/libneuronte.a $(LDLIBS) -lz
 
 # Rebuild the packed weights from the JSON the trainers write.
-pack: $(ASCII).json $(FULL).json $(NETS) $(GATE) $(UI8).json $(UI9).json $(UI10).json $(UI11).json $(UI12).json $(UI14).json $(UI16).json $(UI18).json $(UI20).json $(UI22).json $(UI24).json $(UI26).json $(UI28).json $(UI30).json $(UI32).json
+pack: $(ASCII).json $(FULL).json $(NETS) $(GATE) $(UI1).json $(UI2).json $(UI3).json $(UI4).json $(UI5).json $(UI6).json $(UI7).json $(UI8).json $(UI9).json $(UI10).json $(UI11).json $(UI12).json $(UI13).json $(UI14).json $(UI15).json $(UI16).json $(UI17).json $(UI18).json $(UI19).json $(UI20).json $(UI21).json $(UI22).json $(UI23).json $(UI24).json $(UI25).json $(UI26).json $(UI27).json $(UI28).json $(UI29).json $(UI30).json $(UI31).json $(UI32).json $(UI33).json $(UI34).json $(UI35).json $(UI36).json $(UI37).json $(UI38).json $(UI39).json $(UI43).json
 	$(PYTHON) train/pack.py $(ASCII).json $(ASCII).nrt
 	$(PYTHON) train/pack.py $(FULL).json $(FULL).nrt
 	$(PYTHON) train/pack.py --bundle $(SPLIT) $(NETS) --gate $(GATE)
+	$(PYTHON) train/pack.py --drawing $(UI1).nrt $(UI1).json font/ui-1.txt
+	$(PYTHON) train/pack.py --drawing $(UI2).nrt $(UI2).json font/ui-2.txt
+	$(PYTHON) train/pack.py --drawing $(UI3).nrt $(UI3).json font/ui-3.txt
+	$(PYTHON) train/pack.py --drawing $(UI4).nrt $(UI4).json font/ui-4.txt
+	$(PYTHON) train/pack.py --drawing $(UI5).nrt $(UI5).json font/ui-5.txt
+	$(PYTHON) train/pack.py --drawing $(UI6).nrt $(UI6).json font/ui-6.txt
+	$(PYTHON) train/pack.py --drawing $(UI7).nrt $(UI7).json font/ui-7.txt
 	$(PYTHON) train/pack.py --drawing $(UI8).nrt $(UI8).json font/ui-8.txt
 	$(PYTHON) train/pack.py --drawing $(UI9).nrt $(UI9).json font/ui-9.txt
 	$(PYTHON) train/pack.py --drawing $(UI10).nrt $(UI10).json font/ui-10.txt
 	$(PYTHON) train/pack.py --drawing $(UI11).nrt $(UI11).json font/ui-11.txt
 	$(PYTHON) train/pack.py --drawing $(UI12).nrt $(UI12).json font/ui-12.txt
+	$(PYTHON) train/pack.py --drawing $(UI13).nrt $(UI13).json font/ui-13.txt
 	$(PYTHON) train/pack.py --drawing $(UI14).nrt $(UI14).json font/ui-14.txt
+	$(PYTHON) train/pack.py --drawing $(UI15).nrt $(UI15).json font/ui-15.txt
 	$(PYTHON) train/pack.py --drawing $(UI16).nrt $(UI16).json font/ui-16.txt
+	$(PYTHON) train/pack.py --drawing $(UI17).nrt $(UI17).json font/ui-17.txt
 	$(PYTHON) train/pack.py --drawing $(UI18).nrt $(UI18).json font/ui-18.txt
+	$(PYTHON) train/pack.py --drawing $(UI19).nrt $(UI19).json font/ui-19.txt
 	$(PYTHON) train/pack.py --drawing $(UI20).nrt $(UI20).json font/ui-20.txt
+	$(PYTHON) train/pack.py --drawing $(UI21).nrt $(UI21).json font/ui-21.txt
 	$(PYTHON) train/pack.py --drawing $(UI22).nrt $(UI22).json font/ui-22.txt
+	$(PYTHON) train/pack.py --drawing $(UI23).nrt $(UI23).json font/ui-23.txt
 	$(PYTHON) train/pack.py --drawing $(UI24).nrt $(UI24).json font/ui-24.txt
+	$(PYTHON) train/pack.py --drawing $(UI25).nrt $(UI25).json font/ui-25.txt
 	$(PYTHON) train/pack.py --drawing $(UI26).nrt $(UI26).json font/ui-26.txt
+	$(PYTHON) train/pack.py --drawing $(UI27).nrt $(UI27).json font/ui-27.txt
 	$(PYTHON) train/pack.py --drawing $(UI28).nrt $(UI28).json font/ui-28.txt
+	$(PYTHON) train/pack.py --drawing $(UI29).nrt $(UI29).json font/ui-29.txt
 	$(PYTHON) train/pack.py --drawing $(UI30).nrt $(UI30).json font/ui-30.txt
+	$(PYTHON) train/pack.py --drawing $(UI31).nrt $(UI31).json font/ui-31.txt
 	$(PYTHON) train/pack.py --drawing $(UI32).nrt $(UI32).json font/ui-32.txt
+	$(PYTHON) train/pack.py --drawing $(UI33).nrt $(UI33).json font/ui-33.txt
+	$(PYTHON) train/pack.py --drawing $(UI34).nrt $(UI34).json font/ui-34.txt
+	$(PYTHON) train/pack.py --drawing $(UI35).nrt $(UI35).json font/ui-35.txt
+	$(PYTHON) train/pack.py --drawing $(UI36).nrt $(UI36).json font/ui-36.txt
+	$(PYTHON) train/pack.py --drawing $(UI37).nrt $(UI37).json font/ui-37.txt
+	$(PYTHON) train/pack.py --drawing $(UI38).nrt $(UI38).json font/ui-38.txt
+	$(PYTHON) train/pack.py --drawing $(UI39).nrt $(UI39).json font/ui-39.txt
+	$(PYTHON) train/pack.py --drawing $(UI43).nrt $(UI43).json font/ui-43.txt
 	cd weights && sha256sum *.json *.nrt > SHA256SUMS
 	# A colour file is packed the same way: python3 train/pack.py colour.json colour.nrt
 	# make test builds a small synthetic one under build/. No icon net is trained here.
@@ -115,21 +165,46 @@ test: all $(TESTS)
 	./build/test_api build/colour-fixture.nrt --colour
 	$(PYTHON) tests/check_reference.py build/libneuronte.so build/colour-fixture.json build/colour-fixture.nrt
 	$(PYTHON) tests/check_advances.py build/libneuronte.so $(ASCII).json
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI1).nrt $(UI1).json font/ui-1.txt
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI2).nrt $(UI2).json font/ui-2.txt
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI3).nrt $(UI3).json font/ui-3.txt
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI4).nrt $(UI4).json font/ui-4.txt
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI5).nrt $(UI5).json font/ui-5.txt
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI6).nrt $(UI6).json font/ui-6.txt
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI7).nrt $(UI7).json font/ui-7.txt
 	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI8).nrt $(UI8).json font/ui-8.txt
 	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI9).nrt $(UI9).json font/ui-9.txt
 	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI10).nrt $(UI10).json font/ui-10.txt
 	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI11).nrt $(UI11).json font/ui-11.txt
 	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI12).nrt $(UI12).json font/ui-12.txt
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI13).nrt $(UI13).json font/ui-13.txt
 	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI14).nrt $(UI14).json font/ui-14.txt
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI15).nrt $(UI15).json font/ui-15.txt
 	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI16).nrt $(UI16).json font/ui-16.txt
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI17).nrt $(UI17).json font/ui-17.txt
 	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI18).nrt $(UI18).json font/ui-18.txt
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI19).nrt $(UI19).json font/ui-19.txt
 	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI20).nrt $(UI20).json font/ui-20.txt
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI21).nrt $(UI21).json font/ui-21.txt
 	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI22).nrt $(UI22).json font/ui-22.txt
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI23).nrt $(UI23).json font/ui-23.txt
 	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI24).nrt $(UI24).json font/ui-24.txt
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI25).nrt $(UI25).json font/ui-25.txt
 	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI26).nrt $(UI26).json font/ui-26.txt
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI27).nrt $(UI27).json font/ui-27.txt
 	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI28).nrt $(UI28).json font/ui-28.txt
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI29).nrt $(UI29).json font/ui-29.txt
 	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI30).nrt $(UI30).json font/ui-30.txt
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI31).nrt $(UI31).json font/ui-31.txt
 	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI32).nrt $(UI32).json font/ui-32.txt
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI33).nrt $(UI33).json font/ui-33.txt
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI34).nrt $(UI34).json font/ui-34.txt
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI35).nrt $(UI35).json font/ui-35.txt
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI36).nrt $(UI36).json font/ui-36.txt
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI37).nrt $(UI37).json font/ui-37.txt
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI38).nrt $(UI38).json font/ui-38.txt
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI39).nrt $(UI39).json font/ui-39.txt
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI43).nrt $(UI43).json font/ui-43.txt
 
 bench: build/neuronte-bench
 	./build/neuronte-bench $(ASCII).nrt

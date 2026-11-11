@@ -194,6 +194,82 @@ with tempfile.TemporaryDirectory() as tmp:
 import numpy as np  # noqa: E402
 import glyphs  # noqa: E402
 
+
+def _pen_pixel_table(ss):
+    """Coverage of one pixel for each of the 512 ink patterns around it.
+
+    Strokes are unit steps right or down, or a dot, and the pen radius is
+    0.55 of a pixel. Samples inside a pixel cannot reach ink two steps
+    away, and a stroke that leaves this 3x3 is the same distance from
+    these samples as a dot on the pixel it leaves from. Bit (dy+1)*3+(dx+1)
+    is the ink at offset (dx, dy). The samples are the centres of an
+    ss-by-ss grid, the same ones a full-cell check would use.
+    """
+    pen = 0.55
+    sub = (np.arange(ss) + 0.5) / ss
+    sy, sx = np.meshgrid(sub, sub, indexing="ij")
+    samples = np.stack((sx.ravel(), sy.ravel()), -1)
+    table = np.zeros(512)
+    offsets = [(dx, dy) for dy in (-1, 0, 1) for dx in (-1, 0, 1)]
+    for mask in range(512):
+        ink = {offsets[b] for b in range(9) if mask & (1 << b)}
+        segs, joined = [], set()
+        for c, r in ink:
+            for q in ((c + 1, r), (c, r + 1)):
+                if q in ink:
+                    segs.append((c + 0.5, r + 0.5, q[0] + 0.5, q[1] + 0.5))
+                    joined.update(((c, r), q))
+        for c, r in ink - joined:
+            segs.append((c + 0.5, r + 0.5, c + 0.5, r + 0.5))
+        if not segs:
+            continue
+        A = np.array([(s[0], s[1]) for s in segs])
+        ab = np.array([(s[2] - s[0], s[3] - s[1]) for s in segs])
+        dd = np.maximum((ab * ab).sum(1), 1e-12)
+        w = samples[:, None, :] - A
+        t = np.clip((w * ab).sum(-1) / dd, 0, 1)
+        dist = np.hypot(*(w - t[..., None] * ab).transpose(2, 0, 1)).min(1)
+        table[mask] = (pen - dist > 0).mean()
+    return table
+
+
+def pen_coverage(em, art, ink, ss=8):
+    """Coverage of every pixel the pen can touch, and whether it is ink.
+
+    Returns (coverage, ink) for the ink pixels and the clear pixels beside
+    them. A pixel two steps from ink is uncovered at this pen radius, so
+    it is left out.
+    """
+    table = getattr(pen_coverage, "table", None)
+    if table is None or pen_coverage.ss != ss:
+        pen_coverage.table = table = _pen_pixel_table(ss)
+        pen_coverage.ss = ss
+    shapes = glyphs.traced(art, em)
+    if not shapes:
+        return np.zeros(0), np.zeros(0, bool)
+    top = glyphs.UI_TOP[em]
+    iy, ix = np.nonzero(ink)
+    near = {(int(y + dy), int(x + dx))
+            for y, x in zip(iy + top, ix)
+            for dy in (-1, 0, 1) for dx in (-1, 0, 1)
+            if 0 <= y + dy < 2 * em and 0 <= x + dx < em}
+    pts = np.array(sorted(near))
+    cell = np.zeros((2 * em + 2, em + 2), np.uint8)
+    h, w = ink.shape
+    cell[1 + top:1 + top + h, 1:1 + w] = ink
+    yy, xx = pts[:, 0] + 1, pts[:, 1] + 1
+    mask = np.zeros(len(pts), np.int16)
+    bit = 0
+    for dy in (-1, 0, 1):
+        for dx in (-1, 0, 1):
+            mask |= cell[yy + dy, xx + dx].astype(np.int16) << np.int16(bit)
+            bit += 1
+    on = (pts[:, 0] >= top) & (pts[:, 0] < top + h) & (pts[:, 1] < w)
+    want = np.zeros(len(pts), bool)
+    want[on] = ink[pts[on, 0] - top, pts[on, 1]]
+    return table[mask], want
+
+
 for em in glyphs.UI:
     name = f"font/ui-{em}.txt"
     face = glyphs.pixel_face(em)
@@ -207,8 +283,6 @@ for em in glyphs.UI:
         fail(f"{name} does not pack to 800 bytes the library opens")
         continue
     ss = 8
-    xs, ys = (np.arange(em * ss) + 0.5) / (em * ss), (np.arange(2 * em * ss) + 0.5) / (em * ss)
-    P = np.stack([a.ravel() for a in np.meshgrid(xs, ys)], 1)
     for ch, (adv, art) in sorted(face.items()):
         ink = np.array([[c == "#" for c in r] for r in art])
         for bold in (0, 1):
@@ -216,14 +290,8 @@ for em in glyphs.UI:
                 fail(f"{name}: U+{ord(ch):04X} weight {bold} does not step {adv + bold} pixels")
         if ink.shape[1] > adv:
             fail(f"{name}: U+{ord(ch):04X} steps {adv} pixels, which is less than its drawing is wide")
-        want_px = np.zeros((2 * em, em), bool)
-        want_px[glyphs.UI_TOP[em]:glyphs.UI_TOP[em] + em, :ink.shape[1]] = ink
-        shapes = glyphs.traced(art, em)
-        cov = np.zeros((2 * em, em))
-        if shapes:
-            inside = glyphs.signed_distance(shapes, P, glyphs.PENS[f"ui{em}"]) > 0
-            cov = inside.reshape(2 * em, ss, em, ss).mean((1, 3))
-        if (cov[want_px] < 0.85).any() or (cov[~want_px] > 0.3).any():
+        cov, hit = pen_coverage(em, art, ink, ss)
+        if len(hit) and ((cov[hit] < 0.85).any() or (cov[~hit] > 0.3).any()):
             fail(f"{name}: the strokes for U+{ord(ch):04X} are not firmly its pixels")
     lib.neuronte_close(h)
 

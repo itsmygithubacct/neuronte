@@ -10,7 +10,7 @@ The same buffer can be shown in a Kilix terminal or in a GUI window. The
 library does not open the window or take the terminal.
 
 Status: local only. No remote. There are three weight files for the one
-library, and twelve for the desktop face. Scalars a file was not trained on get a mark of their own, not
+library, and forty for the desktop face. Scalars a file was not trained on get a mark of their own, not
 a letter.
 
 | Weights | Use | Characters | Hidden width | Parameters | File |
@@ -18,11 +18,16 @@ a letter.
 | `neuronte-split-v4` | the font to use | 1,061, over six nets and a router | 48, 128 and 192 | 329,356 | 1,319,616 bytes |
 | `neuronte-full-v2` | the baseline `split` is measured against | 763 of them in one net, all but the sextants and octants | 320 | 234,881 | 939,728 bytes |
 | `neuronte-ascii-v0` | the smallest file | the 95 printable ASCII characters | 128 | 44,801 | 179,408 bytes |
+| `neuronte-ui1-v0`, `neuronte-ui2-v0`, `neuronte-ui3-v0`, `neuronte-ui4-v0`, `neuronte-ui5-v0`, `neuronte-ui6-v0`, `neuronte-ui7-v0` | the desktop face at an em of 1, 2, 3, 4, 5, 6 and 7 pixels | printable ASCII and the ellipsis, 96, with their advances | 96 | 27,457 | 110,864 bytes each |
 | `neuronte-ui8-v0`, `neuronte-ui9-v0`, `neuronte-ui10-v0`, `neuronte-ui11-v0` | the desktop face: proportional binary text at an em of 8, 9, 10 and 11 pixels | printable ASCII and the ellipsis, 96, with their advances | 96 | 27,457 | 110,864 bytes each |
 | `neuronte-ui12-v0`, `neuronte-ui14-v0` | the desktop face at an em of 12 pixels and of 14 | printable ASCII and the ellipsis, 96, with their advances | 128 | 44,801 | 180,240 bytes each |
+| `neuronte-ui13-v0`, `neuronte-ui15-v0` | the desktop face at an em of 13 pixels and of 15 | printable ASCII and the ellipsis, 96, with their advances | 128 | 44,801 | 180,240 bytes each |
 | `neuronte-ui16-v0`, `neuronte-ui18-v0`, `neuronte-ui22-v0`, `neuronte-ui26-v0` | the desktop face at an em of 16, 18, 22 and 26 pixels | printable ASCII and the ellipsis, 96, with their advances | 192 | 91,777 | 368,144 bytes each |
-| `neuronte-ui20-v0` | the desktop face at an em of 20 pixels | printable ASCII and the ellipsis, 96, with their advances | 160 | 66,241 | 266,000 bytes |
-| `neuronte-ui24-v0`, `neuronte-ui28-v0`, `neuronte-ui30-v0` | the desktop face at an em of 24, 28 and 30 pixels | printable ASCII and the ellipsis, 96, with their advances | 384 | 331,009 | 1,325,072 bytes each |
+| `neuronte-ui23-v0`, `neuronte-ui25-v0` | the desktop face at an em of 23 pixels and of 25 | printable ASCII and the ellipsis, 96, with their advances | 192 | 91,777 | 368,144 bytes each |
+| `neuronte-ui17-v0` | the desktop face at an em of 17 pixels | printable ASCII and the ellipsis, 96, with their advances | 256 | 155,137 | 621,584 bytes |
+| `neuronte-ui19-v0`, `neuronte-ui20-v0`, `neuronte-ui21-v0` | the desktop face at an em of 19, 20 and 21 pixels | printable ASCII and the ellipsis, 96, with their advances | 160 | 66,241 | 266,000 bytes each |
+| `neuronte-ui24-v0`, `neuronte-ui27-v0`, `neuronte-ui28-v0`, `neuronte-ui29-v0`, `neuronte-ui30-v0` | the desktop face at an em of 24, 27, 28, 29 and 30 pixels | printable ASCII and the ellipsis, 96, with their advances | 384 | 331,009 | 1,325,072 bytes each |
+| `neuronte-ui31-v0`, `neuronte-ui33-v0`, `neuronte-ui34-v0`, `neuronte-ui35-v0`, `neuronte-ui36-v0`, `neuronte-ui37-v0`, `neuronte-ui38-v0`, `neuronte-ui39-v0`, `neuronte-ui43-v0` | the desktop face at an em of 31, 33, 34, 35, 36, 37, 38, 39 and 43 pixels | printable ASCII and the ellipsis, 96, with their advances | 512 | 572,417 | 2,290,704 bytes each |
 | `neuronte-ui32-v0` | the desktop face at an em of 32 pixels | printable ASCII and the ellipsis, 96, with their advances | 768 | 1,251,841 | 5,008,400 bytes |
 
 `neuronte-split` draws each character with one small net picked for it.
@@ -75,7 +80,7 @@ a letter and a mark, such as ß æ œ ð þ ø ł đ ħ ŋ ĳ, are drawn in
 | `font/symbols.txt` | The symbols of the full set, in the same form |
 | `font/marks.txt` | The diacritic marks, keyed by their combining code points |
 | `font/letters.txt` | The Latin letters beyond ASCII that are not a letter plus a mark, and the Greek and Russian Cyrillic letters. The Greek and Cyrillic are not yet in any weights |
-| `font/ui-8.txt` to `font/ui-32.txt` | A proportional face for small binary desktop text, printable ASCII and the ellipsis, drawn as pixels once for each em: 8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30 and 32 pixels, each character with its advance in pixels. Written for this project. `train/train.py --set ui8` and so on train one net each, and score it pixel by pixel at its size. `train/pack.py --advances` packs a file's advances, bold one pixel more. The nets so far are `neuronte-ui8-v0` through `neuronte-ui32-v0` |
+| `font/ui-1.txt` to `font/ui-128.txt` | A proportional face for binary desktop text, printable ASCII and the ellipsis, drawn as pixels for every em from 1 to 128 except 44, each character with its advance in pixels. Stems are one pixel wide through 16, two from 17 through 26, and three from 27. Written for this project. `train/train.py --set ui10` and so on train one net each, and score it pixel by pixel at its size. `train/pack.py --advances` packs a file's advances, bold one pixel more. The nets so far are `neuronte-ui1-v0` through `neuronte-ui39-v0`, one for every em, and `neuronte-ui43-v0` |
 | `font/icons.txt` | The icons, as colour layers back to front, each naming a palette entry. Not yet in any weights |
 | `font/palette.txt` | The palette for colour glyphs: entry 0 is the cell's foreground, 1 is clear, the rest have a dark-theme and a light-theme colour |
 | `font/code-masks.txt` | The 43 parity masks that turn a scalar into the net's 64 character inputs |
@@ -88,7 +93,7 @@ a letter and a mark, such as ß æ œ ð þ ø ł đ ħ ŋ ĳ, are drawn in
 | `train/snap.py` | The straight edges of a colour glyph, measured from the drawings when the weights are packed, and the warp that snaps them |
 | `train/gate.py` | Trains the router's gate for a bundle of nets. Needs torch; a CPU is enough |
 | `train/pack.py` | Packs weights JSON into the binary file the C library loads: a distance net, a colour net, a bundle, an advance table, or a drawing file. A pixel face such as `font/ui-10.txt` packs as an advance table, bold one pixel more. Documents the layouts |
-| `weights/` | The trained weights as JSON, the packed files, the scores and `SHA256SUMS`. `neuronte-draw-v2`, `neuronte-symbol-v0`, `neuronte-accent-v1`, `neuronte-pixel-v1`, `neuronte-braille-v0` and `neuronte-gate-v3` are the parts of `neuronte-split-v4`, with `neuronte-ascii-v0`. `neuronte-full-v2` is here so that `make test` and `make bench` run from a clone. `neuronte-ui8-v0` through `neuronte-ui32-v0` are the desktop face, each a drawing file of one net and its advances |
+| `weights/` | The trained weights as JSON, the packed files, the scores and `SHA256SUMS`. `neuronte-draw-v2`, `neuronte-symbol-v0`, `neuronte-accent-v1`, `neuronte-pixel-v1`, `neuronte-braille-v0` and `neuronte-gate-v3` are the parts of `neuronte-split-v4`, with `neuronte-ascii-v0`. `neuronte-full-v2` is here so that `make test` and `make bench` run from a clone. `neuronte-ui1-v0` through `neuronte-ui39-v0`, one for every em, and `neuronte-ui43-v0` are the desktop face, each a drawing file of one net and its advances |
 | `include/neuronte.h`, `src/` | The C library |
 | `tools/neuronte-render.c` | Draws lines of text into a PPM file |
 | `tools/neuronte-bench.c` | Times a net per cell, or a full net against a bundle per class of character |
@@ -136,8 +141,8 @@ inner loops twice, plain and AVX2, and picks one by CPU when it loads.
   version 1 box-drawing checks also show that a horizontal line still
   meets a vertical one when snapping is asked for;
 - each desktop-face file draws every one of its characters, regular and
-  bold, as exactly the pixels in its drawing, `font/ui-8.txt` through
-  `font/ui-32.txt`, through `neuronte_draw_text()` with
+  bold, as exactly the pixels in its drawing, `font/ui-1.txt` through
+  `font/ui-39.txt` and `font/ui-43.txt`, through `neuronte_draw_text()` with
   `neuronte_set_binary()` on.
 
 For `neuronte-full` and `neuronte-split` it also checks that box lines

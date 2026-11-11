@@ -1,0 +1,203 @@
+# Neuronte desktop face at an em of 1 pixel: printable ASCII and the
+# ellipsis, as pixels. Written for this project. No font was read, and no
+# width was copied. One character per block: the character (or U+XXXX), a
+# space and its advance in pixels, then 1 row from the ascender down,
+# each starting at the pen. # is ink. train/glyphs.py makes each inked
+# pixel a round dot joined to the inked pixel beside it and below, so the
+# net's target is these pixels. The baseline is row 0 and the x-height
+# row 0; in the drawn cell the baseline is row 1 below the pen
+# (UI_TOP 1). The strokes of the nearest pixel face were refitted to
+# this grid, one pixel wide. Bold is the same letter struck twice, one pixel apart,
+# by the drawer.
+U+0020 1
+.
+! 1
+#
+" 1
+#
+U+0023 1
+#
+$ 1
+#
+% 1
+#
+& 1
+#
+' 1
+#
+( 1
+#
+) 1
+#
+* 1
+#
++ 1
+#
+, 1
+#
+- 1
+#
+. 1
+#
+/ 1
+#
+0 1
+#
+1 1
+#
+2 1
+#
+3 1
+#
+4 1
+#
+5 1
+#
+6 1
+#
+7 1
+#
+8 1
+#
+9 1
+#
+: 1
+#
+; 1
+#
+< 1
+#
+= 1
+#
+> 1
+#
+? 1
+#
+@ 1
+#
+A 1
+#
+B 1
+#
+C 1
+#
+D 1
+#
+E 1
+#
+F 1
+#
+G 1
+#
+H 1
+#
+I 1
+#
+J 1
+#
+K 1
+#
+L 1
+#
+M 1
+#
+N 1
+#
+O 1
+#
+P 1
+#
+Q 1
+#
+R 1
+#
+S 1
+#
+T 1
+#
+U+0055 1
+#
+V 1
+#
+W 1
+#
+X 1
+#
+Y 1
+#
+Z 1
+#
+[ 1
+#
+\ 1
+#
+] 1
+#
+^ 1
+#
+_ 1
+#
+` 1
+#
+a 1
+#
+b 1
+#
+c 1
+#
+d 1
+#
+e 1
+#
+f 1
+#
+g 1
+#
+h 1
+#
+i 1
+#
+j 1
+#
+k 1
+#
+l 1
+#
+m 1
+#
+n 1
+#
+o 1
+#
+p 1
+#
+q 1
+#
+r 1
+#
+s 1
+#
+t 1
+#
+u 1
+#
+v 1
+#
+w 1
+#
+x 1
+#
+y 1
+#
+z 1
+#
+{ 1
+#
+| 1
+#
+} 1
+#
+~ 1
+#
+U+2026 1
+#

@@ -66,6 +66,16 @@ python3 train/colour.py OUT.json --form A --layers 3 --drawing font/flame.txt \
     --palette font/flame-palette.txt --blank U+0020..U+007E,U+FFFD
 ```
 
+The net is `weights/neuronte-flame-v0`: width 64, seed 0, 20,000 steps,
+grid 256, packed as a version 3 file of its own. It is not a member of a
+drawing file, because a drawing file has no router and draws every scalar
+with its first net, and it is not in an icon bundle, because a bundle's
+colour members share one palette and this palette is the desktop's own.
+Drawn by the C library at 16 and 32 px, with the file's snap threshold of
+14 (so neither size snaps), no pixel is more than 32 levels from the
+drawing, and the mean is about one level. Width 32 left one to four
+pixels past 32 levels at 32 px; width 128 was no better at 16 px.
+
 These files are the original drawing and its previews. No installed
 application PNG was replaced, and no desktop code was changed. MIT
 licence; see the repository's LICENSE.

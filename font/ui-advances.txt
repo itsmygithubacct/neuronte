@@ -1,8 +1,11 @@
 # Advances of the desktop face in ui.txt: the pen's step after each
 # character, side bearings included, in design units, regular then bold.
+# Bold is the regular letter struck twice, the second time one pixel to
+# the right, so each bold advance is chosen to be one pixel more than the
+# regular one at an em of 10 pixels and at an em of 11.
 # Written for this project. No font's widths were read or copied.
 # train/pack.py --advances packs this file.
-U+0020 3.0 3.4
+U+0020 3.0 4.0
 ! 3.0 4.0
 " 5.0 6.0
 U+0023 8.4 9.4
@@ -10,7 +13,7 @@ $ 7.0 8.0
 % 10.0 11.0
 & 7.6 8.6
 ' 3.0 4.0
-( 4.0 5.0
+( 4.0 4.9
 ) 4.4 5.4
 * 7.0 8.0
 + 7.0 8.0
@@ -35,7 +38,7 @@ $ 7.0 8.0
 > 7.0 8.0
 ? 5.4 6.4
 @ 10.0 11.0
-A 6.8 7.8
+A 6.8 7.7
 B 7.0 8.0
 C 7.4 8.4
 D 7.0 8.0
@@ -58,7 +61,7 @@ T 6.6 7.6
 U+0055 7.0 8.0
 V 6.6 7.6
 W 9.0 10.0
-X 6.8 7.8
+X 6.8 7.7
 Y 6.6 7.6
 Z 7.0 8.0
 [ 5.0 6.0

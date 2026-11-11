@@ -187,7 +187,8 @@ with tempfile.TemporaryDirectory() as tmp:
 
 # The desktop face: every character drawn in font/ui.txt has an advance in
 # font/ui-advances.txt and no other does, the set is printable ASCII and
-# the ellipsis, the file packs, and no step is shorter than the ink.
+# the ellipsis, the file packs, no step is shorter than the ink, and bold
+# steps one pixel further than regular at an em of 10 and of 11 pixels.
 import strokes  # noqa: E402
 
 face = strokes.parse(os.path.join(ROOT, "font", "ui.txt"))
@@ -204,8 +205,10 @@ else:
         for bold in (0, 1):
             if xs and steps[ord(ch)][bold] < round(max(xs) * 100) + 5:
                 fail(f"U+{ord(ch):04X}: its advance, weight {bold}, ends inside its ink")
-        if steps[ord(ch)][1] < steps[ord(ch)][0]:
-            fail(f"U+{ord(ch):04X}: the bold advance is less than the regular one")
+        # Bold is the letter struck twice, one pixel apart.
+        for em in (10, 11):
+            if pack.pixels(steps[ord(ch)][1], em) != pack.pixels(steps[ord(ch)][0], em) + 1:
+                fail(f"U+{ord(ch):04X}: the bold advance is not one pixel more at {em} px")
 
 print(f"check_advances: {len(want)} characters, a table and two drawing files; the desktop face, {len(face)}")
 print("check_advances: FAILED" if failed else "check_advances: passed")

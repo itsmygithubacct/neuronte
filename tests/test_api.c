@@ -11,6 +11,7 @@
 #define _POSIX_C_SOURCE 200809L
 #include "neuronte.h"
 
+#include <limits.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -1162,6 +1163,35 @@ static void draw_text_checks(neuronte *n)
         FAIL("draw_text argument checks");
 }
 
+/* Fully clipped text keeps its cell count or its measured width. An em
+ * that does not fit in a cell, including one whose doubled height does not
+ * fit in int, is an argument error. The pen may sit on INT_MAX. */
+static void text_edge_checks(neuronte *n)
+{
+    uint32_t pix[2] = {0x11111111u, 0x22222222u};
+    int width = neuronte_text_width(n, "A", 1, 0, 10);
+    int both = neuronte_text_width(n, "AB", 2, 0, 10);
+    int bold = neuronte_text_width(n, "A", 1, 1, 10);
+
+    if (width < 0 || both < 0 || bold < 0)
+        FAIL("text edges: width");
+    if (neuronte_draw_utf8(n, pix, 1, 1, 2, INT_MAX, 0, 1, 2, "A", 1, 0xFFFFFFFFu) != 1 ||
+        neuronte_draw_utf8(n, pix, 1, 1, 2, INT_MAX, 0, 1, 2, "AB", 2, 0xFFFFFFFFu) != 2 ||
+        neuronte_draw_utf8(n, pix, 1, 1, 2, 0, INT_MAX, 1, 2, "A", 1, 0xFFFFFFFFu) != 1 ||
+        neuronte_draw_text(n, pix, 1, 1, 2, INT_MAX, 0, 10, 0, "A", 1, 0xFFFFFFFFu) != width ||
+        neuronte_draw_text(n, pix, 1, 1, 2, INT_MAX - 3, 0, 10, 0, "A", 1, 0xFFFFFFFFu) != width ||
+        neuronte_draw_text(n, pix, 1, 1, 2, INT_MAX, 0, 10, 0, "AB", 2, 0xFFFFFFFFu) != both ||
+        neuronte_draw_text(n, pix, 1, 1, 2, INT_MAX, 0, 10, 1, "A", 1, 0xFFFFFFFFu) != bold ||
+        neuronte_draw_text(n, pix, 1, 1, 2, 0, INT_MAX, 10, 0, "A", 1, 0xFFFFFFFFu) != width ||
+        pix[0] != 0x11111111u || pix[1] != 0x22222222u)
+        FAIL("fully clipped text at the edge of int");
+    if (neuronte_draw_text(n, pix, 1, 1, 2, 0, 0, INT_MAX, 0, "A", 1, 0xFFFFFFFFu) != NEURONTE_ERR_ARG ||
+        neuronte_draw_text(n, pix, 1, 1, 2, 0, 0, INT_MIN, 0, "A", 1, 0xFFFFFFFFu) != NEURONTE_ERR_ARG ||
+        neuronte_draw_text(n, pix, 1, 1, 2, INT_MAX, 0, INT_MAX, 0, "A", 1, 0xFFFFFFFFu) != NEURONTE_ERR_ARG ||
+        pix[0] != 0x11111111u || pix[1] != 0x22222222u)
+        FAIL("draw_text em out of range");
+}
+
 /* The advance table, version 4, and the drawing file, version 5. net is a
  * version 1 image, or NULL when the weights under test are a bundle. */
 static void advance_checks(const unsigned char *net, size_t netlen)
@@ -1184,6 +1214,7 @@ static void advance_checks(const unsigned char *net, size_t netlen)
     neuronte *n = NULL;
     float one[2];
     uint32_t pix[2] = {0, 0};
+    uint8_t ent[1] = {0};
 
     if (neuronte_open(example, sizeof example, &n) != NEURONTE_OK) {
         FAIL("the note's example table does not open");
@@ -1222,6 +1253,7 @@ static void advance_checks(const unsigned char *net, size_t netlen)
         FAIL("advance argument checks");
     /* A table by itself measures and cannot draw. */
     if (neuronte_route(n, 'A') != NEURONTE_ERR_ARG || neuronte_coverage(n, 'A', 1, 2, 1, one) != NEURONTE_ERR_ARG ||
+        neuronte_coverage_layers(n, 'A', 1, 2, 1, one, ent) != NEURONTE_ERR_ARG ||
         neuronte_draw_scalar(n, pix, 1, 1, 2, 0, 0, 1, 2, 'A', 0xFFFFFFFFu) != NEURONTE_ERR_ARG ||
         neuronte_draw_utf8(n, pix, 1, 1, 2, 0, 0, 1, 2, "A", 1, 0xFFFFFFFFu) != NEURONTE_ERR_ARG ||
         neuronte_draw_text(n, pix, 1, 1, 2, 0, 0, 1, 0, "A", 1, 0xFFFFFFFFu) != NEURONTE_ERR_ARG || pix[0] || pix[1])
@@ -1323,6 +1355,8 @@ static void advance_checks(const unsigned char *net, size_t netlen)
     } else if (neuronte_advances(n) != 6 || neuronte_nets(n) != 0 || neuronte_advance(n, 'B', 1, 11) != 7 ||
                neuronte_text_width(n, "AB~", 3, 0, 10) != 5 + 6 + 20) {
         FAIL("drawing file of one table: measures wrong");
+    } else if (neuronte_coverage_layers(n, 'A', 1, 2, 1, one, ent) != NEURONTE_ERR_ARG) {
+        FAIL("drawing file of one table: coverage_layers");
     }
     neuronte_close(n);
     n = NULL;
@@ -1388,6 +1422,7 @@ static void advance_checks(const unsigned char *net, size_t netlen)
             if (neuronte_advance(n, 'A', 0, 10) != 5 || neuronte_advance(n, 'A', 1, 11) != 6)
                 FAIL("drawing file: advance of A");
             draw_text_checks(n);
+            text_edge_checks(n);
         }
         neuronte_close(n);
         neuronte_close(lone);

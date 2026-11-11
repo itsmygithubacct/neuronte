@@ -1617,8 +1617,8 @@ int neuronte_coverage_layers(const neuronte *hd, uint32_t scalar, int cell_w, in
     int ss = samples_per_axis, layers, rc;
     size_t plane;
 
-    if (!hd || !masks || !entries || cell_w <= 0 || cell_h <= 0 || cell_w > NEURONTE_MAX_CELL ||
-        cell_h > NEURONTE_MAX_CELL || ss < 0 || ss > NEURONTE_MAX_SAMPLES)
+    if (!hd || !hd->nets || !masks || !entries || cell_w <= 0 || cell_h <= 0 ||
+        cell_w > NEURONTE_MAX_CELL || cell_h > NEURONTE_MAX_CELL || ss < 0 || ss > NEURONTE_MAX_SAMPLES)
         return NEURONTE_ERR_ARG;
     if (ss == 0)
         ss = auto_samples(cell_w);
@@ -1763,7 +1763,10 @@ int neuronte_draw_scalar(neuronte *n, uint32_t *pixels, int stride, int width, i
     if (!n || !n->nets || !pixels || width < 0 || height < 0 || stride < width || cell_w <= 0 ||
         cell_h <= 0 || cell_w > NEURONTE_MAX_CELL || cell_h > NEURONTE_MAX_CELL)
         return NEURONTE_ERR_ARG;
-    if (alpha <= 0.0f || x >= width || y >= height || x + cell_w <= 0 || y + cell_h <= 0)
+    /* A cell may start at INT_MAX. The sums are wider than int so a clipped
+     * edge is skipped instead of overflowing. */
+    if (alpha <= 0.0f || (int64_t)x >= width || (int64_t)y >= height ||
+        (int64_t)x + cell_w <= 0 || (int64_t)y + cell_h <= 0)
         return NEURONTE_OK;
     ss = n->samples ? n->samples : auto_samples(cell_w);
     scalar = normalize(scalar);
@@ -1772,14 +1775,15 @@ int neuronte_draw_scalar(neuronte *n, uint32_t *pixels, int stride, int width, i
         return rc;
     net = n->net[route(n, scalar)];
     if (!net->col) {
-        for (py = y < 0 ? -y : 0; py < cell_h && y + py < height; py++)
-            for (px = x < 0 ? -x : 0; px < cell_w && x + px < width; px++) {
+        for (py = y < 0 ? (int)(-(int64_t)y) : 0; py < cell_h && (int64_t)y + py < height; py++)
+            for (px = x < 0 ? (int)(-(int64_t)x) : 0; px < cell_w && (int64_t)x + px < width; px++) {
                 float c = cell->cov[(size_t)py * cell_w + px], a;
                 if (n->binary)
                     c = c > 0.5f ? 1.0f : 0.0f;
                 a = c * alpha;
                 if (a > 0.0f) {
-                    uint32_t *d = pixels + (size_t)(y + py) * stride + (x + px);
+                    uint32_t *d = pixels + (size_t)((int64_t)y + py) * (size_t)stride +
+                                  (size_t)((int64_t)x + px);
                     *d = blend(*d, color, a);
                 }
             }
@@ -1789,15 +1793,16 @@ int neuronte_draw_scalar(neuronte *n, uint32_t *pixels, int stride, int width, i
         const uint8_t *pal = n->theme ? n->light : n->dark;
         int k = net->col->k;
         size_t plane = (size_t)cell_w * cell_h;
-        for (py = y < 0 ? -y : 0; py < cell_h && y + py < height; py++)
-            for (px = x < 0 ? -x : 0; px < cell_w && x + px < width; px++) {
+        for (py = y < 0 ? (int)(-(int64_t)y) : 0; py < cell_h && (int64_t)y + py < height; py++)
+            for (px = x < 0 ? (int)(-(int64_t)x) : 0; px < cell_w && (int64_t)x + px < width; px++) {
                 float pr, pg, pb, pa;
                 over_pixel(cell->cov, cell->ent, k, plane, (size_t)py * cell_w + px, pal, color, &pr, &pg,
                            &pb, &pa);
                 if (pa > 0.0f) {
                     uint32_t src = (uint32_t)byte_chan(pr / pa) << 16 | (uint32_t)byte_chan(pg / pa) << 8 |
                                    (uint32_t)byte_chan(pb / pa);
-                    uint32_t *d = pixels + (size_t)(y + py) * stride + (x + px);
+                    uint32_t *d = pixels + (size_t)((int64_t)y + py) * (size_t)stride +
+                                  (size_t)((int64_t)x + px);
                     *d = blend(*d, src, pa);
                 }
             }
@@ -1811,6 +1816,7 @@ int neuronte_draw_utf8(neuronte *n, uint32_t *pixels, int stride, int width, int
 {
     size_t off = 0;
     int cells = 0;
+    int64_t pen = x;
 
     if (!text && len)
         return NEURONTE_ERR_ARG;
@@ -1818,10 +1824,17 @@ int neuronte_draw_utf8(neuronte *n, uint32_t *pixels, int stride, int width, int
         uint32_t s;
         int rc;
         off += neuronte_utf8_decode(text + off, len - off, &s);
-        rc = neuronte_draw_scalar(n, pixels, stride, width, height, x, y, cell_w, cell_h, s, color);
-        if (rc != NEURONTE_OK)
-            return rc;
-        x += cell_w;
+        /* A pen past INT_MAX is off any buffer this call can name. */
+        if (pen <= INT_MAX) {
+            rc = neuronte_draw_scalar(n, pixels, stride, width, height, (int)pen, y, cell_w, cell_h, s,
+                                      color);
+            if (rc != NEURONTE_OK)
+                return rc;
+        }
+        if (cell_w > 0 && pen > INT64_MAX - cell_w)
+            pen = INT64_MAX;
+        else
+            pen += cell_w;
         cells++;
     }
     return cells;
@@ -1892,35 +1905,46 @@ int neuronte_draw_text(neuronte *n, uint32_t *pixels, int stride, int width, int
                        uint32_t color)
 {
     float alpha = (float)(color >> 24) / 255.0f;
-    int cw = em_px, ch = 2 * em_px, total, ss, px, py;
+    int cw, ch, total, ss, px, py;
+    int64_t pen;
     size_t off = 0;
 
+    /* Check em before doubling it. Past INT_MAX / 2 the height overflows. */
     if (!n || !n->nets || !pixels || width < 0 || height < 0 || stride < width || em_px <= 0 ||
         em_px > NEURONTE_MAX_CELL / 2)
         return NEURONTE_ERR_ARG;
+    cw = em_px;
+    ch = em_px * 2;
     total = neuronte_text_width(n, text, len, bold, em_px);
     if (total < 0 || alpha <= 0.0f)
         return total;
     ss = n->samples ? n->samples : auto_samples(cw);
+    pen = x;
     while (off < len) {
         const struct advance *a;
         const struct entry *cell;
         const float *cov;
         uint32_t s;
         int rc = NEURONTE_OK;
+        int ix;
+        int64_t adv;
 
         off += neuronte_utf8_decode(text + off, len - off, &s);
         a = advance_of(n, s);
-        /* One column more for bold, whose second strike is a pixel right. */
-        if (x < width && y < height && x + cw + bold > 0 && y + ch > 0) {
+        /* One column more for bold, whose second strike is a pixel right.
+         * The pen is wider than int: a clipped character may start at
+         * INT_MAX, and its advance still has to be added. */
+        ix = pen > INT_MAX ? INT_MAX : (int)pen;
+        if (pen <= INT_MAX && (int64_t)ix < width && (int64_t)y < height &&
+            pen + (int64_t)cw + bold > 0 && (int64_t)y + ch > 0) {
             cell = cached(n, a->scalar, cw, ch, ss, &rc);
             if (!cell)
                 return rc;
             if (n->net[route(n, a->scalar)]->col)
                 return NEURONTE_ERR_ARG;
             cov = cell->cov;
-            for (py = y < 0 ? -y : 0; py < ch && y + py < height; py++)
-                for (px = x < 0 ? -x : 0; px < cw + bold && x + px < width; px++) {
+            for (py = y < 0 ? (int)(-(int64_t)y) : 0; py < ch && (int64_t)y + py < height; py++)
+                for (px = ix < 0 ? (int)(-(int64_t)ix) : 0; px < cw + bold && (int64_t)ix + px < width; px++) {
                     const float *row = cov + (size_t)py * cw;
                     float c = px < cw ? row[px] : 0.0f;
                     if (bold && px > 0 && row[px - 1] > c)
@@ -1928,12 +1952,17 @@ int neuronte_draw_text(neuronte *n, uint32_t *pixels, int stride, int width, int
                     if (n->binary)
                         c = c > 0.5f ? 1.0f : 0.0f;
                     if (c * alpha > 0.0f) {
-                        uint32_t *d = pixels + (size_t)(y + py) * stride + (x + px);
+                        uint32_t *d = pixels + (size_t)((int64_t)y + py) * (size_t)stride +
+                                      (size_t)((int64_t)ix + px);
                         *d = blend(*d, color, c * alpha);
                     }
                 }
         }
-        x += (a->steps[bold] * em_px + 50) / 100;
+        adv = ((int64_t)a->steps[bold] * em_px + 50) / 100;
+        if (adv > 0 && pen > INT64_MAX - adv)
+            pen = INT64_MAX;
+        else
+            pen += adv;
     }
     return total;
 }

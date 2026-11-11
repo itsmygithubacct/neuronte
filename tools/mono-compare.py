@@ -27,14 +27,14 @@ def main():
     p.add_argument('--library', required=True)
     p.add_argument('--baseline', required=True)
     p.add_argument('--candidate', required=True)
-    p.add_argument('--other-seed', required=True)
+    p.add_argument('--other-seed', help='also measure and gate an independent training seed')
     p.add_argument('--set', choices=('accent', 'full'), default='accent')
     p.add_argument('--include-new', action='store_true')
     p.add_argument('--sizes', default='8,16,48')
     p.add_argument('--samples', type=int, choices=(0,1,2), default=2,
                    help='samples per axis; 0 exercises the production automatic choice')
     p.add_argument('--minimum-iou', type=float,
-                   help='require both new seeds to pass every tier at 16 and 48 px')
+                   help='require the candidate and any supplied other seed to pass every tier at 16 and 48 px')
     p.add_argument('--out', required=True)
     a = p.parse_args()
     try:
@@ -53,7 +53,9 @@ def main():
     lib.neuronte_open_file.argtypes = [ct.c_char_p, ct.POINTER(P)]
     lib.neuronte_close.argtypes = [P]
     lib.neuronte_coverage.argtypes = [P, U, I, I, I, P]
-    inputs = {'old': a.baseline, 'new': a.candidate, 'seed1': a.other_seed}
+    inputs = {'old': a.baseline, 'new': a.candidate}
+    if a.other_seed:
+        inputs['seed1'] = a.other_seed
     documents = {name: json.loads(Path(path).read_text()) for name, path in inputs.items()}
     images = {name: pack.pack(path) for name, path in inputs.items()}
     known = pack.scalars(a.baseline)[1]
@@ -97,6 +99,9 @@ def main():
         sizes[w]['common_labels'] = {'count': len(common),
             **{name+'_mean': float(np.mean([r[name]['iou'] for r in common])) for name in inputs},
             'regressions': [r for r in common if r['delta'] < -1e-12]}
+        if len(common) != len(rs):
+            # An old net's untrained output is not a useful baseline mean.
+            del sizes[w]['old_mean']
         groups = {tier: [r for r in rs if r['tier'] == tier] for tier in sorted({r['tier'] for r in rs})}
         for name, lo, hi in (('greek',0x370,0x3ff), ('russian',0x400,0x4ff), ('latin',0,0x36f)):
             group = [r for r in rs if r['tier'] == 'accent' and lo <= int(r['scalar'][2:],16) <= hi]
@@ -105,7 +110,7 @@ def main():
         tiers = {}
         for name, group in groups.items():
             tiers[name] = {'count': len(group)}
-            for seed in ('new','seed1'):
+            for seed in (name for name in inputs if name != 'old'):
                 tiers[name][seed] = {'mean': float(np.mean([r[seed]['iou'] for r in group])),
                     'minimum': min(r[seed]['iou'] for r in group),
                     'lost': sum(r[seed]['target_ink'] > 0 and r[seed]['intersection'] == 0 for r in group)}
@@ -115,10 +120,12 @@ def main():
     report = {'characters': len(chars), 'samples': a.samples, 'target_grid': 256,
               'target_samples': 8, 'set': a.set, 'include_new': a.include_new,
               'minimum_iou': a.minimum_iou, 'passed': bool(passed),
+              'baseline_comparison_scope':'common_labels only',
               'target': {'grid':256, 'pen_radius':.075, 'tau':.15,
                          'field_storage':'float16', 'subpixels_per_axis':8,
                          'coverage_cutoff':.5},
-              'models': {name: {'shape': {k: v for k,v in d['shape'].items() if k != 'parity_masks'},
+              'models': {name: {'training_seed':d['training'].get('seed'),
+                                'shape': {k: v for k,v in d['shape'].items() if k != 'parity_masks'},
                                 'training_target': {k: d['training'].get(k) for k in ('grid','pen_radius')}}
                          for name,d in documents.items()},
               'library_sha256': hashlib.sha256(Path(a.library).read_bytes()).hexdigest(),

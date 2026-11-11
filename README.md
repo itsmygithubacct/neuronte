@@ -130,6 +130,32 @@ The library is C11 with libm and nothing else. On x86-64 it builds its
 inner loops twice, plain and AVX2, and picks one by CPU when it loads.
 `CFLAGS=-DNEURONTE_NO_CLONES` builds the plain path only.
 
+`neuronte_coverage_styled()` and `neuronte_draw_scalar_styled()` apply
+explicit synthetic terminal bold and italic to a monochrome net. They
+share style flags and geometry, keep the original cell boundary, and
+leave colour artwork unchanged. They do not imply separately trained
+terminal styles. `neuronte_draw_text_stroke()` and its matching width
+call add a caller-selected horizontal stroke to a proportional face,
+with precisely the same added pixel advance. A scalable bold caller can
+use `max(1, (em + 16) / 32)` instead of a one-pixel strike at every size.
+The existing APIs, trained weights and packed advances keep their behavior.
+
+Two-cell colour drawings use the explicit `neuronte_coverage_half()`,
+`neuronte_coverage_layers_half()` and `neuronte_draw_half()` calls. The
+caller selects a model trained on left and right halves, and passes a
+Unicode scalar plus half 0 or 1. The private right-half code is never
+accepted as Unicode by the ordinary APIs. These calls do not adopt a
+colour asset in an application, supply shaping, or assert that a loaded
+model knows a scalar. See `include/neuronte.h` for exact contracts.
+
+The additional `font/ui-EM-italic.txt` drawings cover every integer 3–32;
+the new files at 3–9 and the missing odd sizes are training targets until
+their own trained weights are supplied. At 1 and 2 pixels the grid cannot
+express a distinct slant, so no upright drawing is relabelled as italic.
+`tools/make-italic.py` reproduces new targets without clipping ink or
+overwriting existing artwork. Missing weights and unsupported text or
+layout requests require an explicit fallback in a consumer.
+
 `make test` checks, for every weight file, that:
 
 - the weights match `weights/SHA256SUMS`;

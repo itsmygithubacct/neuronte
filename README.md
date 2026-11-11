@@ -9,7 +9,7 @@ Games, the OS and `soft-raster` link the library and pass in the buffer.
 The same buffer can be shown in a Kilix terminal or in a GUI window. The
 library does not open the window or take the terminal.
 
-Status: local only. No remote. There are three weight files for the one
+Status: public, at github.com/itsmygithubacct/neuronte. There are three weight files for the one
 library, and fifty-one for the desktop face: forty upright and eleven italic. Scalars a file was not trained on get a mark of their own, not
 a letter.
 

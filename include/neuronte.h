@@ -130,6 +130,26 @@ int neuronte_coverage(const neuronte *n, uint32_t scalar, int cell_w, int cell_h
 int neuronte_coverage_layers(const neuronte *n, uint32_t scalar, int cell_w, int cell_h,
                              int samples_per_axis, float *masks, uint8_t *entries);
 
+/* Explicit half of a two-cell drawing. half is 0 (left) or 1 (right).
+ * The selected model must have been trained on scalar for the left and
+ * 0x110000 + scalar for the right; these calls do not imply availability.
+ * They are useful with a separately selected colour emoji asset. The
+ * private right code never passes through Unicode normalization. Invalid
+ * Unicode scalars and halves return ERR_ARG. Right codes must fit the
+ * net's 21-bit input: half 1 rejects scalars above U+EFFFF. Ordinary scalar
+ * APIs still replace all non-Unicode codes with U+FFFD.
+ * Each half's dimensions, layers, palette, snapping and clipping follow
+ * the corresponding ordinary API. No shaping or sequence lookup occurs. */
+int neuronte_route_half(const neuronte *n, uint32_t scalar, int half);
+int neuronte_coverage_half(const neuronte *n, uint32_t scalar, int half,
+                           int cell_w, int cell_h, int samples_per_axis, float *coverage);
+int neuronte_coverage_layers_half(const neuronte *n, uint32_t scalar, int half,
+                                  int cell_w, int cell_h, int samples_per_axis,
+                                  float *masks, uint8_t *entries);
+int neuronte_draw_half(neuronte *n, uint32_t *pixels, int stride, int width, int height,
+                       int x, int y, int cell_w, int cell_h, uint32_t scalar, int half,
+                       uint32_t color);
+
 /* Blend one character into the buffer in colour 0xAARRGGBB, with its cell's
  * top-left corner at (x, y). stride is in pixels. Pixels outside the buffer
  * are skipped, so a cell may hang off any edge. A colour glyph is composited
@@ -139,6 +159,32 @@ int neuronte_coverage_layers(const neuronte *n, uint32_t scalar, int cell_w, int
  * the glyph left clear is not written. */
 int neuronte_draw_scalar(neuronte *n, uint32_t *pixels, int stride, int width, int height,
                          int x, int y, int cell_w, int cell_h, uint32_t scalar, uint32_t color);
+
+enum {
+    NEURONTE_STYLE_BOLD = 1u,
+    NEURONTE_STYLE_ITALIC = 2u
+};
+
+/* Explicit synthetic terminal styles, not separately trained faces. Zero
+ * flags gives exactly neuronte_draw_scalar(). Bold extends monochrome ink
+ * right by max(1, round(cell_w / 32)) pixels, taking the greatest coverage
+ * over every intervening offset. Italic shifts each row right by
+ * round((0.675 - (row + 0.5) / cell_h) * cell_w / 2), ties away from zero.
+ * This shears about the baseline of the 1:2 design cell. Styles combine;
+ * the binary cut is applied after both. Ink is clipped to the original
+ * cell, so terminal advances and neighboring cells never change. Colour
+ * glyphs retain their artwork and ignore these flags. Unknown flags are
+ * NEURONTE_ERR_ARG. The original masks remain cached, independent of style. */
+int neuronte_draw_scalar_styled(neuronte *n, uint32_t *pixels, int stride, int width, int height,
+                                int x, int y, int cell_w, int cell_h, uint32_t scalar,
+                                uint32_t color, unsigned style);
+
+/* The same synthetic style on an uncached coverage mask. samples=0 keeps
+ * the usual automatic sampling. Like neuronte_coverage(), this ignores
+ * the binary setting and returns colour glyphs' unmodified composite alpha.
+ * Cache this result by scalar, dimensions, samples and style together. */
+int neuronte_coverage_styled(const neuronte *n, uint32_t scalar, int cell_w, int cell_h,
+                             int samples_per_axis, unsigned style, float *coverage);
 
 /* Draw text left to right, one cell per scalar, starting at (x, y). ASCII
  * and UTF-8 give the same cells for the same scalars. Nothing is done about
@@ -189,6 +235,23 @@ int neuronte_text_width(const neuronte *n, const char *text, size_t len, int bol
 int neuronte_draw_text(neuronte *n, uint32_t *pixels, int stride, int width, int height,
                        int x, int y, int em_px, int bold, const char *text, size_t len,
                        uint32_t color);
+
+/* Proportional text with explicit synthetic weight. stroke_px is 0..em_px.
+ * The advance of EACH character (including spaces and replacements) is its
+ * rounded regular advance plus exactly stroke_px. The ink is the maximum
+ * of all horizontal offsets 0..stroke_px, blended once; no gaps occur when
+ * a stroke is wider than the original stem. This is suitable for scalable
+ * bold: e.g. max(1, round(em_px / 32)). No packed advances are changed.
+ *
+ * Zero stroke matches regular text. Legacy neuronte_draw_text() continues
+ * to use its stored regular/bold advances and one-pixel bold strike.
+ * These calls do not shape or combine graphemes; select a shaped fallback
+ * for unsupported strings before measuring and drawing them. */
+int neuronte_text_width_stroke(const neuronte *n, const char *text, size_t len,
+                               int stroke_px, int em_px);
+int neuronte_draw_text_stroke(neuronte *n, uint32_t *pixels, int stride, int width, int height,
+                              int x, int y, int em_px, int stroke_px, const char *text, size_t len,
+                              uint32_t color);
 
 #ifdef __cplusplus
 }

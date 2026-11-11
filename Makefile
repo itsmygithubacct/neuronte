@@ -41,6 +41,7 @@ UI20I = weights/neuronte-ui20-italic-v0
 UI22I = weights/neuronte-ui22-italic-v0
 UI24I = weights/neuronte-ui24-italic-v0
 UI26I = weights/neuronte-ui26-italic-v0
+UI28I = weights/neuronte-ui28-italic-v0
 UI30I = weights/neuronte-ui30-italic-v0
 OBJS = build/neuronte.o build/utf8.o
 TOOLS = build/neuronte-render build/neuronte-bench
@@ -86,7 +87,7 @@ $(DEMOS): build/%: demo/%.c demo/common.h build/demo-common.o build/libneuronte.
 		build/libneuronte.a $(LDLIBS) -lz
 
 # Rebuild the packed weights from the JSON the trainers write.
-pack: $(ASCII).json $(FULL).json $(NETS) $(GATE) $(UI10).json $(UI11).json $(UI12).json $(UI14).json $(UI16).json $(UI18).json $(UI20).json $(UI22).json $(UI24).json $(UI26).json $(UI28).json $(UI30).json $(UI10I).json $(UI11I).json $(UI12I).json $(UI14I).json $(UI16I).json $(UI18I).json $(UI20I).json $(UI22I).json $(UI24I).json $(UI26I).json $(UI30I).json
+pack: $(ASCII).json $(FULL).json $(NETS) $(GATE) $(UI10).json $(UI11).json $(UI12).json $(UI14).json $(UI16).json $(UI18).json $(UI20).json $(UI22).json $(UI24).json $(UI26).json $(UI28).json $(UI30).json $(UI10I).json $(UI11I).json $(UI12I).json $(UI14I).json $(UI16I).json $(UI18I).json $(UI20I).json $(UI22I).json $(UI24I).json $(UI26I).json $(UI28I).json $(UI30I).json
 	$(PYTHON) train/pack.py $(ASCII).json $(ASCII).nrt
 	$(PYTHON) train/pack.py $(FULL).json $(FULL).nrt
 	$(PYTHON) train/pack.py --bundle $(SPLIT) $(NETS) --gate $(GATE)
@@ -112,6 +113,7 @@ pack: $(ASCII).json $(FULL).json $(NETS) $(GATE) $(UI10).json $(UI11).json $(UI1
 	$(PYTHON) train/pack.py --drawing $(UI22I).nrt $(UI22I).json font/ui-22-italic.txt
 	$(PYTHON) train/pack.py --drawing $(UI24I).nrt $(UI24I).json font/ui-24-italic.txt
 	$(PYTHON) train/pack.py --drawing $(UI26I).nrt $(UI26I).json font/ui-26-italic.txt
+	$(PYTHON) train/pack.py --drawing $(UI28I).nrt $(UI28I).json font/ui-28-italic.txt
 	$(PYTHON) train/pack.py --drawing $(UI30I).nrt $(UI30I).json font/ui-30-italic.txt
 	cd weights && sha256sum *.json *.nrt > SHA256SUMS
 
@@ -148,6 +150,7 @@ test: all $(TESTS)
 	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI22I).nrt $(UI22I).json font/ui-22-italic.txt
 	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI24I).nrt $(UI24I).json font/ui-24-italic.txt
 	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI26I).nrt $(UI26I).json font/ui-26-italic.txt
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI28I).nrt $(UI28I).json font/ui-28-italic.txt
 	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI30I).nrt $(UI30I).json font/ui-30-italic.txt
 
 bench: build/neuronte-bench

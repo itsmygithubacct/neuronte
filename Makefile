@@ -194,6 +194,8 @@ test: all $(TESTS)
 	./build/test_api $(ASCII).nrt
 	./build/test_api $(FULL).nrt --full --accent
 	./build/test_api $(SPLIT) --full --accent --pixel
+	$(PYTHON) tests/check_styles.py build/libneuronte.so
+	$(PYTHON) tests/check_halves.py build/libneuronte.so
 	$(PYTHON) tests/check_reference.py build/libneuronte.so $(ASCII).json $(ASCII).nrt
 	$(PYTHON) tests/check_reference.py build/libneuronte.so $(FULL).json $(FULL).nrt
 	$(PYTHON) tests/check_reference.py build/libneuronte.so --bundle $(SPLIT) $(NETS) --gate $(GATE)

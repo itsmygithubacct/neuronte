@@ -259,11 +259,11 @@ static void bundle_checks(const unsigned char *data, size_t len)
         static const uint32_t overlap[] = {0x41, 0x5A, 1, 0x50, 0x60, 0};
         static const uint32_t unsorted[] = {0x61, 0x7A, 1, 0x41, 0x5A, 0};
         static const uint32_t bad_net[] = {0x41, 0x5A, 2};
-        static const uint32_t past[] = {0x41, 0x110000, 1};
+        static const uint32_t past[] = {0x41, 0x200000, 1};
         static const uint32_t reversed[] = {0x5A, 0x41, 1};
         struct { const char *name; const uint32_t *r; uint32_t nr, fb, g; } cases[] = {
             {"overlapping ranges", overlap, 2, 0, 0},  {"unsorted ranges", unsorted, 2, 0, 0},
-            {"a range to net 2 of 2", bad_net, 1, 0, 0}, {"a range past U+10FFFF", past, 1, 0, 0},
+            {"a range to net 2 of 2", bad_net, 1, 0, 0}, {"a range past the 21-bit code limit", past, 1, 0, 0},
             {"a range ending before it starts", reversed, 1, 0, 0}, {"fallback 2 of 2", az, 1, 2, 0},
             {"gate width 257", az, 1, 0, 257},
         };

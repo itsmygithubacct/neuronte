@@ -52,9 +52,9 @@ enum {
  *
  * Two more kinds of file open the same way. An advance table holds the
  * pen steps of a proportional face and no net. A drawing file holds
- * nets and at most one advance table; a scalar is drawn by its first
- * net, and a colour net in it is left out, because this library does
- * not read one yet. */
+ * monochrome or colour nets and at most one advance table. A scalar is
+ * drawn by the first net in a drawing file; use a bundle when scalars
+ * need routing between different nets. */
 int neuronte_open(const void *data, size_t len, neuronte **out);
 int neuronte_open_file(const char *path, neuronte **out);
 void neuronte_close(neuronte *n);

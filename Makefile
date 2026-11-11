@@ -44,7 +44,7 @@ build/test_%: tests/test_%.c build/libneuronte.a
 # tree into build/ so that tree is left untouched. Needs zlib and pthreads.
 KITTYFB_DIR ?= $(HOME)/gpu_terminal/kilix-modules/kitty-framebuffer
 
-DEMOS = build/neuronte-demo build/neuronte-compare
+DEMOS = build/neuronte-demo build/neuronte-compare build/neuronte-showcase
 
 demo: $(DEMOS)
 

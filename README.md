@@ -84,6 +84,7 @@ a letter and a mark, such as ß æ œ ð þ ø ł đ ħ ŋ ĳ, are drawn in
 | `tests/` | UTF-8 cases, API and loader checks, and a cross-check against numpy |
 | `demo/neuronte-demo.c` | Shows the font in a Kilix terminal through `kitty-framebuffer`, with typing |
 | `demo/neuronte-compare.c` | Two weight files side by side, on examples that show where they differ |
+| `demo/neuronte-showcase.c` | Every class of character the bundle draws, and pictures through octant cells at three levels |
 | `demo/common.c` | What the two demos share: text, typing, snapshots and the terminal |
 
 ## Build and test
@@ -168,6 +169,31 @@ as it is done. After that a frame takes about a millisecond.
 ./build/neuronte-compare LEFT.nrt RIGHT.nrt   # any two weight files
 ./build/neuronte-compare --snapshot out.ppm 1280 800
 ```
+
+```sh
+./build/neuronte-showcase                      # in a Kilix terminal; Tab changes page
+./build/neuronte-showcase --snapshot out.ppm 1280 800   # also writes out-pictures.ppm
+```
+
+`neuronte-showcase` shows everything `neuronte-split` draws, on two
+pages. The first has every class of character, each with the net that
+draws it, the blocks up close, and an area chart in octants that joins
+across cells. The second is a moving scene made by code, drawn four
+ways side by side, each with its time and its PSNR against the scene:
+
+| Panel | A cell holds | Where it can be shown | One frame, 536 × 304 |
+|---|---|---|---|
+| the scene | | | |
+| level 1 | one octant and two colours per 8 × 16 cell, the best of all 256 patterns in least squares | any terminal | 44 ms, 17.5 dB |
+| level 2 | eight colours per 8 × 16 cell, three octants used as bit planes | a screen Neuronte draws | 8 ms, 17.8 dB |
+| level 2 | eight colours per 2 × 4 cell, one pixel per sub-cell | a screen Neuronte draws | 9 ms, 59.5 dB |
+
+Every cell's shape is the net's coverage of an octant character at that
+size. At 2 × 4 the net's coverage is within about 0.01 of 0 or 1, so the
+picture is the scene to within a level or two of 255; rounding the masks
+would make it exact. At 8 × 16, level 1 keeps sharper edges and level 2
+truer colour, at about the same PSNR: the scene's 1- to 3-pixel bars and
+checkerboard are finer than either can show.
 
 `neuronte-compare` splits the screen in two, and each half is drawn only
 by its own net, labels included. The rows are ASCII at three sizes, a

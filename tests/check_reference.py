@@ -461,7 +461,7 @@ if face_em:
         for bold in (0, 1):
             want = np.zeros((H, W), bool)
             for dx in range(bold + 1):
-                want[Y + glyphs.UI_TOP:Y + glyphs.UI_TOP + em, X + dx:X + dx + ink.shape[1]] |= ink
+                want[Y + glyphs.UI_TOP[em]:Y + glyphs.UI_TOP[em] + em, X + dx:X + dx + ink.shape[1]] |= ink
             buf = np.zeros((H, W), np.uint32)
             text = ch_.encode()
             rc = lib.neuronte_draw_text(handle, buf.ctypes.data, W, W, H, X, Y, em, bold, text, len(text), 0xFFFFFFFF)

@@ -610,8 +610,8 @@ def read_face(path):
         if len(rows) != em or len({len(r) for r in rows}) != 1:
             raise SystemExit(f"{where}: U+{v:04X} is not {em} rows of one length")
         steps = tuple((100 * p + em // 2) // em for p in (int(px), int(px) + 1))
-        if not 1 <= int(px) <= em or [pixels(s, em) for s in steps] != [int(px), int(px) + 1]:
-            raise SystemExit(f"{where}: an advance is 1 to {em} pixels")
+        if not 1 <= int(px) < 2 * em or len(rows[0]) > em or [pixels(s, em) for s in steps] != [int(px), int(px) + 1]:
+            raise SystemExit(f"{where}: an advance is 1 to {2 * em - 1} pixels and a row at most {em}")
         out[v] = steps
     return out, em
 

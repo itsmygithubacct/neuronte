@@ -24,16 +24,18 @@ Tiers:
              ASCII letter and the marks in font/marks.txt, by the Unicode
              decomposition, or taken from font/letters.txt.
     ui10     the desktop face, printable ASCII and U+2026, from
-    ui11     font/ui-10.txt and font/ui-11.txt: a proportional face for
-             small binary text, drawn as pixels once for an em of 10
-             pixels and once for 11. Each inked pixel is a round dot,
-             joined to the inked pixel beside it and the one below.
+    ui11     font/ui-10.txt and so on: a proportional face for small
+    ui12     binary text, drawn as pixels once for each em, of 10, 11,
+    ...      12, 14, 16, 18, 20, 22, 24, 26, 28, 30 and 32 pixels.
+    ui32     Stems are one pixel wide to 16, two from 18 to 26, and
+             three from 28. Each inked pixel is a round dot, joined to
+             the inked pixel beside it and the one below.
 
 Sets, each a list of tiers: ascii; draw (box, block, shade, braille);
 symbol; accent; full, which is all of those; and three sets for choosing
 how the mosaics join the bundle: pixel (block, mosaic), pixelbraille
-(block, mosaic, braille) and boxshade (box, shade). The sets ui10 and
-ui11 are each their tier alone. They share their scalars with ascii and
+(block, mosaic, braille) and boxshade (box, shade). The sets ui10 to
+ui32 are each their tier alone. They share their scalars with ascii and
 with each other, so they join no other set, and their nets no bundle.
 Each has a pen of its own, in PENS, a little over one pixel wide at its em.
 
@@ -55,10 +57,11 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import strokes  # noqa: E402
 
 OCTANTS = os.path.join(strokes.ROOT, "font", "octants.txt")
-UI = {10: os.path.join(strokes.ROOT, "font", "ui-10.txt"), 11: os.path.join(strokes.ROOT, "font", "ui-11.txt")}
-UI_TOP = 6                  # the cell row of a desktop-face drawing's first row
+UI_TOP = {10: 6, 11: 6, 12: 7, 14: 8, 16: 9, 18: 10, 20: 11, 22: 12,
+          24: 14, 26: 15, 28: 16, 30: 17, 32: 18}  # per em, the cell row of a desktop-face drawing's first row
+UI = {em: os.path.join(strokes.ROOT, "font", f"ui-{em}.txt") for em in UI_TOP}
 PEN = 0.075                 # the pen radius, in cell widths
-PENS = {"ui10": 0.55 / 10, "ui11": 0.55 / 11}  # sets drawn with another: 1.1 pixels wide at their em
+PENS = {f"ui{em}": 0.55 / em for em in UI_TOP}  # sets drawn with another: 1.1 pixels wide at their em
 PAD = 0.25                  # how far edge lines and blocks run past the cell
 LIGHT, HEAVY = 0.06, 0.12   # half widths of box lines, in cell widths
 DOUBLE = 0.19               # offset of each line of a double line from its centre line
@@ -396,7 +399,7 @@ def pixel_face(em):
             if " " in line:
                 name, _, adv = line.partition(" ")
                 ch = chr(int(name[2:], 16)) if name.startswith("U+") else name
-                if len(ch) != 1 or ch in out or not adv.isdigit() or not 1 <= int(adv) <= em:
+                if len(ch) != 1 or ch in out or not adv.isdigit() or not 1 <= int(adv) < 2 * em:
                     raise ValueError(f"{UI[em]}:{num}: bad or repeated character line {line!r}")
                 out[ch] = (int(adv), [])
             elif ch is None or set(line) - set(".#") or len(line) > em:
@@ -417,7 +420,7 @@ def traced(rows, em):
     ink = {(c, r) for r, row in enumerate(rows) for c, v in enumerate(row) if v == "#"}
 
     def at(c, r):
-        return (c + 0.5) / em, (UI_TOP + r + 0.5) / em
+        return (c + 0.5) / em, (UI_TOP[em] + r + 0.5) / em
 
     out, joined = [], set()
     for c, r in sorted(ink):
@@ -554,8 +557,7 @@ SETS = {
     "pixelbraille": ["block", "mosaic", "braille"],
     "boxshade": ["box", "shade"],
     "braille": ["braille"],
-    "ui10": ["ui10"],
-    "ui11": ["ui11"],
+    **{f"ui{em}": [f"ui{em}"] for em in UI_TOP},
 }
 
 
@@ -586,7 +588,7 @@ def tier(name):
     if name == "accent":
         acc = accents()
         return [(c, acc[c]) for c in sorted(acc)]
-    if name in ("ui10", "ui11"):
+    if name in PENS:
         em = int(name[2:])
         g = pixel_face(em)
         if sorted(g) != [chr(c) for c in range(32, 127)] + ["\u2026"]:

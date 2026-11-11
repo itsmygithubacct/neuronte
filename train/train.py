@@ -9,9 +9,9 @@ signed distance to the ink edge over tau, clamped to -1..1, held on a grid
 of nodes 1/256 cell width apart and read between them bilinearly.
 
 The pen is the set's own (glyphs.PENS) unless --pen gives one. The
-scores at cell widths 10 and 11 also count pixels, for a face shown as
-binary letters at those sizes (sets ui10 and ui11, each judged at its
-own): how many characters are exactly their
+scores at cell widths 10 to 32 also count pixels, for a
+face shown as binary letters at those sizes (sets ui10 to ui32, each
+judged at its own): how many characters are exactly their
 drawing's pixels, and which are not, over all pixels and over the firm
 ones, those whose drawing is not within 0.1 of half covered.
 """
@@ -163,8 +163,8 @@ res = {"set": a.set, "chars": G, "width": W, "steps": a.steps, "seed": a.seed, "
        "unlabelled": a.unlabelled, "params": sum(q.numel() for q in net.parameters()),
        "final_loss": float(loss.detach())}
 tier_idx = {t: torch.tensor([i for i, x in enumerate(TIERS) if x == t]) for t in dict.fromkeys(TIERS)}
-PIXEL_SIZES = (10, 11)  # where a face is shown as binary letters
-for wpx in (4, 5, 8, 10, 11, 16, 48):
+PIXEL_SIZES = (10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32)  # where a face is shown as binary letters
+for wpx in (4, 5, 8) + PIXEL_SIZES + (48,):
     t = truth(wpx).reshape(G, -1)
     # Targets that differ by under half a pixel of ink at this size, such
     # as space and U+00A0, count as one when checking the nearest.

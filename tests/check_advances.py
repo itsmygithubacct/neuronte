@@ -8,7 +8,7 @@ the net, and opens both through the library. The steps the library reads
 must be the ones written, its pixels must be pack.pixels(), and a line of
 text must measure as the sum of its characters. The packer must also
 refuse what the library would refuse. Then the desktop face in
-font/ui-10.txt and font/ui-11.txt is checked. Needs numpy.
+the font/ui-EM.txt files is checked. Needs numpy.
 """
 import ctypes
 import os
@@ -194,7 +194,7 @@ with tempfile.TemporaryDirectory() as tmp:
 import numpy as np  # noqa: E402
 import glyphs  # noqa: E402
 
-for em in (10, 11):
+for em in glyphs.UI:
     name = f"font/ui-{em}.txt"
     face = glyphs.pixel_face(em)
     steps, rows = pack.read_face(os.path.join(ROOT, name))
@@ -217,7 +217,7 @@ for em in (10, 11):
         if ink.shape[1] > adv:
             fail(f"{name}: U+{ord(ch):04X} steps {adv} pixels, which is less than its drawing is wide")
         want_px = np.zeros((2 * em, em), bool)
-        want_px[glyphs.UI_TOP:glyphs.UI_TOP + em, :ink.shape[1]] = ink
+        want_px[glyphs.UI_TOP[em]:glyphs.UI_TOP[em] + em, :ink.shape[1]] = ink
         shapes = glyphs.traced(art, em)
         cov = np.zeros((2 * em, em))
         if shapes:
@@ -227,6 +227,6 @@ for em in (10, 11):
             fail(f"{name}: the strokes for U+{ord(ch):04X} are not firmly its pixels")
     lib.neuronte_close(h)
 
-print(f"check_advances: {len(want)} characters, a table and two drawing files; the desktop face at 10 and 11 px")
+print(f"check_advances: {len(want)} characters, a table and two drawing files; the desktop face at {len(glyphs.UI)} sizes")
 print("check_advances: FAILED" if failed else "check_advances: passed")
 sys.exit(1 if failed else 0)

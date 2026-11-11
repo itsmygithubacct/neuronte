@@ -44,7 +44,13 @@ enum {
  * same calls load any of the weight files: they differ in hidden width,
  * which the file states, and in which characters were trained. A file
  * may also be a bundle of several nets with a router that sends each
- * scalar to one of them; the calls below work the same on it. */
+ * scalar to one of them; the calls below work the same on it.
+ *
+ * Two more kinds of file open the same way. An advance table holds the
+ * pen steps of a proportional face and no net. A drawing file holds
+ * nets and at most one advance table; a scalar is drawn by its first
+ * net, and a colour net in it is left out, because this library does
+ * not read one yet. */
 int neuronte_open(const void *data, size_t len, neuronte **out);
 int neuronte_open_file(const char *path, neuronte **out);
 void neuronte_close(neuronte *n);
@@ -53,7 +59,9 @@ void neuronte_close(neuronte *n);
  * or 0 for NULL. */
 size_t neuronte_parameters(const neuronte *n);
 
-/* How many nets the file holds: 1, or more for a bundle. 0 for NULL. */
+/* How many nets the file holds: 1, or more for a bundle. 0 for NULL, and
+ * for an advance table by itself, whose handle measures and cannot draw:
+ * the route, coverage and draw calls return NEURONTE_ERR_ARG on it. */
 int neuronte_nets(const neuronte *n);
 
 /* Which net draws the scalar, from 0, after the same replacement the draw
@@ -91,6 +99,34 @@ int neuronte_draw_scalar(neuronte *n, uint32_t *pixels, int stride, int width, i
 int neuronte_draw_utf8(neuronte *n, uint32_t *pixels, int stride, int width, int height,
                        int x, int y, int cell_w, int cell_h, const char *text, size_t len,
                        uint32_t color);
+
+/* Advances, for a proportional face. An advance is how far the pen moves
+ * after a character, side bearings included. The file stores it in steps
+ * of a hundredth of an em, for a regular and a bold weight (bold 0 or 1).
+ * A scalar with no record of its own is measured as the table's fallback
+ * scalar, and the caller draws that scalar in its place, so a measured
+ * line ends where the drawn one does. Nothing is kerned.
+ *
+ * neuronte_advances() is the number of records, 0 for a handle with no
+ * table. The other calls return NEURONTE_ERR_ARG on such a handle, but
+ * neuronte_advance_scalar(), which returns U+FFFD. */
+int neuronte_advances(const neuronte *n);
+
+/* The scalar that is measured and drawn for this one: itself, or the
+ * fallback. */
+uint32_t neuronte_advance_scalar(const neuronte *n, uint32_t scalar);
+
+/* The advance in steps, 10 to 200. */
+int neuronte_advance_steps(const neuronte *n, uint32_t scalar, int bold);
+
+/* The advance in whole pixels for an em of em_px pixels, 1 to
+ * NEURONTE_MAX_CELL: (steps * em_px + 50) / 100, the nearest pixel, with
+ * a tie going to the wider count. */
+int neuronte_advance(const neuronte *n, uint32_t scalar, int bold, int em_px);
+
+/* The width of UTF-8 text in pixels: each character's pixel advance,
+ * rounded by itself, summed. Ill-formed bytes measure as U+FFFD does. */
+int neuronte_text_width(const neuronte *n, const char *text, size_t len, int bold, int em_px);
 
 #ifdef __cplusplus
 }

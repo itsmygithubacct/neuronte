@@ -17,9 +17,16 @@
  * net, and for scalars outside the table either a gate, a small net over
  * the same 64 code features that picks a net, or a fallback net. The
  * handle is the same either way; one net is a bundle of one.
+ *
+ * An advance table (version 4) is the pen step of each character of a
+ * proportional face, regular and bold, in steps of a hundredth of an em.
+ * A drawing file (version 5) is a directory of whole images: nets, at
+ * most one advance table, and colour nets (version 3), which this
+ * library does not read yet and leaves out.
  */
 #include "neuronte.h"
 
+#include <limits.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -37,6 +44,13 @@
 #define MAX_RANGES 65536
 #define MAX_GATE 256 /* gate hidden width */
 #define BUNDLE_HEAD 28
+#define ADV_HEAD 32
+#define ADV_RECORD 8
+#define ADV_MAX 4096           /* records in an advance table */
+#define ADV_LO 10              /* the least and the greatest advance, in steps */
+#define ADV_HI 200
+#define DRAWING_HEAD 16
+#define MIN_IMAGE 12           /* a magic and a version */
 #define SETS 256 /* the draw cache: SETS x WAYS cells, least recently used out */
 #define WAYS 4
 
@@ -78,7 +92,14 @@ struct range {
     uint32_t first, last, net;
 };
 
+struct advance {
+    uint32_t scalar;
+    uint16_t steps[2]; /* regular, bold */
+};
+
 struct neuronte {
+    struct advance *adv; /* sorted by scalar; NULL for no advance table */
+    size_t nadv, adv_fallback; /* the record a scalar with none of its own takes */
     int nets;
     struct net *net[MAX_NETS];
     struct range *ranges; /* sorted, not overlapping */
@@ -237,6 +258,7 @@ static void free_handle(neuronte *n)
             free(n->cache[i][j].cov);
     free(n->ranges);
     free(n->gate);
+    free(n->adv);
     free(n);
 }
 
@@ -300,10 +322,108 @@ static int bundle_open(const unsigned char *p, size_t len, neuronte *n)
     return NEURONTE_OK;
 }
 
+/* The length of an advance table from its first 28 bytes, or 0. */
+static size_t adv_len(const unsigned char *p)
+{
+    uint32_t count = rd32(p + 24);
+    return count >= 1 && count <= ADV_MAX ? ADV_HEAD + ADV_RECORD * (size_t)count : 0;
+}
+
+/* The advance table from a version 4 image. Nothing in it is repaired. */
+static int adv_open(const unsigned char *p, size_t len, neuronte *n)
+{
+    uint32_t fallback;
+    size_t count, i;
+    int found = 0;
+
+    if (n->adv || len < ADV_HEAD || memcmp(p, "NEURONTE", 8) != 0 || rd32(p + 8) != 4 ||
+        rd32(p + 12) != 10 || rd32(p + 16) != 10 || rd32(p + 20) != 2 || adv_len(p) != len)
+        return NEURONTE_ERR_FORMAT;
+    count = rd32(p + 24);
+    fallback = rd32(p + 28);
+    n->adv = malloc(count * sizeof *n->adv);
+    if (!n->adv)
+        return NEURONTE_ERR_NOMEM;
+    n->nadv = count;
+    for (i = 0; i < count; i++) {
+        const unsigned char *r = p + ADV_HEAD + ADV_RECORD * i;
+        struct advance *a = &n->adv[i];
+        int w;
+        a->scalar = rd32(r);
+        if (a->scalar > 0x10FFFF || (a->scalar >= 0xD800 && a->scalar <= 0xDFFF) ||
+            (i > 0 && a->scalar <= n->adv[i - 1].scalar))
+            return NEURONTE_ERR_FORMAT;
+        for (w = 0; w < 2; w++) {
+            a->steps[w] = (uint16_t)(r[4 + 2 * w] | r[5 + 2 * w] << 8);
+            if (a->steps[w] < ADV_LO || a->steps[w] > ADV_HI)
+                return NEURONTE_ERR_FORMAT;
+        }
+        if (a->scalar == fallback) {
+            n->adv_fallback = i;
+            found = 1;
+        }
+    }
+    return found ? NEURONTE_OK : NEURONTE_ERR_FORMAT;
+}
+
+/* The bytes a drawing file needs before its members, or 0 if the header is bad. */
+static size_t drawing_prefix(const unsigned char *p)
+{
+    uint32_t m = rd32(p + 12);
+    return m >= 1 && m <= MAX_NETS ? DRAWING_HEAD + 8 * (size_t)m : 0;
+}
+
+/* The length of a drawing file from its first drawing_prefix() bytes, or 0.
+ * Members follow the directory in its order, with nothing between them. */
+static size_t drawing_len(const unsigned char *p)
+{
+    size_t total = drawing_prefix(p), i;
+    for (i = 0; total && i < rd32(p + 12); i++) {
+        uint32_t off = rd32(p + DRAWING_HEAD + 8 * i), len = rd32(p + DRAWING_HEAD + 8 * i + 4);
+        if (off != total || len < MIN_IMAGE || len > file_len(MAX_H))
+            return 0;
+        total += len;
+    }
+    return total;
+}
+
+static int drawing_open(const unsigned char *p, size_t len, neuronte *n)
+{
+    size_t prefix, off, i;
+
+    if (len < DRAWING_HEAD || (prefix = drawing_prefix(p)) == 0 || len < prefix || drawing_len(p) != len)
+        return NEURONTE_ERR_FORMAT;
+    for (i = 0, off = prefix; i < rd32(p + 12); i++) {
+        size_t ml = rd32(p + DRAWING_HEAD + 8 * i + 4);
+        const unsigned char *m = p + off;
+        int rc = NEURONTE_OK;
+        if (memcmp(m, "NEURONTE", 8) != 0)
+            return NEURONTE_ERR_FORMAT;
+        switch (rd32(m + 8)) {
+        case 1:
+            rc = net_open(m, ml, &n->net[n->nets]);
+            n->nets += rc == NEURONTE_OK;
+            break;
+        case 3: /* a colour net: not read by this library, and not drawn */
+            break;
+        case 4:
+            rc = adv_open(m, ml, n); /* a second table is refused there */
+            break;
+        default: /* a bundle or a drawing file inside one, or a later kind */
+            rc = NEURONTE_ERR_FORMAT;
+        }
+        if (rc != NEURONTE_OK)
+            return rc;
+        off += ml;
+    }
+    return NEURONTE_OK;
+}
+
 int neuronte_open(const void *data, size_t len, neuronte **out)
 {
     const unsigned char *p = data;
     neuronte *n;
+    uint32_t version;
     int rc;
 
     if (!out)
@@ -311,16 +431,23 @@ int neuronte_open(const void *data, size_t len, neuronte **out)
     *out = NULL;
     if (!data)
         return NEURONTE_ERR_ARG;
-    if (len < 12 || memcmp(p, "NEURONTE", 8) != 0 || (rd32(p + 8) != 1 && rd32(p + 8) != 2))
+    if (len < MIN_IMAGE || memcmp(p, "NEURONTE", 8) != 0)
+        return NEURONTE_ERR_FORMAT;
+    version = rd32(p + 8);
+    if (version != 1 && version != 2 && version != 4 && version != 5)
         return NEURONTE_ERR_FORMAT;
     n = calloc(1, sizeof *n);
     if (!n)
         return NEURONTE_ERR_NOMEM;
-    if (rd32(p + 8) == 1) {
+    if (version == 1) {
         rc = net_open(p, len, &n->net[0]);
         n->nets = rc == NEURONTE_OK;
-    } else {
+    } else if (version == 2) {
         rc = bundle_open(p, len, n);
+    } else if (version == 4) {
+        rc = adv_open(p, len, n);
+    } else {
+        rc = drawing_open(p, len, n);
     }
     if (rc != NEURONTE_OK) {
         free_handle(n);
@@ -336,6 +463,7 @@ int neuronte_open_file(const char *path, neuronte **out)
 {
     unsigned char head[BUNDLE_HEAD], *buf = NULL;
     size_t got, want = 0, prefix = 0;
+    size_t (*whole)(const unsigned char *) = bundle_len;
     FILE *f;
     int rc;
 
@@ -352,7 +480,17 @@ int neuronte_open_file(const char *path, neuronte **out)
         want = file_len(rd32(head + 20));
     else if (got == sizeof head && rd32(head + 8) == 2)
         prefix = bundle_prefix(head);
+    else if (got == sizeof head && rd32(head + 8) == 4)
+        want = adv_len(head);
+    else if (got == sizeof head && rd32(head + 8) == 5) {
+        prefix = drawing_prefix(head);
+        whole = drawing_len;
+    }
     if (prefix) {
+        /* A drawing file of one member has a prefix shorter than the head
+         * already read. */
+        if (prefix < sizeof head)
+            prefix = sizeof head;
         buf = malloc(prefix);
         if (!buf) {
             fclose(f);
@@ -360,7 +498,7 @@ int neuronte_open_file(const char *path, neuronte **out)
         }
         memcpy(buf, head, sizeof head);
         got = sizeof head + fread(buf + sizeof head, 1, prefix - sizeof head, f);
-        want = got == prefix ? bundle_len(buf) : 0;
+        want = got == prefix ? whole(buf) : 0;
         if (want == 0) {
             rc = ferror(f) ? NEURONTE_ERR_IO : NEURONTE_ERR_FORMAT;
             fclose(f);
@@ -568,7 +706,7 @@ static int auto_samples(int cell_w)
 
 int neuronte_route(const neuronte *n, uint32_t scalar)
 {
-    return n ? route(n, normalize(scalar)) : NEURONTE_ERR_ARG;
+    return n && n->nets ? route(n, normalize(scalar)) : NEURONTE_ERR_ARG;
 }
 
 int neuronte_coverage(const neuronte *hd, uint32_t scalar, int cell_w, int cell_h,
@@ -579,7 +717,7 @@ int neuronte_coverage(const neuronte *hd, uint32_t scalar, int cell_w, int cell_
     int ss = samples_per_axis, sw, sh, i, j, px, py;
     size_t h;
 
-    if (!hd || !coverage || cell_w <= 0 || cell_h <= 0 || cell_w > NEURONTE_MAX_CELL ||
+    if (!hd || !hd->nets || !coverage || cell_w <= 0 || cell_h <= 0 || cell_w > NEURONTE_MAX_CELL ||
         cell_h > NEURONTE_MAX_CELL || ss < 0 || ss > NEURONTE_MAX_SAMPLES)
         return NEURONTE_ERR_ARG;
     if (ss == 0)
@@ -675,7 +813,7 @@ int neuronte_draw_scalar(neuronte *n, uint32_t *pixels, int stride, int width, i
     float alpha = (float)(color >> 24) / 255.0f;
     int rc = NEURONTE_OK, ss, px, py;
 
-    if (!n || !pixels || width < 0 || height < 0 || stride < width || cell_w <= 0 ||
+    if (!n || !n->nets || !pixels || width < 0 || height < 0 || stride < width || cell_w <= 0 ||
         cell_h <= 0 || cell_w > NEURONTE_MAX_CELL || cell_h > NEURONTE_MAX_CELL)
         return NEURONTE_ERR_ARG;
     if (alpha <= 0.0f || x >= width || y >= height || x + cell_w <= 0 || y + cell_h <= 0)
@@ -715,4 +853,64 @@ int neuronte_draw_utf8(neuronte *n, uint32_t *pixels, int stride, int width, int
         cells++;
     }
     return cells;
+}
+
+/* The record that measures the scalar: its own, or the fallback's. */
+static const struct advance *advance_of(const neuronte *n, uint32_t scalar)
+{
+    size_t lo = 0, hi = n->nadv;
+    while (lo < hi) {
+        size_t mid = lo + (hi - lo) / 2;
+        if (n->adv[mid].scalar < scalar)
+            lo = mid + 1;
+        else
+            hi = mid;
+    }
+    return lo < n->nadv && n->adv[lo].scalar == scalar ? &n->adv[lo] : &n->adv[n->adv_fallback];
+}
+
+int neuronte_advances(const neuronte *n)
+{
+    return n && n->adv ? (int)n->nadv : 0;
+}
+
+uint32_t neuronte_advance_scalar(const neuronte *n, uint32_t scalar)
+{
+    return n && n->adv ? advance_of(n, scalar)->scalar : NEURONTE_REPLACEMENT;
+}
+
+int neuronte_advance_steps(const neuronte *n, uint32_t scalar, int bold)
+{
+    if (!n || !n->adv || bold < 0 || bold > 1)
+        return NEURONTE_ERR_ARG;
+    return advance_of(n, scalar)->steps[bold];
+}
+
+int neuronte_advance(const neuronte *n, uint32_t scalar, int bold, int em_px)
+{
+    int steps = neuronte_advance_steps(n, scalar, bold);
+    if (steps < 0 || em_px <= 0 || em_px > NEURONTE_MAX_CELL)
+        return NEURONTE_ERR_ARG;
+    return (steps * em_px + 50) / 100; /* to the nearest pixel, a tie going up */
+}
+
+int neuronte_text_width(const neuronte *n, const char *text, size_t len, int bold, int em_px)
+{
+    size_t off = 0;
+    int total = 0;
+
+    if (!text && len)
+        return NEURONTE_ERR_ARG;
+    if (neuronte_advance(n, 0x20, bold, em_px) < 0)
+        return NEURONTE_ERR_ARG;
+    while (off < len) {
+        uint32_t s;
+        int px;
+        off += neuronte_utf8_decode(text + off, len - off, &s);
+        px = neuronte_advance(n, s, bold, em_px);
+        if (px > INT_MAX - total)
+            return NEURONTE_ERR_ARG;
+        total += px;
+    }
+    return total;
 }

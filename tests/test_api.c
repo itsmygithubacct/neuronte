@@ -4,7 +4,8 @@
  * accented letters, and --pixel of the sextants and octants, for weights
  * trained on them. Given a one-net file, it also checks the loader's
  * refusals by damaging that file, and builds bundles from it to check the
- * router. Given a bundle, it checks the drawing only. */
+ * router. Given a bundle, it checks the drawing only. Either way it
+ * checks the advance table and the drawing file on images it builds. */
 #define _POSIX_C_SOURCE 200809L
 #include "neuronte.h"
 
@@ -501,6 +502,319 @@ static void pixel_checks(neuronte *n)
              wrong, worst);
 }
 
+/* An advance table of count records, each scalar, regular, bold. */
+static unsigned char *adv_table(uint32_t (*rec)[3], uint32_t count, uint32_t fallback, size_t *len)
+{
+    unsigned char *t = malloc(32 + 8 * (size_t)count);
+    uint32_t i;
+    memcpy(t, "NEURONTE", 8);
+    put32(t + 8, 4);
+    put32(t + 12, 10);
+    put32(t + 16, 10);
+    put32(t + 20, 2);
+    put32(t + 24, count);
+    put32(t + 28, fallback);
+    for (i = 0; i < count; i++) {
+        put32(t + 32 + 8 * i, rec[i][0]);
+        put32(t + 36 + 8 * i, rec[i][1] | rec[i][2] << 16);
+    }
+    *len = 32 + 8 * (size_t)count;
+    return t;
+}
+
+/* A drawing file of the members given, in order. */
+static unsigned char *drawing(const unsigned char *const *member, const size_t *mlen, uint32_t count, size_t *len)
+{
+    size_t off = 16 + 8 * (size_t)count, total = off;
+    unsigned char *d;
+    uint32_t i;
+    for (i = 0; i < count; i++)
+        total += mlen[i];
+    d = malloc(total + 1);
+    memcpy(d, "NEURONTE", 8);
+    put32(d + 8, 5);
+    put32(d + 12, count);
+    for (i = 0; i < count; i++) {
+        put32(d + 16 + 8 * i, (uint32_t)off);
+        put32(d + 20 + 8 * i, (uint32_t)mlen[i]);
+        memcpy(d + off, member[i], mlen[i]);
+        off += mlen[i];
+    }
+    d[total] = 0;
+    *len = total;
+    return d;
+}
+
+static void expect_file(const char *name, const unsigned char *data, size_t len, int want)
+{
+    char path[] = "/tmp/neuronte-test-XXXXXX";
+    int fd = mkstemp(path), rc;
+    neuronte *n = NULL;
+    FILE *f = fd < 0 ? NULL : fdopen(fd, "wb");
+    if (!f || fwrite(data, 1, len, f) != len) {
+        FAIL("%s: cannot write a temporary file", name);
+    } else {
+        fclose(f);
+        f = NULL;
+        rc = neuronte_open_file(path, &n);
+        if (rc != want)
+            FAIL("%s: open_file returned %d, want %d", name, rc, want);
+        neuronte_close(n);
+    }
+    if (f)
+        fclose(f);
+    if (fd >= 0)
+        unlink(path);
+}
+
+/* The advance table, version 4, and the drawing file, version 5. net is a
+ * version 1 image, or NULL when the weights under test are a bundle. */
+static void advance_checks(const unsigned char *net, size_t netlen)
+{
+    /* The example in the format note, byte for byte. */
+    static const unsigned char example[56] = {
+        0x4e, 0x45, 0x55, 0x52, 0x4f, 0x4e, 0x54, 0x45, 0x04, 0, 0, 0, 0x0a, 0, 0, 0,
+        0x0a, 0, 0, 0, 0x02, 0, 0, 0, 0x03, 0, 0, 0, 0x3f, 0, 0, 0,
+        0x20, 0, 0, 0, 0x1e, 0, 0x1e, 0, 0x3f, 0, 0, 0, 0x37, 0, 0x3e, 0,
+        0x26, 0x20, 0, 0, 0x5a, 0, 0x60, 0};
+    /* Steps, and the pixels they are at an em of 10 and of 11. */
+    static const int px[][3] = {{10, 1, 1},   {30, 3, 3},   {45, 5, 5},    {50, 5, 6},  {55, 6, 6},
+                                {64, 6, 7},   {100, 10, 11}, {150, 15, 17}, {200, 20, 22}};
+    static const uint32_t rows[6][3] = {{0x20, 10, 30},  {0x41, 45, 50},  {0x42, 55, 64}, {0x3f, 100, 150},
+                                       {0x7e, 200, 200}, {0x2026, 90, 96}};
+    uint32_t sorted[6][3];
+    unsigned char *t, *d, bad[57];
+    const unsigned char *member[3];
+    size_t tlen, dlen, mlen[3], i;
+    neuronte *n = NULL;
+    float one[2];
+    uint32_t pix[2] = {0, 0};
+
+    if (neuronte_open(example, sizeof example, &n) != NEURONTE_OK) {
+        FAIL("the note's example table does not open");
+        return;
+    }
+    if (neuronte_advances(n) != 3 || neuronte_nets(n) != 0 || neuronte_parameters(n) != 0)
+        FAIL("example table: %d records, %d nets", neuronte_advances(n), neuronte_nets(n));
+    if (neuronte_advance_steps(n, 0x20, 0) != 30 || neuronte_advance_steps(n, 0x20, 1) != 30 ||
+        neuronte_advance_steps(n, 0x3f, 0) != 55 || neuronte_advance_steps(n, 0x3f, 1) != 62 ||
+        neuronte_advance_steps(n, 0x2026, 0) != 90 || neuronte_advance_steps(n, 0x2026, 1) != 96)
+        FAIL("example table: steps read wrong");
+    /* A missing character is the fallback, measured and named. */
+    if (neuronte_advance_steps(n, 'A', 0) != 55 || neuronte_advance_steps(n, 0x07, 1) != 62 ||
+        neuronte_advance_steps(n, 0x10FFFF, 0) != 55 || neuronte_advance_steps(n, 0xFFFFFFFFu, 0) != 55)
+        FAIL("a missing character is not measured as the fallback");
+    if (neuronte_advance_scalar(n, 'A') != 0x3f || neuronte_advance_scalar(n, 0x2026) != 0x2026 ||
+        neuronte_advance_scalar(n, 0x20) != 0x20 || neuronte_advance_scalar(NULL, 'A') != NEURONTE_REPLACEMENT)
+        FAIL("advance_scalar");
+    if (neuronte_advance(n, 0x3f, 0, 10) != 6 || neuronte_advance(n, 0x3f, 0, 11) != 6 ||
+        neuronte_advance(n, 0x3f, 1, 10) != 6 || neuronte_advance(n, 0x3f, 1, 11) != 7)
+        FAIL("example table: pixels of ?");
+    /* " ?" and an ellipsis, then a letter and a bad byte, both missing. */
+    if (neuronte_text_width(n, " ?\xe2\x80\xa6", 5, 0, 10) != 3 + 6 + 9 ||
+        neuronte_text_width(n, " ?\xe2\x80\xa6", 5, 1, 11) != 3 + 7 + 11 ||
+        neuronte_text_width(n, "A\xff", 2, 0, 10) != 12 || neuronte_text_width(n, "", 0, 0, 10) != 0 ||
+        neuronte_text_width(n, NULL, 0, 0, 11) != 0)
+        FAIL("text_width");
+    if (neuronte_advance_steps(n, 'A', 2) != NEURONTE_ERR_ARG || neuronte_advance_steps(n, 'A', -1) != NEURONTE_ERR_ARG ||
+        neuronte_advance(n, 'A', 0, 0) != NEURONTE_ERR_ARG ||
+        neuronte_advance(n, 'A', 0, NEURONTE_MAX_CELL + 1) != NEURONTE_ERR_ARG ||
+        neuronte_advance(n, 'A', 0, NEURONTE_MAX_CELL) != (55 * NEURONTE_MAX_CELL + 50) / 100 ||
+        neuronte_text_width(n, "a", 1, 2, 10) != NEURONTE_ERR_ARG ||
+        neuronte_text_width(n, "a", 1, 0, 0) != NEURONTE_ERR_ARG ||
+        neuronte_text_width(n, NULL, 1, 0, 10) != NEURONTE_ERR_ARG ||
+        neuronte_advance_steps(NULL, 'A', 0) != NEURONTE_ERR_ARG || neuronte_advances(NULL) != 0)
+        FAIL("advance argument checks");
+    /* A table by itself measures and cannot draw. */
+    if (neuronte_route(n, 'A') != NEURONTE_ERR_ARG || neuronte_coverage(n, 'A', 1, 2, 1, one) != NEURONTE_ERR_ARG ||
+        neuronte_draw_scalar(n, pix, 1, 1, 2, 0, 0, 1, 2, 'A', 0xFFFFFFFFu) != NEURONTE_ERR_ARG ||
+        neuronte_draw_utf8(n, pix, 1, 1, 2, 0, 0, 1, 2, "A", 1, 0xFFFFFFFFu) != NEURONTE_ERR_ARG || pix[0] || pix[1])
+        FAIL("a table with no net let a draw call through");
+    neuronte_close(n);
+    expect_file("example table from a file", example, sizeof example, NEURONTE_OK);
+
+    /* The rounding table, through a table that holds those steps. */
+    for (i = 0; i < sizeof px / sizeof *px; i++) {
+        uint32_t r[1][3] = {{0x3f, (uint32_t)px[i][0], (uint32_t)px[i][0]}};
+        t = adv_table(r, 1, 0x3f, &tlen);
+        if (neuronte_open(t, tlen, &n) != NEURONTE_OK)
+            FAIL("table of one record, %d steps", px[i][0]);
+        else if (neuronte_advance(n, 0x3f, 0, 10) != px[i][1] || neuronte_advance(n, 0x3f, 1, 11) != px[i][2])
+            FAIL("%d steps are %d and %d pixels, want %d and %d", px[i][0], neuronte_advance(n, 0x3f, 0, 10),
+                 neuronte_advance(n, 0x3f, 1, 11), px[i][1], px[i][2]);
+        neuronte_close(n);
+        n = NULL;
+        free(t);
+    }
+
+    /* Refusals. Nothing is repaired. */
+    memcpy(bad, example, sizeof example);
+    bad[56] = 0;
+    expect_open("table one byte short", bad, 55, NEURONTE_ERR_FORMAT);
+    expect_open("table one byte long", bad, 57, NEURONTE_ERR_FORMAT);
+    expect_file("table one byte short, from a file", bad, 55, NEURONTE_ERR_FORMAT);
+    expect_file("table one byte long, from a file", bad, 57, NEURONTE_ERR_FORMAT);
+    expect_open("table header only", bad, 32, NEURONTE_ERR_FORMAT);
+#define BAD(name, at, value, width) \
+    (memcpy(bad, example, sizeof example), width == 4 ? put32(bad + (at), (value)) : \
+     (void)(bad[at] = (value) & 0xFF, bad[(at) + 1] = (value) >> 8), \
+     expect_open(name, bad, sizeof example, NEURONTE_ERR_FORMAT))
+    BAD("table with 12 units per em", 12, 12, 4);
+    BAD("table with 16 steps per unit", 16, 16, 4);
+    BAD("table with one weight", 20, 1, 4);
+    BAD("table with three weights", 20, 3, 4);
+    BAD("table with no records", 24, 0, 4);
+    BAD("table with 4097 records", 24, 4097, 4);
+    BAD("table with a record count that is not its length", 24, 2, 4);
+    BAD("table whose fallback has no record", 28, 0x41, 4);
+    BAD("table with a repeated scalar", 40, 0x20, 4);
+    BAD("table out of order", 40, 0x2027, 4);
+    BAD("table with a surrogate", 48, 0xD800, 4);
+    BAD("table with a scalar above U+10FFFF", 48, 0x110000, 4);
+    BAD("regular advance of 9 steps", 36, 9, 2);
+    BAD("bold advance of 201 steps", 38, 201, 2);
+    BAD("bold advance of 0 steps", 54, 0, 2);
+#undef BAD
+
+    /* 4096 records open; lookups at both ends and between. */
+    {
+        static uint32_t big[4096][3];
+        for (i = 0; i < 4096; i++) {
+            big[i][0] = 0x100 + 2 * (uint32_t)i;
+            big[i][1] = 10 + (uint32_t)i % 191;
+            big[i][2] = 200 - (uint32_t)i % 191;
+        }
+        t = adv_table(big, 4096, 0x100, &tlen);
+        if (neuronte_open(t, tlen, &n) != NEURONTE_OK) {
+            FAIL("table of 4096 records");
+        } else {
+            for (i = 0; i < 4096; i++)
+                if (neuronte_advance_steps(n, big[i][0], 0) != (int)big[i][1] ||
+                    neuronte_advance_steps(n, big[i][0], 1) != (int)big[i][2] ||
+                    neuronte_advance_scalar(n, big[i][0] + 1) != 0x100) {
+                    FAIL("table of 4096 records: record %d", (int)i);
+                    break;
+                }
+            if (neuronte_advance_scalar(n, 0xFF) != 0x100 || neuronte_advance_scalar(n, 0) != 0x100)
+                FAIL("table of 4096 records: below the first record");
+        }
+        neuronte_close(n);
+        n = NULL;
+        expect_file("table of 4096 records from a file", t, tlen, NEURONTE_OK);
+        free(t);
+    }
+
+    /* The records may be given in any order here; sort them for the file. */
+    memcpy(sorted, rows, sizeof sorted);
+    for (i = 0; i < 6; i++) {
+        size_t j;
+        for (j = i + 1; j < 6; j++)
+            if (sorted[j][0] < sorted[i][0]) {
+                uint32_t swap[3];
+                memcpy(swap, sorted[i], sizeof swap);
+                memcpy(sorted[i], sorted[j], sizeof swap);
+                memcpy(sorted[j], swap, sizeof swap);
+            }
+    }
+    t = adv_table(sorted, 6, 0x3f, &tlen);
+
+    /* A drawing file of the table alone. */
+    member[0] = t;
+    mlen[0] = tlen;
+    d = drawing(member, mlen, 1, &dlen);
+    if (neuronte_open(d, dlen, &n) != NEURONTE_OK) {
+        FAIL("drawing file of one table");
+    } else if (neuronte_advances(n) != 6 || neuronte_nets(n) != 0 || neuronte_advance(n, 'B', 1, 11) != 7 ||
+               neuronte_text_width(n, "AB~", 3, 0, 10) != 5 + 6 + 20) {
+        FAIL("drawing file of one table: measures wrong");
+    }
+    neuronte_close(n);
+    n = NULL;
+    expect_file("drawing file of one table, from a file", d, dlen, NEURONTE_OK);
+    expect_file("drawing file one byte long, from a file", d, dlen + 1, NEURONTE_ERR_FORMAT);
+    expect_open("drawing file one byte short", d, dlen - 1, NEURONTE_ERR_FORMAT);
+    expect_open("drawing file one byte long", d, dlen + 1, NEURONTE_ERR_FORMAT);
+    put32(d + 12, 0);
+    expect_open("drawing file with no members", d, dlen, NEURONTE_ERR_FORMAT);
+    put32(d + 12, 17);
+    expect_open("drawing file with 17 members", d, dlen, NEURONTE_ERR_FORMAT);
+    put32(d + 12, 1);
+    put32(d + 16, 25);
+    expect_open("member that does not start after the directory", d, dlen, NEURONTE_ERR_FORMAT);
+    put32(d + 16, 24);
+    put32(d + 20, 11);
+    expect_open("member of 11 bytes", d, dlen, NEURONTE_ERR_FORMAT);
+    put32(d + 20, (uint32_t)tlen);
+    d[24] = 'X';
+    expect_open("member with a bad magic", d, dlen, NEURONTE_ERR_FORMAT);
+    d[24] = 'N';
+    put32(d + 24 + 8, 2);
+    expect_open("bundle inside a drawing file", d, dlen, NEURONTE_ERR_FORMAT);
+    put32(d + 24 + 8, 5);
+    expect_open("drawing file inside a drawing file", d, dlen, NEURONTE_ERR_FORMAT);
+    put32(d + 24 + 8, 6);
+    expect_open("member of a later version", d, dlen, NEURONTE_ERR_FORMAT);
+    put32(d + 24 + 8, 4);
+    put32(d + 24 + 36, 9);
+    expect_open("drawing file whose table has a bad advance", d, dlen, NEURONTE_ERR_FORMAT);
+    free(d);
+
+    /* Two tables are one too many. A colour member is left out. */
+    member[1] = t;
+    mlen[1] = tlen;
+    d = drawing(member, mlen, 2, &dlen);
+    expect_open("drawing file of two tables", d, dlen, NEURONTE_ERR_FORMAT);
+    put32(d + 32 + 8, 3);
+    if (neuronte_open(d, dlen, &n) != NEURONTE_OK || neuronte_advances(n) != 6 || neuronte_nets(n) != 0)
+        FAIL("drawing file of a table and a colour member");
+    neuronte_close(n);
+    n = NULL;
+    free(d);
+
+    /* A net and the table: draws as the net does, and measures. */
+    if (net) {
+        neuronte *lone = NULL;
+        float a[8 * 16], b[8 * 16];
+        member[0] = net;
+        mlen[0] = netlen;
+        member[1] = t;
+        mlen[1] = tlen;
+        member[2] = net;
+        mlen[2] = netlen;
+        d = drawing(member, mlen, 3, &dlen);
+        if (neuronte_open(d, dlen, &n) != NEURONTE_OK || neuronte_open(net, netlen, &lone) != NEURONTE_OK) {
+            FAIL("drawing file of a net, a table and a net");
+        } else {
+            if (neuronte_nets(n) != 2 || neuronte_advances(n) != 6 || neuronte_route(n, 'A') != 0 ||
+                neuronte_parameters(n) != 2 * neuronte_parameters(lone))
+                FAIL("drawing file: %d nets, %d records", neuronte_nets(n), neuronte_advances(n));
+            if (neuronte_coverage(n, 'A', 8, 16, 0, a) != NEURONTE_OK ||
+                neuronte_coverage(lone, 'A', 8, 16, 0, b) != NEURONTE_OK || memcmp(a, b, sizeof a) != 0)
+                FAIL("drawing file: A is not what its net draws");
+            if (neuronte_advance(n, 'A', 0, 10) != 5 || neuronte_advance(n, 'A', 1, 11) != 6)
+                FAIL("drawing file: advance of A");
+        }
+        neuronte_close(n);
+        neuronte_close(lone);
+        n = NULL;
+        expect_file("drawing file of a net, a table and a net, from a file", d, dlen, NEURONTE_OK);
+        expect_file("that file one byte long", d, dlen + 1, NEURONTE_ERR_FORMAT);
+        expect_file("that file one byte short", d, dlen - 1, NEURONTE_ERR_FORMAT);
+        d[16 + 8 * 3 + 20] ^= 0xFF; /* the first net's hidden width */
+        expect_open("drawing file whose net is damaged", d, dlen, NEURONTE_ERR_SHAPE);
+        free(d);
+        /* A net with no table still has no advances. */
+        d = drawing(member, mlen, 1, &dlen);
+        if (neuronte_open(d, dlen, &n) != NEURONTE_OK || neuronte_advances(n) != 0 ||
+            neuronte_advance(n, 'A', 0, 10) != NEURONTE_ERR_ARG ||
+            neuronte_text_width(n, "A", 1, 0, 10) != NEURONTE_ERR_ARG)
+            FAIL("drawing file of one net: has advances");
+        neuronte_close(n);
+        free(d);
+    }
+    free(t);
+}
+
 int main(int argc, char **argv)
 {
     unsigned char *data, *copy;
@@ -748,6 +1062,7 @@ drawing:
         pixel_checks(n);
     if (!bundled)
         bundle_checks(data, len);
+    advance_checks(bundled ? NULL : data, len);
 
     neuronte_close(n);
     free(copy);

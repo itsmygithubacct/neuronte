@@ -3,6 +3,7 @@
 usage: python3 tests/check_reference.py LIB.so WEIGHTS.json WEIGHTS.nrt
        python3 tests/check_reference.py LIB.so --bundle BUNDLE.nrt NET.json...
                                         [--gate GATE.json] [--fallback I]
+       python3 tests/check_reference.py LIB.so --drawing DRAWING.nrt NET.json FACE.txt
 
 The numpy side reads the JSON weights and works in float64. The C side
 loads the packed file and works in float32. They must agree to 1e-3 in
@@ -10,6 +11,12 @@ coverage, and the packed file must be exactly what train/pack.py makes
 from the JSON. For a bundle, the net the C router picks for each case must
 also be the one this file picks: the table, then the gate, evaluated here
 in numpy, or the fallback net.
+
+For a drawing file of one net and the advances of a pixel face, such as
+font/ui-10.txt, the net is checked the same way at the face's em too.
+Then every character of the face, drawn by neuronte_draw_text() at that
+em with neuronte_set_binary() on, regular and bold, must be exactly the
+face's pixels, and the pen must move by the face's advance.
 """
 import ctypes
 import json
@@ -68,6 +75,7 @@ class Net:
 args = sys.argv[1:]
 failed = False
 lib_path = args[0]
+face_em = 0
 if args[1:2] == ["--bundle"]:
     nrt_path, rest, gate_path, fallback, json_paths = args[2], iter(args[3:]), None, 0, []
     for a in rest:
@@ -83,6 +91,13 @@ if args[1:2] == ["--bundle"]:
         with open(gate_path) as fh:
             gdoc = json.load(fh)
         gate = (layers(gdoc), [int(m, 16) for m in gdoc["parity_masks"]])
+elif args[1:2] == ["--drawing"] and len(args) == 5:
+    nrt_path, json_paths, face_path = args[2], [args[3]], args[4]
+    made, table, gate, fallback = pack.drawing([args[3], face_path])[0], [], None, 0
+    face = pack.read_face(face_path)
+    if face is None:
+        raise SystemExit(f"{face_path} is not a pixel face")
+    face_em = face[1]
 elif len(args) == 3:
     json_paths, nrt_path = [args[1]], args[2]
     made, table, gate, fallback = pack.pack(args[1]), [], None, 0
@@ -135,7 +150,8 @@ for s in scalars + list(range(0, 0x3000, 7)) + list(range(0x1CC00, 0x1CEC0, 3)) 
     if want != got:
         print(f"FAIL U+{s:04X} routed to net {got}, want {want}")
         failed = True
-cases = [(s, cw, ch, ss) for s in scalars for cw, ch, ss in ((8, 16, 2), (16, 32, 2), (33, 61, 1))]
+sizes = [(8, 16, 2), (16, 32, 2), (33, 61, 1)] + ([(face_em, 2 * face_em, 2)] if face_em else [])
+cases = [(s, cw, ch, ss) for s in scalars for cw, ch, ss in sizes]
 worst = 0.0
 for s, cw, ch, ss in cases:
     out = (ctypes.c_float * (cw * ch))()
@@ -150,6 +166,31 @@ for s, cw, ch, ss in cases:
     if d > 1e-3:
         print(f"FAIL U+{s:04X} {cw}x{ch} samples {ss}: C and numpy differ by {d:.2e}")
         failed = True
+if face_em:
+    import glyphs  # noqa: E402
+    em, drawn = face_em, 0
+    lib.neuronte_set_binary.argtypes = [ctypes.c_void_p, ctypes.c_int]
+    lib.neuronte_draw_text.argtypes = ([ctypes.c_void_p, ctypes.c_void_p] + [ctypes.c_int] * 7
+                                       + [ctypes.c_char_p, ctypes.c_size_t, ctypes.c_uint32])
+    lib.neuronte_set_binary(handle, 1)
+    W, H, X, Y = 2 * em + 4, 2 * em + 4, 2, 2
+    for ch_, (adv, art) in sorted(glyphs.pixel_face(em).items()):
+        ink = np.array([[c == "#" for c in r] for r in art])
+        for bold in (0, 1):
+            want = np.zeros((H, W), bool)
+            for dx in range(bold + 1):
+                want[Y + glyphs.UI_TOP:Y + glyphs.UI_TOP + em, X + dx:X + dx + ink.shape[1]] |= ink
+            buf = np.zeros((H, W), np.uint32)
+            text = ch_.encode()
+            rc = lib.neuronte_draw_text(handle, buf.ctypes.data, W, W, H, X, Y, em, bold, text, len(text), 0xFFFFFFFF)
+            drawn += 1
+            if rc != adv + bold:
+                print(f"FAIL U+{ord(ch_):04X} weight {bold}: the pen moved {rc}, want {adv + bold}")
+                failed = True
+            if ((buf != 0) != want).any() or ((buf != 0) & (buf != 0xFFFFFFFF)).any():
+                print(f"FAIL U+{ord(ch_):04X} weight {bold}: {int(((buf != 0) != want).sum())} pixels are not the face's")
+                failed = True
+    print(f"check_reference: {drawn} binary letters at {em} px, each exactly its drawing")
 lib.neuronte_close(handle)
 print(f"check_reference: {len(cases)} cells, {routes} routes, largest coverage difference {worst:.2e}")
 print("check_reference: FAILED" if failed else "check_reference: passed")

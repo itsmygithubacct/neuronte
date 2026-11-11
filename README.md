@@ -10,7 +10,7 @@ The same buffer can be shown in a Kilix terminal or in a GUI window. The
 library does not open the window or take the terminal.
 
 Status: local only. No remote. There are three weight files for the one
-library. Scalars a file was not trained on get a mark of their own, not
+library, and two for the desktop face. Scalars a file was not trained on get a mark of their own, not
 a letter.
 
 | Weights | Use | Characters | Hidden width | Parameters | File |
@@ -18,6 +18,7 @@ a letter.
 | `neuronte-split-v4` | the font to use | 1,061, over six nets and a router | 48, 128 and 192 | 329,356 | 1,319,616 bytes |
 | `neuronte-full-v2` | the baseline `split` is measured against | 763 of them in one net, all but the sextants and octants | 320 | 234,881 | 939,728 bytes |
 | `neuronte-ascii-v0` | the smallest file | the 95 printable ASCII characters | 128 | 44,801 | 179,408 bytes |
+| `neuronte-ui10-v0`, `neuronte-ui11-v0` | the desktop face: proportional binary text at an em of 10 pixels and of 11 | printable ASCII and the ellipsis, 96, with their advances | 96 | 27,457 | 110,864 bytes each |
 
 `neuronte-split` draws each character with one small net picked for it.
 It draws ASCII, symbols, blocks and the mosaics four to seven times
@@ -69,7 +70,7 @@ a letter and a mark, such as ß æ œ ð þ ø ł đ ħ ŋ ĳ, are drawn in
 | `font/symbols.txt` | The symbols of the full set, in the same form |
 | `font/marks.txt` | The diacritic marks, keyed by their combining code points |
 | `font/letters.txt` | The Latin letters beyond ASCII that are not a letter plus a mark, and the Greek and Russian Cyrillic letters. The Greek and Cyrillic are not yet in any weights |
-| `font/ui-10.txt`, `font/ui-11.txt` | A proportional face for small binary desktop text, printable ASCII and the ellipsis, drawn as pixels once for an em of 10 pixels and once for 11, each character with its advance in pixels. Written for this project. `train/train.py --set ui10` and `--set ui11` train one net each, and score it pixel by pixel at its size. `train/pack.py --advances` packs a file's advances, bold one pixel more. Not yet in any weights |
+| `font/ui-10.txt`, `font/ui-11.txt` | A proportional face for small binary desktop text, printable ASCII and the ellipsis, drawn as pixels once for an em of 10 pixels and once for 11, each character with its advance in pixels. Written for this project. `train/train.py --set ui10` and `--set ui11` train one net each, and score it pixel by pixel at its size. `train/pack.py --advances` packs a file's advances, bold one pixel more. The nets are `neuronte-ui10-v0` and `neuronte-ui11-v0` |
 | `font/icons.txt` | The icons, as colour layers back to front, each naming a palette entry. Not yet in any weights |
 | `font/palette.txt` | The palette for colour glyphs: entry 0 is the cell's foreground, 1 is clear, the rest have a dark-theme and a light-theme colour |
 | `font/code-masks.txt` | The 43 parity masks that turn a scalar into the net's 64 character inputs |
@@ -80,7 +81,7 @@ a letter and a mark, such as ß æ œ ð þ ø ł đ ħ ŋ ĳ, are drawn in
 | `train/train.py` | Trains a net on one set. Needs torch, and wants a GPU |
 | `train/gate.py` | Trains the router's gate for a bundle of nets. Needs torch; a CPU is enough |
 | `train/pack.py` | Packs weights JSON into the binary file the C library loads, one net or a bundle. Also packs an advance table, the pen steps of a proportional face, from a text file, and a drawing file of nets and a table. Documents the four layouts. No face with advances is drawn yet |
-| `weights/` | The trained weights as JSON, the packed files, the scores and `SHA256SUMS`. `neuronte-draw-v2`, `neuronte-symbol-v0`, `neuronte-accent-v1`, `neuronte-pixel-v1`, `neuronte-braille-v0` and `neuronte-gate-v3` are the parts of `neuronte-split-v4`, with `neuronte-ascii-v0`. `neuronte-full-v2` is here so that `make test` and `make bench` run from a clone |
+| `weights/` | The trained weights as JSON, the packed files, the scores and `SHA256SUMS`. `neuronte-draw-v2`, `neuronte-symbol-v0`, `neuronte-accent-v1`, `neuronte-pixel-v1`, `neuronte-braille-v0` and `neuronte-gate-v3` are the parts of `neuronte-split-v4`, with `neuronte-ascii-v0`. `neuronte-full-v2` is here so that `make test` and `make bench` run from a clone. `neuronte-ui10-v0` and `neuronte-ui11-v0` are the desktop face, each a drawing file of one net and its advances |
 | `include/neuronte.h`, `src/` | The C library |
 | `tools/neuronte-render.c` | Draws lines of text into a PPM file |
 | `tools/neuronte-bench.c` | Times a net per cell, or a full net against a bundle per class of character |
@@ -119,7 +120,10 @@ inner loops twice, plain and AVX2, and picks one by CPU when it loads.
   what `train/pack.py` makes from the JSON. For the bundle, the C router
   must also send each of about 2,100 scalars, both Symbols for Legacy
   Computing blocks among them, to the net a Python router picks, with the
-  gate evaluated in numpy.
+  gate evaluated in numpy;
+- each desktop-face file draws every one of its characters, regular and
+  bold, as exactly the pixels in `font/ui-10.txt` or `font/ui-11.txt`,
+  through `neuronte_draw_text()` with `neuronte_set_binary()` on.
 
 For `neuronte-full` and `neuronte-split` it also checks that box lines
 reach the cell edges, that █ fills its cell and ▀ the top half, that

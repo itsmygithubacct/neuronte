@@ -11,17 +11,23 @@ Tiers:
 
     ascii    U+0020..U+007E, from font/strokes.txt.
     box      box drawing U+2500..U+257F, made here from the Unicode names.
-    block    block elements U+2580..U+259F, from the names, and the
-             shades U+2591..U+2593 as dither patterns.
+    block    block elements U+2580..U+259F but the shades, from the names.
+    shade    the shades U+2591..U+2593, as dither patterns.
     braille  U+2800..U+28FF, made here from the dot bits.
+    mosaic   sextants U+1FB00..U+1FB3B, by rule; octants U+1CD00..U+1CDE5,
+             from font/octants.txt, which train/mosaics.py makes from
+             Unicode's data; and the 8 octant patterns encoded elsewhere
+             (SUBSTITUTES). Filled cells of a 2 x 3 or 2 x 4 lattice.
     symbol   the symbols in font/symbols.txt and five asterisks made here.
     accent   Latin-1 letters U+00C0..U+00FF, Latin Extended-A
              U+0100..U+017F and the spacing marks, made here from an
              ASCII letter and the marks in font/marks.txt, by the Unicode
              decomposition, or taken from font/letters.txt.
 
-Sets, each a list of tiers: ascii; draw (box, block, braille); symbol;
-accent; and full, which is all of them.
+Sets, each a list of tiers: ascii; draw (box, block, shade, braille);
+symbol; accent; full, which is all of those; and three sets for choosing
+how the mosaics join the bundle: pixel (block, mosaic), pixelbraille
+(block, mosaic, braille) and boxshade (box, shade).
 
 field() gives the target: the signed distance to the ink edge, positive
 inside, divided by tau and clamped to -1..1, at grid nodes 1/n cell width
@@ -40,6 +46,7 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import strokes  # noqa: E402
 
+OCTANTS = os.path.join(strokes.ROOT, "font", "octants.txt")
 PAD = 0.25                  # how far edge lines and blocks run past the cell
 LIGHT, HEAVY = 0.06, 0.12   # half widths of box lines, in cell widths
 DOUBLE = 0.19               # offset of each line of a double line from its centre line
@@ -193,28 +200,19 @@ NUM = {"ONE": 1, "THREE": 3, "FIVE": 5, "SEVEN": 7}
 DEN = {"EIGHTH": 8, "EIGHTHS": 8, "QUARTER": 4, "QUARTERS": 4}
 
 
+def quadrant(name):
+    """The 2 x 2 lattice bits of a QUADRANT ... name."""
+    cell = {("UPPER", "LEFT"): 1, ("UPPER", "RIGHT"): 2, ("LOWER", "LEFT"): 4, ("LOWER", "RIGHT"): 8}
+    return sum(cell[tuple(q.split())] for q in name[len("QUADRANT "):].split(" AND "))
+
+
 def block(ch):
     name = unicodedata.name(ch)
     words = name.split()
     if name == "FULL BLOCK":
         return [rect(-PAD, -PAD, 1 + PAD, 2 + PAD)]
     if words[0] == "QUADRANT":
-        quads = {tuple(part.split()) for part in " ".join(words[1:]).split(" AND ")}
-        out = []
-        for v, h in quads:
-            x0, x1 = (-PAD, CX) if h == "LEFT" else (CX, 1 + PAD)
-            y0, y1 = (-PAD, CY) if v == "UPPER" else (CY, 2 + PAD)
-            # run into a neighbour that is also ink, so the union has no seam
-            if (v, "RIGHT") in quads and h == "LEFT":
-                x1 = CX + PAD
-            if (v, "LEFT") in quads and h == "RIGHT":
-                x0 = CX - PAD
-            if ("LOWER", h) in quads and v == "UPPER":
-                y1 = CY + PAD
-            if ("UPPER", h) in quads and v == "LOWER":
-                y0 = CY - PAD
-            out.append(rect(x0, y0, x1, y1))
-        return out
+        return lattice(quadrant(name), 2)
     assert words[-1] == "BLOCK", name
     frac = 0.5 if words[1] == "HALF" else NUM[words[1]] / DEN[words[2]]
     return [{"UPPER": rect(-PAD, -PAD, 1 + PAD, 2 * frac),
@@ -259,6 +257,78 @@ def braille(bits):
         if bits >> k & 1:
             x, y = 0.25 + 0.5 * c, 0.25 + 0.5 * r
             out.append(("seg", x, y, x, y, BRAILLE_R))
+    return out
+
+
+# Mosaics: the filled cells of a lattice two cells across and 3 or 4
+# down, numbered 1 2 / 3 4 / ... by row; bit n - 1 is cell n. Rows are
+# thirds or quarters of the cell height, exactly, not snapped to pixels.
+
+# The octant patterns Unicode encodes outside U+1CD00..U+1CDE5 and not
+# among the block elements. train/mosaics.py checks them against
+# Unicode's names.
+SUBSTITUTES = {
+    0x1FB82: 0b00000011,  # upper one quarter
+    0x1FB85: 0b00111111,  # upper three quarters
+    0x1FBE6: 0b00010100,  # middle left one quarter
+    0x1FBE7: 0b00101000,  # middle right one quarter
+    0x1CEA0: 0b10000000,  # right half lower one quarter
+    0x1CEA3: 0b01000000,  # left half lower one quarter
+    0x1CEA8: 0b00000001,  # left half upper one quarter
+    0x1CEAB: 0b00000010,  # right half upper one quarter
+}
+
+
+def lattice(bits, rows):
+    """The filled cells as rectangles. Each run of rows with the same
+    filled columns is one rectangle. A run reaches PAD into the row next
+    to it when that row is filled across all of the run's columns, so the
+    union has no seam and no ink falls in an empty cell. Edges on the
+    cell's border run past it, so neighbouring cells join."""
+    h = 2 / rows
+    span = [bits >> (2 * r) & 3 for r in range(rows)]  # 1 left, 2 right, 3 both
+    out, r = [], 0
+    while r < rows:
+        s, top = span[r], r
+        while r + 1 < rows and span[r + 1] == s:
+            r += 1
+        if s:
+            y0 = -PAD if top == 0 else h * top - (PAD if span[top - 1] & s == s else 0)
+            y1 = 2 + PAD if r == rows - 1 else h * (r + 1) + (PAD if span[r + 1] & s == s else 0)
+            out.append(rect(-PAD if s & 1 else 0.5, y0, 1 + PAD if s & 2 else 0.5, y1))
+        r += 1
+    return out
+
+
+def sextant(cp):
+    """(bits, 3) for U+1FB00..U+1FB3B: patterns 1..62 in order, leaving out
+    the left and right halves, 21 and 42, which are block elements."""
+    p = cp - 0x1FB00 + 1
+    p += p >= 21
+    p += p >= 42
+    return p, 3
+
+
+def octants():
+    """{code point: bits} from font/octants.txt."""
+    out = {}
+    with open(OCTANTS, encoding="utf-8") as fh:
+        for line in fh:
+            line = line.split("#")[0].split()
+            if not line:
+                continue
+            cp, cells = int(line[0][2:], 16), line[1]
+            out[cp] = sum(1 << (int(d) - 1) for d in cells)
+    if len(out) != 230 or set(out) != set(range(0x1CD00, 0x1CDE6)):
+        raise ValueError("octants.txt must hold exactly U+1CD00..U+1CDE5")
+    return out
+
+
+def mosaics():
+    """{code point: (bits, rows)} for the mosaic tier."""
+    out = {cp: sextant(cp) for cp in range(0x1FB00, 0x1FB3C)}
+    out.update({cp: (bits, 4) for cp, bits in octants().items()})
+    out.update({cp: (bits, 4) for cp, bits in SUBSTITUTES.items()})
     return out
 
 
@@ -418,10 +488,13 @@ def accents():
 
 SETS = {
     "ascii": ["ascii"],
-    "draw": ["box", "block", "braille"],
+    "draw": ["box", "block", "shade", "braille"],
     "symbol": ["symbol"],
     "accent": ["accent"],
-    "full": ["ascii", "box", "block", "braille", "symbol", "accent"],
+    "full": ["ascii", "box", "block", "shade", "braille", "symbol", "accent"],
+    "pixel": ["block", "mosaic"],
+    "pixelbraille": ["block", "mosaic", "braille"],
+    "boxshade": ["box", "shade"],
 }
 
 
@@ -435,9 +508,13 @@ def tier(name):
     if name == "box":
         return [(chr(c), box(chr(c))) for c in range(0x2500, 0x2580)]
     if name == "block":
-        return [(chr(c), shade(chr(c)) if c in SHADES else block(chr(c))) for c in range(0x2580, 0x25A0)]
+        return [(chr(c), block(chr(c))) for c in range(0x2580, 0x25A0) if c not in SHADES]
+    if name == "shade":
+        return [(chr(c), shade(chr(c))) for c in SHADES]
     if name == "braille":
         return [(chr(c), braille(c - 0x2800)) for c in range(0x2800, 0x2900)]
+    if name == "mosaic":
+        return [(chr(c), lattice(*m)) for c, m in sorted(mosaics().items())]
     if name == "symbol":
         sym = strokes.parse(strokes.SYMBOLS)
         made = asterisks()
@@ -519,6 +596,8 @@ def sources(name):
         files.append("font/symbols.txt")
     if "accent" in tiers:
         files += ["font/letters.txt", "font/marks.txt"]
+    if "mosaic" in tiers:
+        files.append("font/octants.txt")
     return files + ["train/strokes.py", "train/glyphs.py"]
 
 
@@ -533,10 +612,27 @@ if __name__ == "__main__":
                 if key in junctions:
                     raise SystemExit(f"U+{ord(ch):04X} and U+{ord(junctions[key]):04X} have the same arms")
                 junctions[key] = ch
+    # Each mosaic and quadrant is ink over its filled cells, including where
+    # two filled cells meet (no seam), and empty over the rest. Points
+    # within 0.03 of a border between a filled and an empty cell are left out.
+    xs, ys = np.meshgrid(np.linspace(0, 1, 41), np.linspace(0, 2, 81))
+    P = np.stack([xs.ravel(), ys.ravel()], 1)
+    quads = {c: (quadrant(unicodedata.name(chr(c))), 2) for c in range(0x2596, 0x25A0)}
+    for cp, (bits, rows) in {**mosaics(), **quads}.items():
+        h, e = 2 / rows, 0.03
+        near = [{(c, r) for c in range(2) for r in range(rows)
+                 if 0.5 * c - e <= x <= 0.5 * c + 0.5 + e and h * r - e <= y <= h * r + h + e}
+                for x, y in P]
+        want = np.array([1 if all(bits >> (2 * r + c) & 1 for c, r in n) else
+                         -1 if not any(bits >> (2 * r + c) & 1 for c, r in n) else 0 for n in near])
+        sd = signed_distance(lattice(bits, rows), P, 0.075)
+        if ((want == 1) & (sd <= 0.02)).any() or ((want == -1) & (sd >= -0.02)).any():
+            raise SystemExit(f"U+{cp:04X} does not fill exactly its cells")
     counts = {}
     for _, t, _ in full:
         counts[t] = counts.get(t, 0) + 1
     print(len(full), "characters:", ", ".join(f"{k} {v}" for k, v in counts.items()),
           f"({len(junctions)} distinct box junctions)")
+    print(len(mosaics()), "mosaics and", len(quads), "quadrants, each filling exactly its cells")
     for name in SETS:
         print(f"  {name}: {len(charset(name))}")

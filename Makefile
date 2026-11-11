@@ -67,6 +67,7 @@ pack: $(ASCII).json $(FULL).json $(NETS) $(GATE)
 
 test: all $(TESTS)
 	cd weights && sha256sum -c --quiet SHA256SUMS
+	$(PYTHON) train/glyphs.py > /dev/null
 	./build/test_utf8
 	./build/test_api $(ASCII).nrt
 	./build/test_api $(FULL).nrt --full --accent

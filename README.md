@@ -62,8 +62,10 @@ a letter and a mark, such as ß æ œ ð þ ø ł đ ħ ŋ ĳ, are drawn in
 | `font/marks.txt` | The diacritic marks, keyed by their combining code points |
 | `font/letters.txt` | The Latin letters beyond ASCII that are not a letter plus a mark |
 | `font/code-masks.txt` | The 43 parity masks that turn a scalar into the net's 64 character inputs |
+| `font/octants.txt` | Which cells each octant U+1CD00..U+1CDE5 fills. Made by `train/mosaics.py` from Unicode 16's `UnicodeData.txt`, whose version and sha256 it records |
 | `train/strokes.py` | Reads the stroke files |
-| `train/glyphs.py` | The character sets. Makes box drawing and blocks from their Unicode names, Braille from the dot bits, accented letters from a letter and a mark, and the target the net learns |
+| `train/glyphs.py` | The character sets. Makes box drawing and blocks from their Unicode names, Braille from the dot bits, sextants and octants from the cells they fill, accented letters from a letter and a mark, and the target the net learns. `python3 train/glyphs.py` checks the sets |
+| `train/mosaics.py` | Makes `font/octants.txt`, and checks the sextants and the octant patterns encoded elsewhere against the same Unicode data |
 | `train/train.py` | Trains a net on one set. Needs torch, and wants a GPU |
 | `train/gate.py` | Trains the router's gate for a bundle of nets. Needs torch; a CPU is enough |
 | `train/pack.py` | Packs weights JSON into the binary file the C library loads, one net or a bundle. Documents both layouts |
@@ -112,6 +114,10 @@ U+2800 and U+00A0 are blank, and that ⣿ carries about eight times the
 ink of ⠁. For both it checks that é ä ô ñ ü š ž ć are their letter
 below the x-height with a mark above it, and ç its c with a mark below.
 Those checks fail on a net that was not trained on accents.
+
+It also runs `python3 train/glyphs.py`, which checks the targets
+themselves: every box junction is distinct, and every quadrant, sextant
+and octant is ink over exactly its cells, with no seam where two meet.
 
 ## Demo
 
@@ -368,6 +374,14 @@ The history of `neuronte-full`: v0 knew 557 characters at 256 wide; v1
 added the shades, within 0.006 of v0 on each class with 2 × 2 samples;
 v2 added the 203 accented letters and is 320 wide, for the reasons in
 [The width of neuronte-full](#the-width-of-neuronte-full).
+
+The three-quadrant blocks ▙ ▛ ▜ ▟ in `neuronte-draw-v1` and
+`neuronte-full-v2` were trained on targets with a square of ink a
+quarter of a cell wide in the corner of the empty quadrant, so those
+nets draw that corner as a step. The scores could not show it, since
+they compare a net with its own targets. `train/glyphs.py` now makes
+the quadrants and the mosaics by one rule and checks that each fills
+exactly its cells; nets trained from it draw the corner square.
 
 Box lines are not snapped to pixels. A line's centre falls on a pixel
 edge at even cell sizes, so at 8 pixels a light line is two grey rows,

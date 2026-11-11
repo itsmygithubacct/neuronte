@@ -30,11 +30,13 @@ def main():
     p.add_argument('--output', choices=['ansi','rgb'], default='rgb')
     p.add_argument('--weights'); p.add_argument('--library')
     p.add_argument('--margin',type=float,default=0)
-    p.add_argument('--check-exact',action='store_true'); p.add_argument('--require-exact',action='store_true')
+    exact=p.add_mutually_exclusive_group()
+    exact.add_argument('--check-exact',action='store_true'); exact.add_argument('--require-exact',action='store_true')
     p.add_argument('--stats',type=Path)
     p.add_argument('--helper',choices=['none','speed','quality'],default='none')
     p.add_argument('--helper-model',type=Path)
     a = p.parse_args()
+    if a.require_exact and a.level!='multi':p.error('--require-exact requires --level multi')
     if a.check_exact or a.require_exact:
         check = exactness(a.weights,a.library)
         if a.check_exact:
@@ -46,12 +48,14 @@ def main():
     if w < 1 or h < 1 or a.width % w or a.height % h: p.error('frame must divide exactly into positive cells')
     if a.level == 'multi' and a.output == 'ansi': p.error('multi-ink requires RGB output')
     renderer = (MultiInk(a.weights,a.library,w,h) if a.level == 'multi' else TwoInk(a.mode,w,h,a.weights,a.library,a.margin))
+    if a.require_exact and renderer.ink_indices is None:
+        p.error('neural masks are fractional at the selected cell size')
     helper=None
     if a.helper!='none':
         if a.level!='two' or a.mode!='full' or (w,h)!=(8,16) or a.margin:
             p.error('helpers require --level two --mode full --cell 8x16 and zero margin')
         from neuronte_video_helpers import Helper,features,quality_cells
-        helper=Helper(a.helper_model or ROOT/f'weights/neuronte-video-{a.helper}-v0.json',a.helper)
+        helper=Helper(a.helper_model or ROOT/f'weights/neuronte-video-{a.helper}-v0.json',a.helper,runtime=True)
         expected=helper.doc.get('scalar_bundle_sha256')
         actual=hashlib.sha256(Path(a.weights or ROOT/'weights/neuronte-split-v4.nrt').read_bytes()).hexdigest()
         if not expected or expected!=actual:p.error('helper scalar manifest/weights differ from the selected bundle')

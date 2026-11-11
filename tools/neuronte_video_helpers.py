@@ -19,18 +19,25 @@ def features(frame,previous=None):
 
 
 class Helper:
-    def __init__(self,path,kind):
+    def __init__(self,path,kind,*,runtime=False):
         self.doc=json.loads(Path(path).read_text())
         d=self.doc
+        if not isinstance(d,dict):raise ValueError('video helper must be a JSON object')
         if d.get('format')!='neuronte-video-helper' or d.get('version')!=1 or d.get('kind')!=kind or d.get('cell')!=[8,16] or d.get('scalar_manifest')!='split-v4':
             raise ValueError('incompatible video helper')
         policy=d.get('inference')
+        if runtime and not isinstance(policy,dict):
+            raise ValueError('runtime video helper requires an inference policy object')
         if policy is not None:
+            if not isinstance(policy,dict):raise ValueError('invalid inference policy object')
             if kind=='speed' and (type(policy.get('candidates')) is not int or not 1<=policy['candidates']<=1061):
                 raise ValueError('invalid candidate count')
             if kind=='quality' and (policy.get('local_ssim_loss_max')!=.0001 or policy.get('frame_ssim_loss_max')!=.001):
                 raise ValueError('unsupported temporal quality policy')
-        self.layers=[(np.asarray(x['weight'],np.float32),np.asarray(x['bias'],np.float32)) for x in d['layers']]
+        layers=d.get('layers')
+        if not isinstance(layers,list) or len(layers)!=2 or not all(isinstance(x,dict) for x in layers):
+            raise ValueError('video helper needs two layer objects')
+        self.layers=[(np.asarray(x.get('weight'),np.float32),np.asarray(x.get('bias'),np.float32)) for x in layers]
         sizes=[24 if kind=='speed' else 51,96,1061 if kind=='speed' else 2]
         if len(self.layers)!=2:raise ValueError('video helper needs two layers')
         for i,(w,b) in enumerate(self.layers):

@@ -1,0 +1,124 @@
+{
+  "form": "A",
+  "layers": 6,
+  "icons": 167,
+  "width": 256,
+  "steps": 40000,
+  "seed": 0,
+  "params": 156422,
+  "head_params": 3070,
+  "final_loss": 0.0013182660331949592,
+  "head_wrong": 0,
+  "head_wrong_all": 0,
+  "w12_s2": {
+    "iou_mean": 0.9898103040501376,
+    "iou_min": 0.75,
+    "stray_unused": 0,
+    "stray_positive": 0,
+    "lost_used": 0,
+    "empty_target_used": 1,
+    "zero_coverage_used": 0,
+    "dark": {
+      "mean_err": 0.605240607511498,
+      "off_gt32": 0.000291084497671324
+    },
+    "light": {
+      "mean_err": 0.6210851117879331,
+      "off_gt32": 0.000291084497671324
+    },
+    "worst": [
+      "U+F0F6 layer 1",
+      "U+F065 layer 0",
+      "U+F073 layer 0"
+    ]
+  },
+  "w16_s2": {
+    "iou_mean": 0.9917934163156801,
+    "iou_min": 0.75,
+    "stray_unused": 0,
+    "stray_positive": 0,
+    "lost_used": 0,
+    "empty_target_used": 0,
+    "zero_coverage_used": 0,
+    "dark": {
+      "mean_err": 0.6672466824690025,
+      "off_gt32": 0.0001637350299401198
+    },
+    "light": {
+      "mean_err": 0.6843377377637132,
+      "off_gt32": 0.00017543038922155694
+    },
+    "worst": [
+      "U+F135 layer 1",
+      "U+E654 layer 1",
+      "U+F110 layer 0"
+    ]
+  },
+  "w32_s1": {
+    "iou_mean": 0.9915035191740567,
+    "iou_min": 0.8888888888888888,
+    "stray_unused": 0,
+    "stray_positive": 0,
+    "lost_used": 0,
+    "empty_target_used": 0,
+    "zero_coverage_used": 0,
+    "dark": {
+      "mean_err": 0.6790160756268186,
+      "off_gt32": 0.002301061938622753
+    },
+    "light": {
+      "mean_err": 0.6965861382063273,
+      "off_gt32": 0.002409244011976046
+    },
+    "worst": [
+      "U+F08AE layer 2",
+      "U+F15B layer 1",
+      "U+F09C layer 1"
+    ]
+  },
+  "final_loss_note": "Training loss before the recorded uniform distance-output calibration.",
+  "calibration": {
+    "kind": "uniform-distance-offset",
+    "offset": -0.00800000037997961,
+    "source_weights_sha256": "2d325b8197b76c4319cf6c88cc9edbb297ca56f33fbcbf362eb64bad851b7bd5",
+    "script_sha256": "72359cd721a1d8ca1fc7688c648e3417f3d8e583e71462506706e8d72aa2febf"
+  },
+  "acceptance": {
+    "passed": true,
+    "published_seed": 0,
+    "mean_iou16_minimum": 0.99,
+    "sizes": [
+      12,
+      16,
+      32
+    ],
+    "requirements": "Exact head; zero thresholded/positive unused layers, lost nonempty layers and zero-coverage used layers at all sizes.",
+    "seeds": [
+      {
+        "seed": 0,
+        "mean_iou16": 0.9917934163156801,
+        "min_iou16": 0.75,
+        "all_sizes_head_wrong": 0,
+        "all_sizes_positive_unused": 0,
+        "all_sizes_lost_nonempty": 0,
+        "all_sizes_zero_coverage_used": 0,
+        "weights_sha256": "82d7d526f5160b2c9e046b187e507c8540b82c3f8f143429aed0d197a0f03c1a",
+        "packed_sha256": "1c2023a5f7af300b930e58ecdef36ff5c79a5585a16acefc03a70b4c5529a70e"
+      },
+      {
+        "seed": 1,
+        "mean_iou16": 0.9903628304155582,
+        "min_iou16": 0.75,
+        "all_sizes_head_wrong": 0,
+        "all_sizes_positive_unused": 0,
+        "all_sizes_lost_nonempty": 0,
+        "all_sizes_zero_coverage_used": 0,
+        "weights_sha256": "bd34ee925199df16afdf556b7d7e1e3fa8590f643dca88790b6ccb9e8de256f8",
+        "packed_sha256": "33b06bf2b100362466faf95d595da1d2745c02e3b6e06af377f020edc2a052e3"
+      }
+    ],
+    "selection": "Narrowest tested passing setup: width256,40000 steps,uniform distance offset -0.008. Uncalibrated192/20k,256/20k,256/40k and384/40k pairs failed."
+  },
+  "training_commit": "eba2477837fd5073da9c8b08e9f0baf28a3a910e",
+  "scoring": "Packed C API; unchanged float16 grid256 targets, bilinear interpolation,8x8 target samples; 2x2 network samples at12/16px,1 at32px; strict coverage>0.5."
+}

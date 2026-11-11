@@ -3,7 +3,8 @@
 usage: check_icon_quality.py LIB JSON NRT [--out SCORES] [--report-only]
 
 The acceptance gate is mean 16px IoU >= .990, exact palette entries, no
-stray unused layers at 12/16/32px, and no lost used layer at 16px. Target
+positive unused coverage, and no lost nonempty or zero-coverage used
+layer at any of 12/16/32px. Empty thresholded targets are counted separately. Target
 coverage follows the trainer's float16 grid256, bilinear interpolation,
 8x8 positive-inside samples and strict >.5 threshold. An additional score
 uses the analytic drawings to expose grid-boundary differences.
@@ -20,6 +21,26 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(
 import glyphs
 import pack
 import strokes
+
+THEMES = {"dark": ((0x11, 0x15, 0x1C), (0xE9, 0xE6, 0xDF)),
+          "light": ((0xFA, 0xFA, 0xF7), (0x1E, 0x23, 0x30))}
+
+
+def composite(cov, entries, palette, theme):
+    bg, fg = (np.asarray(c, np.float32) / 255 for c in THEMES[theme])
+    table = {n: fg if n == 0 else np.asarray(d if theme == "dark" else l, np.float32) / 255
+             for n, d, l in palette.values() if n != 1}
+    rgb = np.zeros((*cov.shape[1:], 3), np.float32)
+    alpha = np.zeros((*cov.shape[1:], 1), np.float32)
+    for c, entry in zip(cov, entries):
+        c = c[..., None]
+        if entry == 1:
+            rgb *= 1 - c
+            alpha *= 1 - c
+        else:
+            rgb = table[entry] * c + rgb * (1 - c)
+            alpha = c + alpha * (1 - c)
+    return rgb + bg * (1 - alpha)
 
 
 def sample_points(cw, ss=8):
@@ -51,6 +72,13 @@ def counts(truth, predicted):
     return {"iou": intersection / union if union else 1.0,
             "intersection": intersection, "union": union,
             "target_ink": int(truth.sum()), "predicted_ink": int(predicted.sum())}
+
+
+def passes_gate(results):
+    return (set(results) == {"12", "16", "32"} and results["16"]["iou_mean"] >= .990
+            and all(r["head_wrong"] == 0 and r["stray_unused"] == 0
+                    and r["stray_positive"] == 0 and r["lost_used"] == 0
+                    and r["zero_coverage_used"] == 0 for r in results.values()))
 
 
 def main():
@@ -85,7 +113,10 @@ def main():
         raise SystemExit("C library refused snap=0")
     widths = (12, 16, 32)
     points = {cw: sample_points(cw) for cw in widths}
-    results = {str(cw): {"layers": [], "head_wrong": 0, "stray_unused": 0} for cw in widths}
+    results = {str(cw): {"layers": [], "head_wrong": 0, "stray_unused": 0,
+                        "stray_positive": 0,
+                        **{theme: {"mean_err": 0., "off_gt32": 0.} for theme in THEMES}}
+               for cw in widths}
     for scalar in labelled:
         layers = icons[chr(scalar)]
         fields = [glyphs.field(shapes, grid, pen, tau).astype(np.float16).astype(np.float32)
@@ -100,13 +131,24 @@ def main():
                 raise SystemExit(f"C coverage failed for U+{scalar:04X}")
             r["head_wrong"] += sum(x != y for x, y in zip(ent, want))
             r["stray_unused"] += int((cov[len(layers):] > .5).any(axis=(1, 2)).sum())
+            r["stray_positive"] += int((cov[len(layers):] > 0).any(axis=(1, 2)).sum())
+            target_cov = np.zeros_like(cov)
             for i, (_, shapes) in enumerate(layers):
                 predicted = cov[i] > .5
-                target = mask(interpolate(fields[i], points[cw], grid), cw)
+                values = interpolate(fields[i], points[cw], grid)
+                target_cov[i] = (values > 0).reshape(2 * cw, 8, cw, 8).mean((1, 3))
+                target = target_cov[i] > .5
                 analytic = mask(glyphs.signed_distance(shapes, points[cw], pen), cw)
                 r["layers"].append({"scalar": f"U+{scalar:04X}", "layer": i,
                                      **counts(target, predicted),
+                                     "target_coverage_sum": float(target_cov[i].sum()),
+                                     "predicted_coverage_sum": float(cov[i].sum()),
                                      "analytic": counts(analytic, predicted)})
+            for theme in THEMES:
+                err = np.abs(composite(cov, ent, pal, theme)
+                             - composite(target_cov, want, pal, theme)) * 255
+                r[theme]["mean_err"] += float(err.mean()) / len(labelled)
+                r[theme]["off_gt32"] += float((err.max(-1) > 32).mean()) / len(labelled)
     lib.neuronte_close(handle)
     for cw in widths:
         r = results[str(cw)]
@@ -114,13 +156,15 @@ def main():
         r["iou_min"] = min(x["iou"] for x in r["layers"])
         r["lost_used"] = sum(x["target_ink"] > 0 and x["intersection"] == 0 for x in r["layers"])
         r["empty_target_used"] = sum(x["target_ink"] == 0 for x in r["layers"])
+        r["zero_coverage_used"] = sum(x["predicted_coverage_sum"] == 0 for x in r["layers"])
         r["analytic_iou_mean"] = float(np.mean([x["analytic"]["iou"] for x in r["layers"]]))
         print(f"{cw}px: IoU {r['iou_mean']:.9f}, min {r['iou_min']:.6f}, "
               f"lost {r['lost_used']}, empty target {r['empty_target_used']}, "
               f"stray {r['stray_unused']}, head {r['head_wrong']}; "
               f"analytic IoU {r['analytic_iou_mean']:.9f}", flush=True)
-    passed = (results["16"]["iou_mean"] >= .990 and results["16"]["lost_used"] == 0
-              and all(r["head_wrong"] == 0 and r["stray_unused"] == 0 for r in results.values()))
+        print(f"  composite error dark/light {r['dark']['mean_err']:.6f}/{r['light']['mean_err']:.6f}; "
+              f"zero-coverage used {r['zero_coverage_used']}, positive unused {r['stray_positive']}", flush=True)
+    passed = passes_gate(results)
     if a.out:
         with open(a.out, "w") as fh:
             json.dump({"passed": passed, "per_size": results}, fh, indent=2)

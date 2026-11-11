@@ -69,7 +69,7 @@ a letter and a mark, such as ß æ œ ð þ ø ł đ ħ ŋ ĳ, are drawn in
 | `font/symbols.txt` | The symbols of the full set, in the same form |
 | `font/marks.txt` | The diacritic marks, keyed by their combining code points |
 | `font/letters.txt` | The Latin letters beyond ASCII that are not a letter plus a mark, and the Greek and Russian Cyrillic letters. The Greek and Cyrillic are not yet in any weights |
-| `font/ui.txt` | A proportional face for small binary desktop text, printable ASCII and the ellipsis, as pen strokes on the same grid. Written for this project. Not yet in any weights |
+| `font/ui.txt` | A proportional face for small binary desktop text, printable ASCII and the ellipsis, as pen strokes on the same grid. Written for this project. `train/train.py --set ui` trains it, with its own pen, and scores it pixel by pixel at 10 and 11 px. Not yet in any weights |
 | `font/ui-advances.txt` | That face's advances: the pen's step after each character, regular and bold. `train/pack.py --advances` packs it |
 | `font/icons.txt` | The icons, as colour layers back to front, each naming a palette entry. Not yet in any weights |
 | `font/palette.txt` | The palette for colour glyphs: entry 0 is the cell's foreground, 1 is clear, the rest have a dark-theme and a light-theme colour |

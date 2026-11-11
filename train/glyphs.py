@@ -23,11 +23,15 @@ Tiers:
              U+0100..U+017F and the spacing marks, made here from an
              ASCII letter and the marks in font/marks.txt, by the Unicode
              decomposition, or taken from font/letters.txt.
+    ui       the desktop face, printable ASCII and U+2026, from
+             font/ui.txt: a proportional face for small binary text.
 
 Sets, each a list of tiers: ascii; draw (box, block, shade, braille);
 symbol; accent; full, which is all of those; and three sets for choosing
 how the mosaics join the bundle: pixel (block, mosaic), pixelbraille
-(block, mosaic, braille) and boxshade (box, shade).
+(block, mosaic, braille) and boxshade (box, shade). The set ui is the
+ui tier alone. It shares its scalars with ascii, so it joins no other
+set, and its net no bundle. It has a pen of its own, in PENS.
 
 field() gives the target: the signed distance to the ink edge, positive
 inside, divided by tau and clamped to -1..1, at grid nodes 1/n cell width
@@ -47,6 +51,9 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import strokes  # noqa: E402
 
 OCTANTS = os.path.join(strokes.ROOT, "font", "octants.txt")
+UI = os.path.join(strokes.ROOT, "font", "ui.txt")
+PEN = 0.075                 # the pen radius, in cell widths
+PENS = {"ui": 0.05}         # sets drawn with another: one pixel wide at an em of 10
 PAD = 0.25                  # how far edge lines and blocks run past the cell
 LIGHT, HEAVY = 0.06, 0.12   # half widths of box lines, in cell widths
 DOUBLE = 0.19               # offset of each line of a double line from its centre line
@@ -496,6 +503,7 @@ SETS = {
     "pixelbraille": ["block", "mosaic", "braille"],
     "boxshade": ["box", "shade"],
     "braille": ["braille"],
+    "ui": ["ui"],
 }
 
 
@@ -526,6 +534,11 @@ def tier(name):
     if name == "accent":
         acc = accents()
         return [(c, acc[c]) for c in sorted(acc)]
+    if name == "ui":
+        g = strokes.parse(UI)
+        if sorted(g) != [chr(c) for c in range(32, 127)] + ["\u2026"]:
+            raise ValueError("ui.txt must hold exactly U+0020..U+007E and U+2026")
+        return [(c, g[c]) for c in sorted(g)]
     raise ValueError(f"no tier {name!r}")
 
 
@@ -631,6 +644,8 @@ def sources(name):
         files += ["font/letters.txt", "font/marks.txt"]
     if "mosaic" in tiers:
         files.append("font/octants.txt")
+    if "ui" in tiers:
+        files.append("font/ui.txt")
     return files + ["train/strokes.py", "train/glyphs.py"]
 
 

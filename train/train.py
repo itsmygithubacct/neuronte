@@ -24,6 +24,7 @@ import json
 import math
 import os
 import sys
+import time
 
 import numpy as np
 import torch
@@ -42,7 +43,13 @@ p.add_argument("--seed", type=int, default=0)
 p.add_argument("--pen", type=float, default=None, help="pen radius in cell widths; default: the set's own")
 p.add_argument("--grid", type=int, default=256, help="target grid nodes per cell width")
 p.add_argument("--unlabelled", type=float, default=1.0, help="weight of the term for scalars with no glyph")
+p.add_argument("--tau", type=float, default=0.15, help="distance normalization in cell widths")
+p.add_argument("--score-sizes", help="comma-separated cell widths; default: the historical size inventory")
+p.add_argument("--scores-out", help="write scores including every character's overlap counts")
+p.add_argument("--log-every", type=int, default=1000)
 a = p.parse_args()
+if a.steps < 1 or a.tau <= 0 or not math.isfinite(a.tau):
+    p.error("steps and finite tau must be positive")
 if a.pen is None:
     a.pen = glyphs.PENS.get(a.set, glyphs.PEN)
 torch.manual_seed(a.seed)
@@ -55,8 +62,8 @@ def sha(rel):
 
 
 # Taken now, so the record names the files the targets were made from.
-SOURCES = {f: sha(f) for f in glyphs.sources(a.set)}
-TAU, OCT, W, N = 0.15, 6, a.width, a.grid
+SOURCES = {f: sha(f) for f in glyphs.sources(a.set) + ["train/train.py", "font/code-masks.txt"]}
+TAU, OCT, W, N = a.tau, 6, a.width, a.grid
 SET = glyphs.charset(a.set)
 CHARS = [c for c, _, _ in SET]
 TIERS = [t for _, t, _ in SET]
@@ -107,6 +114,7 @@ gi = torch.arange(G)
 CF = code(LAB)
 opt = torch.optim.Adam(net.parameters(), lr=2e-3)
 sched = torch.optim.lr_scheduler.CosineAnnealingLR(opt, a.steps)
+started = time.monotonic()
 for step in range(a.steps):
     cand = torch.rand(G, 1024, 2) * SPAN
     tc = target(gi, cand)
@@ -131,6 +139,9 @@ for step in range(a.steps):
     loss.backward()
     opt.step()
     sched.step()
+    if a.log_every and (step + 1) % a.log_every == 0:
+        print(f"step={step+1} loss={float(loss.detach()):.7f} seconds={time.monotonic()-started:.1f}",
+              file=sys.stderr, flush=True)
 
 
 def grid(wpx, ss):
@@ -205,12 +216,17 @@ res = {"set": a.set, "chars": G, "width": W, "steps": a.steps, "seed": a.seed, "
        "unlabelled": a.unlabelled, "params": sum(q.numel() for q in net.parameters()),
        "final_loss": float(loss.detach())}
 tier_idx = {t: torch.tensor([i for i, x in enumerate(TIERS) if x == t]) for t in dict.fromkeys(TIERS)}
+for name, lo, hi in (("greek", 0x370, 0x3ff), ("cyrillic", 0x400, 0x4ff), ("latin", 0xc0, 0x2ff)):
+    indices = [i for i, c in enumerate(CHARS) if lo <= ord(c) <= hi]
+    if indices:
+        tier_idx[name] = torch.tensor(indices)
 PIXEL_SIZES = (8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32)  # where a face is shown as binary letters
 ui_em = a.set[2:].removesuffix("i") if a.set.startswith("ui") else ""
 if ui_em.isdigit():
     PIXEL_SIZES = tuple(sorted(set(PIXEL_SIZES) | {int(ui_em)}))
 SOFT = {"uilarge": (32, 48, 64, 96)}  # sets shown blended, and the sizes they are judged at
-for wpx in SOFT.get(a.set, (4, 5) + PIXEL_SIZES + (48,)):
+score_sizes = tuple(map(int, a.score_sizes.split(","))) if a.score_sizes else SOFT.get(a.set, (4, 5) + PIXEL_SIZES + (48,))
+for wpx in score_sizes:
     t = truth(wpx).reshape(G, -1)
     # Targets that differ by under half a pixel of ink at this size, such
     # as space and U+00A0, count as one when checking the nearest.
@@ -221,11 +237,15 @@ for wpx in SOFT.get(a.set, (4, 5) + PIXEL_SIZES + (48,)):
         u = (ti | ni).sum(1).float()
         iou = torch.where(u > 0, (ti & ni).sum(1).float() / u.clamp_min(1), torch.ones_like(u))
         nearest = torch.cdist(n, t, p=1).argmin(1)
-        r = {"iou_mean": round(float(iou.mean()), 4), "iou_min": round(float(iou.min()), 4),
+        r = {"iou_mean": float(iou.mean()), "iou_min": float(iou.min()),
              "worst": [label(int(i)) for i in iou.argsort()[:3]],
              "nearest_ok": int(twin[gi, nearest].sum())}
         if len(tier_idx) > 1:
-            r["tiers"] = {k: round(float(iou[ix].mean()), 4) for k, ix in tier_idx.items()}
+            r["tiers"] = {k: float(iou[ix].mean()) for k, ix in tier_idx.items()}
+        if a.scores_out:
+            r["glyphs"] = [{"scalar": f"U+{ord(CHARS[i]):04X}", "intersection": int((ti[i] & ni[i]).sum()),
+                            "union": int(u[i]), "target_ink": int(ti[i].sum()), "predicted_ink": int(ni[i].sum())}
+                           for i in range(G)]
         if wpx in PIXEL_SIZES and a.set not in SOFT:
             wrong = ti != ni
             firm = wrong & ((t - 0.5).abs() >= 0.1)
@@ -236,4 +256,9 @@ for wpx in SOFT.get(a.set, (4, 5) + PIXEL_SIZES + (48,)):
             r["firm_differ"] = [label(int(i)) for i in firm.any(1).nonzero().flatten()]
             r["firm_wrong_pixels"] = int(firm.sum())
         res[f"w{wpx}_s{ss}"] = r
-print(json.dumps(res, ensure_ascii=False))
+if a.scores_out:
+    with open(a.scores_out, "w") as fh:
+        json.dump(res, fh, indent=2, ensure_ascii=False)
+        fh.write("\n")
+print(json.dumps({k: ({x: y for x, y in v.items() if x != "glyphs"} if isinstance(v, dict) else v)
+                  for k, v in res.items()}, ensure_ascii=False))

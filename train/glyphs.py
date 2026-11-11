@@ -588,6 +588,38 @@ def field(shapes, n, pen, tau):
     return np.clip(sd / tau, -1, 1).reshape(2 * n + 1, n + 1)
 
 
+def layer_seams(layers, n=160, delta=0.02, pen=0.075, allow=4):
+    """Where two adjacent layers of a colour glyph meet edge to edge.
+
+    For each pair (lower, upper), neither clear: a point just inside the
+    upper layer's edge, mirrored to delta outside it, finds the lower layer
+    ink there. If the lower layer is not also ink at the point inside, it
+    stops at the upper edge instead of running under it, and the
+    anti-aliased edges would leave a seam. Where a free edge of the lower
+    layer meets the upper one's edge, a point or two at the corner count on
+    this grid, so up to `allow` points are not a seam. Returns
+    [(lower, upper, points)] for the pairs with more."""
+    P = nodes(n)
+    sds = [signed_distance(shapes, P, pen).reshape(2 * n + 1, n + 1) for _, shapes in layers]
+    out = []
+    for lo in range(len(layers) - 1):
+        up = lo + 1
+        if "clear" in (layers[lo][0], layers[up][0]):
+            continue
+        su, sl = sds[up], sds[lo]
+        gy, gx = np.gradient(su, 1 / n)
+        norm = np.maximum(np.hypot(gx, gy), 1e-9)
+        band = (su > 0) & (su < delta)
+        yy, xx = np.nonzero(band)
+        step = (su[yy, xx] + delta) * n
+        xo = np.clip(np.rint(xx - step * gx[yy, xx] / norm[yy, xx]).astype(int), 0, n)
+        yo = np.clip(np.rint(yy - step * gy[yy, xx] / norm[yy, xx]).astype(int), 0, 2 * n)
+        bad = int(((sl[yo, xo] > 0) & (sl[yy, xx] <= 0)).sum())
+        if bad > allow:
+            out.append((lo, up, bad))
+    return out
+
+
 def sources(name):
     """The files the set is made from, for the weights' record."""
     tiers = SETS[name]
@@ -628,11 +660,18 @@ if __name__ == "__main__":
         sd = signed_distance(lattice(bits, rows), P, 0.075)
         if ((want == 1) & (sd <= 0.02)).any() or ((want == -1) & (sd >= -0.02)).any():
             raise SystemExit(f"U+{cp:04X} does not fill exactly its cells")
+    # Colour glyphs: every adjacent pair of layers overlaps where it meets.
+    icons = strokes.parse_layers()
+    for ch, layers in icons.items():
+        for lo, up, bad in layer_seams(layers):
+            raise SystemExit(f"U+{ord(ch):04X}: layer {lo + 1} stops at the edge of layer {up + 1} "
+                             f"({bad} points) instead of running under it")
     counts = {}
     for _, t, _ in full:
         counts[t] = counts.get(t, 0) + 1
     print(len(full), "characters:", ", ".join(f"{k} {v}" for k, v in counts.items()),
           f"({len(junctions)} distinct box junctions)")
     print(len(mosaics()), "mosaics and", len(quads), "quadrants, each filling exactly its cells")
+    print(len(icons), "colour glyphs, at most", max(len(v) for v in icons.values()), "layers, no seams between layers")
     for name in SETS:
         print(f"  {name}: {len(charset(name))}")

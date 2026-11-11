@@ -18,6 +18,12 @@ File syntax, one character per line, coordinates on a 10 x 20 grid:
 
 The character is written first, or as U+XXXX, then a space, then shapes
 separated by " | ".
+
+Colour glyphs (font/icons.txt) are written as layers, back to front,
+separated by " || ", each starting with a palette entry in braces from
+font/palette.txt:
+
+    U+E654 {red} O 5,10 3.9,3.9 || {clear} P@0.6 3.4,8.4 6.6,11.6
 """
 import math
 import os
@@ -26,6 +32,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STROKES = os.path.join(ROOT, "font", "strokes.txt")
 SYMBOLS = os.path.join(ROOT, "font", "symbols.txt")
 MASKS = os.path.join(ROOT, "font", "code-masks.txt")
+ICONS = os.path.join(ROOT, "font", "icons.txt")
+PALETTE = os.path.join(ROOT, "font", "palette.txt")
 
 
 def _xy(tok):
@@ -83,6 +91,55 @@ def parse(path=STROKES):
     return glyphs
 
 
+def palette(path=PALETTE):
+    """The palette: {name: (entry, dark, light)}, colours as (r, g, b) in 0..255,
+    None for entries 0 (the cell's foreground) and 1 (clear)."""
+    out = {}
+    with open(path) as fh:
+        for raw in fh:
+            tok = raw.split()
+            if not tok or tok[0].startswith("#"):
+                continue
+            n, name, cols = int(tok[0]), tok[1], tok[2:]
+            if n != len(out) or name in out:
+                raise ValueError(f"palette entry {n} {name!r} is out of order or repeated")
+            if (n < 2) != (not cols) or (n < 2 and name != ("fg", "clear")[n]) or (cols and len(cols) != 2):
+                raise ValueError(f"palette entry {n} {name!r}: 0 is fg and 1 clear, with no colour; "
+                                 "the rest have a dark and a light colour")
+            rgb = [tuple(int(c[i:i + 2], 16) for i in (1, 3, 5)) for c in cols]
+            out[name] = (n, *rgb) if rgb else (n, None, None)
+    return out
+
+
+def parse_layers(path=ICONS, pal=None):
+    """Read a file of colour glyphs: {ch: [(entry name, shapes), ...]}, back to front."""
+    pal = palette() if pal is None else pal
+    glyphs = {}
+    with open(path, encoding="utf-8") as fh:
+        for raw in fh:
+            line = raw.rstrip("\n")
+            if line.startswith("#") or not line.strip():
+                continue
+            head, _, rest = line.partition(" ")
+            ch = chr(int(head[2:], 16))
+            layers = []
+            for part in (p.strip() for p in rest.split(" || ")):
+                if not part.startswith("{") or "}" not in part:
+                    raise ValueError(f"layer {part[:20]!r} of U+{ord(ch):04X} does not start with {{entry}}")
+                name, _, body = part[1:].partition("}")
+                if name not in pal:
+                    raise ValueError(f"U+{ord(ch):04X} uses {name!r}, which is not in the palette")
+                shapes = []
+                for sh in (q.strip() for q in body.split("|")):
+                    if sh:
+                        shapes += _shapes(sh, ch)
+                layers.append((name, shapes))
+            if ch in glyphs:
+                raise ValueError(f"duplicate U+{ord(ch):04X} in {path}")
+            glyphs[ch] = layers
+    return glyphs
+
+
 def masks(path=MASKS):
     with open(path) as fh:
         out = [int(line, 16) for line in fh if line.startswith("0x")]
@@ -95,3 +152,6 @@ if __name__ == "__main__":
     for path in (STROKES, SYMBOLS):
         g = parse(path)
         print(os.path.basename(path), len(g), "characters, most shapes", max(len(s) for s in g.values()))
+    g = parse_layers()
+    print("icons.txt", len(g), "characters, most layers", max(len(v) for v in g.values()),
+          "palette", len(palette()), "entries")

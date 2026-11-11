@@ -1,0 +1,15 @@
+# Neuronte palette for colour glyphs. Written for this project.
+# Each line: the entry number, its name, then its colour on a dark
+# background and on a light one, as #RRGGBB. Entries 0 and 1 have no
+# colour of their own: 0 is the cell's foreground colour, given by the
+# caller, and 1 is clear, which takes away the layers below it so the cell's
+# background shows. Glyphs name entries in braces in font/icons.txt.
+0 fg
+1 clear
+2 red #F2555A #C42B2B
+3 amber #F5A623 #B86E00
+4 yellow #F8D44C #A07F00
+5 green #45C27E #1D8048
+6 blue #5BA8F5 #1D5FC0
+7 purple #B48CF2 #6B3FB8
+8 grey #9AA3B2 #5C6573

@@ -31,6 +31,9 @@ UI24 = weights/neuronte-ui24-v0
 UI26 = weights/neuronte-ui26-v0
 UI28 = weights/neuronte-ui28-v0
 UI30 = weights/neuronte-ui30-v0
+# The icon net: a colour net, form A, a version 3 file by itself. It is not
+# in the bundle; neuronte-split-v4 stays the default font.
+ICON = weights/neuronte-icon-v0
 OBJS = build/neuronte.o build/utf8.o
 TOOLS = build/neuronte-render build/neuronte-bench
 TESTS = build/test_utf8 build/test_api
@@ -75,7 +78,7 @@ $(DEMOS): build/%: demo/%.c demo/common.h build/demo-common.o build/libneuronte.
 		build/libneuronte.a $(LDLIBS) -lz
 
 # Rebuild the packed weights from the JSON the trainers write.
-pack: $(ASCII).json $(FULL).json $(NETS) $(GATE) $(UI10).json $(UI11).json $(UI12).json $(UI14).json $(UI16).json $(UI18).json $(UI20).json $(UI22).json $(UI24).json $(UI26).json $(UI28).json $(UI30).json
+pack: $(ASCII).json $(FULL).json $(NETS) $(GATE) $(UI10).json $(UI11).json $(UI12).json $(UI14).json $(UI16).json $(UI18).json $(UI20).json $(UI22).json $(UI24).json $(UI26).json $(UI28).json $(UI30).json $(ICON).json
 	$(PYTHON) train/pack.py $(ASCII).json $(ASCII).nrt
 	$(PYTHON) train/pack.py $(FULL).json $(FULL).nrt
 	$(PYTHON) train/pack.py --bundle $(SPLIT) $(NETS) --gate $(GATE)
@@ -91,9 +94,8 @@ pack: $(ASCII).json $(FULL).json $(NETS) $(GATE) $(UI10).json $(UI11).json $(UI1
 	$(PYTHON) train/pack.py --drawing $(UI26).nrt $(UI26).json font/ui-26.txt
 	$(PYTHON) train/pack.py --drawing $(UI28).nrt $(UI28).json font/ui-28.txt
 	$(PYTHON) train/pack.py --drawing $(UI30).nrt $(UI30).json font/ui-30.txt
+	$(PYTHON) train/pack.py $(ICON).json $(ICON).nrt
 	cd weights && sha256sum *.json *.nrt > SHA256SUMS
-	# A colour file is packed the same way: python3 train/pack.py colour.json colour.nrt
-	# make test builds a small synthetic one under build/. No icon net is trained here.
 
 test: all $(TESTS)
 	cd weights && sha256sum -c --quiet SHA256SUMS
@@ -108,6 +110,8 @@ test: all $(TESTS)
 	$(PYTHON) tests/colour_fixture.py build/colour-fixture.nrt
 	./build/test_api build/colour-fixture.nrt --colour
 	$(PYTHON) tests/check_reference.py build/libneuronte.so build/colour-fixture.json build/colour-fixture.nrt
+	./build/test_api $(ICON).nrt --colour --trained
+	$(PYTHON) tests/check_reference.py build/libneuronte.so $(ICON).json $(ICON).nrt
 	$(PYTHON) tests/check_advances.py build/libneuronte.so $(ASCII).json
 	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI10).nrt $(UI10).json font/ui-10.txt
 	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI11).nrt $(UI11).json font/ui-11.txt

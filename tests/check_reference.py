@@ -344,7 +344,11 @@ if len(nets) == 1 and nets[0].colour:
         if lib.neuronte_palette(handle, theme, rgb) != 0 or bytes(rgb) != info[side]:
             print(f"FAIL {side} palette")
             failed = True
-    icons = strokes.parse_layers()
+    # The drawing and palette the weights name: font/icons.txt, or another
+    # colour drawing such as the Kilix flame.
+    drawing_path, palette_path = (os.path.join(pack.ROOT, rel) for rel in pack.colour_sources(net.doc))
+    pal = strokes.palette(palette_path)
+    icons = strokes.parse_layers(drawing_path, pal)
     saw_edge = False
     for scalar, rec in info["records"]:
         probed = snap_mod.probe(icons[chr(scalar)])
@@ -365,7 +369,6 @@ if len(nets) == 1 and nets[0].colour:
     if not saw_edge:
         print("FAIL the edge table has no edge to round-trip")
         failed = True
-    pal = strokes.palette()
     for scalar in net.records:
         drawn = icons[chr(scalar)]
         want = [pal[drawn[i][0]][0] if i < len(drawn) else 0 for i in range(K)]
@@ -435,19 +438,22 @@ if len(nets) == 1 and nets[0].colour:
                         print(f"FAIL U+{scalar:04X} {cw}px theme {theme} snap {snapping}: "
                               f"pixels differ by {max(channels)} levels")
                         failed = True
-    if lib.neuronte_set_snap(handle, 0) != 0:
-        print("FAIL set_snap(0) for the grid-aligned icon")
-        failed = True
-    else:
-        off, _ = c_masks(0xF04C, 16, 32, 2)
-        if lib.neuronte_set_snap(handle, 17) != 0:
-            print("FAIL set_snap(17) for the grid-aligned icon")
+    # U+F04C, the paused icon, sits on whole pixels at 16 px. A drawing
+    # without it, such as the flame, skips this check.
+    if 0xF04C in net.records:
+        if lib.neuronte_set_snap(handle, 0) != 0:
+            print("FAIL set_snap(0) for the grid-aligned icon")
             failed = True
         else:
-            on, _ = c_masks(0xF04C, 16, 32, 2)
-            if off is None or on is None or off.tobytes() != on.tobytes():
-                print("FAIL a grid-aligned icon changed at 16 px with snapping on")
+            off, _ = c_masks(0xF04C, 16, 32, 2)
+            if lib.neuronte_set_snap(handle, 17) != 0:
+                print("FAIL set_snap(17) for the grid-aligned icon")
                 failed = True
+            else:
+                on, _ = c_masks(0xF04C, 16, 32, 2)
+                if off is None or on is None or off.tobytes() != on.tobytes():
+                    print("FAIL a grid-aligned icon changed at 16 px with snapping on")
+                    failed = True
 if face_em:
     import glyphs  # noqa: E402
     em, drawn = face_em, 0

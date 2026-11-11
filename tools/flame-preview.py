@@ -7,7 +7,6 @@ there are no trained weights. All labels use the project's own ui-10 face.
 MIT licence. See LICENSE.
 """
 import argparse
-import json
 from pathlib import Path
 import sys
 
@@ -20,26 +19,22 @@ import glyphs  # noqa: E402
 import strokes  # noqa: E402
 
 SAMPLES = 8
+SCALAR = 0x100000  # the scalar the flame's net is trained and drawn at
 BACKGROUNDS = {"dark": (17, 21, 28), "light": (250, 250, 247)}
 
 
 def drawing():
-    path = ROOT / "font" / "flame.json"
-    doc = json.loads(path.read_text())
-    if doc["form"] != "A" or doc["design_cell"] != [10, 20]:
-        raise ValueError("the flame must be form A on the 10 by 20 design cell")
-    if doc["square_crop"] != [0, 5, 10, 15]:
-        raise ValueError("the flame occupies the middle square of the cell")
-    pal = strokes.palette(path.parent / doc["palette"])
-    layers = []
-    for layer in doc["layers"]:
-        name = layer["entry"]
-        points = np.asarray(layer["polygon"], dtype=np.float64)
-        if points.ndim != 2 or points.shape[1] != 2 or len(points) < 3 or not np.isfinite(points).all():
-            raise ValueError(f"{name}: a polygon needs at least three finite points")
+    pal = strokes.palette(ROOT / "font" / "flame-palette.txt")
+    glyphs_ = strokes.parse_layers(ROOT / "font" / "flame.txt", pal)
+    if list(glyphs_) != [chr(SCALAR)]:
+        raise ValueError(f"font/flame.txt draws one glyph, U+{SCALAR:X}")
+    layers = glyphs_[chr(SCALAR)]
+    for name, shapes in layers:
+        if any(kind != "poly" for kind, *_ in shapes):
+            raise ValueError(f"{name}: the flame's layers are filled polygons")
+        points = np.concatenate([np.asarray(pts, dtype=np.float64) for _, pts in shapes]) * 10
         if (points < [0, 5]).any() or (points > [10, 15]).any():
             raise ValueError(f"{name}: polygon is outside the square crop")
-        layers.append((name, [("poly", (points / 10).tolist())]))
     if [name for name, _ in layers] != ["red", "yellow", "white"]:
         raise ValueError("the flame has three layers: red, yellow, white, back to front")
     if any(pal[name][0] < 2 or pal[name][1] != pal[name][2] for name, _ in layers):

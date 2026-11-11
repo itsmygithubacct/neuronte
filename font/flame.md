@@ -2,9 +2,11 @@
 
 The in-house Start-button flame is drawn as one named colour glyph with
 three flat layers, back to front: red outer flame, yellow middle, white
-core. [flame.json](flame.json) is the drawing source for form A, with one
-distance field per layer. It has no assigned Unicode scalar and stays
-separate from the widget icon batch. It is drawing data, not a weight file.
+core. [flame.txt](flame.txt) is the drawing source for form A, one filled
+polygon per layer, in the syntax of `icons.txt`. No Unicode code point is
+assigned to the mark; its net is trained and drawn at U+100000, the first
+scalar of Supplementary Private Use Area-B, which no Nerd Font uses. It
+stays separate from the widget icon batch.
 
 The teacher is `_flame` in `kilix-desktops/kilix-95/icons.py`. The three
 polygons retain its vertices and its red, yellow and white fills. The
@@ -15,13 +17,13 @@ no cutouts or strokes.
 The teacher uses a 16 by 16 grid, with polygon vertices centred on logical
 pixels. A vertex `(x, y)` becomes `(0.625 * (x + 0.5), 5 + 0.625 * (y + 0.5))`
 on Neuronte's 10 by 20 design grid. The drawing occupies the middle square,
-`[0, 5, 10, 15]`. Divide its coordinates by 10 to obtain the shapes used by
+`[0, 5, 10, 15]`. `strokes.parse_layers()` reads it as the shapes used by
 `glyphs.signed_distance()` and `glyphs.field()`.
 
 The same polygons are sampled independently at 16 pixels for Start and at
 32 pixels for desktop use. These are smooth polygon targets; the 32-pixel
-image is not an enlargement of the 16-pixel bitmap. To render this crop from
-a future net, evaluate an `s` by `2*s` cell and take rows `s/2` through
+image is not an enlargement of the 16-pixel bitmap. To draw the mark from
+its net, evaluate an `s` by `2*s` cell and take rows `s/2` through
 `3*s/2 - 1`. Evaluating the whole cell at `s` by `s` would compress the mark
 vertically.
 
@@ -55,7 +57,15 @@ yellow and white pixels at both sizes, unchanged outer alpha when the
 inner layers are added, transparent exterior pixels, and identical colours
 in both themes. Sheet labels use only the project's `ui-10.txt` pixel face.
 
-These files are the original drawing and its previews. No network was
-trained, no installed application PNG was replaced, and no desktop code
-was changed. Runtime scalar assignment and training belong to the later
-drawing-net integration. MIT licence; see the repository's LICENSE.
+Train its net with the colour trainer, three layers, on this drawing and
+palette, with the printable ASCII and U+FFFD as blanks so that any other
+scalar draws nothing:
+
+```sh
+python3 train/colour.py OUT.json --form A --layers 3 --drawing font/flame.txt \
+    --palette font/flame-palette.txt --blank U+0020..U+007E,U+FFFD
+```
+
+These files are the original drawing and its previews. No installed
+application PNG was replaced, and no desktop code was changed. MIT
+licence; see the repository's LICENSE.

@@ -1,4 +1,4 @@
-"""Train a colour glyph net on the layered icons: the experiment between two forms.
+"""Train a colour glyph net on the icons: the drawn ones and those made by rule.
 
 usage: python3 train/colour.py OUT.json --form A|B [--layers K] [--width W]
                                [--steps N] [--device cuda] [--seed S]
@@ -15,7 +15,8 @@ Both carry the palette head: from the 64 code features to each layer's
 palette entry, as 5 bits a layer. It runs once per glyph, so it is not
 part of the per-pixel cost.
 
-Writes the weights as JSON and prints one JSON line of scores:
+Writes the weights as JSON, for form A in the format train/pack.py packs
+(neuronte-colour-weights, version 1), and prints one JSON line of scores:
 - each used layer's IoU at 12, 16 and 32 px, as glyphs are scored, with
   2 x 2 samples below 24 px and 1 above, as the library draws;
 - any unused layer that draws a pixel;
@@ -243,9 +244,10 @@ def layers_of(seq, names):
             for name, l in zip(names, lin)}
 
 
+# Form A is the form train/pack.py packs. Form B stays the experiment's file.
 doc = {
-    "format": "neuronte-colour-weights-experimental",
-    "version": 0,
+    "format": "neuronte-colour-weights" if a.form == "A" else "neuronte-colour-weights-experimental",
+    "version": 1 if a.form == "A" else 0,
     "shape": {"form": a.form, "glyph_layers": K, "position_octaves": OCT, "code_bits": 64, "hidden_width": W,
               "hidden_layers": 3, "tau": TAU, "parity_masks": [f"0x{m:06X}" for m in MASKS],
               "entry_bits": ENTRY_BITS, "head_width": a.head_width},

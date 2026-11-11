@@ -27,6 +27,7 @@ import sys
 import numpy as np
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "train"))
+import glyphs  # noqa: E402
 import pack  # noqa: E402
 import snap  # noqa: E402
 import strokes  # noqa: E402
@@ -344,7 +345,7 @@ if len(nets) == 1 and nets[0].colour:
         if lib.neuronte_palette(handle, theme, rgb) != 0 or bytes(rgb) != info[side]:
             print(f"FAIL {side} palette")
             failed = True
-    icons = strokes.parse_layers()
+    icons = glyphs.colour_icons()
     saw_edge = False
     for scalar, rec in info["records"]:
         probed = snap_mod.probe(icons[chr(scalar)])
@@ -372,7 +373,9 @@ if len(nets) == 1 and nets[0].colour:
         if net.entries_of(scalar) != want:
             print(f"FAIL U+{scalar:04X} head returns {net.entries_of(scalar)}, drawings say {want}")
             failed = True
-    if net.entries_of(0x41) != [0] * K:
+    # Only a hand-built head, as tests/colour_fixture.py writes with steps 0,
+    # is made to return entry 0 for a scalar it was not labelled with.
+    if net.doc["training"].get("steps") == 0 and net.entries_of(0x41) != [0] * K:
         print(f"FAIL an unlabelled scalar returned {net.entries_of(0x41)}")
         failed = True
 
@@ -449,7 +452,6 @@ if len(nets) == 1 and nets[0].colour:
                 print("FAIL a grid-aligned icon changed at 16 px with snapping on")
                 failed = True
 if face_em:
-    import glyphs  # noqa: E402
     em, drawn = face_em, 0
     lib.neuronte_set_binary.argtypes = [ctypes.c_void_p, ctypes.c_int]
     lib.neuronte_draw_text.argtypes = ([ctypes.c_void_p, ctypes.c_void_p] + [ctypes.c_int] * 7

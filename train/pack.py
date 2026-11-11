@@ -102,8 +102,9 @@ One edge record per labelled glyph, sorted by scalar. A record is the
 scalar as u32, then K layer blocks. A block is an x-edge count and a
 y-edge count as u16, then that many x edges and that many y edges. An
 edge is an f32 position in design-cell widths and a u32 side, 1 for
-rising and 0 for falling. The edges come from font/icons.txt, and the
-packer refuses the file when that drawing's sha256 is not the one in
+rising and 0 for falling. The edges come from font/icons.txt and from the
+powerline and progress glyphs train/glyphs.py makes by rule, and the
+packer refuses the file when either file's sha256 is not the one in
 training.sources_sha256.
 
 An advance table, version 4. An advance is stored in steps of a tenth of
@@ -141,6 +142,7 @@ import sys
 
 import numpy as np
 
+import glyphs
 import snap
 import strokes
 
@@ -301,12 +303,15 @@ def _layer_arrays(doc, group, name, rows, cols, path):
 
 def edge_records(doc, path, k):
     """One record per labelled glyph, sorted by scalar, padded out to K layers."""
-    icons = strokes.parse_layers()
+    icons = glyphs.colour_icons()
+    ruled = set(glyphs.ruled_codepoints())
     recs = []
     for s in sorted(labelled_scalars(doc, path)):
         ch = chr(s)
         if ch not in icons:
-            raise SystemExit(f"{path}: U+{s:04X} is labelled and is not in font/icons.txt")
+            raise SystemExit(f"{path}: U+{s:04X} is labelled and is neither in font/icons.txt nor made by rule")
+        if s in ruled and "train/glyphs.py" not in doc["training"]["sources_sha256"]:
+            raise SystemExit(f"{path}: U+{s:04X} is made by rule and training.sources_sha256 has no train/glyphs.py")
         drawn = icons[ch]
         if len(drawn) > k:
             raise SystemExit(f"{path}: U+{s:04X} has {len(drawn)} layers and K is {k}")

@@ -10,7 +10,8 @@ The same buffer can be shown in a Kilix terminal or in a GUI window. The
 library does not open the window or take the terminal.
 
 Status: local only. No remote. There are three weight files for the one
-library, and twelve for the desktop face. Scalars a file was not trained on get a mark of their own, not
+library, and thirteen for the desktop face: twelve for single ems from
+10 to 30 pixels, and one for every em above 32. Scalars a file was not trained on get a mark of their own, not
 a letter.
 
 | Weights | Use | Characters | Hidden width | Parameters | File |
@@ -23,6 +24,7 @@ a letter.
 | `neuronte-ui16-v0`, `neuronte-ui18-v0`, `neuronte-ui22-v0`, `neuronte-ui26-v0` | the desktop face at an em of 16, 18, 22 and 26 pixels | printable ASCII and the ellipsis, 96, with their advances | 192 | 91,777 | 368,144 bytes each |
 | `neuronte-ui20-v0` | the desktop face at an em of 20 pixels | printable ASCII and the ellipsis, 96, with their advances | 160 | 66,241 | 266,000 bytes |
 | `neuronte-ui24-v0`, `neuronte-ui28-v0`, `neuronte-ui30-v0` | the desktop face at an em of 24, 28 and 30 pixels | printable ASCII and the ellipsis, 96, with their advances | 384 | 331,009 | 1,325,072 bytes each |
+| `neuronte-ui-large-v0` | the desktop face at every em from 33 pixels up, drawn blended | printable ASCII and the ellipsis, 96, with their advances | 384 | 331,009 | 1,325,072 bytes |
 
 `neuronte-split` draws each character with one small net picked for it.
 It draws ASCII, symbols, blocks and the mosaics four to seven times
@@ -75,6 +77,7 @@ a letter and a mark, such as ß æ œ ð þ ø ł đ ħ ŋ ĳ, are drawn in
 | `font/marks.txt` | The diacritic marks, keyed by their combining code points |
 | `font/letters.txt` | The Latin letters beyond ASCII that are not a letter plus a mark, and the Greek and Russian Cyrillic letters. The Greek and Cyrillic are not yet in any weights |
 | `font/ui-10.txt` to `font/ui-32.txt` | A proportional face for small binary desktop text, printable ASCII and the ellipsis, drawn as pixels once for each em: 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30 and 32 pixels, each character with its advance in pixels. Written for this project. `train/train.py --set ui10` and so on train one net each, and score it pixel by pixel at its size. `train/pack.py --advances` packs a file's advances, bold one pixel more. The nets so far are `neuronte-ui10-v0` through `neuronte-ui30-v0` |
+| `font/ui-large.txt`, `font/ui-large-advances.txt` | The same face above 32 pixels: the first-pass strokes the pixel faces were fitted to, drawn once for every em with a pen 3/32 em wide, the 32 px drawing's three-pixel stem, and blended. The advances are the 32 px drawing's in em, bold 0.2 more. `train/train.py --set uilarge` trains the net and scores it by overlap at 32, 48, 64 and 96 pixels. The net is `neuronte-ui-large-v0` |
 | `font/icons.txt` | The icons, as colour layers back to front, each naming a palette entry. Not yet in any weights |
 | `font/palette.txt` | The palette for colour glyphs: entry 0 is the cell's foreground, 1 is clear, the rest have a dark-theme and a light-theme colour |
 | `font/code-masks.txt` | The 43 parity masks that turn a scalar into the net's 64 character inputs |
@@ -137,7 +140,13 @@ inner loops twice, plain and AVX2, and picks one by CPU when it loads.
 - each desktop-face file draws every one of its characters, regular and
   bold, as exactly the pixels in its drawing, `font/ui-10.txt` through
   `font/ui-30.txt`, through `neuronte_draw_text()` with
-  `neuronte_set_binary()` on.
+  `neuronte_set_binary()` on;
+- `neuronte-ui-large-v0`, which has no pixels to compare, holds the
+  advances `font/ui-large-advances.txt` gives, regular and bold, and
+  measures them in pixels as the packer does from 33 to 128 pixels;
+  its net agrees with numpy at cells up to 96 pixels, and its letters
+  drawn blended by `neuronte_draw_text()` at 36, 48 and 64 pixels,
+  regular and bold, are the numpy coverage composited the same way.
 
 For `neuronte-full` and `neuronte-split` it also checks that box lines
 reach the cell edges, that █ fills its cell and ▀ the top half, that

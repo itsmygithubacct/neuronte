@@ -1,7 +1,8 @@
 /* Loader refusals, drawing, clipping, blending and bundles. MIT licence.
- * usage: test_api WEIGHTS.nrt [--full] [--accent]
- * --full adds checks of box drawing, blocks and Braille, and --accent of
- * accented letters, for weights trained on them. Given a one-net file, it also checks the loader's
+ * usage: test_api WEIGHTS.nrt [--full] [--accent] [--pixel]
+ * --full adds checks of box drawing, blocks and Braille, --accent of
+ * accented letters, and --pixel of the sextants and octants, for weights
+ * trained on them. Given a one-net file, it also checks the loader's
  * refusals by damaging that file, and builds bundles from it to check the
  * router. Given a bundle, it checks the drawing only. */
 #define _POSIX_C_SOURCE 200809L
@@ -396,6 +397,110 @@ static void accent_checks(neuronte *n)
     }
 }
 
+/* The 26 octant patterns Unicode encodes outside U+1CD00..U+1CDE5, and
+ * their characters: space, 17 block elements and 8 substitutes. Bit n - 1
+ * is cell n of the lattice 1 2 / 3 4 / 5 6 / 7 8. */
+static const uint32_t elsewhere[26][2] = {
+    {0, 0x20},      {255, 0x2588},   {15, 0x2580},    {240, 0x2584},   {85, 0x258C},
+    {170, 0x2590},  {192, 0x2582},   {252, 0x2586},   {80, 0x2596},    {160, 0x2597},
+    {5, 0x2598},    {245, 0x2599},   {165, 0x259A},   {95, 0x259B},    {175, 0x259C},
+    {10, 0x259D},   {90, 0x259E},    {250, 0x259F},   {3, 0x1FB82},    {63, 0x1FB85},
+    {20, 0x1FBE6},  {40, 0x1FBE7},   {128, 0x1CEA0},  {64, 0x1CEA3},   {1, 0x1CEA8},
+    {2, 0x1CEAB}};
+
+/* The character for an octant pattern. An octant's code point is its
+ * pattern's rank among the 230 patterns not encoded elsewhere;
+ * train/mosaics.py checks that against Unicode's data. */
+static uint32_t octant_char(int bits)
+{
+    int i, b, rank = 0;
+    for (i = 0; i < 26; i++)
+        if ((int)elsewhere[i][0] == bits)
+            return elsewhere[i][1];
+    for (b = 0; b < bits; b++) {
+        int other = 0;
+        for (i = 0; i < 26; i++)
+            other |= (int)elsewhere[i][0] == b;
+        rank += !other;
+    }
+    return 0x1CD00 + (uint32_t)rank;
+}
+
+/* Each sub-cell of a 2-column lattice of `rows` rows, at 16 x 32 with
+ * 2 x 2 samples, is inked (mean above 0.9) when its bit is set and clear
+ * (below 0.1) when not, leaving out the pixels within one pixel of an inner
+ * boundary. A full column also inks the cell's top and bottom rows, so
+ * cells stacked in a column show no gap. */
+static void lattice_check(neuronte *n, uint32_t s, int bits, int rows)
+{
+    enum { W = 16, H = 32 };
+    float c[W * H];
+    int r, k, x, y;
+
+    neuronte_coverage(n, s, W, H, 2, c);
+    for (r = 0; r < rows; r++)
+        for (k = 0; k < 2; k++) {
+            float top = (float)H * r / rows, bot = (float)H * (r + 1) / rows, sum = 0, mean;
+            int count = 0, set = bits >> (2 * r + k) & 1;
+            for (y = 0; y < H; y++) {
+                float cy = y + 0.5f;
+                if (cy < top || cy >= bot || (r > 0 && cy - top < 1.0f) || (r < rows - 1 && bot - cy < 1.0f))
+                    continue;
+                for (x = k * W / 2; x < (k + 1) * W / 2; x++)
+                    if (fabsf(x + 0.5f - W / 2.0f) >= 1.0f) {
+                        sum += c[y * W + x];
+                        count++;
+                    }
+            }
+            mean = sum / (float)count;
+            if (set ? mean < 0.9f : mean > 0.1f)
+                FAIL("U+%04X sub-cell %d has mean coverage %.3f", (unsigned)s, 2 * r + k + 1, mean);
+        }
+    for (k = 0; k < 2; k++) {
+        int full = 1;
+        for (r = 0; r < rows; r++)
+            full &= bits >> (2 * r + k) & 1;
+        if (full)
+            for (x = k * W / 2; x < (k + 1) * W / 2; x++)
+                if (fabsf(x + 0.5f - W / 2.0f) >= 1.0f && (c[x] < 0.9f || c[(H - 1) * W + x] < 0.9f)) {
+                    FAIL("U+%04X column %d does not reach the top and bottom", (unsigned)s, k + 1);
+                    break;
+                }
+    }
+}
+
+static void pixel_checks(neuronte *n)
+{
+    float c[8], worst = 0;
+    int k, bits, i, wrong = 0;
+
+    /* Sextants: U+1FB00 + k is pattern k + 1, skipping 21 and 42, the
+     * left and right half blocks. */
+    for (k = 0; k < 60; k++) {
+        int p = k + 1;
+        p += p >= 21;
+        p += p >= 42;
+        lattice_check(n, 0x1FB00 + (uint32_t)k, p, 3);
+    }
+    /* Every octant pattern, the block elements and substitutes among them. */
+    for (bits = 1; bits < 256; bits++)
+        lattice_check(n, octant_char(bits), bits, 4);
+
+    /* At a 2 x 4 cell each sub-cell is one pixel. Video at that size shows
+     * a frame exactly only if every pixel is on the right side of 0.5. */
+    for (bits = 1; bits < 256; bits++) {
+        neuronte_coverage(n, octant_char(bits), 2, 4, 0, c);
+        for (i = 0; i < 8; i++) {
+            float want = (float)(bits >> i & 1), d = fabsf(c[i] - want);
+            wrong += d >= 0.5f;
+            worst = d > worst ? d : worst;
+        }
+    }
+    if (wrong || worst > 0.25f)
+        FAIL("at 2 x 4, %d of 2040 octant pixels are wrong; the largest distance from 0 or 1 is %.3f",
+             wrong, worst);
+}
+
 int main(int argc, char **argv)
 {
     unsigned char *data, *copy;
@@ -404,18 +509,20 @@ int main(int argc, char **argv)
     enum { CW = 16, CH = 32, BW = 64, BH = 48 };
     float cov[CW * CH], cov2[CW * CH];
     uint32_t buf[BW * BH], ref[BW * BH];
-    int i, rc, bundled, full = 0, accent = 0;
+    int i, rc, bundled, full = 0, accent = 0, pixel = 0;
 
     for (i = 2; i < argc; i++) {
         if (strcmp(argv[i], "--full") == 0)
             full = 1;
         else if (strcmp(argv[i], "--accent") == 0)
             accent = 1;
+        else if (strcmp(argv[i], "--pixel") == 0)
+            pixel = 1;
         else
             argc = 0;
     }
     if (argc < 2) {
-        fprintf(stderr, "usage: %s WEIGHTS.nrt [--full] [--accent]\n", argv[0]);
+        fprintf(stderr, "usage: %s WEIGHTS.nrt [--full] [--accent] [--pixel]\n", argv[0]);
         return 2;
     }
     data = slurp(argv[1], &len);
@@ -637,6 +744,8 @@ drawing:
         full_checks(n);
     if (accent)
         accent_checks(n);
+    if (pixel)
+        pixel_checks(n);
     if (!bundled)
         bundle_checks(data, len);
 

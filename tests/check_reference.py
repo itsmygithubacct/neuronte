@@ -120,13 +120,16 @@ if rc != 0:
     raise SystemExit(f"neuronte_open_file returned {rc}")
 
 scalars = [0x20, 0x41, 0x67, 0x40, 0x7E, 0x30, 0xE9, 0x2500, 0x256C, 0x2588, 0x2592, 0x28FF,
-           0x25C6, 0x4E2D, 0xFFFD, 0x10FFFF, 0xD800]
+           0x25C6, 0x4E2D, 0xFFFD, 0x10FFFF, 0xD800,
+           # sextants, octants and two of the octant substitutes
+           0x1FB00, 0x1FB3B, 0x1CD00, 0x1CD74, 0x1CDE5, 0x1CEA0, 0x1FBE6]
 # A few from each range of the table, its ends among them.
 for first, last, _ in table[::max(1, len(table) // 12)]:
     scalars += [first, last]
 scalars = list(dict.fromkeys(scalars))
 routes = 0
-for s in scalars + list(range(0, 0x3000, 7)):
+# The two Symbols for Legacy Computing blocks, which hold the mosaics.
+for s in scalars + list(range(0, 0x3000, 7)) + list(range(0x1CC00, 0x1CEC0, 3)) + list(range(0x1FB00, 0x1FC00, 3)):
     want, got = route(s), lib.neuronte_route(handle, s)
     routes += 1
     if want != got:

@@ -154,6 +154,7 @@ struct neuronte {
     int snap_below; /* snap a colour glyph when cell_w is below this; 0 is off */
     int snap_file;  /* the number -1 restores */
     int layers;     /* the largest K in the file, at least 1 */
+    int binary;     /* distance-net draw calls cut coverage at one half */
     uint8_t dark[96], light[96];
     unsigned long tick;
     struct entry cache[SETS][WAYS];
@@ -1076,6 +1077,14 @@ int neuronte_palette(const neuronte *n, int theme, uint8_t *rgb)
     return NEURONTE_OK;
 }
 
+int neuronte_set_binary(neuronte *n, int on)
+{
+    if (!n || on < 0 || on > 1)
+        return NEURONTE_ERR_ARG;
+    n->binary = on;
+    return NEURONTE_OK;
+}
+
 static uint32_t normalize(uint32_t s)
 {
     return (s > 0x10FFFF || (s >= 0xD800 && s <= 0xDFFF)) ? NEURONTE_REPLACEMENT : s;
@@ -1765,7 +1774,10 @@ int neuronte_draw_scalar(neuronte *n, uint32_t *pixels, int stride, int width, i
     if (!net->col) {
         for (py = y < 0 ? -y : 0; py < cell_h && y + py < height; py++)
             for (px = x < 0 ? -x : 0; px < cell_w && x + px < width; px++) {
-                float a = cell->cov[(size_t)py * cell_w + px] * alpha;
+                float c = cell->cov[(size_t)py * cell_w + px], a;
+                if (n->binary)
+                    c = c > 0.5f ? 1.0f : 0.0f;
+                a = c * alpha;
                 if (a > 0.0f) {
                     uint32_t *d = pixels + (size_t)(y + py) * stride + (x + px);
                     *d = blend(*d, color, a);
@@ -1871,6 +1883,57 @@ int neuronte_text_width(const neuronte *n, const char *text, size_t len, int bol
         if (px > INT_MAX - total)
             return NEURONTE_ERR_ARG;
         total += px;
+    }
+    return total;
+}
+
+int neuronte_draw_text(neuronte *n, uint32_t *pixels, int stride, int width, int height,
+                       int x, int y, int em_px, int bold, const char *text, size_t len,
+                       uint32_t color)
+{
+    float alpha = (float)(color >> 24) / 255.0f;
+    int cw = em_px, ch = 2 * em_px, total, ss, px, py;
+    size_t off = 0;
+
+    if (!n || !n->nets || !pixels || width < 0 || height < 0 || stride < width || em_px <= 0 ||
+        em_px > NEURONTE_MAX_CELL / 2)
+        return NEURONTE_ERR_ARG;
+    total = neuronte_text_width(n, text, len, bold, em_px);
+    if (total < 0 || alpha <= 0.0f)
+        return total;
+    ss = n->samples ? n->samples : auto_samples(cw);
+    while (off < len) {
+        const struct advance *a;
+        const struct entry *cell;
+        const float *cov;
+        uint32_t s;
+        int rc = NEURONTE_OK;
+
+        off += neuronte_utf8_decode(text + off, len - off, &s);
+        a = advance_of(n, s);
+        /* One column more for bold, whose second strike is a pixel right. */
+        if (x < width && y < height && x + cw + bold > 0 && y + ch > 0) {
+            cell = cached(n, a->scalar, cw, ch, ss, &rc);
+            if (!cell)
+                return rc;
+            if (n->net[route(n, a->scalar)]->col)
+                return NEURONTE_ERR_ARG;
+            cov = cell->cov;
+            for (py = y < 0 ? -y : 0; py < ch && y + py < height; py++)
+                for (px = x < 0 ? -x : 0; px < cw + bold && x + px < width; px++) {
+                    const float *row = cov + (size_t)py * cw;
+                    float c = px < cw ? row[px] : 0.0f;
+                    if (bold && px > 0 && row[px - 1] > c)
+                        c = row[px - 1];
+                    if (n->binary)
+                        c = c > 0.5f ? 1.0f : 0.0f;
+                    if (c * alpha > 0.0f) {
+                        uint32_t *d = pixels + (size_t)(y + py) * stride + (x + px);
+                        *d = blend(*d, color, c * alpha);
+                    }
+                }
+        }
+        x += (a->steps[bold] * em_px + 50) / 100;
     }
     return total;
 }

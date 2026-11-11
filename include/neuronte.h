@@ -104,6 +104,13 @@ int neuronte_set_snap(neuronte *n, int below_px);
  * 1 is clear. A file with no colour net copies zeros. */
 int neuronte_palette(const neuronte *n, int theme, uint8_t *rgb);
 
+/* Binary letters for the distance-net draw calls: with on = 1, a pixel
+ * more than half covered is drawn fully in the colour and any other is
+ * left alone, so no edge is blended. 0, the default, blends by coverage.
+ * A colour glyph is not cut; it is still composited by coverage.
+ * neuronte_coverage() is not changed by it. */
+int neuronte_set_binary(neuronte *n, int on);
+
 /* Coverage of one character's cell, cell_w * cell_h floats in 0..1,
  * row-major. samples_per_axis 0 is automatic as above. A surrogate or a
  * value above U+10FFFF is drawn as U+FFFD. The cell is the net's 1 x 2
@@ -167,6 +174,21 @@ int neuronte_advance(const neuronte *n, uint32_t scalar, int bold, int em_px);
 /* The width of UTF-8 text in pixels: each character's pixel advance,
  * rounded by itself, summed. Ill-formed bytes measure as U+FFFD does. */
 int neuronte_text_width(const neuronte *n, const char *text, size_t len, int bold, int em_px);
+
+/* Draw UTF-8 text in a proportional face, for a handle with a net and an
+ * advance table. Each character's cell is em_px wide and twice that
+ * high, with its top-left corner at the pen, which starts at (x, y) and
+ * moves by the character's pixel advance. Cells overlap where an advance
+ * is less than an em. A character with no advance is drawn as the
+ * table's fallback scalar. Bold is the regular letter struck twice, the
+ * second time one pixel to the right: each pixel takes the greater of
+ * the two coverages, before neuronte_set_binary()'s cut if that is on.
+ * Pixels outside the buffer are skipped. Returns how
+ * far the pen moved, which is neuronte_text_width() of the same text,
+ * or an error. */
+int neuronte_draw_text(neuronte *n, uint32_t *pixels, int stride, int width, int height,
+                       int x, int y, int em_px, int bold, const char *text, size_t len,
+                       uint32_t color);
 
 #ifdef __cplusplus
 }

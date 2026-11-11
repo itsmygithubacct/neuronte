@@ -1024,6 +1024,144 @@ static void expect_file(const char *name, const unsigned char *data, size_t len,
         unlink(path);
 }
 
+/* neuronte_draw_text on a handle with a net and the advances of
+ * advance_checks: space 10 and 30 steps, A 45 and 50, B 55 and 64,
+ * ? 100 and 150, ~ 200 and 200. */
+static void draw_text_checks(neuronte *n)
+{
+    enum { W = 96, H = 30, EM = 11 };
+    static const char text[] = "AB?~ \xc3\xa9" "A"; /* e with acute has no advance: drawn as ? */
+    static const uint32_t drawn[] = {'A', 'B', '?', '~', ' ', '?', 'A'};
+    uint32_t got[W * H], want[W * H], color = 0xC0FF8040u;
+    int bold, x0 = 3, y0 = 2, rc;
+    size_t i;
+
+    for (bold = 0; bold < 2; bold++) {
+        int pen = x0, px, py;
+        for (i = 0; i < W * H; i++)
+            got[i] = want[i] = 0xFF102030u;
+        for (i = 0; i < sizeof drawn / sizeof *drawn; i++)
+            pen += neuronte_advance(n, i == 5 ? 0xE9 : drawn[i], bold, EM);
+        rc = neuronte_draw_text(n, got, W, W, H, x0, y0, EM, bold, text, sizeof text - 1, color);
+        if (rc != neuronte_text_width(n, text, sizeof text - 1, bold, EM) || rc != pen - x0)
+            FAIL("draw_text weight %d returned %d, want %d", bold, rc, pen - x0);
+        /* Regular is exactly the one-cell call at each pen position. */
+        if (!bold) {
+            pen = x0;
+            for (i = 0; i < sizeof drawn / sizeof *drawn; i++) {
+                neuronte_draw_scalar(n, want, W, W, H, pen, y0, EM, 2 * EM, drawn[i], color);
+                pen += neuronte_advance(n, drawn[i], 0, EM);
+            }
+            if (memcmp(got, want, sizeof got) != 0)
+                FAIL("draw_text: regular text is not its cells drawn at the pen positions");
+        } else {
+            /* Bold: every pixel regular inks is inked, so is the pixel to
+             * its right, and nothing left of the first pen is touched. */
+            uint32_t reg[W * H];
+            int bad = 0;
+            for (i = 0; i < W * H; i++)
+                reg[i] = 0xFF102030u;
+            pen = x0;
+            for (i = 0; i < sizeof drawn / sizeof *drawn; i++) {
+                neuronte_draw_scalar(n, reg, W, W, H, pen, y0, EM, 2 * EM, drawn[i], color);
+                pen += neuronte_advance(n, i == 5 ? 0xE9 : drawn[i], 1, EM);
+            }
+            for (py = 0; py < H; py++)
+                for (px = 0; px < W - 1; px++)
+                    if (reg[py * W + px] != 0xFF102030u &&
+                        (got[py * W + px] == 0xFF102030u || got[py * W + px + 1] == 0xFF102030u))
+                        bad++;
+            for (py = 0; py < H; py++)
+                for (px = 0; px < x0; px++)
+                    if (got[py * W + px] != 0xFF102030u)
+                        bad++;
+            if (bad)
+                FAIL("draw_text: bold is not the letter struck twice (%d pixels)", bad);
+        }
+    }
+    /* Clipped on every side, the part inside is the same pixels. */
+    {
+        uint32_t whole[W * H], part[W * H];
+        int px, py, bad = 0;
+        for (i = 0; i < W * H; i++)
+            whole[i] = part[i] = 0;
+        neuronte_draw_text(n, whole, W, W, H, 3, 2, EM, 1, "AB?", 3, 0xFFFFFFFFu);
+        rc = neuronte_draw_text(n, part + 5 * W + 8, W, 12, 9, 3 - 8, 2 - 5, EM, 1, "AB?", 3, 0xFFFFFFFFu);
+        for (py = 0; py < H; py++)
+            for (px = 0; px < W; px++) {
+                int in = px >= 8 && px < 20 && py >= 5 && py < 14;
+                if (part[py * W + px] != (in ? whole[py * W + px] : 0))
+                    bad++;
+            }
+        if (bad || rc != neuronte_text_width(n, "AB?", 3, 1, EM))
+            FAIL("draw_text: clipping changed %d pixels, or the width", bad);
+    }
+    /* Binary: a pixel is the colour where coverage is more than half, and
+     * untouched elsewhere; bold is the two strikes' pixels together. */
+    {
+        uint32_t one[W * H], two[W * H], bg = 0xFF102030u, fg = 0xFFE0D0C0u;
+        float cov[EM * 2 * EM];
+        int px, py, bad = 0, on = 0;
+        for (i = 0; i < W * H; i++)
+            one[i] = two[i] = got[i] = bg;
+        if (neuronte_set_binary(n, 2) != NEURONTE_ERR_ARG || neuronte_set_binary(n, -1) != NEURONTE_ERR_ARG ||
+            neuronte_set_binary(NULL, 1) != NEURONTE_ERR_ARG || neuronte_set_binary(n, 1) != NEURONTE_OK)
+            FAIL("set_binary argument checks");
+        neuronte_coverage(n, 'B', EM, 2 * EM, 0, cov);
+        neuronte_draw_scalar(n, one, W, W, H, 4, 3, EM, 2 * EM, 'B', fg);
+        neuronte_draw_text(n, two, W, W, H, 4, 3, EM, 0, "B", 1, fg);
+        neuronte_draw_text(n, got, W, W, H, 4, 3, EM, 1, "B", 1, fg);
+        for (py = 0; py < H; py++)
+            for (px = 0; px < W; px++) {
+                int cx = px - 4, cy = py - 3, in = cx >= 0 && cx < EM && cy >= 0 && cy < 2 * EM;
+                int ink = in && cov[cy * EM + cx] > 0.5f;
+                int left = cx >= 1 && cx <= EM && cy >= 0 && cy < 2 * EM && cov[cy * EM + cx - 1] > 0.5f;
+                on += ink;
+                if (one[py * W + px] != (ink ? fg : bg) || two[py * W + px] != one[py * W + px] ||
+                    got[py * W + px] != (ink || left ? fg : bg))
+                    bad++;
+            }
+        if (bad || on == 0)
+            FAIL("binary drawing: %d pixels are not the coverage cut at one half (%d inked)", bad, on);
+        /* A half-clear colour is blended once, at full coverage or not at all. */
+        for (i = 0; i < W * H; i++)
+            one[i] = bg;
+        neuronte_draw_scalar(n, one, W, W, H, 4, 3, EM, 2 * EM, 'B', 0x80FFFFFFu);
+        bad = 0;
+        {
+            uint32_t seen = 0;
+            for (i = 0; i < W * H; i++)
+                if (one[i] != bg) {
+                    if (!seen)
+                        seen = one[i];
+                    if (one[i] != seen)
+                        bad++;
+                }
+            if (bad || !seen)
+                FAIL("binary drawing with a half-clear colour is not one blended colour");
+        }
+        if (neuronte_set_binary(n, 0) != NEURONTE_OK)
+            FAIL("set_binary off");
+        for (i = 0; i < W * H; i++)
+            one[i] = bg;
+        neuronte_draw_scalar(n, one, W, W, H, 4, 3, EM, 2 * EM, 'B', fg);
+        for (i = 0, on = 0; i < W * H; i++)
+            on += one[i] != bg && one[i] != fg;
+        if (on == 0)
+            FAIL("with binary off, no edge pixel is blended");
+    }
+    if (neuronte_draw_text(n, got, W, W, H, 0, 0, EM, 2, "A", 1, color) != NEURONTE_ERR_ARG ||
+        neuronte_draw_text(n, got, W, W, H, 0, 0, 0, 0, "A", 1, color) != NEURONTE_ERR_ARG ||
+        neuronte_draw_text(n, got, W, W, H, 0, 0, NEURONTE_MAX_CELL / 2 + 1, 0, "A", 1, color) != NEURONTE_ERR_ARG ||
+        neuronte_draw_text(n, NULL, W, W, H, 0, 0, EM, 0, "A", 1, color) != NEURONTE_ERR_ARG ||
+        neuronte_draw_text(n, got, W - 1, W, H, 0, 0, EM, 0, "A", 1, color) != NEURONTE_ERR_ARG ||
+        neuronte_draw_text(n, got, W, W, H, 0, 0, EM, 0, NULL, 1, color) != NEURONTE_ERR_ARG ||
+        neuronte_draw_text(NULL, got, W, W, H, 0, 0, EM, 0, "A", 1, color) != NEURONTE_ERR_ARG ||
+        neuronte_draw_text(n, got, W, W, H, 0, 0, EM, 0, "", 0, color) != 0 ||
+        neuronte_draw_text(n, got, W, W, H, 0, 0, EM, 0, "AB", 2, 0x00FFFFFFu) != neuronte_text_width(n, "AB", 2, 0, EM))
+        FAIL("draw_text argument checks");
+}
+
 /* The advance table, version 4, and the drawing file, version 5. net is a
  * version 1 image, or NULL when the weights under test are a bundle. */
 static void advance_checks(const unsigned char *net, size_t netlen)
@@ -1085,7 +1223,8 @@ static void advance_checks(const unsigned char *net, size_t netlen)
     /* A table by itself measures and cannot draw. */
     if (neuronte_route(n, 'A') != NEURONTE_ERR_ARG || neuronte_coverage(n, 'A', 1, 2, 1, one) != NEURONTE_ERR_ARG ||
         neuronte_draw_scalar(n, pix, 1, 1, 2, 0, 0, 1, 2, 'A', 0xFFFFFFFFu) != NEURONTE_ERR_ARG ||
-        neuronte_draw_utf8(n, pix, 1, 1, 2, 0, 0, 1, 2, "A", 1, 0xFFFFFFFFu) != NEURONTE_ERR_ARG || pix[0] || pix[1])
+        neuronte_draw_utf8(n, pix, 1, 1, 2, 0, 0, 1, 2, "A", 1, 0xFFFFFFFFu) != NEURONTE_ERR_ARG ||
+        neuronte_draw_text(n, pix, 1, 1, 2, 0, 0, 1, 0, "A", 1, 0xFFFFFFFFu) != NEURONTE_ERR_ARG || pix[0] || pix[1])
         FAIL("a table with no net let a draw call through");
     neuronte_close(n);
     expect_file("example table from a file", example, sizeof example, NEURONTE_OK);
@@ -1248,6 +1387,7 @@ static void advance_checks(const unsigned char *net, size_t netlen)
                 FAIL("drawing file: A is not what its net draws");
             if (neuronte_advance(n, 'A', 0, 10) != 5 || neuronte_advance(n, 'A', 1, 11) != 6)
                 FAIL("drawing file: advance of A");
+            draw_text_checks(n);
         }
         neuronte_close(n);
         neuronte_close(lone);
@@ -1262,7 +1402,8 @@ static void advance_checks(const unsigned char *net, size_t netlen)
         d = drawing(member, mlen, 1, &dlen);
         if (neuronte_open(d, dlen, &n) != NEURONTE_OK || neuronte_advances(n) != 0 ||
             neuronte_advance(n, 'A', 0, 10) != NEURONTE_ERR_ARG ||
-            neuronte_text_width(n, "A", 1, 0, 10) != NEURONTE_ERR_ARG)
+            neuronte_text_width(n, "A", 1, 0, 10) != NEURONTE_ERR_ARG ||
+            neuronte_draw_text(n, pix, 1, 1, 2, 0, 0, 1, 0, "A", 1, 0xFFFFFFFFu) != NEURONTE_ERR_ARG)
             FAIL("drawing file of one net: has advances");
         neuronte_close(n);
         free(d);

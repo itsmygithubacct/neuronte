@@ -7,7 +7,8 @@ Writes an advances file, packs it by itself and in a drawing file with
 the net, and opens both through the library. The steps the library reads
 must be the ones written, its pixels must be pack.pixels(), and a line of
 text must measure as the sum of its characters. The packer must also
-refuse what the library would refuse.
+refuse what the library would refuse. Then the desktop face in
+font/ui-10.txt and font/ui-11.txt is checked. Needs numpy.
 """
 import ctypes
 import os
@@ -185,6 +186,47 @@ with tempfile.TemporaryDirectory() as tmp:
     if r.returncode == 0 or "Traceback" in r.stderr:
         fail("the packer did not refuse a net one byte short")
 
-print(f"check_advances: {len(want)} characters, a table and two drawing files")
+# The desktop face, drawn as pixels once for each em: both files hold
+# printable ASCII and the ellipsis, each packs, the library steps each
+# character its pixels at that em and bold one more, no drawing is wider
+# than its step, and the pen strokes the trainer makes of a drawing, cut at one
+# half covered, are that drawing's pixels with none of them close to half.
+import numpy as np  # noqa: E402
+import glyphs  # noqa: E402
+
+for em in (10, 11):
+    name = f"font/ui-{em}.txt"
+    face = glyphs.pixel_face(em)
+    steps, rows = pack.read_face(os.path.join(ROOT, name))
+    if rows != em or set(map(ord, face)) != set(steps) or set(steps) != set(range(0x20, 0x7F)) | {0x2026}:
+        fail(f"{name} is not printable ASCII and U+2026 at an em of {em}")
+        continue
+    image = pack.advances(steps)
+    h = ctypes.c_void_p()
+    if len(image) != 800 or lib.neuronte_open(image, len(image), ctypes.byref(h)) != 0:
+        fail(f"{name} does not pack to 800 bytes the library opens")
+        continue
+    ss = 8
+    xs, ys = (np.arange(em * ss) + 0.5) / (em * ss), (np.arange(2 * em * ss) + 0.5) / (em * ss)
+    P = np.stack([a.ravel() for a in np.meshgrid(xs, ys)], 1)
+    for ch, (adv, art) in sorted(face.items()):
+        ink = np.array([[c == "#" for c in r] for r in art])
+        for bold in (0, 1):
+            if lib.neuronte_advance(h, ord(ch), bold, em) != adv + bold:
+                fail(f"{name}: U+{ord(ch):04X} weight {bold} does not step {adv + bold} pixels")
+        if ink.shape[1] > adv:
+            fail(f"{name}: U+{ord(ch):04X} steps {adv} pixels, which is less than its drawing is wide")
+        want_px = np.zeros((2 * em, em), bool)
+        want_px[glyphs.UI_TOP:glyphs.UI_TOP + em, :ink.shape[1]] = ink
+        shapes = glyphs.traced(art, em)
+        cov = np.zeros((2 * em, em))
+        if shapes:
+            inside = glyphs.signed_distance(shapes, P, glyphs.PENS[f"ui{em}"]) > 0
+            cov = inside.reshape(2 * em, ss, em, ss).mean((1, 3))
+        if (cov[want_px] < 0.85).any() or (cov[~want_px] > 0.3).any():
+            fail(f"{name}: the strokes for U+{ord(ch):04X} are not firmly its pixels")
+    lib.neuronte_close(h)
+
+print(f"check_advances: {len(want)} characters, a table and two drawing files; the desktop face at 10 and 11 px")
 print("check_advances: FAILED" if failed else "check_advances: passed")
 sys.exit(1 if failed else 0)

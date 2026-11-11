@@ -16,8 +16,8 @@ for the same nets in the same order) or, with no gate, to net I (0).
 The third packs an advance table for a proportional face, and the fourth
 a drawing file, whose members are kept in the order given. A member is
 weights JSON, packed as a version 1 net; a colour JSON, packed as a
-version 3 net; an advances file, packed as a table; or a file already
-packed, version 1, 3 or 4, copied whole.
+version 3 net; an advances file or a pixel face, packed as a table; or
+a file already packed, version 1, 3 or 4, copied whole.
 
 An advances file has one character per line, as the stroke files do: the
 character (or U+XXXX), a space, then its regular and its bold advance in
@@ -31,6 +31,12 @@ A line with one number takes the bold advance as that number plus
 1.0 to 20.0. Lines starting "# " are comments. The fallback character,
 which a character with no line is measured and drawn as, must have a
 line.
+
+ADVANCES.txt may instead be a pixel face, such as font/ui-10.txt: a
+face drawn as rows of pixels for one em, each character's line giving
+its advance in pixels. The table then holds, for each character, steps
+that come to that many pixels at that em, and to one pixel more for
+bold. --bold-add is not used.
 
 One distance net, version 1, all little-endian:
 
@@ -574,6 +580,49 @@ def read_advances(path, bold_add=None):
     return out
 
 
+def read_face(path):
+    """({scalar: (regular, bold)} in steps, em) from a pixel face, or None
+    if the file is not one. A pixel face has a character line, a
+    character or U+XXXX and its advance in pixels, then em rows of . and
+    #. The steps come to that advance at that em, and bold to one more."""
+    with open(path, encoding="utf-8") as fh:
+        lines = [(n, l.rstrip("\n")) for n, l in enumerate(fh, 1)]
+    lines = [(n, l) for n, l in lines if l and l != "#" and not l.startswith("# ")]
+    if len(lines) < 2 or " " in lines[1][1] or set(lines[1][1]) - set(".#"):
+        return None
+    blocks = []
+    for n, l in lines:
+        if " " in l:
+            blocks.append((n, l, []))
+        elif not blocks or set(l) - set(".#"):
+            raise SystemExit(f"{path}:{n}: a row is . and #, after a character line")
+        else:
+            blocks[-1][2].append(l)
+    em, out = len(blocks[0][2]), {}
+    for n, l, rows in blocks:
+        where = f"{path}:{n}"
+        head, _, px = l.partition(" ")
+        v = _scalar(head, where) if head.startswith("U+") else ord(head) if len(head) == 1 else None
+        if v is None or not px.isdigit():
+            raise SystemExit(f"{where}: a character line is a character or U+XXXX, a space, and its advance in pixels")
+        if v in out:
+            raise SystemExit(f"{where}: U+{v:04X} has a block already")
+        if len(rows) != em or len({len(r) for r in rows}) != 1:
+            raise SystemExit(f"{where}: U+{v:04X} is not {em} rows of one length")
+        steps = tuple((100 * p + em // 2) // em for p in (int(px), int(px) + 1))
+        if not 1 <= int(px) <= em or [pixels(s, em) for s in steps] != [int(px), int(px) + 1]:
+            raise SystemExit(f"{where}: an advance is 1 to {em} pixels")
+        out[v] = steps
+    return out, em
+
+
+def read_table(path, bold_add=None):
+    """{scalar: (regular, bold)} in steps, from an advances file or a
+    pixel face."""
+    face = read_face(path)
+    return face[0] if face else read_advances(path, bold_add)
+
+
 def advances(table, fallback=0x3F):
     """The version 4 image of {scalar: (regular, bold)}, in steps."""
     if not 1 <= len(table) <= ADV_RECORDS:
@@ -612,8 +661,11 @@ def member(path, fallback=0x3F, bold_add=None):
             raise SystemExit(f"{path}: a version {version} file cannot be a member of a drawing file")
         return version, raw
     if raw.lstrip()[:1] == b"{":
-        return 1, pack(path)
-    return 4, advances(read_advances(path, bold_add), fallback)
+        image = pack(path)
+        if len(image) < 12 or image[:8] != b"NEURONTE":
+            raise SystemExit(f"{path}: pack did not make a Neuronte file")
+        return struct.unpack_from("<I", image, 8)[0], image
+    return 4, advances(read_table(path, bold_add), fallback)
 
 
 def drawing(paths, fallback=0x3F, bold_add=None):
@@ -666,7 +718,7 @@ if __name__ == "__main__":
         rest, fallback, bold_add = _options(args[1:])
         if len(rest) != 2:
             raise SystemExit(__doc__)
-        table = read_advances(rest[0], bold_add)
+        table = read_table(rest[0], bold_add)
         data, out = advances(table, fallback), rest[1]
         print(out, len(data), "bytes,", len(table), f"advances, fallback U+{fallback:04X}")
     elif args[:1] == ["--drawing"]:

@@ -32,6 +32,7 @@ import torch
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import glyphs  # noqa: E402
 import strokes  # noqa: E402
+import checkpoint  # noqa: E402
 
 p = argparse.ArgumentParser()
 p.add_argument("out")
@@ -47,6 +48,7 @@ p.add_argument("--tau", type=float, default=0.15, help="distance normalization i
 p.add_argument("--score-sizes", help="comma-separated cell widths; default: the historical size inventory")
 p.add_argument("--scores-out", help="write scores including every character's overlap counts")
 p.add_argument("--log-every", type=int, default=1000)
+checkpoint.arguments(p)
 a = p.parse_args()
 if a.steps < 1 or a.tau <= 0 or not math.isfinite(a.tau):
     p.error("steps and finite tau must be positive")
@@ -62,7 +64,7 @@ def sha(rel):
 
 
 # Taken now, so the record names the files the targets were made from.
-SOURCES = {f: sha(f) for f in glyphs.sources(a.set) + ["train/train.py", "font/code-masks.txt"]}
+SOURCES = {f: sha(f) for f in glyphs.sources(a.set) + ["train/train.py", "train/checkpoint.py", "font/code-masks.txt"]}
 TAU, OCT, W, N = a.tau, 6, a.width, a.grid
 SET = glyphs.charset(a.set)
 CHARS = [c for c, _, _ in SET]
@@ -114,8 +116,12 @@ gi = torch.arange(G)
 CF = code(LAB)
 opt = torch.optim.Adam(net.parameters(), lr=2e-3)
 sched = torch.optim.lr_scheduler.CosineAnnealingLR(opt, a.steps)
+MODELS = {"net": net}
+IDENTITY = checkpoint.identity(a, SOURCES)
+first_step, last_metrics = checkpoint.restore(a.resume, MODELS, opt, sched, IDENTITY, a.device) if a.resume else (0, {})
+loss = torch.tensor(last_metrics.get("loss", float("nan")))
 started = time.monotonic()
-for step in range(a.steps):
+for step in range(first_step, a.steps):
     cand = torch.rand(G, 1024, 2) * SPAN
     tc = target(gi, cand)
     near = tc.abs().topk(128, dim=1, largest=False).indices  # the candidates nearest an edge
@@ -139,6 +145,7 @@ for step in range(a.steps):
     loss.backward()
     opt.step()
     sched.step()
+    checkpoint.tick(a, step + 1, MODELS, opt, sched, IDENTITY, {"loss": loss})
     if a.log_every and (step + 1) % a.log_every == 0:
         print(f"step={step+1} loss={float(loss.detach()):.7f} seconds={time.monotonic()-started:.1f}",
               file=sys.stderr, flush=True)

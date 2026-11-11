@@ -1,0 +1,1806 @@
+{
+  "version": 1,
+  "cell_columns": 2,
+  "glyphs": [
+    {
+      "scalar": "U+2139",
+      "name": "INFORMATION SOURCE",
+      "category": "objects",
+      "layers": 2
+    },
+    {
+      "scalar": "U+2196",
+      "name": "NORTH WEST ARROW",
+      "category": "controls",
+      "layers": 1
+    },
+    {
+      "scalar": "U+2197",
+      "name": "NORTH EAST ARROW",
+      "category": "controls",
+      "layers": 1
+    },
+    {
+      "scalar": "U+2198",
+      "name": "SOUTH EAST ARROW",
+      "category": "controls",
+      "layers": 1
+    },
+    {
+      "scalar": "U+2199",
+      "name": "SOUTH WEST ARROW",
+      "category": "controls",
+      "layers": 1
+    },
+    {
+      "scalar": "U+2328",
+      "name": "KEYBOARD",
+      "category": "objects",
+      "layers": 2
+    },
+    {
+      "scalar": "U+23CF",
+      "name": "EJECT SYMBOL",
+      "category": "controls",
+      "layers": 1
+    },
+    {
+      "scalar": "U+23F8",
+      "name": "DOUBLE VERTICAL BAR",
+      "category": "objects",
+      "layers": 1
+    },
+    {
+      "scalar": "U+23F9",
+      "name": "BLACK SQUARE FOR STOP",
+      "category": "controls",
+      "layers": 1
+    },
+    {
+      "scalar": "U+23FA",
+      "name": "BLACK CIRCLE FOR RECORD",
+      "category": "controls",
+      "layers": 1
+    },
+    {
+      "scalar": "U+25B6",
+      "name": "BLACK RIGHT-POINTING TRIANGLE",
+      "category": "controls",
+      "layers": 1
+    },
+    {
+      "scalar": "U+25C0",
+      "name": "BLACK LEFT-POINTING TRIANGLE",
+      "category": "controls",
+      "layers": 1
+    },
+    {
+      "scalar": "U+2601",
+      "name": "CLOUD",
+      "category": "objects",
+      "layers": 1
+    },
+    {
+      "scalar": "U+267B",
+      "name": "BLACK UNIVERSAL RECYCLING SYMBOL",
+      "category": "objects",
+      "layers": 1
+    },
+    {
+      "scalar": "U+2699",
+      "name": "GEAR",
+      "category": "objects",
+      "layers": 2
+    },
+    {
+      "scalar": "U+26A0",
+      "name": "WARNING SIGN",
+      "category": "objects",
+      "layers": 2
+    },
+    {
+      "scalar": "U+26A1",
+      "name": "HIGH VOLTAGE SIGN",
+      "category": "objects",
+      "layers": 1
+    },
+    {
+      "scalar": "U+26AA",
+      "name": "MEDIUM WHITE CIRCLE",
+      "category": "shapes",
+      "layers": 1
+    },
+    {
+      "scalar": "U+26AB",
+      "name": "MEDIUM BLACK CIRCLE",
+      "category": "shapes",
+      "layers": 1
+    },
+    {
+      "scalar": "U+2705",
+      "name": "WHITE HEAVY CHECK MARK",
+      "category": "objects",
+      "layers": 1
+    },
+    {
+      "scalar": "U+2709",
+      "name": "ENVELOPE",
+      "category": "objects",
+      "layers": 2
+    },
+    {
+      "scalar": "U+270A",
+      "name": "RAISED FIST",
+      "category": "hands",
+      "layers": 2
+    },
+    {
+      "scalar": "U+270B",
+      "name": "RAISED HAND",
+      "category": "hands",
+      "layers": 2
+    },
+    {
+      "scalar": "U+270C",
+      "name": "VICTORY HAND",
+      "category": "hands",
+      "layers": 2
+    },
+    {
+      "scalar": "U+270D",
+      "name": "WRITING HAND",
+      "category": "hands",
+      "layers": 3
+    },
+    {
+      "scalar": "U+2716",
+      "name": "HEAVY MULTIPLICATION X",
+      "category": "controls",
+      "layers": 1
+    },
+    {
+      "scalar": "U+2734",
+      "name": "EIGHT POINTED BLACK STAR",
+      "category": "controls",
+      "layers": 1
+    },
+    {
+      "scalar": "U+274C",
+      "name": "CROSS MARK",
+      "category": "objects",
+      "layers": 1
+    },
+    {
+      "scalar": "U+2753",
+      "name": "BLACK QUESTION MARK ORNAMENT",
+      "category": "controls",
+      "layers": 1
+    },
+    {
+      "scalar": "U+2757",
+      "name": "HEAVY EXCLAMATION MARK SYMBOL",
+      "category": "controls",
+      "layers": 1
+    },
+    {
+      "scalar": "U+2764",
+      "name": "HEAVY BLACK HEART",
+      "category": "hearts",
+      "layers": 1
+    },
+    {
+      "scalar": "U+2795",
+      "name": "HEAVY PLUS SIGN",
+      "category": "controls",
+      "layers": 1
+    },
+    {
+      "scalar": "U+2796",
+      "name": "HEAVY MINUS SIGN",
+      "category": "controls",
+      "layers": 1
+    },
+    {
+      "scalar": "U+2797",
+      "name": "HEAVY DIVISION SIGN",
+      "category": "controls",
+      "layers": 1
+    },
+    {
+      "scalar": "U+27A1",
+      "name": "BLACK RIGHTWARDS ARROW",
+      "category": "controls",
+      "layers": 1
+    },
+    {
+      "scalar": "U+2B05",
+      "name": "LEFTWARDS BLACK ARROW",
+      "category": "controls",
+      "layers": 1
+    },
+    {
+      "scalar": "U+2B06",
+      "name": "UPWARDS BLACK ARROW",
+      "category": "controls",
+      "layers": 1
+    },
+    {
+      "scalar": "U+2B07",
+      "name": "DOWNWARDS BLACK ARROW",
+      "category": "controls",
+      "layers": 1
+    },
+    {
+      "scalar": "U+2B1B",
+      "name": "BLACK LARGE SQUARE",
+      "category": "shapes",
+      "layers": 1
+    },
+    {
+      "scalar": "U+2B1C",
+      "name": "WHITE LARGE SQUARE",
+      "category": "shapes",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F310",
+      "name": "GLOBE WITH MERIDIANS",
+      "category": "objects",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F321",
+      "name": "THERMOMETER",
+      "category": "objects",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F381",
+      "name": "WRAPPED PRESENT",
+      "category": "objects",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F3A4",
+      "name": "MICROPHONE",
+      "category": "objects",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F3A7",
+      "name": "HEADPHONE",
+      "category": "objects",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F3AF",
+      "name": "DIRECT HIT",
+      "category": "objects",
+      "layers": 4
+    },
+    {
+      "scalar": "U+1F3B5",
+      "name": "MUSICAL NOTE",
+      "category": "objects",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F3B6",
+      "name": "MULTIPLE MUSICAL NOTES",
+      "category": "objects",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F3C1",
+      "name": "CHEQUERED FLAG",
+      "category": "objects",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F3C6",
+      "name": "TROPHY",
+      "category": "objects",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F3E0",
+      "name": "HOUSE BUILDING",
+      "category": "objects",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F3F7",
+      "name": "LABEL",
+      "category": "objects",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F41B",
+      "name": "BUG",
+      "category": "objects",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F446",
+      "name": "WHITE UP POINTING BACKHAND INDEX",
+      "category": "hands",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F447",
+      "name": "WHITE DOWN POINTING BACKHAND INDEX",
+      "category": "hands",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F448",
+      "name": "WHITE LEFT POINTING BACKHAND INDEX",
+      "category": "hands",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F449",
+      "name": "WHITE RIGHT POINTING BACKHAND INDEX",
+      "category": "hands",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F44A",
+      "name": "FISTED HAND SIGN",
+      "category": "hands",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F44B",
+      "name": "WAVING HAND SIGN",
+      "category": "hands",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F44C",
+      "name": "OK HAND SIGN",
+      "category": "hands",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F44D",
+      "name": "THUMBS UP SIGN",
+      "category": "hands",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F44E",
+      "name": "THUMBS DOWN SIGN",
+      "category": "hands",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F44F",
+      "name": "CLAPPING HANDS SIGN",
+      "category": "hands",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F450",
+      "name": "OPEN HANDS SIGN",
+      "category": "hands",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F493",
+      "name": "BEATING HEART",
+      "category": "hearts",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F494",
+      "name": "BROKEN HEART",
+      "category": "hearts",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F495",
+      "name": "TWO HEARTS",
+      "category": "hearts",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F496",
+      "name": "SPARKLING HEART",
+      "category": "hearts",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F497",
+      "name": "GROWING HEART",
+      "category": "hearts",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F498",
+      "name": "HEART WITH ARROW",
+      "category": "hearts",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F499",
+      "name": "BLUE HEART",
+      "category": "hearts",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F49A",
+      "name": "GREEN HEART",
+      "category": "hearts",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F49B",
+      "name": "YELLOW HEART",
+      "category": "hearts",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F49C",
+      "name": "PURPLE HEART",
+      "category": "hearts",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F49D",
+      "name": "HEART WITH RIBBON",
+      "category": "hearts",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F49E",
+      "name": "REVOLVING HEARTS",
+      "category": "hearts",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F49F",
+      "name": "HEART DECORATION",
+      "category": "hearts",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F4A1",
+      "name": "ELECTRIC LIGHT BULB",
+      "category": "objects",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F4A7",
+      "name": "DROPLET",
+      "category": "objects",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F4AC",
+      "name": "SPEECH BALLOON",
+      "category": "objects",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F4AF",
+      "name": "HUNDRED POINTS SYMBOL",
+      "category": "objects",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F4B2",
+      "name": "HEAVY DOLLAR SIGN",
+      "category": "objects",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F4B3",
+      "name": "CREDIT CARD",
+      "category": "objects",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F4BB",
+      "name": "PERSONAL COMPUTER",
+      "category": "objects",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F4BE",
+      "name": "FLOPPY DISK",
+      "category": "objects",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F4BF",
+      "name": "OPTICAL DISC",
+      "category": "objects",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F4C0",
+      "name": "DVD",
+      "category": "objects",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F4C1",
+      "name": "FILE FOLDER",
+      "category": "objects",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F4C2",
+      "name": "OPEN FILE FOLDER",
+      "category": "objects",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F4C3",
+      "name": "PAGE WITH CURL",
+      "category": "objects",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F4C4",
+      "name": "PAGE FACING UP",
+      "category": "objects",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F4C5",
+      "name": "CALENDAR",
+      "category": "objects",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F4C6",
+      "name": "TEAR-OFF CALENDAR",
+      "category": "objects",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F4C7",
+      "name": "CARD INDEX",
+      "category": "objects",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F4C8",
+      "name": "CHART WITH UPWARDS TREND",
+      "category": "objects",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F4C9",
+      "name": "CHART WITH DOWNWARDS TREND",
+      "category": "objects",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F4CA",
+      "name": "BAR CHART",
+      "category": "objects",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F4CB",
+      "name": "CLIPBOARD",
+      "category": "objects",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F4CC",
+      "name": "PUSHPIN",
+      "category": "objects",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F4CD",
+      "name": "ROUND PUSHPIN",
+      "category": "objects",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F4CE",
+      "name": "PAPERCLIP",
+      "category": "objects",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F4D5",
+      "name": "CLOSED BOOK",
+      "category": "objects",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F4D7",
+      "name": "GREEN BOOK",
+      "category": "objects",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F4D8",
+      "name": "BLUE BOOK",
+      "category": "objects",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F4D9",
+      "name": "ORANGE BOOK",
+      "category": "objects",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F4DA",
+      "name": "BOOKS",
+      "category": "objects",
+      "layers": 4
+    },
+    {
+      "scalar": "U+1F4DD",
+      "name": "MEMO",
+      "category": "objects",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F4E0",
+      "name": "FAX MACHINE",
+      "category": "objects",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F4E4",
+      "name": "OUTBOX TRAY",
+      "category": "objects",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F4E5",
+      "name": "INBOX TRAY",
+      "category": "objects",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F4E6",
+      "name": "PACKAGE",
+      "category": "objects",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F4E7",
+      "name": "E-MAIL SYMBOL",
+      "category": "objects",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F4E8",
+      "name": "INCOMING ENVELOPE",
+      "category": "objects",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F4E9",
+      "name": "ENVELOPE WITH DOWNWARDS ARROW ABOVE",
+      "category": "objects",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F4F1",
+      "name": "MOBILE PHONE",
+      "category": "objects",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F4F6",
+      "name": "ANTENNA WITH BARS",
+      "category": "objects",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F4F7",
+      "name": "CAMERA",
+      "category": "objects",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F4F8",
+      "name": "CAMERA WITH FLASH",
+      "category": "objects",
+      "layers": 4
+    },
+    {
+      "scalar": "U+1F4FA",
+      "name": "TELEVISION",
+      "category": "objects",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F50A",
+      "name": "SPEAKER WITH THREE SOUND WAVES",
+      "category": "objects",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F50B",
+      "name": "BATTERY",
+      "category": "objects",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F50C",
+      "name": "ELECTRIC PLUG",
+      "category": "objects",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F50D",
+      "name": "LEFT-POINTING MAGNIFYING GLASS",
+      "category": "objects",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F50E",
+      "name": "RIGHT-POINTING MAGNIFYING GLASS",
+      "category": "objects",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F511",
+      "name": "KEY",
+      "category": "objects",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F512",
+      "name": "LOCK",
+      "category": "objects",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F513",
+      "name": "OPEN LOCK",
+      "category": "objects",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F514",
+      "name": "BELL",
+      "category": "objects",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F516",
+      "name": "BOOKMARK",
+      "category": "objects",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F517",
+      "name": "LINK SYMBOL",
+      "category": "objects",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F525",
+      "name": "FIRE",
+      "category": "objects",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F527",
+      "name": "WRENCH",
+      "category": "objects",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F534",
+      "name": "LARGE RED CIRCLE",
+      "category": "shapes",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F535",
+      "name": "LARGE BLUE CIRCLE",
+      "category": "shapes",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F550",
+      "name": "CLOCK FACE ONE OCLOCK",
+      "category": "clocks",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F551",
+      "name": "CLOCK FACE TWO OCLOCK",
+      "category": "clocks",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F552",
+      "name": "CLOCK FACE THREE OCLOCK",
+      "category": "clocks",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F553",
+      "name": "CLOCK FACE FOUR OCLOCK",
+      "category": "clocks",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F554",
+      "name": "CLOCK FACE FIVE OCLOCK",
+      "category": "clocks",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F555",
+      "name": "CLOCK FACE SIX OCLOCK",
+      "category": "clocks",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F556",
+      "name": "CLOCK FACE SEVEN OCLOCK",
+      "category": "clocks",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F557",
+      "name": "CLOCK FACE EIGHT OCLOCK",
+      "category": "clocks",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F558",
+      "name": "CLOCK FACE NINE OCLOCK",
+      "category": "clocks",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F559",
+      "name": "CLOCK FACE TEN OCLOCK",
+      "category": "clocks",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F55A",
+      "name": "CLOCK FACE ELEVEN OCLOCK",
+      "category": "clocks",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F55B",
+      "name": "CLOCK FACE TWELVE OCLOCK",
+      "category": "clocks",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F55C",
+      "name": "CLOCK FACE ONE-THIRTY",
+      "category": "clocks",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F55D",
+      "name": "CLOCK FACE TWO-THIRTY",
+      "category": "clocks",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F55E",
+      "name": "CLOCK FACE THREE-THIRTY",
+      "category": "clocks",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F55F",
+      "name": "CLOCK FACE FOUR-THIRTY",
+      "category": "clocks",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F560",
+      "name": "CLOCK FACE FIVE-THIRTY",
+      "category": "clocks",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F561",
+      "name": "CLOCK FACE SIX-THIRTY",
+      "category": "clocks",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F562",
+      "name": "CLOCK FACE SEVEN-THIRTY",
+      "category": "clocks",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F563",
+      "name": "CLOCK FACE EIGHT-THIRTY",
+      "category": "clocks",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F564",
+      "name": "CLOCK FACE NINE-THIRTY",
+      "category": "clocks",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F565",
+      "name": "CLOCK FACE TEN-THIRTY",
+      "category": "clocks",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F566",
+      "name": "CLOCK FACE ELEVEN-THIRTY",
+      "category": "clocks",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F567",
+      "name": "CLOCK FACE TWELVE-THIRTY",
+      "category": "clocks",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F590",
+      "name": "RAISED HAND WITH FINGERS SPLAYED",
+      "category": "hands",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F596",
+      "name": "RAISED HAND WITH PART BETWEEN MIDDLE AND RING FINGERS",
+      "category": "hands",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F5A4",
+      "name": "BLACK HEART",
+      "category": "hearts",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F5A5",
+      "name": "DESKTOP COMPUTER",
+      "category": "objects",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F5A8",
+      "name": "PRINTER",
+      "category": "objects",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F5B1",
+      "name": "THREE BUTTON MOUSE",
+      "category": "objects",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F5BC",
+      "name": "FRAME WITH PICTURE",
+      "category": "objects",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F5D1",
+      "name": "WASTEBASKET",
+      "category": "objects",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F600",
+      "name": "GRINNING FACE",
+      "category": "faces",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F601",
+      "name": "GRINNING FACE WITH SMILING EYES",
+      "category": "faces",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F602",
+      "name": "FACE WITH TEARS OF JOY",
+      "category": "faces",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F603",
+      "name": "SMILING FACE WITH OPEN MOUTH",
+      "category": "faces",
+      "layers": 4
+    },
+    {
+      "scalar": "U+1F604",
+      "name": "SMILING FACE WITH OPEN MOUTH AND SMILING EYES",
+      "category": "faces",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F605",
+      "name": "SMILING FACE WITH OPEN MOUTH AND COLD SWEAT",
+      "category": "faces",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F606",
+      "name": "SMILING FACE WITH OPEN MOUTH AND TIGHTLY-CLOSED EYES",
+      "category": "faces",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F607",
+      "name": "SMILING FACE WITH HALO",
+      "category": "faces",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F608",
+      "name": "SMILING FACE WITH HORNS",
+      "category": "faces",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F609",
+      "name": "WINKING FACE",
+      "category": "faces",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F60A",
+      "name": "SMILING FACE WITH SMILING EYES",
+      "category": "faces",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F60B",
+      "name": "FACE SAVOURING DELICIOUS FOOD",
+      "category": "faces",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F60C",
+      "name": "RELIEVED FACE",
+      "category": "faces",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F60D",
+      "name": "SMILING FACE WITH HEART-SHAPED EYES",
+      "category": "faces",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F60E",
+      "name": "SMILING FACE WITH SUNGLASSES",
+      "category": "faces",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F60F",
+      "name": "SMIRKING FACE",
+      "category": "faces",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F610",
+      "name": "NEUTRAL FACE",
+      "category": "faces",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F611",
+      "name": "EXPRESSIONLESS FACE",
+      "category": "faces",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F612",
+      "name": "UNAMUSED FACE",
+      "category": "faces",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F613",
+      "name": "FACE WITH COLD SWEAT",
+      "category": "faces",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F614",
+      "name": "PENSIVE FACE",
+      "category": "faces",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F615",
+      "name": "CONFUSED FACE",
+      "category": "faces",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F616",
+      "name": "CONFOUNDED FACE",
+      "category": "faces",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F617",
+      "name": "KISSING FACE",
+      "category": "faces",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F618",
+      "name": "FACE THROWING A KISS",
+      "category": "faces",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F619",
+      "name": "KISSING FACE WITH SMILING EYES",
+      "category": "faces",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F61A",
+      "name": "KISSING FACE WITH CLOSED EYES",
+      "category": "faces",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F61B",
+      "name": "FACE WITH STUCK-OUT TONGUE",
+      "category": "faces",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F61C",
+      "name": "FACE WITH STUCK-OUT TONGUE AND WINKING EYE",
+      "category": "faces",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F61D",
+      "name": "FACE WITH STUCK-OUT TONGUE AND TIGHTLY-CLOSED EYES",
+      "category": "faces",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F61E",
+      "name": "DISAPPOINTED FACE",
+      "category": "faces",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F61F",
+      "name": "WORRIED FACE",
+      "category": "faces",
+      "layers": 4
+    },
+    {
+      "scalar": "U+1F620",
+      "name": "ANGRY FACE",
+      "category": "faces",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F621",
+      "name": "POUTING FACE",
+      "category": "faces",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F622",
+      "name": "CRYING FACE",
+      "category": "faces",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F623",
+      "name": "PERSEVERING FACE",
+      "category": "faces",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F624",
+      "name": "FACE WITH LOOK OF TRIUMPH",
+      "category": "faces",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F625",
+      "name": "DISAPPOINTED BUT RELIEVED FACE",
+      "category": "faces",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F626",
+      "name": "FROWNING FACE WITH OPEN MOUTH",
+      "category": "faces",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F627",
+      "name": "ANGUISHED FACE",
+      "category": "faces",
+      "layers": 4
+    },
+    {
+      "scalar": "U+1F628",
+      "name": "FEARFUL FACE",
+      "category": "faces",
+      "layers": 4
+    },
+    {
+      "scalar": "U+1F629",
+      "name": "WEARY FACE",
+      "category": "faces",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F62A",
+      "name": "SLEEPY FACE",
+      "category": "faces",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F62B",
+      "name": "TIRED FACE",
+      "category": "faces",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F62C",
+      "name": "GRIMACING FACE",
+      "category": "faces",
+      "layers": 4
+    },
+    {
+      "scalar": "U+1F62D",
+      "name": "LOUDLY CRYING FACE",
+      "category": "faces",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F62E",
+      "name": "FACE WITH OPEN MOUTH",
+      "category": "faces",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F62F",
+      "name": "HUSHED FACE",
+      "category": "faces",
+      "layers": 4
+    },
+    {
+      "scalar": "U+1F630",
+      "name": "FACE WITH OPEN MOUTH AND COLD SWEAT",
+      "category": "faces",
+      "layers": 5
+    },
+    {
+      "scalar": "U+1F631",
+      "name": "FACE SCREAMING IN FEAR",
+      "category": "faces",
+      "layers": 5
+    },
+    {
+      "scalar": "U+1F632",
+      "name": "ASTONISHED FACE",
+      "category": "faces",
+      "layers": 4
+    },
+    {
+      "scalar": "U+1F633",
+      "name": "FLUSHED FACE",
+      "category": "faces",
+      "layers": 5
+    },
+    {
+      "scalar": "U+1F634",
+      "name": "SLEEPING FACE",
+      "category": "faces",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F635",
+      "name": "DIZZY FACE",
+      "category": "faces",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F636",
+      "name": "FACE WITHOUT MOUTH",
+      "category": "faces",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F637",
+      "name": "FACE WITH MEDICAL MASK",
+      "category": "faces",
+      "layers": 4
+    },
+    {
+      "scalar": "U+1F638",
+      "name": "GRINNING CAT FACE WITH SMILING EYES",
+      "category": "faces",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F639",
+      "name": "CAT FACE WITH TEARS OF JOY",
+      "category": "faces",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F63A",
+      "name": "SMILING CAT FACE WITH OPEN MOUTH",
+      "category": "faces",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F63B",
+      "name": "SMILING CAT FACE WITH HEART-SHAPED EYES",
+      "category": "faces",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F63C",
+      "name": "CAT FACE WITH WRY SMILE",
+      "category": "faces",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F63D",
+      "name": "KISSING CAT FACE WITH CLOSED EYES",
+      "category": "faces",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F63E",
+      "name": "POUTING CAT FACE",
+      "category": "faces",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F63F",
+      "name": "CRYING CAT FACE",
+      "category": "faces",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F640",
+      "name": "WEARY CAT FACE",
+      "category": "faces",
+      "layers": 4
+    },
+    {
+      "scalar": "U+1F641",
+      "name": "SLIGHTLY FROWNING FACE",
+      "category": "faces",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F642",
+      "name": "SLIGHTLY SMILING FACE",
+      "category": "faces",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F643",
+      "name": "UPSIDE-DOWN FACE",
+      "category": "faces",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F644",
+      "name": "FACE WITH ROLLING EYES",
+      "category": "faces",
+      "layers": 4
+    },
+    {
+      "scalar": "U+1F64C",
+      "name": "PERSON RAISING BOTH HANDS IN CELEBRATION",
+      "category": "hands",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F64F",
+      "name": "PERSON WITH FOLDED HANDS",
+      "category": "hands",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F680",
+      "name": "ROCKET",
+      "category": "objects",
+      "layers": 4
+    },
+    {
+      "scalar": "U+1F6A9",
+      "name": "TRIANGULAR FLAG ON POST",
+      "category": "objects",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F6AB",
+      "name": "NO ENTRY SIGN",
+      "category": "objects",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F6E1",
+      "name": "SHIELD",
+      "category": "objects",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F7E0",
+      "name": "LARGE ORANGE CIRCLE",
+      "category": "shapes",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F7E1",
+      "name": "LARGE YELLOW CIRCLE",
+      "category": "shapes",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F7E2",
+      "name": "LARGE GREEN CIRCLE",
+      "category": "shapes",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F7E3",
+      "name": "LARGE PURPLE CIRCLE",
+      "category": "shapes",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F7E4",
+      "name": "LARGE BROWN CIRCLE",
+      "category": "shapes",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F7E5",
+      "name": "LARGE RED SQUARE",
+      "category": "shapes",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F7E6",
+      "name": "LARGE BLUE SQUARE",
+      "category": "shapes",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F7E7",
+      "name": "LARGE ORANGE SQUARE",
+      "category": "shapes",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F7E8",
+      "name": "LARGE YELLOW SQUARE",
+      "category": "shapes",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F7E9",
+      "name": "LARGE GREEN SQUARE",
+      "category": "shapes",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F7EA",
+      "name": "LARGE PURPLE SQUARE",
+      "category": "shapes",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F7EB",
+      "name": "LARGE BROWN SQUARE",
+      "category": "shapes",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F90C",
+      "name": "PINCHED FINGERS",
+      "category": "hands",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F90D",
+      "name": "WHITE HEART",
+      "category": "hearts",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F90E",
+      "name": "BROWN HEART",
+      "category": "hearts",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F90F",
+      "name": "PINCHING HAND",
+      "category": "hands",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F910",
+      "name": "ZIPPER-MOUTH FACE",
+      "category": "faces",
+      "layers": 4
+    },
+    {
+      "scalar": "U+1F911",
+      "name": "MONEY-MOUTH FACE",
+      "category": "faces",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F912",
+      "name": "FACE WITH THERMOMETER",
+      "category": "faces",
+      "layers": 4
+    },
+    {
+      "scalar": "U+1F913",
+      "name": "NERD FACE",
+      "category": "faces",
+      "layers": 4
+    },
+    {
+      "scalar": "U+1F914",
+      "name": "THINKING FACE",
+      "category": "faces",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F915",
+      "name": "FACE WITH HEAD-BANDAGE",
+      "category": "faces",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F916",
+      "name": "ROBOT FACE",
+      "category": "faces",
+      "layers": 4
+    },
+    {
+      "scalar": "U+1F917",
+      "name": "HUGGING FACE",
+      "category": "faces",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F918",
+      "name": "SIGN OF THE HORNS",
+      "category": "hands",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F919",
+      "name": "CALL ME HAND",
+      "category": "hands",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F91A",
+      "name": "RAISED BACK OF HAND",
+      "category": "hands",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F91B",
+      "name": "LEFT-FACING FIST",
+      "category": "hands",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F91C",
+      "name": "RIGHT-FACING FIST",
+      "category": "hands",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F91D",
+      "name": "HANDSHAKE",
+      "category": "hands",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F91E",
+      "name": "HAND WITH INDEX AND MIDDLE FINGERS CROSSED",
+      "category": "hands",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F91F",
+      "name": "I LOVE YOU HAND SIGN",
+      "category": "hands",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F920",
+      "name": "FACE WITH COWBOY HAT",
+      "category": "faces",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F921",
+      "name": "CLOWN FACE",
+      "category": "faces",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F922",
+      "name": "NAUSEATED FACE",
+      "category": "faces",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F923",
+      "name": "ROLLING ON THE FLOOR LAUGHING",
+      "category": "faces",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F924",
+      "name": "DROOLING FACE",
+      "category": "faces",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F925",
+      "name": "LYING FACE",
+      "category": "faces",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F927",
+      "name": "SNEEZING FACE",
+      "category": "faces",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F928",
+      "name": "FACE WITH ONE EYEBROW RAISED",
+      "category": "faces",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F929",
+      "name": "GRINNING FACE WITH STAR EYES",
+      "category": "faces",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F92A",
+      "name": "GRINNING FACE WITH ONE LARGE AND ONE SMALL EYE",
+      "category": "faces",
+      "layers": 5
+    },
+    {
+      "scalar": "U+1F92B",
+      "name": "FACE WITH FINGER COVERING CLOSED LIPS",
+      "category": "faces",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F92C",
+      "name": "SERIOUS FACE WITH SYMBOLS COVERING MOUTH",
+      "category": "faces",
+      "layers": 6
+    },
+    {
+      "scalar": "U+1F92D",
+      "name": "SMILING FACE WITH SMILING EYES AND HAND COVERING MOUTH",
+      "category": "faces",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F92E",
+      "name": "FACE WITH OPEN MOUTH VOMITING",
+      "category": "faces",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F92F",
+      "name": "SHOCKED FACE WITH EXPLODING HEAD",
+      "category": "faces",
+      "layers": 5
+    },
+    {
+      "scalar": "U+1F932",
+      "name": "PALMS UP TOGETHER",
+      "category": "hands",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F970",
+      "name": "SMILING FACE WITH SMILING EYES AND THREE HEARTS",
+      "category": "faces",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F971",
+      "name": "YAWNING FACE",
+      "category": "faces",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F972",
+      "name": "SMILING FACE WITH TEAR",
+      "category": "faces",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F973",
+      "name": "FACE WITH PARTY HORN AND PARTY HAT",
+      "category": "faces",
+      "layers": 4
+    },
+    {
+      "scalar": "U+1F974",
+      "name": "FACE WITH UNEVEN EYES AND WAVY MOUTH",
+      "category": "faces",
+      "layers": 5
+    },
+    {
+      "scalar": "U+1F975",
+      "name": "OVERHEATED FACE",
+      "category": "faces",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F976",
+      "name": "FREEZING FACE",
+      "category": "faces",
+      "layers": 5
+    },
+    {
+      "scalar": "U+1F9D0",
+      "name": "FACE WITH MONOCLE",
+      "category": "faces",
+      "layers": 4
+    },
+    {
+      "scalar": "U+1F9E1",
+      "name": "ORANGE HEART",
+      "category": "hearts",
+      "layers": 1
+    },
+    {
+      "scalar": "U+1F9ED",
+      "name": "COMPASS",
+      "category": "objects",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F9F0",
+      "name": "TOOLBOX",
+      "category": "objects",
+      "layers": 2
+    }
+  ]
+}

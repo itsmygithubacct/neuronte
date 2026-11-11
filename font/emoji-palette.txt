@@ -1,0 +1,17 @@
+# Original emoji palette. Opaque entries keep their identity in both themes.
+0 fg
+1 clear
+2 red #ED555F #D43C4B
+3 amber #E5A238 #CE8923
+4 yellow #F5CB54 #F0BC35
+5 green #54B87C #339D60
+6 blue #56A5DF #2E83C3
+7 purple #AA7DCD #8A5EB3
+8 grey #A2AAB4 #7A8490
+9 ink #283447 #283447
+10 paper #FFF6DE #FFF6DE
+11 orange #F08F42 #DD752D
+12 skin #E9B47E #E9B47E
+13 brown #96664A #7A5039
+14 pink #F59CBA #DC79A0
+15 silver #CBD2D9 #AFB9C2

@@ -29,8 +29,8 @@ Tiers:
              through 26, and three from 27. Each inked pixel is a round
              dot, joined to the inked pixel beside it and the one below.
              The 8 px face: baseline row 6, x-height row 2, UI_TOP 5.
-    ui10i    the italic of that face, from font/ui-10-italic.txt and so
-    ...      on, at 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30 and 32
+    ui3i     the italic of that face, from font/ui-3-italic.txt and so
+    ...      on, at every integer size from 3 through 32
     ui32i    pixels. The same pixels, sheared on the grid so the top sits
              to the right of the bottom, with the advance widened to fit.
     uilarge  the same face above 32 pixels, from font/ui-large.txt: the
@@ -41,7 +41,7 @@ Sets, each a list of tiers: ascii; draw (box, block, shade, braille);
 symbol; accent; full, which is all of those; and three sets for choosing
 how the mosaics join the bundle: pixel (block, mosaic), pixelbraille
 (block, mosaic, braille) and boxshade (box, shade). The sets ui1 to
-ui128, except ui44, the italic sets ui10i to ui32i, and uilarge, are each their
+ui128, except ui44, the italic sets ui3i to ui32i, and uilarge, are each their
 tier alone. They share their scalars with ascii and with each other, so
 they join no other set, and their nets no bundle.
 Each has a pen of its own, in PENS: a little over one pixel wide at its em

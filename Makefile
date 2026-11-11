@@ -11,11 +11,11 @@ FULL = weights/neuronte-full-v2
 # asks about characters none of them was trained on.
 DRAW = weights/neuronte-draw-v2
 SYMBOL = weights/neuronte-symbol-v0
-ACCENT = weights/neuronte-accent-v0
+ACCENT = weights/neuronte-accent-v1
 PIXEL = weights/neuronte-pixel-v1
 BRAILLE = weights/neuronte-braille-v0
 GATE = weights/neuronte-gate-v3.json
-SPLIT = weights/neuronte-split-v3.nrt
+SPLIT = weights/neuronte-split-v4.nrt
 NETS = $(ASCII).json $(DRAW).json $(SYMBOL).json $(ACCENT).json $(PIXEL).json $(BRAILLE).json
 OBJS = build/neuronte.o build/utf8.o
 TOOLS = build/neuronte-render build/neuronte-bench

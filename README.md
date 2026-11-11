@@ -15,7 +15,7 @@ a letter.
 
 | Weights | Use | Characters | Hidden width | Parameters | File |
 |---|---|---|---:|---:|---:|
-| `neuronte-split-v3` | the font to use | 1,061, over six nets and a router | 48, 128 and 192 | 329,356 | 1,319,616 bytes |
+| `neuronte-split-v4` | the font to use | 1,061, over six nets and a router | 48, 128 and 192 | 329,356 | 1,319,616 bytes |
 | `neuronte-full-v2` | the baseline `split` is measured against | 763 of them in one net, all but the sextants and octants | 320 | 234,881 | 939,728 bytes |
 | `neuronte-ascii-v0` | the smallest file | the 95 printable ASCII characters | 128 | 44,801 | 179,408 bytes |
 
@@ -79,7 +79,7 @@ a letter and a mark, such as ß æ œ ð þ ø ł đ ħ ŋ ĳ, are drawn in
 | `train/train.py` | Trains a net on one set. Needs torch, and wants a GPU |
 | `train/gate.py` | Trains the router's gate for a bundle of nets. Needs torch; a CPU is enough |
 | `train/pack.py` | Packs weights JSON into the binary file the C library loads, one net or a bundle. Documents both layouts |
-| `weights/` | The trained weights as JSON, the packed files, the scores and `SHA256SUMS`. `neuronte-draw-v2`, `neuronte-symbol-v0`, `neuronte-accent-v0`, `neuronte-pixel-v1`, `neuronte-braille-v0` and `neuronte-gate-v3` are the parts of `neuronte-split-v3`, with `neuronte-ascii-v0`. `neuronte-full-v2` is here so that `make test` and `make bench` run from a clone |
+| `weights/` | The trained weights as JSON, the packed files, the scores and `SHA256SUMS`. `neuronte-draw-v2`, `neuronte-symbol-v0`, `neuronte-accent-v1`, `neuronte-pixel-v1`, `neuronte-braille-v0` and `neuronte-gate-v3` are the parts of `neuronte-split-v4`, with `neuronte-ascii-v0`. `neuronte-split-v3`, the bundle before it with the earlier accent net, stays until the programs that load it by name move to v4. `neuronte-full-v2` is here so that `make test` and `make bench` run from a clone |
 | `include/neuronte.h`, `src/` | The C library |
 | `tools/neuronte-render.c` | Draws lines of text into a PPM file |
 | `tools/neuronte-bench.c` | Times a net per cell, or a full net against a bundle per class of character |
@@ -95,7 +95,7 @@ a letter and a mark, such as ß æ œ ð þ ø ł đ ħ ŋ ĳ, are drawn in
 make          # build/libneuronte.a, build/libneuronte.so and the tools
 make test     # needs python3 with numpy
 make bench
-./build/neuronte-render weights/neuronte-split-v3.nrt 16 out.ppm 'Hello, café.' '╭──╮ ⣿⣶⣤⣀ ░▒▓ ✔'
+./build/neuronte-render weights/neuronte-split-v4.nrt 16 out.ppm 'Hello, café.' '╭──╮ ⣿⣶⣤⣀ ░▒▓ ✔'
 ```
 
 The library is C11 with libm and nothing else. On x86-64 it builds its
@@ -169,7 +169,7 @@ as it is done. After that a frame takes about a millisecond.
 
 ```sh
 ./build/neuronte-compare                      # neuronte-ascii left, neuronte-full right
-./build/neuronte-compare weights/neuronte-full-v2.nrt weights/neuronte-split-v3.nrt
+./build/neuronte-compare weights/neuronte-full-v2.nrt weights/neuronte-split-v4.nrt
 ./build/neuronte-compare LEFT.nrt RIGHT.nrt   # any two weight files
 ./build/neuronte-compare --snapshot out.ppm 1280 800
 ```
@@ -215,7 +215,7 @@ it took to draw one cell, the whole half, and the last keypress.
 #include "neuronte.h"
 
 neuronte *font;
-if (neuronte_open_file("neuronte-split-v3.nrt", &font) != NEURONTE_OK)
+if (neuronte_open_file("neuronte-split-v4.nrt", &font) != NEURONTE_OK)
     return 1;
 /* pixels: row-major 0xAARRGGBB, stride in pixels. */
 neuronte_draw_utf8(font, pixels, stride, width, height,
@@ -262,7 +262,7 @@ pixels, against 0.948, 0.990 and 0.992 for the shipped file.
 
 ## Split nets and the router
 
-`neuronte-split-v3` is a bundle of nets that each know one part of the
+`neuronte-split-v4` is a bundle of nets that each know one part of the
 set, with a router in front:
 
 | Net | Characters | Hidden width | Parameters |
@@ -270,7 +270,7 @@ set, with a router in front:
 | `neuronte-ascii-v0` | the 95 printable ASCII characters | 128 | 44,801 |
 | `neuronte-draw-v2` | 131: box drawing and the shades | 192 | 91,777 |
 | `neuronte-symbol-v0` | the 49 symbols | 128 | 44,801 |
-| `neuronte-accent-v0` | the 203 accented letters and marks | 192 | 91,777 |
+| `neuronte-accent-v1` | the 203 accented letters and marks | 192 | 91,777 |
 | `neuronte-pixel-v1` | 327: the other 29 block elements, the 60 sextants, the 230 octants and the 8 octant substitutes | 128 | 44,801 |
 | `neuronte-braille-v0` | the 256 Braille patterns | 48 | 9,121 |
 | `neuronte-gate-v3` | the router's gate: 64 inputs, 32 hidden, 6 outputs | | 2,278 |
@@ -361,16 +361,20 @@ the targets `train/glyphs.py` makes now:
 | Braille | `braille`, 48 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
 | sextants and octants | `pixel`, 128 | 1.0000 | 0.9998 | 0.9992 | | | |
 | symbols | `symbol`, 128 | 0.9828 | 0.9908 | 0.9952 | 0.9778 | 0.9856 | 0.9838 |
-| accented | `accent`, 192 | 0.9795 | 0.9846 | 0.9881 | 0.9772 | 0.9810 | 0.9822 |
+| accented | `accent`, 192 | 0.9786 | 0.9849 | 0.9886 | 0.9748 | 0.9786 | 0.9798 |
 
 The bundle is level with `full` or ahead of it everywhere but ASCII at 8
 pixels, where it is behind by 0.004, and box drawing at 16, by 0.0002.
 `full`'s blocks fall short of 1 because of the three-quadrant blocks
 (see [Quality](#quality)); its own score file, against the targets it
 was trained on, has them at 1.0000, 1.0000 and 0.9993 with the shades.
-The weakest accented characters are the spacing marks alone, ¨ and ˙,
-whose dots are small enough that a pixel off costs much of their
-overlap, and ĳ at 8 pixels.
+The weakest accented characters are the spacing mark ¨ alone, whose
+dots are small enough that a pixel off costs much of their overlap, Œ,
+and ĳ at 8 pixels. `neuronte-accent-v1` is the training of v0, same
+seed, run again after the capital Ĳ was redrawn without serifs: at 12
+and 16 pixels the I's serifs ran into the J's bar and the pair read as
+a box. It scores within 0.001 of v0 at each size. `neuronte-full-v2`
+was trained on the earlier Ĳ, which costs it 0.0024 at each size here.
 
 ### The pixel net and the new draw net
 
@@ -434,7 +438,7 @@ With 2 × 2 samples at 8, 16 and 48 pixels:
 | 256 | 155,137 | .951 .985 .980 | .909 .999 .993 | .977 .980 .978 | .976 .978 .977 |
 | 320, `full-v2` | 234,881 | .951 .988 .985 | .949 .999 .995 | .978 .986 .984 | .977 .981 .982 |
 | 384 | 331,009 | .948 .988 .989 | .928 .998 .996 | .981 .984 .987 | .977 .983 .985 |
-| the bundle, `split-v3` | 329,356 | .948 .990 .992 | .975 .999 .999 | .983 .991 .995 | .980 .985 .988 |
+| the bundle, `split-v4` | 329,356 | .948 .990 .992 | .975 .999 .999 | .983 .991 .995 | .979 .985 .989 |
 
 Blocks score 0.993 or better and Braille 1.000 at 192 and above. 320 is
 the narrowest width that comes back to v1 on the classes v1 knew: it is

@@ -68,7 +68,7 @@ a letter and a mark, such as ß æ œ ð þ ø ł đ ħ ŋ ĳ, are drawn in
 | `font/strokes.txt` | The ASCII face: each character as pen strokes on a 10 × 20 grid. Written for this project |
 | `font/symbols.txt` | The symbols of the full set, in the same form |
 | `font/marks.txt` | The diacritic marks, keyed by their combining code points |
-| `font/letters.txt` | The Latin letters beyond ASCII that are not a letter plus a mark |
+| `font/letters.txt` | The Latin letters beyond ASCII that are not a letter plus a mark, and the Greek and Russian Cyrillic letters. The Greek and Cyrillic are not yet in any weights |
 | `font/icons.txt` | The icons, as colour layers back to front, each naming a palette entry. Not yet in any weights |
 | `font/palette.txt` | The palette for colour glyphs: entry 0 is the cell's foreground, 1 is clear, the rest have a dark-theme and a light-theme colour |
 | `font/code-masks.txt` | The 43 parity masks that turn a scalar into the net's 64 character inputs |

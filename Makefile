@@ -77,6 +77,7 @@ test: all $(TESTS)
 	$(PYTHON) tests/check_reference.py build/libneuronte.so $(ASCII).json $(ASCII).nrt
 	$(PYTHON) tests/check_reference.py build/libneuronte.so $(FULL).json $(FULL).nrt
 	$(PYTHON) tests/check_reference.py build/libneuronte.so --bundle $(SPLIT) $(NETS) --gate $(GATE)
+	$(PYTHON) tests/check_advances.py build/libneuronte.so $(ASCII).json
 
 bench: build/neuronte-bench
 	./build/neuronte-bench $(ASCII).nrt

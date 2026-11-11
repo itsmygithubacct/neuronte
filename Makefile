@@ -17,6 +17,11 @@ BRAILLE = weights/neuronte-braille-v0
 GATE = weights/neuronte-gate-v3.json
 SPLIT = weights/neuronte-split-v4.nrt
 NETS = $(ASCII).json $(DRAW).json $(SYMBOL).json $(ACCENT).json $(PIXEL).json $(BRAILLE).json
+# RC9 assets are explicit; the retained default and baselines above stay named.
+RC9_ACCENT = weights/neuronte-accent-v2
+RC9_GATE = weights/neuronte-gate-v4.json
+RC9_SPLIT = weights/neuronte-split-v5.nrt
+RC9_NETS = $(ASCII).json $(DRAW).json $(SYMBOL).json $(RC9_ACCENT).json $(PIXEL).json $(BRAILLE).json
 # The desktop face: one drawing file for each em, a net and the advances
 # of that em's pixel face.
 UI1 = weights/neuronte-ui1-v0
@@ -123,6 +128,12 @@ $(DEMOS): build/%: demo/%.c demo/common.h build/demo-common.o build/libneuronte.
 		build/libneuronte.a $(LDLIBS) -lz
 
 # Rebuild the packed weights from the JSON the trainers write.
+pack: pack-rc9
+
+pack-rc9: $(RC9_NETS) $(RC9_GATE)
+	$(PYTHON) train/pack.py $(RC9_ACCENT).json $(RC9_ACCENT).nrt
+	$(PYTHON) train/pack.py --bundle $(RC9_SPLIT) $(RC9_NETS) --gate $(RC9_GATE)
+
 pack: $(ASCII).json $(FULL).json $(NETS) $(GATE) $(UI1).json $(UI2).json $(UI3).json $(UI4).json $(UI5).json $(UI6).json $(UI7).json $(UI8).json $(UI9).json $(UI10).json $(UI10I).json $(UI11).json $(UI11I).json $(UI12).json $(UI12I).json $(UI13).json $(UI14).json $(UI14I).json $(UI15).json $(UI16).json $(UI16I).json $(UI17).json $(UI18).json $(UI18I).json $(UI19).json $(UI20).json $(UI20I).json $(UI21).json $(UI22).json $(UI22I).json $(UI23).json $(UI24).json $(UI24I).json $(UI25).json $(UI26).json $(UI26I).json $(UI27).json $(UI28).json $(UI29).json $(UI30).json $(UI30I).json $(UI31).json $(UI32).json $(UI33).json $(UI34).json $(UI35).json $(UI36).json $(UI37).json $(UI38).json $(UI39).json $(UI43).json $(UILARGE).json $(FLAME).json $(ICON).json $(UI28I).json $(UI32I).json
 	$(PYTHON) train/pack.py $(ASCII).json $(ASCII).nrt
 	$(PYTHON) train/pack.py $(FULL).json $(FULL).nrt
@@ -185,9 +196,15 @@ pack: $(ASCII).json $(FULL).json $(NETS) $(GATE) $(UI1).json $(UI2).json $(UI3).
 	# A colour file is packed the same way: python3 train/pack.py colour.json colour.nrt
 	# make test builds a small synthetic one under build/; $(FLAME) is a trained one.
 	$(PYTHON) train/pack.py $(ICON).json $(ICON).nrt
-	cd weights && sha256sum *.json *.nrt > SHA256SUMS
+	cd weights && sha256sum *.json *.nrt *.md > SHA256SUMS
 
-test: all $(TESTS)
+test-rc9: all $(TESTS)
+	$(PYTHON) tests/check_reference.py build/libneuronte.so $(RC9_ACCENT).json $(RC9_ACCENT).nrt
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --bundle $(RC9_SPLIT) $(RC9_NETS) --gate $(RC9_GATE)
+	$(PYTHON) tests/check_scripts.py build/libneuronte.so $(RC9_SPLIT) $(RC9_ACCENT).json
+	./build/test_api $(RC9_SPLIT) --full --accent --pixel
+
+test: all $(TESTS) test-rc9
 	cd weights && sha256sum -c --quiet SHA256SUMS
 	$(PYTHON) train/glyphs.py > /dev/null
 	./build/test_utf8
@@ -272,4 +289,4 @@ bench: build/neuronte-bench
 clean:
 	rm -rf build
 
-.PHONY: all demo pack test bench clean
+.PHONY: all demo pack pack-rc9 test test-rc9 bench clean

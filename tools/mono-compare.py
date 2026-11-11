@@ -30,6 +30,10 @@ def main():
     p.add_argument('--set', choices=('accent', 'full'), default='accent')
     p.add_argument('--include-new', action='store_true')
     p.add_argument('--sizes', default='8,16,48')
+    p.add_argument('--samples', type=int, choices=(0,1,2), default=2,
+                   help='samples per axis; 0 exercises the production automatic choice')
+    p.add_argument('--minimum-iou', type=float,
+                   help='require both new seeds to pass every tier at 16 and 48 px')
     p.add_argument('--out', required=True)
     a = p.parse_args()
     lib = ct.CDLL(str(Path(a.library).resolve()))
@@ -62,7 +66,7 @@ def main():
                            'baseline_trained': ord(c) in known}
                     for name, h in handles.items():
                         cov = np.zeros((2*w, w), np.float32)
-                        assert lib.neuronte_coverage(h, ord(c), w, 2*w, 2, cov.ctypes.data) == 0
+                        assert lib.neuronte_coverage(h, ord(c), w, 2*w, a.samples, cov.ctypes.data) == 0
                         row[name] = counts(truth, cov > .5)
                     row['delta'] = row['new']['iou'] - row['old']['iou']
                     rows[str(w)].append(row)
@@ -70,20 +74,43 @@ def main():
             for h in handles.values():
                 lib.neuronte_close(h)
     sizes = {}
+    passed = True
     for w, rs in rows.items():
         sizes[w] = {name+'_mean': float(np.mean([r[name]['iou'] for r in rs]))
                     for name in inputs}
         sizes[w]['regressions'] = [r for r in rs if r['delta'] < -1e-12]
         sizes[w]['glyphs'] = rs
-    report = {'characters': len(chars), 'samples': 2, 'target_grid': 256,
+        common = [r for r in rs if r['baseline_trained']]
+        sizes[w]['common_labels'] = {'count': len(common),
+            **{name+'_mean': float(np.mean([r[name]['iou'] for r in common])) for name in inputs},
+            'regressions': [r for r in common if r['delta'] < -1e-12]}
+        groups = {tier: [r for r in rs if r['tier'] == tier] for tier in sorted({r['tier'] for r in rs})}
+        for name, lo, hi in (('greek',0x370,0x3ff), ('russian',0x400,0x4ff), ('latin',0,0x36f)):
+            group = [r for r in rs if r['tier'] == 'accent' and lo <= int(r['scalar'][2:],16) <= hi]
+            if group:
+                groups[name] = group
+        tiers = {}
+        for name, group in groups.items():
+            tiers[name] = {'count': len(group)}
+            for seed in ('new','seed1'):
+                tiers[name][seed] = {'mean': float(np.mean([r[seed]['iou'] for r in group])),
+                    'minimum': min(r[seed]['iou'] for r in group),
+                    'lost': sum(r[seed]['target_ink'] > 0 and r[seed]['intersection'] == 0 for r in group)}
+                if a.minimum_iou is not None and int(w) in (16,48):
+                    passed &= tiers[name][seed]['mean'] >= a.minimum_iou and tiers[name][seed]['lost'] == 0
+        sizes[w]['tiers'] = tiers
+    report = {'characters': len(chars), 'samples': a.samples, 'target_grid': 256,
               'target_samples': 8, 'set': a.set, 'include_new': a.include_new,
+              'minimum_iou': a.minimum_iou, 'passed': bool(passed),
               'sources_sha256': {f: hashlib.sha256((ROOT/f).read_bytes()).hexdigest()
                                  for f in glyphs.sources(a.set)},
               'weights_sha256': {n: hashlib.sha256(b).hexdigest() for n, b in images.items()},
               'sizes': sizes}
     Path(a.out).write_text(json.dumps(report, indent=2)+'\n')
-    print(json.dumps({w: {k: v for k, v in r.items() if k not in ('glyphs', 'regressions')}
+    print(json.dumps({w: {k: v for k, v in r.items() if k not in ('glyphs', 'regressions','common_labels')}
                      | {'regressed_glyphs': len(r['regressions'])} for w, r in sizes.items()}, indent=2))
+    if not passed:
+        raise SystemExit(1)
 
 
 if __name__ == '__main__':

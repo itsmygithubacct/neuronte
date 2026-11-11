@@ -11,6 +11,7 @@ A separate float64 numpy evaluation checks sampled halves against the C API.
 """
 import argparse
 import ctypes as ct
+import hashlib
 import json
 import math
 from pathlib import Path
@@ -86,6 +87,7 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('lib');p.add_argument('bundle');p.add_argument('nets',nargs='+')
     p.add_argument('--out',required=True);p.add_argument('--report-only',action='store_true')
+    p.add_argument('--target-cache',help='reuse hash-bound target coverages across seeds/calibration trials')
     a=p.parse_args()
     images=[pack.pack(n) for n in a.nets]
     want=pack.bundle(a.nets)[0] if len(a.nets)>1 else images[0]
@@ -93,6 +95,9 @@ def main():
     lib,h=bind(a.lib,a.bundle); k=lib.neuronte_layers(h)
     assert lib.neuronte_set_snap(h,0)==0
     points={w:sample_points(w) for w in (12,16,32)}
+    cache=Path(a.target_cache) if a.target_cache else None
+    if cache:cache.mkdir(parents=True,exist_ok=True)
+    target_implementation=hashlib.sha256(Path(glyphs.__file__).read_bytes()).hexdigest()
     results={}; maxdiff=0.; maxpixel=0; known=set()
     for ni,(path,packed) in enumerate(zip(a.nets,images)):
         d=json.loads(Path(path).read_text()); assert d['training'].get('cell_columns')==2
@@ -109,15 +114,27 @@ def main():
             layers=drawing_at(drawings,s)
             entries=[pal[layers[i][0]][0] if i<len(layers) else 0 for i in range(k)]
             assert head(d,s)==entries, f'numpy palette mismatch U+{s:X}'
-            fields=[glyphs.field(sh,d['training']['grid'],d['training']['pen_radius'],d['shape']['tau']).astype(np.float16).astype(np.float32) for _,sh in layers]
+            key=hashlib.sha256(json.dumps([layers,d['training']['grid'],d['training']['pen_radius'],
+                                          d['shape']['tau'],k,target_implementation],sort_keys=True).encode()).hexdigest()
+            cached=cache/(key+'.npz') if cache else None
+            if cached and cached.exists():
+                with np.load(cached,allow_pickle=False) as archive:
+                    targets={w:archive[str(w)] for w in points}
+            else:
+                fields=[glyphs.field(sh,d['training']['grid'],d['training']['pen_radius'],d['shape']['tau']).astype(np.float16).astype(np.float32) for _,sh in layers]
+                targets={w:np.zeros((k,2*w,w),np.float32) for w in points}
+                for cw in points:
+                    for i,f in enumerate(fields):
+                        v=interpolate(f,points[cw],d['training']['grid'])
+                        targets[cw][i]=(v>0).reshape(2*cw,8,cw,8).mean((1,3))
+                if cached:
+                    np.savez_compressed(cached,**{str(w):t for w,t in targets.items()})
             for cw in points:
                 r=group[str(cw)]; cov,ent=c_mask(lib,h,s,cw,k)
                 r['head_wrong']+=sum(x!=y for x,y in zip(ent,entries))
                 r['unused_positive']+=int((cov[len(layers):]>0).any(axis=(1,2)).sum())
-                target=np.zeros_like(cov)
-                for i,f in enumerate(fields):
-                    v=interpolate(f,points[cw],d['training']['grid'])
-                    target[i]=(v>0).reshape(2*cw,8,cw,8).mean((1,3))
+                target=targets[cw]
+                for i in range(len(layers)):
                     tc=float(target[i].sum()); pc=float(cov[i].sum())
                     c=counts(target[i]>.5,cov[i]>.5)
                     row={'code':f'U+{s:X}','layer':i,**c,'target_coverage':tc,'predicted_coverage':pc}

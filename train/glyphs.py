@@ -24,11 +24,11 @@ Tiers:
              ASCII letter and the marks in font/marks.txt, by the Unicode
              decomposition, or taken from font/letters.txt.
     ui8      the desktop face, printable ASCII and U+2026, from
-    ui10     font/ui-8.txt and so on: a proportional face for small
-    ui11     binary text, drawn as pixels once for each em, of 8, 10,
-    ui12     11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30 and 32 pixels.
-    ...      The 8 px face: baseline row 6, x-height row 2, UI_TOP 5.
-    ui32     Stems are one pixel wide to 16, two from 18 to 26, and
+    ui9      font/ui-8.txt and so on: a proportional face for small
+    ui10     binary text, drawn as pixels once for each em, of 8, 9,
+    ...      10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30 and 32 pixels.
+    ui32     The 8 px face: baseline row 6, x-height row 2, UI_TOP 5.
+             Stems are one pixel wide to 16, two from 18 to 26, and
              three from 28. Each inked pixel is a round dot, joined to
              the inked pixel beside it and the one below.
 
@@ -58,7 +58,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import strokes  # noqa: E402
 
 OCTANTS = os.path.join(strokes.ROOT, "font", "octants.txt")
-UI_TOP = {8: 5, 10: 6, 11: 6, 12: 7, 14: 8, 16: 9, 18: 10, 20: 11, 22: 12,
+UI_TOP = {8: 5, 9: 6, 10: 6, 11: 6, 12: 7, 14: 8, 16: 9, 18: 10, 20: 11, 22: 12,
           24: 14, 26: 15, 28: 16, 30: 17, 32: 18}  # per em, the cell row of a desktop-face drawing's first row
 # 8 px drawing rows: baseline 6, x-height 2. With UI_TOP 5 the baseline is cell row 11.
 UI = {em: os.path.join(strokes.ROOT, "font", f"ui-{em}.txt") for em in UI_TOP}

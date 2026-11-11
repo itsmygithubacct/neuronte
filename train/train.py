@@ -163,7 +163,7 @@ res = {"set": a.set, "chars": G, "width": W, "steps": a.steps, "seed": a.seed, "
        "unlabelled": a.unlabelled, "params": sum(q.numel() for q in net.parameters()),
        "final_loss": float(loss.detach())}
 tier_idx = {t: torch.tensor([i for i, x in enumerate(TIERS) if x == t]) for t in dict.fromkeys(TIERS)}
-PIXEL_SIZES = (8, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32)  # where a face is shown as binary letters
+PIXEL_SIZES = (8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32)  # where a face is shown as binary letters
 for wpx in (4, 5) + PIXEL_SIZES + (48,):
     t = truth(wpx).reshape(G, -1)
     # Targets that differ by under half a pixel of ink at this size, such

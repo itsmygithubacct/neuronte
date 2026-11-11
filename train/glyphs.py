@@ -495,6 +495,7 @@ SETS = {
     "pixel": ["block", "mosaic"],
     "pixelbraille": ["block", "mosaic", "braille"],
     "boxshade": ["box", "shade"],
+    "braille": ["braille"],
 }
 
 

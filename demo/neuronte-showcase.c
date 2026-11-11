@@ -75,7 +75,7 @@ static void add_utf8(struct cls *c, const char *t)
         off += neuronte_utf8_decode(t + off, len - off, &c->s[c->count++]);
 }
 
-/* The classes of neuronte-split-v2, as the training sets define them. */
+/* The classes of neuronte-split-v3, as the training sets define them. */
 static int classes(struct cls *c)
 {
     static const uint32_t subs[] = {0x1FB82, 0x1FB85, 0x1FBE6, 0x1FBE7, 0x1CEA0, 0x1CEA3, 0x1CEA8, 0x1CEAB};
@@ -692,7 +692,7 @@ static int open_weights(const char *path, neuronte **n)
 {
     int rc;
     if (!path)
-        path = "weights/neuronte-split-v2.nrt";
+        path = "weights/neuronte-split-v3.nrt";
     rc = neuronte_open_file(path, n);
     if (rc != NEURONTE_OK)
         fprintf(stderr, "%s: cannot load weights (%d)\n", path, rc);

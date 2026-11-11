@@ -15,14 +15,14 @@ a letter.
 
 | Weights | Use | Characters | Hidden width | Parameters | File |
 |---|---|---|---:|---:|---:|
-| `neuronte-split-v2` | the font to use | 1,061, over five nets and a router | 128 and 192 | 320,202 | 1,282,792 bytes |
+| `neuronte-split-v3` | the font to use | 1,061, over six nets and a router | 48, 128 and 192 | 329,356 | 1,319,616 bytes |
 | `neuronte-full-v2` | the baseline `split` is measured against | 763 of them in one net, all but the sextants and octants | 320 | 234,881 | 939,728 bytes |
 | `neuronte-ascii-v0` | the smallest file | the 95 printable ASCII characters | 128 | 44,801 | 179,408 bytes |
 
 `neuronte-split` draws each character with one small net picked for it.
-It draws ASCII, symbols, blocks, Braille and the mosaics four to six
-times faster than `neuronte-full`, and box drawing and accented letters
-about twice as fast, as well or better. `neuronte-full` draws every character with one
+It draws ASCII, symbols, blocks and the mosaics four to seven times
+faster than `neuronte-full`, Braille about sixteen times faster, and box
+drawing and accented letters about twice as fast, as well or better. `neuronte-full` draws every character with one
 net, which has to be as wide as its hardest characters need, and is kept
 to show what the split gains. See
 [Split nets and the router](#split-nets-and-the-router).
@@ -79,7 +79,7 @@ a letter and a mark, such as ß æ œ ð þ ø ł đ ħ ŋ ĳ, are drawn in
 | `train/train.py` | Trains a net on one set. Needs torch, and wants a GPU |
 | `train/gate.py` | Trains the router's gate for a bundle of nets. Needs torch; a CPU is enough |
 | `train/pack.py` | Packs weights JSON into the binary file the C library loads, one net or a bundle. Documents both layouts |
-| `weights/` | The trained weights as JSON, the packed files, the scores and `SHA256SUMS`. `neuronte-draw-v2`, `neuronte-symbol-v0`, `neuronte-accent-v0`, `neuronte-pixel-v0` and `neuronte-gate-v2` are the parts of `neuronte-split-v2`, with `neuronte-ascii-v0`. `neuronte-full-v2` is here so that `make test` and `make bench` run from a clone |
+| `weights/` | The trained weights as JSON, the packed files, the scores and `SHA256SUMS`. `neuronte-draw-v2`, `neuronte-symbol-v0`, `neuronte-accent-v0`, `neuronte-pixel-v1`, `neuronte-braille-v0` and `neuronte-gate-v3` are the parts of `neuronte-split-v3`, with `neuronte-ascii-v0`. `neuronte-full-v2` is here so that `make test` and `make bench` run from a clone |
 | `include/neuronte.h`, `src/` | The C library |
 | `tools/neuronte-render.c` | Draws lines of text into a PPM file |
 | `tools/neuronte-bench.c` | Times a net per cell, or a full net against a bundle per class of character |
@@ -95,7 +95,7 @@ a letter and a mark, such as ß æ œ ð þ ø ł đ ħ ŋ ĳ, are drawn in
 make          # build/libneuronte.a, build/libneuronte.so and the tools
 make test     # needs python3 with numpy
 make bench
-./build/neuronte-render weights/neuronte-split-v2.nrt 16 out.ppm 'Hello, café.' '╭──╮ ⣿⣶⣤⣀ ░▒▓ ✔'
+./build/neuronte-render weights/neuronte-split-v3.nrt 16 out.ppm 'Hello, café.' '╭──╮ ⣿⣶⣤⣀ ░▒▓ ✔'
 ```
 
 The library is C11 with libm and nothing else. On x86-64 it builds its
@@ -169,7 +169,7 @@ as it is done. After that a frame takes about a millisecond.
 
 ```sh
 ./build/neuronte-compare                      # neuronte-ascii left, neuronte-full right
-./build/neuronte-compare weights/neuronte-full-v2.nrt weights/neuronte-split-v2.nrt
+./build/neuronte-compare weights/neuronte-full-v2.nrt weights/neuronte-split-v3.nrt
 ./build/neuronte-compare LEFT.nrt RIGHT.nrt   # any two weight files
 ./build/neuronte-compare --snapshot out.ppm 1280 800
 ```
@@ -215,7 +215,7 @@ it took to draw one cell, the whole half, and the last keypress.
 #include "neuronte.h"
 
 neuronte *font;
-if (neuronte_open_file("neuronte-split-v2.nrt", &font) != NEURONTE_OK)
+if (neuronte_open_file("neuronte-split-v3.nrt", &font) != NEURONTE_OK)
     return 1;
 /* pixels: row-major 0xAARRGGBB, stride in pixels. */
 neuronte_draw_utf8(font, pixels, stride, width, height,
@@ -262,7 +262,7 @@ pixels, against 0.948, 0.990 and 0.992 for the shipped file.
 
 ## Split nets and the router
 
-`neuronte-split-v2` is a bundle of nets that each know one part of the
+`neuronte-split-v3` is a bundle of nets that each know one part of the
 set, with a router in front:
 
 | Net | Characters | Hidden width | Parameters |
@@ -271,8 +271,9 @@ set, with a router in front:
 | `neuronte-draw-v2` | 131: box drawing and the shades | 192 | 91,777 |
 | `neuronte-symbol-v0` | the 49 symbols | 128 | 44,801 |
 | `neuronte-accent-v0` | the 203 accented letters and marks | 192 | 91,777 |
-| `neuronte-pixel-v0` | 583: the other 29 block elements, Braille, the 60 sextants, the 230 octants and the 8 octant substitutes | 128 | 44,801 |
-| `neuronte-gate-v2` | the router's gate: 64 inputs, 32 hidden, 5 outputs | | 2,245 |
+| `neuronte-pixel-v1` | 327: the other 29 block elements, the 60 sextants, the 230 octants and the 8 octant substitutes | 128 | 44,801 |
+| `neuronte-braille-v0` | the 256 Braille patterns | 48 | 9,121 |
+| `neuronte-gate-v3` | the router's gate: 64 inputs, 32 hidden, 6 outputs | | 2,278 |
 
 The router is in the file. It first looks the scalar up in a table of
 ranges, made from the characters each net was trained on: 62 ranges, a
@@ -281,20 +282,29 @@ net over the same 64 code features the font nets take. It picks the net
 trained on most of the characters in that scalar's Unicode block, or the
 ASCII net for blocks none of them knows, so 中 is drawn by the ASCII net
 and ↔ by the symbol net. The gate agrees with that rule on all 1,061
-trained characters, on all 2,187 others in their blocks, and on 99.978%
+trained characters, on all 2,187 others in their blocks, and on 99.97%
 of a sample of 199,044 from the rest. It learns from Unicode's
 `Blocks.txt`, which `train/gate.py` reads at training time; the block
-list is not in the repository. `neuronte-gate-v2` used version 16.0,
+list is not in the repository. `neuronte-gate-v3` used version 16.0,
 the first with the octants' block.
+
+Braille has a net of its own because it needs so little. Its dots are
+the low eight bits of the scalar, which the net reads directly, so a net
+48 wide draws all 256 patterns exactly: 1.0000 at every size scored, with
+both seeds, where one of two seeds at 32 wide did not. In
+`neuronte-split-v2` Braille shared the 128-wide pixel net, which costs
+about three times as much per cell. The same was tried per character for
+the mosaics and did not pay: a 64-wide net matches the 128-wide one on
+only about one mosaic in ten.
 
 Language-model routers were set aside: the smallest considered had 45
 million parameters, hundreds of times the font, and routing is a
 function of the code point that a table answers exactly.
 
 ```sh
-python3 train/train.py pixel.json --set pixelbraille --width 128   # also ascii, symbol, accent; draw is --set boxshade --width 192
-python3 train/gate.py gate.json ascii.json draw.json symbol.json accent.json pixel.json --blocks Blocks.txt
-python3 train/pack.py --bundle split.nrt ascii.json draw.json symbol.json accent.json pixel.json --gate gate.json
+python3 train/train.py pixel.json --set pixel --width 128   # also ascii, symbol, accent; draw is --set boxshade --width 192, braille --width 48
+python3 train/gate.py gate.json ascii.json draw.json symbol.json accent.json pixel.json braille.json --blocks Blocks.txt
+python3 train/pack.py --bundle split.nrt ascii.json draw.json symbol.json accent.json pixel.json braille.json --gate gate.json
 ```
 
 `make bench` runs `neuronte-bench FULL BUNDLE`, which times each class of
@@ -305,31 +315,35 @@ from run to run and the ratios by less. Milliseconds per cell, one run:
 
 | Class | Drawn in the bundle by | Cell | `full` | `split` | Faster |
 |---|---|---|---:|---:|---:|
-| ASCII, 95 | `ascii`, 128 | 8 × 16, 2 × 2 samples | 5.33 | 1.31 | 4.1× |
-| | | 16 × 32, 2 × 2 | 22.3 | 5.6 | 4.0× |
-| | | 48 × 96, 1 | 58.0 | 11.6 | 5.0× |
-| box drawing and shades, 131 | `draw`, 192 | 8 × 16, 2 × 2 | 5.39 | 2.68 | 2.0× |
-| | | 16 × 32, 2 × 2 | 21.6 | 10.1 | 2.1× |
-| | | 48 × 96, 1 | 46.3 | 21.2 | 2.2× |
-| symbols, 49 | `symbol`, 128 | 8 × 16, 2 × 2 | 5.45 | 1.70 | 3.2× |
-| | | 16 × 32, 2 × 2 | 22.0 | 4.9 | 4.5× |
-| | | 48 × 96, 1 | 52.5 | 11.9 | 4.4× |
-| accented, 191 | `accent`, 192 | 8 × 16, 2 × 2 | 5.48 | 2.59 | 2.1× |
-| | | 16 × 32, 2 × 2 | 23.5 | 10.5 | 2.2× |
-| | | 48 × 96, 1 | 52.0 | 21.9 | 2.4× |
-| blocks, Braille and mosaics, 583 | `pixel`, 128 | 8 × 16, 2 × 2 | 7.13 | 1.10 | 6.5× |
-| | | 16 × 32, 2 × 2 | 26.4 | 4.0 | 6.5× |
-| | | 48 × 96, 1 | 60.2 | 9.6 | 6.3× |
+| ASCII, 95 | `ascii`, 128 | 8 × 16, 2 × 2 samples | 3.46 | 0.85 | 4.1× |
+| | | 16 × 32, 2 × 2 | 13.4 | 2.9 | 4.6× |
+| | | 48 × 96, 1 | 30.3 | 6.6 | 4.6× |
+| box drawing and shades, 131 | `draw`, 192 | 8 × 16, 2 × 2 | 3.15 | 1.53 | 2.1× |
+| | | 16 × 32, 2 × 2 | 12.5 | 5.8 | 2.1× |
+| | | 48 × 96, 1 | 28.1 | 13.9 | 2.0× |
+| symbols, 49 | `symbol`, 128 | 8 × 16, 2 × 2 | 3.21 | 0.84 | 3.8× |
+| | | 16 × 32, 2 × 2 | 12.9 | 3.2 | 4.1× |
+| | | 48 × 96, 1 | 29.3 | 7.3 | 4.0× |
+| accented, 191 | `accent`, 192 | 8 × 16, 2 × 2 | 3.21 | 1.56 | 2.1× |
+| | | 16 × 32, 2 × 2 | 12.8 | 6.1 | 2.1× |
+| | | 48 × 96, 1 | 29.5 | 13.3 | 2.2× |
+| blocks and mosaics, 327 | `pixel`, 128 | 8 × 16, 2 × 2 | 4.31 | 0.65 | 6.7× |
+| | | 16 × 32, 2 × 2 | 17.6 | 2.5 | 7.0× |
+| | | 48 × 96, 1 | 38.7 | 6.0 | 6.5× |
+| Braille, 256 | `braille`, 48 | 8 × 16, 2 × 2 | 3.64 | 0.23 | 15.9× |
+| | | 16 × 32, 2 × 2 | 14.3 | 0.72 | 19.9× |
+| | | 48 × 96, 1 | 31.2 | 1.9 | 16.4× |
 
-A second run, at a load average of 20, gave 3.8 to 4.9 times for ASCII
-and 4.8 to 7.6 for the mosaics: the two nets have the same width, and
-the difference between them is mostly noise. `neuronte-full` was not
-trained on the mosaics; it is timed on them, not scored.
+ASCII and the mosaics are drawn by nets of the same width, and the
+difference between them is mostly noise; an earlier run under heavier
+load gave 3.8 to 4.9 times for ASCII and 4.8 to 7.6 for the mosaics.
+`neuronte-full` was not trained on the mosaics; it is timed on them, not
+scored.
 
 A net's hidden layers cost about the square of its width: 128 does a
 sixth of the work of 320, and 192 a little over a third. The measured
 gain is smaller than that because the first layer and the per-cell work
-cost the same in both. The router takes 25 to 36 nanoseconds per call
+cost the same in both. The router takes 15 to 36 nanoseconds per call
 through the table, and about a microsecond when the gate has to answer,
 both far under a millisecond cell, and the draw calls route only on a
 cache miss.
@@ -344,8 +358,8 @@ the targets `train/glyphs.py` makes now:
 | box drawing | `draw`, 192 | 0.9748 | 0.9990 | 0.9988 | 0.9491 | 0.9992 | 0.9946 |
 | shades | `draw`, 192 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 0.9933 |
 | blocks | `pixel`, 128 | 1.0000 | 1.0000 | 0.9999 | 0.9945 | 0.9945 | 0.9944 |
-| Braille | `pixel`, 128 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
-| sextants and octants | `pixel`, 128 | 1.0000 | 0.9999 | 0.9992 | | | |
+| Braille | `braille`, 48 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| sextants and octants | `pixel`, 128 | 1.0000 | 0.9998 | 0.9992 | | | |
 | symbols | `symbol`, 128 | 0.9828 | 0.9908 | 0.9952 | 0.9778 | 0.9856 | 0.9838 |
 | accented | `accent`, 192 | 0.9795 | 0.9846 | 0.9881 | 0.9772 | 0.9810 | 0.9822 |
 
@@ -360,7 +374,7 @@ overlap, and ĳ at 8 pixels.
 
 ### The pixel net and the new draw net
 
-How the five nets are grouped was decided by measurement. Three ways to
+How the nets are grouped was decided by measurement. Three ways to
 split the blocks, Braille, mosaics, box drawing and shades were trained
 at several widths, each twice with different seeds, side by side on one
 GPU. A grouping was kept if the mean of its two seeds was within the
@@ -380,9 +394,19 @@ widths was taken. Means of two seeds:
 
 At 64 the eighth blocks ▏ ▕ fail and Braille loses its exactness. Box
 drawing at 128 falls behind the old draw net at 8 pixels (0.950 against
-0.963). So the bundle has the blocks, mosaics and Braille in one net 128
-wide, and box drawing with the shades in one 192 wide. The seed kept for
-each is the better of its two.
+0.963). So `neuronte-split-v2` had the blocks, mosaics and Braille in one
+net 128 wide, and box drawing with the shades in one 192 wide. The seed
+kept for each is the better of its two.
+
+A later measurement scored the 64-wide net character by character
+against the 128-wide one. Within 0.002 at all three sizes it matched on
+240 of the 256 Braille patterns, but on only 28 of the 298 mosaics and 12
+of the 29 blocks. So Braille was the one class a narrower net could
+take. Trained alone, twice each: at 48 and at 64 wide it is exact with
+both seeds; at 32 one seed is exact and the other scores 0.976.
+`neuronte-split-v3` therefore gives Braille a 48-wide net,
+`neuronte-braille-v0`, and the blocks and mosaics keep a 128-wide net
+trained without it, `neuronte-pixel-v1`.
 
 Every candidate at 128 or 192 is exact at a 2 × 4 cell: all 2,040 pixels
 of the octant patterns are on the right side of 0.5, none further than
@@ -410,7 +434,7 @@ With 2 × 2 samples at 8, 16 and 48 pixels:
 | 256 | 155,137 | .951 .985 .980 | .909 .999 .993 | .977 .980 .978 | .976 .978 .977 |
 | 320, `full-v2` | 234,881 | .951 .988 .985 | .949 .999 .995 | .978 .986 .984 | .977 .981 .982 |
 | 384 | 331,009 | .948 .988 .989 | .928 .998 .996 | .981 .984 .987 | .977 .983 .985 |
-| the bundle, `split-v2` | 320,202 | .948 .990 .992 | .975 .999 .999 | .983 .991 .995 | .980 .985 .988 |
+| the bundle, `split-v3` | 329,356 | .948 .990 .992 | .975 .999 .999 | .983 .991 .995 | .980 .985 .988 |
 
 Blocks score 0.993 or better and Braille 1.000 at 192 and above. 320 is
 the narrowest width that comes back to v1 on the classes v1 knew: it is
@@ -487,10 +511,10 @@ a quarter of a cell wide in the corner of the empty quadrant, so those
 nets draw that corner as a step. The scores could not show it, since
 they compare a net with its own targets. `train/glyphs.py` now makes
 the quadrants and the mosaics by one rule and checks that each fills
-exactly its cells. `neuronte-pixel-v0`, trained from it, draws the
+exactly its cells. `neuronte-pixel-v1`, trained from it, draws the
 corner square, and `test_api --pixel` checks that it does. Scored
 against today's targets, the blocks of `neuronte-draw-v1` come to 0.9945
-at every size, against 1.0000 for `neuronte-pixel-v0`.
+at every size, against 1.0000 for `neuronte-pixel-v1`.
 
 Box lines are not snapped to pixels. A line's centre falls on a pixel
 edge at even cell sizes, so at 8 pixels a light line is two grey rows,

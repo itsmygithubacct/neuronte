@@ -143,8 +143,9 @@ def grid(wpx, ss):
 def cover(c, wpx, ss):
     xy = grid(wpx, ss)
     out = []
-    for i in range(0, c.shape[0], 8):
-        f = field(c[i:i + 8], xy.expand(c[i:i + 8].shape[0], -1, -1))
+    k = max(1, min(8, 2 ** 16 // xy.shape[1]))  # characters at a time, fewer for large cells
+    for i in range(0, c.shape[0], k):
+        f = field(c[i:i + k], xy.expand(c[i:i + k].shape[0], -1, -1))
         cv = (0.5 + f * TAU * wpx * ss).clamp(0, 1)
         out.append(cv.reshape(-1, 2 * wpx, ss, wpx, ss).mean((2, 4)))
     return torch.cat(out)
@@ -161,40 +162,8 @@ def label(i):
     return f"U+{ord(CHARS[i]):04X} {CHARS[i]}"
 
 
-res = {"set": a.set, "chars": G, "width": W, "steps": a.steps, "seed": a.seed, "pen": a.pen,
-       "unlabelled": a.unlabelled, "params": sum(q.numel() for q in net.parameters()),
-       "final_loss": float(loss.detach())}
-tier_idx = {t: torch.tensor([i for i, x in enumerate(TIERS) if x == t]) for t in dict.fromkeys(TIERS)}
-PIXEL_SIZES = (10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32)  # where a face is shown as binary letters
-SOFT = {"uilarge": (32, 48, 64, 96)}  # sets shown blended, and the sizes they are judged at
-for wpx in SOFT.get(a.set, (4, 5, 8) + PIXEL_SIZES + (48,)):
-    t = truth(wpx).reshape(G, -1)
-    # Targets that differ by under half a pixel of ink at this size, such
-    # as space and U+00A0, count as one when checking the nearest.
-    twin = torch.cdist(t, t, p=1) < 0.5
-    for ss in (1, 2):
-        n = cover(CF, wpx, ss).reshape(G, -1)
-        ti, ni = t > 0.5, n > 0.5
-        u = (ti | ni).sum(1).float()
-        iou = torch.where(u > 0, (ti & ni).sum(1).float() / u.clamp_min(1), torch.ones_like(u))
-        nearest = torch.cdist(n, t, p=1).argmin(1)
-        r = {"iou_mean": round(float(iou.mean()), 4), "iou_min": round(float(iou.min()), 4),
-             "worst": [label(int(i)) for i in iou.argsort()[:3]],
-             "nearest_ok": int(twin[gi, nearest].sum())}
-        if len(tier_idx) > 1:
-            r["tiers"] = {k: round(float(iou[ix].mean()), 4) for k, ix in tier_idx.items()}
-        if wpx in PIXEL_SIZES and a.set not in SOFT:
-            wrong = ti != ni
-            firm = wrong & ((t - 0.5).abs() >= 0.1)
-            r["exact"] = int((~wrong.any(1)).sum())
-            r["differ"] = [label(int(i)) for i in wrong.any(1).nonzero().flatten()]
-            r["wrong_pixels"] = int(wrong.sum())
-            r["firm_exact"] = int((~firm.any(1)).sum())
-            r["firm_differ"] = [label(int(i)) for i in firm.any(1).nonzero().flatten()]
-            r["firm_wrong_pixels"] = int(firm.sum())
-        res[f"w{wpx}_s{ss}"] = r
-
-
+# The weights are written before they are scored, so a run that fails
+# while scoring keeps them.
 def ranges(scalars):
     out, s = [], sorted(scalars)
     i = 0
@@ -229,4 +198,38 @@ doc = {
 }
 with open(a.out, "w") as fh:
     json.dump(doc, fh)
+
+
+res = {"set": a.set, "chars": G, "width": W, "steps": a.steps, "seed": a.seed, "pen": a.pen,
+       "unlabelled": a.unlabelled, "params": sum(q.numel() for q in net.parameters()),
+       "final_loss": float(loss.detach())}
+tier_idx = {t: torch.tensor([i for i, x in enumerate(TIERS) if x == t]) for t in dict.fromkeys(TIERS)}
+PIXEL_SIZES = (10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32)  # where a face is shown as binary letters
+SOFT = {"uilarge": (32, 48, 64, 96)}  # sets shown blended, and the sizes they are judged at
+for wpx in SOFT.get(a.set, (4, 5, 8) + PIXEL_SIZES + (48,)):
+    t = truth(wpx).reshape(G, -1)
+    # Targets that differ by under half a pixel of ink at this size, such
+    # as space and U+00A0, count as one when checking the nearest.
+    twin = torch.cdist(t, t, p=1) < 0.5
+    for ss in (1, 2):
+        n = cover(CF, wpx, ss).reshape(G, -1)
+        ti, ni = t > 0.5, n > 0.5
+        u = (ti | ni).sum(1).float()
+        iou = torch.where(u > 0, (ti & ni).sum(1).float() / u.clamp_min(1), torch.ones_like(u))
+        nearest = torch.cdist(n, t, p=1).argmin(1)
+        r = {"iou_mean": round(float(iou.mean()), 4), "iou_min": round(float(iou.min()), 4),
+             "worst": [label(int(i)) for i in iou.argsort()[:3]],
+             "nearest_ok": int(twin[gi, nearest].sum())}
+        if len(tier_idx) > 1:
+            r["tiers"] = {k: round(float(iou[ix].mean()), 4) for k, ix in tier_idx.items()}
+        if wpx in PIXEL_SIZES and a.set not in SOFT:
+            wrong = ti != ni
+            firm = wrong & ((t - 0.5).abs() >= 0.1)
+            r["exact"] = int((~wrong.any(1)).sum())
+            r["differ"] = [label(int(i)) for i in wrong.any(1).nonzero().flatten()]
+            r["wrong_pixels"] = int(wrong.sum())
+            r["firm_exact"] = int((~firm.any(1)).sum())
+            r["firm_differ"] = [label(int(i)) for i in firm.any(1).nonzero().flatten()]
+            r["firm_wrong_pixels"] = int(firm.sum())
+        res[f"w{wpx}_s{ss}"] = r
 print(json.dumps(res, ensure_ascii=False))

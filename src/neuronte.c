@@ -12,11 +12,18 @@
  * other layers are stored transposed so each multiply is an axpy over the
  * outputs, which skips the inputs ReLU set to zero.
  *
- * A weights file holds one net (version 1) or a bundle of several
- * (version 2) with a router: a table of scalar ranges, each drawn by one
- * net, and for scalars outside the table either a gate, a small net over
- * the same 64 code features that picks a net, or a fallback net. The
- * handle is the same either way; one net is a bundle of one.
+ * A weights file holds one distance net (version 1), a bundle of nets
+ * (version 2) with a router, or one colour net (version 3). A bundle's
+ * members are version 1 or version 3. The router is a table of scalar
+ * ranges, each drawn by one net, and for scalars outside the table either
+ * a gate, a small net over the same 64 code features that picks a net, or
+ * a fallback net. The handle is the same either way; one net is a bundle
+ * of one.
+ *
+ * A colour net has K distance outputs that share the hidden vector, a
+ * palette head that runs once per glyph, and the straight edges of the
+ * drawings. Snapping warps the sample positions. It does not change the
+ * weights. The warp is the one in train/snap.py.
  */
 #include "neuronte.h"
 
@@ -39,6 +46,11 @@
 #define BUNDLE_HEAD 28
 #define SETS 256 /* the draw cache: SETS x WAYS cells, least recently used out */
 #define WAYS 4
+#define MAX_K 16
+#define MAX_R 256
+#define COLOUR_FIXED 420
+#define MAX_E 65536
+#define MAX_MEMBER (32u * 1024u * 1024u) /* a wide colour net, plus its edge table */
 
 /* On x86-64 with GCC or Clang, build the inner loops twice, plain and
  * AVX2, and let the loader pick by CPU at run time. Built as ISO C, the
@@ -52,10 +64,39 @@
 #endif
 
 struct entry {
-    float *cov;
+    float *cov;   /* layers masks, each w * h, layer 0 first */
+    uint8_t *ent; /* one palette index per layer */
     uint32_t scalar;
-    int w, h, ss;
+    int w, h, ss, snap;
     unsigned long used;
+};
+
+struct one_edge {
+    float pos;
+    int rising;
+};
+
+struct layer_edges {
+    int nx, ny;
+    struct one_edge *x, *y;
+};
+
+struct glyph_rec {
+    uint32_t scalar;
+    struct layer_edges *layer;
+};
+
+struct colour {
+    int k, r, snap_px;
+    uint8_t dark[96], light[96];
+    float *w_out, *b_out; /* K x H, and K bias */
+    float *hw1, *hb1;     /* head h1, R x 64, and R bias */
+    float *hw2, *hb2;     /* head out, (K*5) x R, and K*5 bias */
+    float *mem;
+    struct glyph_rec *recs;
+    struct layer_edges *layers;
+    struct one_edge *pool;
+    int nrecs;
 };
 
 struct net {
@@ -71,7 +112,8 @@ struct net {
     float b4;
     float tau;
     uint32_t masks[NMASK];
-    float mem[]; /* the arrays above point into this */
+    struct colour *col; /* set for a version 3 net, otherwise NULL */
+    float mem[];        /* the arrays above point into this */
 };
 
 struct range {
@@ -88,6 +130,11 @@ struct neuronte {
     uint32_t gate_masks[NMASK];
     float *gate; /* CODE rows of gate_h (l1, transposed), gate_h bias, nets rows of gate_h, nets bias */
     int samples;
+    int theme;      /* 0 dark, 1 light */
+    int snap_below; /* snap a colour glyph when cell_w is below this; 0 is off */
+    int snap_file;  /* the number -1 restores */
+    int layers;     /* the largest K in the file, at least 1 */
+    uint8_t dark[96], light[96];
     unsigned long tick;
     struct entry cache[SETS][WAYS];
 };
@@ -96,6 +143,18 @@ struct neuronte {
 static size_t params(size_t h)
 {
     return h * IN + h + 2 * (h * h + h) + h + 1;
+}
+
+/* Trunk and palette-head weights of a colour net. Palette bytes and the
+ * edge table are not weights. */
+static size_t trunk_floats(size_t h, size_t k)
+{
+    return 2 * h * h + (93 + k) * h + k;
+}
+
+static size_t head_floats(size_t r, size_t k)
+{
+    return r * (65 + 5 * k) + 5 * k;
 }
 
 /* The length of a one-net file of hidden width h, or 0 if no such width. */
@@ -151,6 +210,7 @@ static int net_open(const unsigned char *p, size_t len, struct net **out)
     n = malloc(sizeof *n + (params((size_t)h) - 1) * sizeof *n->mem);
     if (!n)
         return NEURONTE_ERR_NOMEM;
+    n->col = NULL;
     m = n->mem;
     n->h = h;
     n->w1_pos = m;
@@ -220,24 +280,290 @@ static size_t bundle_len(const unsigned char *p)
     size_t total = bundle_prefix(p), i;
     for (i = 0; total && i < rd32(p + 12); i++) {
         uint32_t len = rd32(p + BUNDLE_HEAD + 4 * i);
-        if (len < HEADER || len > file_len(MAX_H))
+        /* A colour member is longer than a distance net of the same width.
+         * The cap is the largest colour image this reader will load. */
+        if (len < HEADER || len > MAX_MEMBER)
             return 0;
         total += len;
     }
     return total;
 }
 
+static void colour_free(struct colour *c)
+{
+    if (!c)
+        return;
+    free(c->mem);
+    free(c->recs);
+    free(c->layers);
+    free(c->pool);
+    free(c);
+}
+
+static void net_free(struct net *n)
+{
+    if (!n)
+        return;
+    colour_free(n->col);
+    free(n);
+}
+
 static void free_handle(neuronte *n)
 {
     int i, j;
     for (i = 0; i < n->nets; i++)
-        free(n->net[i]);
+        net_free(n->net[i]);
     for (i = 0; i < SETS; i++)
-        for (j = 0; j < WAYS; j++)
+        for (j = 0; j < WAYS; j++) {
             free(n->cache[i][j].cov);
+            free(n->cache[i][j].ent);
+        }
     free(n->ranges);
     free(n->gate);
     free(n);
+}
+
+static uint32_t rd16(const unsigned char *p)
+{
+    return (uint32_t)p[0] | (uint32_t)p[1] << 8;
+}
+
+/* 1 when the fixed header names a colour net this reader can size.
+ * A version 1 image with the version word overwritten fails here, and
+ * the caller reports it as a damaged file. */
+static int colour_sizes(const unsigned char *p, size_t *weights, uint32_t *k_out, uint32_t *e_out)
+{
+    uint32_t h = rd32(p + 20), k = rd32(p + 32), r = rd32(p + 44), e = rd32(p + 48);
+    size_t trunk, head;
+
+    if (rd32(p + 12) != OCT || rd32(p + 16) != CODE || rd32(p + 24) != LAYERS)
+        return 0;
+    if (rd32(p + 36) != 32 || rd32(p + 40) != 5 || k < 1 || k > MAX_K || e > MAX_E)
+        return 0;
+    if (h < 8 || h > MAX_H || h % 8 != 0 || r < 8 || r > MAX_R || r % 8 != 0)
+        return 0;
+    trunk = trunk_floats(h, k);
+    head = head_floats(r, k);
+    *weights = 4 * (trunk + head);
+    *k_out = k;
+    *e_out = e;
+    return 1;
+}
+
+/* One form A colour net from a version 3 image. */
+static int colour_open(const unsigned char *p, size_t len, struct net **out)
+{
+    struct net *n;
+    struct colour *c;
+    size_t weights, off, count, used;
+    float *m;
+    uint32_t k, rbits, e, snap, prev;
+    int h, r, i, o, layer;
+
+    if (len < COLOUR_FIXED || memcmp(p, "NEURONTE", 8) != 0 || rd32(p + 8) != 3)
+        return NEURONTE_ERR_FORMAT;
+    /* K before the shape checks: a distance file with its version word set
+     * to 3 has a parity mask there, not a layer count, and that is a
+     * damaged file rather than a net of a different shape. */
+    k = rd32(p + 32);
+    if (k < 1 || k > MAX_K)
+        return NEURONTE_ERR_FORMAT;
+    if (rd32(p + 36) != 32 || rd32(p + 40) != 5)
+        return NEURONTE_ERR_SHAPE;
+    if (rd32(p + 12) != OCT || rd32(p + 16) != CODE || rd32(p + 24) != LAYERS)
+        return NEURONTE_ERR_SHAPE;
+    if (!colour_sizes(p, &weights, &k, &e))
+        return NEURONTE_ERR_SHAPE;
+    snap = rd32(p + 52);
+    if (snap > 65535)
+        return NEURONTE_ERR_FORMAT;
+    if (len < COLOUR_FIXED + weights || !finite_run(p + COLOUR_FIXED, weights / 4))
+        return NEURONTE_ERR_FORMAT;
+
+    h = (int)rd32(p + 20);
+    r = (int)rd32(p + 44);
+    n = malloc(sizeof *n + (params((size_t)h) - 1) * sizeof *n->mem);
+    c = calloc(1, sizeof *c);
+    if (!n || !c) {
+        free(n);
+        free(c);
+        return NEURONTE_ERR_NOMEM;
+    }
+    n->col = c;
+    m = n->mem;
+    n->h = h;
+    n->w1_pos = m;
+    n->w1_code = m += POS * h;
+    n->b1 = m += CODE * h;
+    n->w2 = m += h;
+    n->b2 = m += (size_t)h * h;
+    n->w3 = m += h;
+    n->b3 = m += (size_t)h * h;
+    n->w4 = m += h;
+    n->tau = rdf(p + 28);
+    if (!isfinite(n->tau) || n->tau <= 0)
+        goto bad;
+    for (i = 0; i < NMASK; i++) {
+        n->masks[i] = rd32(p + 56 + 4 * i);
+        if (n->masks[i] == 0 || n->masks[i] >= 1u << 21)
+            goto bad;
+    }
+    c->k = (int)k;
+    c->r = r;
+    c->snap_px = (int)snap;
+    memcpy(c->dark, p + 228, 96);
+    memcpy(c->light, p + 324, 96);
+    /* Trunk hidden weights live in n->mem. What remains is the K outputs
+     * and the palette head. */
+    {
+        size_t hidden = (size_t)(2 * h * h + 93 * h);
+        size_t rest = weights / 4 - hidden;
+        float *cm;
+
+        c->mem = malloc(rest * sizeof *c->mem);
+        if (!c->mem)
+            goto nomem;
+        cm = c->mem;
+        c->w_out = cm;
+        c->b_out = cm += (size_t)k * h;
+        c->hw1 = cm += k;
+        c->hb1 = cm += (size_t)r * 64;
+        c->hw2 = cm += r;
+        c->hb2 = cm += (size_t)k * 5 * r;
+        (void)cm;
+    }
+
+    off = COLOUR_FIXED;
+#define NEXT() (off += 4, rdf(p + off - 4))
+    for (o = 0; o < h; o++)
+        for (i = 0; i < IN; i++) {
+            float v = NEXT();
+            if (i < POS)
+                n->w1_pos[(size_t)i * h + o] = v;
+            else
+                n->w1_code[(size_t)(i - POS) * h + o] = v;
+        }
+    for (o = 0; o < h; o++)
+        n->b1[o] = NEXT();
+    for (o = 0; o < h; o++)
+        for (i = 0; i < h; i++)
+            n->w2[(size_t)i * h + o] = NEXT();
+    for (o = 0; o < h; o++)
+        n->b2[o] = NEXT();
+    for (o = 0; o < h; o++)
+        for (i = 0; i < h; i++)
+            n->w3[(size_t)i * h + o] = NEXT();
+    for (o = 0; o < h; o++)
+        n->b3[o] = NEXT();
+    for (layer = 0; layer < (int)k; layer++)
+        for (i = 0; i < h; i++)
+            c->w_out[(size_t)layer * h + i] = NEXT();
+    for (layer = 0; layer < (int)k; layer++)
+        c->b_out[layer] = NEXT();
+    for (o = 0; o < r; o++)
+        for (i = 0; i < CODE; i++)
+            c->hw1[(size_t)o * CODE + i] = NEXT();
+    for (o = 0; o < r; o++)
+        c->hb1[o] = NEXT();
+    rbits = k * 5;
+    for (o = 0; o < (int)rbits; o++)
+        for (i = 0; i < r; i++)
+            c->hw2[(size_t)o * r + i] = NEXT();
+    for (o = 0; o < (int)rbits; o++)
+        c->hb2[o] = NEXT();
+#undef NEXT
+
+    /* One pass to check the edge table, one to keep it. */
+    count = 0;
+    prev = 0;
+    {
+        size_t at = off;
+        for (e = 0; e < rd32(p + 48); e++) {
+            uint32_t scalar, nk;
+            if (at + 4 > len)
+                goto bad;
+            scalar = rd32(p + at);
+            at += 4;
+            if (e > 0 && scalar <= prev)
+                goto bad;
+            prev = scalar;
+            for (nk = 0; nk < k; nk++) {
+                uint32_t nx, ny, t;
+                if (at + 4 > len)
+                    goto bad;
+                nx = rd16(p + at);
+                ny = rd16(p + at + 2);
+                at += 4;
+                if (at + (size_t)(nx + ny) * 8 > len)
+                    goto bad;
+                for (t = 0; t < nx + ny; t++) {
+                    float pos = rdf(p + at);
+                    uint32_t side = rd32(p + at + 4);
+                    if (!isfinite(pos) || side > 1)
+                        goto bad;
+                    at += 8;
+                }
+                count += (size_t)nx + ny;
+            }
+        }
+        if (at != len)
+            goto bad;
+    }
+    c->nrecs = (int)rd32(p + 48);
+    if (c->nrecs) {
+        c->recs = calloc((size_t)c->nrecs, sizeof *c->recs);
+        c->layers = calloc((size_t)c->nrecs * k, sizeof *c->layers);
+        if (!c->recs || !c->layers)
+            goto nomem;
+    }
+    if (count) {
+        c->pool = calloc(count, sizeof *c->pool);
+        if (!c->pool)
+            goto nomem;
+    }
+    used = 0;
+    for (e = 0; e < (uint32_t)c->nrecs; e++) {
+        uint32_t nk;
+        c->recs[e].scalar = rd32(p + off);
+        off += 4;
+        c->recs[e].layer = c->layers + (size_t)e * k;
+        for (nk = 0; nk < k; nk++) {
+            struct layer_edges *le = &c->recs[e].layer[nk];
+            uint32_t t;
+            le->nx = (int)rd16(p + off);
+            le->ny = (int)rd16(p + off + 2);
+            off += 4;
+            le->x = c->pool + used;
+            for (t = 0; t < (uint32_t)le->nx; t++, off += 8, used++) {
+                c->pool[used].pos = rdf(p + off);
+                c->pool[used].rising = (int)rd32(p + off + 4);
+            }
+            le->y = c->pool + used;
+            for (t = 0; t < (uint32_t)le->ny; t++, off += 8, used++) {
+                c->pool[used].pos = rdf(p + off);
+                c->pool[used].rising = (int)rd32(p + off + 4);
+            }
+        }
+    }
+    *out = n;
+    return NEURONTE_OK;
+nomem:
+    net_free(n);
+    return NEURONTE_ERR_NOMEM;
+bad:
+    net_free(n);
+    return NEURONTE_ERR_FORMAT;
+}
+
+static int member_open(const unsigned char *p, size_t len, struct net **out)
+{
+    if (len < 12 || memcmp(p, "NEURONTE", 8) != 0)
+        return NEURONTE_ERR_FORMAT;
+    if (rd32(p + 8) == 1)
+        return net_open(p, len, out);
+    if (rd32(p + 8) == 3)
+        return colour_open(p, len, out);
+    return NEURONTE_ERR_FORMAT;
 }
 
 static int bundle_open(const unsigned char *p, size_t len, neuronte *n)
@@ -291,7 +617,7 @@ static int bundle_open(const unsigned char *p, size_t len, neuronte *n)
     }
     for (i = 0; i < k; i++) {
         size_t nl = rd32(p + BUNDLE_HEAD + 4 * i);
-        rc = net_open(p + off, nl, &n->net[i]);
+        rc = member_open(p + off, nl, &n->net[i]);
         if (rc != NEURONTE_OK)
             return rc;
         n->nets++;
@@ -300,10 +626,43 @@ static int bundle_open(const unsigned char *p, size_t len, neuronte *n)
     return NEURONTE_OK;
 }
 
+/* Copy the first colour net's palette and snap threshold onto the handle.
+ * A later colour net with a different palette or threshold is a damaged
+ * bundle. A file of distance nets keeps a zero palette and snapping off. */
+static int adopt(neuronte *n)
+{
+    int i, seen = 0;
+
+    n->layers = 1;
+    n->snap_file = 0;
+    n->snap_below = 0;
+    memset(n->dark, 0, sizeof n->dark);
+    memset(n->light, 0, sizeof n->light);
+    for (i = 0; i < n->nets; i++) {
+        struct colour *c = n->net[i]->col;
+        if (!c)
+            continue;
+        if (!seen) {
+            memcpy(n->dark, c->dark, 96);
+            memcpy(n->light, c->light, 96);
+            n->snap_file = c->snap_px;
+            n->snap_below = c->snap_px;
+            seen = 1;
+        } else if (memcmp(n->dark, c->dark, 96) != 0 || memcmp(n->light, c->light, 96) != 0 ||
+                   c->snap_px != n->snap_file) {
+            return NEURONTE_ERR_FORMAT;
+        }
+        if (c->k > n->layers)
+            n->layers = c->k;
+    }
+    return NEURONTE_OK;
+}
+
 int neuronte_open(const void *data, size_t len, neuronte **out)
 {
     const unsigned char *p = data;
     neuronte *n;
+    uint32_t ver;
     int rc;
 
     if (!out)
@@ -311,17 +670,25 @@ int neuronte_open(const void *data, size_t len, neuronte **out)
     *out = NULL;
     if (!data)
         return NEURONTE_ERR_ARG;
-    if (len < 12 || memcmp(p, "NEURONTE", 8) != 0 || (rd32(p + 8) != 1 && rd32(p + 8) != 2))
+    if (len < 12 || memcmp(p, "NEURONTE", 8) != 0)
+        return NEURONTE_ERR_FORMAT;
+    ver = rd32(p + 8);
+    if (ver != 1 && ver != 2 && ver != 3)
         return NEURONTE_ERR_FORMAT;
     n = calloc(1, sizeof *n);
     if (!n)
         return NEURONTE_ERR_NOMEM;
-    if (rd32(p + 8) == 1) {
+    if (ver == 1) {
         rc = net_open(p, len, &n->net[0]);
         n->nets = rc == NEURONTE_OK;
-    } else {
+    } else if (ver == 2) {
         rc = bundle_open(p, len, n);
+    } else {
+        rc = colour_open(p, len, &n->net[0]);
+        n->nets = rc == NEURONTE_OK;
     }
+    if (rc == NEURONTE_OK)
+        rc = adopt(n);
     if (rc != NEURONTE_OK) {
         free_handle(n);
         return rc;
@@ -330,8 +697,97 @@ int neuronte_open(const void *data, size_t len, neuronte **out)
     return NEURONTE_OK;
 }
 
+/* Append n bytes. 1 means the file ended early: *len is what was read,
+ * and the caller lets neuronte_open report the short file. A count that
+ * would pass MAX_MEMBER is refused before the read. */
+static int colour_append(FILE *f, unsigned char **buf, size_t *len, size_t *cap, size_t n)
+{
+    size_t got;
+    unsigned char *grown;
+
+    if (n > MAX_MEMBER || *len > MAX_MEMBER - n)
+        return NEURONTE_ERR_FORMAT;
+    if (*len + n + 1 > *cap) {
+        grown = realloc(*buf, *len + n + 1);
+        if (!grown)
+            return NEURONTE_ERR_NOMEM;
+        *buf = grown;
+        *cap = *len + n + 1;
+    }
+    got = fread(*buf + *len, 1, n, f);
+    *len += got;
+    if (ferror(f))
+        return NEURONTE_ERR_IO;
+    return got == n ? NEURONTE_OK : 1;
+}
+
+/* A version 3 image: fixed header, weights, edge table, and one extra
+ * byte so a file that runs on is rejected. */
+static int slurp_colour(FILE *f, const unsigned char *fixed, unsigned char **out, size_t *out_len)
+{
+    size_t weights, len, cap;
+    uint32_t k, e, rec, layer;
+    unsigned char *buf;
+    int rc;
+
+    if (!colour_sizes(fixed, &weights, &k, &e) || COLOUR_FIXED + weights > MAX_MEMBER) {
+        buf = malloc(COLOUR_FIXED);
+        if (!buf)
+            return NEURONTE_ERR_NOMEM;
+        memcpy(buf, fixed, COLOUR_FIXED);
+        *out = buf;
+        *out_len = COLOUR_FIXED;
+        return NEURONTE_OK;
+    }
+    cap = COLOUR_FIXED + weights + 1;
+    buf = malloc(cap);
+    if (!buf)
+        return NEURONTE_ERR_NOMEM;
+    memcpy(buf, fixed, COLOUR_FIXED);
+    len = COLOUR_FIXED;
+    rc = colour_append(f, &buf, &len, &cap, weights);
+    if (rc == 1)
+        goto done;
+    if (rc != NEURONTE_OK)
+        goto fail;
+    for (rec = 0; rec < e; rec++) {
+        rc = colour_append(f, &buf, &len, &cap, 4);
+        if (rc == 1)
+            goto done;
+        if (rc != NEURONTE_OK)
+            goto fail;
+        for (layer = 0; layer < k; layer++) {
+            size_t at = len;
+            uint32_t nx, ny;
+            rc = colour_append(f, &buf, &len, &cap, 4);
+            if (rc == 1)
+                goto done;
+            if (rc != NEURONTE_OK)
+                goto fail;
+            nx = rd16(buf + at);
+            ny = rd16(buf + at + 2);
+            rc = colour_append(f, &buf, &len, &cap, (size_t)(nx + ny) * 8);
+            if (rc == 1)
+                goto done;
+            if (rc != NEURONTE_OK)
+                goto fail;
+        }
+    }
+    rc = colour_append(f, &buf, &len, &cap, 1);
+    if (rc == 1 || rc == NEURONTE_OK)
+        goto done;
+fail:
+    free(buf);
+    return rc;
+done:
+    *out = buf;
+    *out_len = len;
+    return NEURONTE_OK;
+}
+
 /* Read exactly the bytes the file's header says it has, and one more,
- * which shows a file too long; never more than that. */
+ * which shows a file too long; never more than that. A version 3 file's
+ * length is the edge table's, so that table is walked with the same cap. */
 int neuronte_open_file(const char *path, neuronte **out)
 {
     unsigned char head[BUNDLE_HEAD], *buf = NULL;
@@ -348,6 +804,31 @@ int neuronte_open_file(const char *path, neuronte **out)
     if (!f)
         return NEURONTE_ERR_IO;
     got = fread(head, 1, sizeof head, f);
+    if (got == sizeof head && rd32(head + 8) == 3) {
+        unsigned char fixed[COLOUR_FIXED];
+        size_t more;
+        memcpy(fixed, head, sizeof head);
+        more = fread(fixed + sizeof head, 1, COLOUR_FIXED - sizeof head, f);
+        if (ferror(f)) {
+            fclose(f);
+            return NEURONTE_ERR_IO;
+        }
+        got = sizeof head + more;
+        if (got < COLOUR_FIXED) {
+            rc = neuronte_open(fixed, got, out);
+            fclose(f);
+            return rc;
+        }
+        rc = slurp_colour(f, fixed, &buf, &got);
+        if (rc != NEURONTE_OK) {
+            fclose(f);
+            return rc;
+        }
+        rc = neuronte_open(buf, got, out);
+        fclose(f);
+        free(buf);
+        return rc;
+    }
     if (got == sizeof head && rd32(head + 8) == 1)
         want = file_len(rd32(head + 20));
     else if (got == sizeof head && rd32(head + 8) == 2)
@@ -401,8 +882,14 @@ size_t neuronte_parameters(const neuronte *n)
     int i;
     if (!n)
         return 0;
-    for (i = 0; i < n->nets; i++)
-        total += params((size_t)n->net[i]->h);
+    for (i = 0; i < n->nets; i++) {
+        struct colour *c = n->net[i]->col;
+        if (c)
+            total += trunk_floats((size_t)n->net[i]->h, (size_t)c->k) +
+                     head_floats((size_t)c->r, (size_t)c->k);
+        else
+            total += params((size_t)n->net[i]->h);
+    }
     return total + (n->gate_h ? gate_params((size_t)n->gate_h, (size_t)n->nets) : 0);
 }
 
@@ -422,6 +909,35 @@ int neuronte_set_samples(neuronte *n, int per_axis)
     if (!n || per_axis < 0 || per_axis > NEURONTE_MAX_SAMPLES)
         return NEURONTE_ERR_ARG;
     n->samples = per_axis;
+    return NEURONTE_OK;
+}
+
+int neuronte_layers(const neuronte *n)
+{
+    return n ? n->layers : 0;
+}
+
+int neuronte_set_theme(neuronte *n, int theme)
+{
+    if (!n || (theme != 0 && theme != 1))
+        return NEURONTE_ERR_ARG;
+    n->theme = theme;
+    return NEURONTE_OK;
+}
+
+int neuronte_set_snap(neuronte *n, int below_px)
+{
+    if (!n || below_px < -1)
+        return NEURONTE_ERR_ARG;
+    n->snap_below = below_px < 0 ? n->snap_file : below_px;
+    return NEURONTE_OK;
+}
+
+int neuronte_palette(const neuronte *n, int theme, uint8_t *rgb)
+{
+    if (!n || !rgb || (theme != 0 && theme != 1))
+        return NEURONTE_ERR_ARG;
+    memcpy(rgb, theme ? n->light : n->dark, 96);
     return NEURONTE_OK;
 }
 
@@ -566,6 +1082,324 @@ static int auto_samples(int cell_w)
     return cell_w < 24 ? 2 : 1;
 }
 
+struct warp_pair {
+    double p, t;
+};
+
+static int cmp_edge(const void *a, const void *b)
+{
+    const struct one_edge *x = a, *y = b;
+    if (x->pos < y->pos)
+        return -1;
+    if (x->pos > y->pos)
+        return 1;
+    return x->rising - y->rising;
+}
+
+static int cmp_pair(const void *a, const void *b)
+{
+    const struct warp_pair *x = a, *y = b;
+    if (x->p < y->p)
+        return -1;
+    if (x->p > y->p)
+        return 1;
+    if (x->t < y->t)
+        return -1;
+    if (x->t > y->t)
+        return 1;
+    return 0;
+}
+
+/* Nearest whole pixel. A value on n + 0.5 moves toward centre. */
+static double round_half(double v, double centre)
+{
+    double f = floor(v);
+    if (v - f == 0.5)
+        return v > centre ? f : f + 1.0;
+    return floor(v + 0.5);
+}
+
+static double interp_knots(double u, const double *xp, const double *fp, int n)
+{
+    int i;
+    if (n <= 1 || u <= xp[0])
+        return fp[0];
+    if (u >= xp[n - 1])
+        return fp[n - 1];
+    for (i = 1; i < n; i++) {
+        if (u <= xp[i]) {
+            double span = xp[i] - xp[i - 1];
+            if (span == 0.0)
+                return fp[i - 1];
+            return fp[i - 1] + (u - xp[i - 1]) * (fp[i] - fp[i - 1]) / span;
+        }
+    }
+    return fp[n - 1];
+}
+
+/* Knots for one axis, matching train/snap.py. orig is the original pixel
+ * position and snapped is where it lands. Both run from 0 to extent. */
+static int build_knots(const struct glyph_rec *rec, int k, int axis, double scale, double extent,
+                       double **orig_out, double **snap_out, int *n_out)
+{
+    struct warp_pair *pairs = NULL, *kn;
+    double *orig, *snapped;
+    int total = 0, np = 0, nk, layer, i;
+
+    for (layer = 0; layer < k; layer++)
+        total += axis == 0 ? rec->layer[layer].nx : rec->layer[layer].ny;
+    if (total) {
+        pairs = malloc((size_t)total * sizeof *pairs);
+        if (!pairs)
+            return NEURONTE_ERR_NOMEM;
+    }
+    for (layer = 0; layer < k; layer++) {
+        struct layer_edges *le = &rec->layer[layer];
+        struct one_edge *src = axis == 0 ? le->x : le->y;
+        struct one_edge *ed;
+        int n = axis == 0 ? le->nx : le->ny;
+        int e;
+        if (!n)
+            continue;
+        ed = malloc((size_t)n * sizeof *ed);
+        if (!ed) {
+            free(pairs);
+            return NEURONTE_ERR_NOMEM;
+        }
+        memcpy(ed, src, (size_t)n * sizeof *ed);
+        qsort(ed, (size_t)n, sizeof *ed, cmp_edge);
+        for (e = 0; e < n;) {
+            double p = (double)ed[e].pos * scale;
+            if (ed[e].rising && e + 1 < n && !ed[e + 1].rising) {
+                double q = (double)ed[e + 1].pos * scale;
+                double w = ceil(q - p - 0.5);
+                double left;
+                if (w < 1.0)
+                    w = 1.0;
+                left = round_half((p + q) / 2.0 - w / 2.0, extent / 2.0 - w / 2.0);
+                pairs[np].p = p;
+                pairs[np++].t = left;
+                pairs[np].p = q;
+                pairs[np++].t = left + w;
+                e += 2;
+            } else {
+                pairs[np].p = p;
+                pairs[np++].t = round_half(p, extent / 2.0);
+                e++;
+            }
+        }
+        free(ed);
+    }
+    if (np > 1)
+        qsort(pairs, (size_t)np, sizeof *pairs, cmp_pair);
+    kn = malloc((size_t)(np + 2) * sizeof *kn);
+    if (!kn) {
+        free(pairs);
+        return NEURONTE_ERR_NOMEM;
+    }
+    kn[0].p = 0;
+    kn[0].t = 0;
+    nk = 1;
+    for (i = 0; i < np; i++) {
+        double p = pairs[i].p, t = pairs[i].t, lp = kn[nk - 1].p, lt = kn[nk - 1].t;
+        if (p - lp < 0.5 || p >= extent)
+            continue;
+        if (t < lt + 1.0)
+            t = lt + 1.0;
+        if (t >= extent)
+            break;
+        kn[nk].p = p;
+        kn[nk].t = t;
+        nk++;
+    }
+    kn[nk].p = extent;
+    kn[nk].t = extent;
+    nk++;
+    free(pairs);
+    orig = malloc((size_t)nk * sizeof *orig);
+    snapped = malloc((size_t)nk * sizeof *snapped);
+    if (!orig || !snapped) {
+        free(orig);
+        free(snapped);
+        free(kn);
+        return NEURONTE_ERR_NOMEM;
+    }
+    for (i = 0; i < nk; i++) {
+        orig[i] = kn[i].p;
+        snapped[i] = kn[i].t;
+    }
+    free(kn);
+    *orig_out = orig;
+    *snap_out = snapped;
+    *n_out = nk;
+    return NEURONTE_OK;
+}
+
+static int axis_samples(const struct glyph_rec *rec, int k, int axis, int n_px, int ss, double scale,
+                        double extent, double *out)
+{
+    double *orig = NULL, *snapped = NULL;
+    int n = n_px * ss, nk = 0, i, rc = NEURONTE_OK;
+
+    if (rec) {
+        rc = build_knots(rec, k, axis, scale, extent, &orig, &snapped, &nk);
+        if (rc != NEURONTE_OK)
+            return rc;
+    }
+    for (i = 0; i < n; i++) {
+        double u = ((double)i + 0.5) / (double)ss;
+        out[i] = (rec ? interp_knots(u, snapped, orig, nk) : u) / scale;
+    }
+    free(orig);
+    free(snapped);
+    return NEURONTE_OK;
+}
+
+static const struct glyph_rec *find_rec(const struct colour *c, uint32_t s)
+{
+    int lo = 0, hi = c->nrecs;
+    while (lo < hi) {
+        int mid = lo + (hi - lo) / 2;
+        if (c->recs[mid].scalar < s)
+            lo = mid + 1;
+        else
+            hi = mid;
+    }
+    if (lo < c->nrecs && c->recs[lo].scalar == s)
+        return &c->recs[lo];
+    return NULL;
+}
+
+/* Snapping is on only for a colour glyph that has an edge record, and only
+ * when the cell is narrower than the threshold. */
+static int snap_on(const neuronte *hd, const struct net *net, uint32_t s, int cell_w)
+{
+    return net->col && hd->snap_below > 0 && cell_w < hd->snap_below && find_rec(net->col, s) != NULL;
+}
+
+static void colour_hidden(const struct net *n, const float *c, const float *xp, const float *yp,
+                          float *scratch)
+{
+    int o, h = n->h;
+    float *h1 = scratch, *h2 = scratch + h, *h3 = scratch + 2 * h;
+    for (o = 0; o < h; o++) {
+        float v = c[o] + xp[o] + yp[o];
+        h1[o] = v > 0.0f ? v : 0.0f;
+    }
+    dense(n->w2, n->b2, h1, h2, h);
+    dense(n->w3, n->b3, h2, h3, h);
+}
+
+static void palette_index(const struct net *n, uint32_t s, uint8_t *entries)
+{
+    const struct colour *c = n->col;
+    float code[CODE], hid[MAX_R];
+    int r = c->r, k = c->k, i, o, layer;
+
+    code_of(s, n->masks, code);
+    memcpy(hid, c->hb1, (size_t)r * sizeof *hid);
+    for (i = 0; i < CODE; i++)
+        for (o = 0; o < r; o++)
+            hid[o] += code[i] * c->hw1[(size_t)o * CODE + i];
+    for (o = 0; o < r; o++)
+        if (!(hid[o] > 0.0f))
+            hid[o] = 0.0f;
+    for (layer = 0; layer < k; layer++) {
+        int bits = 0, b;
+        for (b = 0; b < 5; b++) {
+            int row = layer * 5 + b;
+            float z = c->hb2[row];
+            for (o = 0; o < r; o++)
+                z += c->hw2[(size_t)row * r + o] * hid[o];
+            if (z > 0.0f)
+                bits |= 1 << b;
+        }
+        entries[layer] = (uint8_t)bits;
+    }
+}
+
+/* K coverage masks and K palette indices. masks has room for K planes of
+ * cell_h * cell_w, and the caller has zeroed any planes past K. */
+static int eval_colour(const neuronte *hd, const struct net *net, uint32_t scalar, int cell_w, int cell_h,
+                       int ss, float *masks, uint8_t *entries)
+{
+    const struct colour *col = net->col;
+    const struct glyph_rec *rec;
+    double *pos;
+    float *mem, *part, *scratch, *xp, *yp, slope;
+    int k = col->k, h = net->h, sw = cell_w * ss, sh = cell_h * ss;
+    int i, j, px, py, layer, rc;
+    size_t plane = (size_t)cell_w * cell_h;
+
+    rec = snap_on(hd, net, scalar, cell_w) ? find_rec(col, scalar) : NULL;
+    pos = malloc(((size_t)sw + (size_t)sh) * sizeof *pos);
+    mem = malloc(((size_t)sw + (size_t)sh + 4) * (size_t)h * sizeof *mem);
+    if (!pos || !mem) {
+        free(pos);
+        free(mem);
+        return NEURONTE_ERR_NOMEM;
+    }
+    rc = axis_samples(rec, k, 0, cell_w, ss, cell_w, cell_w, pos);
+    if (rc == NEURONTE_OK)
+        rc = axis_samples(rec, k, 1, cell_h, ss, (double)cell_h / 2.0, cell_h, pos + sw);
+    if (rc != NEURONTE_OK) {
+        free(pos);
+        free(mem);
+        return rc;
+    }
+    part = mem;
+    scratch = part + h;
+    xp = scratch + 3 * h;
+    yp = xp + (size_t)sw * h;
+    char_part(net, scalar, part);
+    for (i = 0; i < sw; i++)
+        axis_part(net, 0, pos[i], xp + (size_t)i * h);
+    for (j = 0; j < sh; j++)
+        axis_part(net, 1, pos[sw + j], yp + (size_t)j * h);
+    palette_index(net, scalar, entries);
+    slope = net->tau * (float)cell_w * (float)ss;
+    for (py = 0; py < cell_h; py++)
+        for (px = 0; px < cell_w; px++) {
+            float acc[MAX_K];
+            memset(acc, 0, sizeof acc);
+            for (j = 0; j < ss; j++)
+                for (i = 0; i < ss; i++) {
+                    const float *h3;
+                    colour_hidden(net, part, xp + (size_t)(px * ss + i) * h,
+                                  yp + (size_t)(py * ss + j) * h, scratch);
+                    h3 = scratch + 2 * h;
+                    for (layer = 0; layer < k; layer++) {
+                        const float *w = col->w_out + (size_t)layer * h;
+                        float f = col->b_out[layer], v;
+                        int o;
+                        for (o = 0; o < h; o++)
+                            f += w[o] * h3[o];
+                        v = 0.5f + slope * f;
+                        acc[layer] += v < 0.0f ? 0.0f : v > 1.0f ? 1.0f : v;
+                    }
+                }
+            for (layer = 0; layer < k; layer++)
+                masks[(size_t)layer * plane + (size_t)py * cell_w + px] = acc[layer] / (float)(ss * ss);
+        }
+    free(pos);
+    free(mem);
+    return NEURONTE_OK;
+}
+
+static float cover_alpha(const float *masks, const uint8_t *ent, int k, size_t plane, size_t px)
+{
+    float a = 0.0f;
+    int layer;
+    for (layer = 0; layer < k; layer++) {
+        float c = masks[(size_t)layer * plane + px];
+        if (ent[layer] == 1)
+            a *= 1.0f - c;
+        else
+            a = c + a * (1.0f - c);
+    }
+    return a;
+}
+
 int neuronte_route(const neuronte *n, uint32_t scalar)
 {
     return n ? route(n, normalize(scalar)) : NEURONTE_ERR_ARG;
@@ -586,6 +1420,21 @@ int neuronte_coverage(const neuronte *hd, uint32_t scalar, int cell_w, int cell_
         ss = auto_samples(cell_w);
     scalar = normalize(scalar);
     n = hd->net[route(hd, scalar)];
+    if (n->col) {
+        size_t plane = (size_t)cell_w * cell_h;
+        int k = n->col->k, rc;
+        float *masks = calloc(plane * (size_t)k, sizeof *masks);
+        uint8_t ent[MAX_K];
+        size_t px;
+        if (!masks)
+            return NEURONTE_ERR_NOMEM;
+        rc = eval_colour(hd, n, scalar, cell_w, cell_h, ss, masks, ent);
+        if (rc == NEURONTE_OK)
+            for (px = 0; px < plane; px++)
+                coverage[px] = cover_alpha(masks, ent, k, plane, px);
+        free(masks);
+        return rc;
+    }
     sw = cell_w * ss;
     sh = cell_h * ss;
     h = (size_t)n->h;
@@ -617,40 +1466,131 @@ int neuronte_coverage(const neuronte *hd, uint32_t scalar, int cell_w, int cell_
     return NEURONTE_OK;
 }
 
-static const float *cached(neuronte *n, uint32_t s, int w, int h, int ss, int *rc)
+int neuronte_coverage_layers(const neuronte *hd, uint32_t scalar, int cell_w, int cell_h,
+                             int samples_per_axis, float *masks, uint8_t *entries)
 {
-    uint32_t k = s * 2654435761u ^ (uint32_t)w * 40503u ^ (uint32_t)h * 9973u ^ (uint32_t)ss;
-    struct entry *set = n->cache[(k >> 8) % SETS], *e = set;
+    const struct net *n;
+    int ss = samples_per_axis, layers, rc;
+    size_t plane;
+
+    if (!hd || !masks || !entries || cell_w <= 0 || cell_h <= 0 || cell_w > NEURONTE_MAX_CELL ||
+        cell_h > NEURONTE_MAX_CELL || ss < 0 || ss > NEURONTE_MAX_SAMPLES)
+        return NEURONTE_ERR_ARG;
+    if (ss == 0)
+        ss = auto_samples(cell_w);
+    scalar = normalize(scalar);
+    n = hd->net[route(hd, scalar)];
+    layers = hd->layers;
+    plane = (size_t)cell_w * cell_h;
+    memset(entries, 0, (size_t)layers);
+    memset(masks, 0, plane * (size_t)layers * sizeof *masks);
+    if (!n->col)
+        return neuronte_coverage(hd, scalar, cell_w, cell_h, ss, masks);
+    rc = eval_colour(hd, n, scalar, cell_w, cell_h, ss, masks, entries);
+    return rc;
+}
+
+static const struct entry *cached(neuronte *n, uint32_t s, int w, int h, int ss, int *rc)
+{
+    const struct net *net = n->net[route(n, s)];
+    int snap = snap_on(n, net, s, w);
+    uint32_t key = s * 2654435761u ^ (uint32_t)w * 40503u ^ (uint32_t)h * 9973u ^ (uint32_t)ss;
+    struct entry *set, *e;
     float *cov;
+    uint8_t *ent;
     int i;
 
+    if (snap)
+        key ^= 0x9E3779B9u;
+    set = n->cache[(key >> 8) % SETS];
+    e = set;
     for (i = 0; i < WAYS; i++) {
         struct entry *c = &set[i];
-        if (c->cov && c->scalar == s && c->w == w && c->h == h && c->ss == ss) {
+        if (c->cov && c->scalar == s && c->w == w && c->h == h && c->ss == ss && c->snap == snap) {
             c->used = ++n->tick;
-            return c->cov;
+            return c;
         }
         if (!c->cov || (e->cov && c->used < e->used))
             e = c; /* an empty way, else the least recently used */
     }
-    cov = malloc((size_t)w * h * sizeof *cov);
-    if (!cov) {
+    cov = calloc((size_t)n->layers * (size_t)w * (size_t)h, sizeof *cov);
+    ent = calloc((size_t)n->layers, 1);
+    if (!cov || !ent) {
+        free(cov);
+        free(ent);
         *rc = NEURONTE_ERR_NOMEM;
         return NULL;
     }
-    *rc = neuronte_coverage(n, s, w, h, ss, cov);
+    if (!net->col)
+        *rc = neuronte_coverage(n, s, w, h, ss, cov);
+    else
+        *rc = eval_colour(n, net, s, w, h, ss, cov, ent);
     if (*rc != NEURONTE_OK) {
         free(cov);
+        free(ent);
         return NULL;
     }
     free(e->cov);
+    free(e->ent);
     e->cov = cov;
+    e->ent = ent;
     e->scalar = s;
     e->w = w;
     e->h = h;
     e->ss = ss;
+    e->snap = snap;
     e->used = ++n->tick;
-    return cov;
+    return e;
+}
+
+static int byte_chan(float v)
+{
+    if (!(v > 0.0f))
+        return 0;
+    if (v >= 255.0f)
+        return 255;
+    return (int)(v + 0.5f);
+}
+
+/* Premultiplied composite, back to front, then scaled by the call's alpha. */
+static void over_pixel(const float *masks, const uint8_t *ent, int k, size_t plane, size_t px,
+                       const uint8_t *pal, uint32_t color, float *or, float *og, float *ob, float *oa)
+{
+    float r = 0.0f, g = 0.0f, b = 0.0f, a = 0.0f;
+    float cr = (float)((color >> 16) & 255), cg = (float)((color >> 8) & 255), cb = (float)(color & 255);
+    float ca = (float)(color >> 24) / 255.0f;
+    int layer;
+
+    for (layer = 0; layer < k; layer++) {
+        float c = masks[(size_t)layer * plane + px];
+        float keep = 1.0f - c;
+        int entry = ent[layer];
+        if (entry == 1) {
+            r *= keep;
+            g *= keep;
+            b *= keep;
+            a *= keep;
+        } else {
+            float ir, ig, ib;
+            if (entry >= 2 && entry <= 31) {
+                ir = pal[entry * 3];
+                ig = pal[entry * 3 + 1];
+                ib = pal[entry * 3 + 2];
+            } else {
+                ir = cr;
+                ig = cg;
+                ib = cb;
+            }
+            r = ir * c + r * keep;
+            g = ig * c + g * keep;
+            b = ib * c + b * keep;
+            a = c + a * keep;
+        }
+    }
+    *or = r * ca;
+    *og = g * ca;
+    *ob = b * ca;
+    *oa = a * ca;
 }
 
 static uint32_t blend(uint32_t dst, uint32_t color, float a)
@@ -671,7 +1611,8 @@ static uint32_t blend(uint32_t dst, uint32_t color, float a)
 int neuronte_draw_scalar(neuronte *n, uint32_t *pixels, int stride, int width, int height,
                          int x, int y, int cell_w, int cell_h, uint32_t scalar, uint32_t color)
 {
-    const float *cov;
+    const struct entry *cell;
+    const struct net *net;
     float alpha = (float)(color >> 24) / 255.0f;
     int rc = NEURONTE_OK, ss, px, py;
 
@@ -681,17 +1622,39 @@ int neuronte_draw_scalar(neuronte *n, uint32_t *pixels, int stride, int width, i
     if (alpha <= 0.0f || x >= width || y >= height || x + cell_w <= 0 || y + cell_h <= 0)
         return NEURONTE_OK;
     ss = n->samples ? n->samples : auto_samples(cell_w);
-    cov = cached(n, normalize(scalar), cell_w, cell_h, ss, &rc);
-    if (!cov)
+    scalar = normalize(scalar);
+    cell = cached(n, scalar, cell_w, cell_h, ss, &rc);
+    if (!cell)
         return rc;
-    for (py = y < 0 ? -y : 0; py < cell_h && y + py < height; py++)
-        for (px = x < 0 ? -x : 0; px < cell_w && x + px < width; px++) {
-            float a = cov[(size_t)py * cell_w + px] * alpha;
-            if (a > 0.0f) {
-                uint32_t *d = pixels + (size_t)(y + py) * stride + (x + px);
-                *d = blend(*d, color, a);
+    net = n->net[route(n, scalar)];
+    if (!net->col) {
+        for (py = y < 0 ? -y : 0; py < cell_h && y + py < height; py++)
+            for (px = x < 0 ? -x : 0; px < cell_w && x + px < width; px++) {
+                float a = cell->cov[(size_t)py * cell_w + px] * alpha;
+                if (a > 0.0f) {
+                    uint32_t *d = pixels + (size_t)(y + py) * stride + (x + px);
+                    *d = blend(*d, color, a);
+                }
             }
-        }
+        return NEURONTE_OK;
+    }
+    {
+        const uint8_t *pal = n->theme ? n->light : n->dark;
+        int k = net->col->k;
+        size_t plane = (size_t)cell_w * cell_h;
+        for (py = y < 0 ? -y : 0; py < cell_h && y + py < height; py++)
+            for (px = x < 0 ? -x : 0; px < cell_w && x + px < width; px++) {
+                float pr, pg, pb, pa;
+                over_pixel(cell->cov, cell->ent, k, plane, (size_t)py * cell_w + px, pal, color, &pr, &pg,
+                           &pb, &pa);
+                if (pa > 0.0f) {
+                    uint32_t src = (uint32_t)byte_chan(pr / pa) << 16 | (uint32_t)byte_chan(pg / pa) << 8 |
+                                   (uint32_t)byte_chan(pb / pa);
+                    uint32_t *d = pixels + (size_t)(y + py) * stride + (x + px);
+                    *d = blend(*d, src, pa);
+                }
+            }
+    }
     return NEURONTE_OK;
 }
 

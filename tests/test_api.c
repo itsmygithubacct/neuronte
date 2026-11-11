@@ -1,10 +1,11 @@
 /* Loader refusals, drawing, clipping, blending and bundles. MIT licence.
- * usage: test_api WEIGHTS.nrt [--full] [--accent] [--pixel]
+ * usage: test_api WEIGHTS.nrt [--full] [--accent] [--pixel] [--colour]
  * --full adds checks of box drawing, blocks and Braille, --accent of
  * accented letters, and --pixel of the sextants and octants, for weights
  * trained on them. Given a one-net file, it also checks the loader's
  * refusals by damaging that file, and builds bundles from it to check the
- * router. Given a bundle, it checks the drawing only. */
+ * router. Given a bundle, it checks the drawing only. --colour checks a
+ * version 3 file: the palette, the head, the edge table and the composite. */
 #define _POSIX_C_SOURCE 200809L
 #include "neuronte.h"
 
@@ -54,6 +55,16 @@ static void put32(unsigned char *p, uint32_t v)
     p[1] = v >> 8 & 0xFF;
     p[2] = v >> 16 & 0xFF;
     p[3] = v >> 24;
+}
+
+static uint32_t get32(const unsigned char *p)
+{
+    return (uint32_t)p[0] | (uint32_t)p[1] << 8 | (uint32_t)p[2] << 16 | (uint32_t)p[3] << 24;
+}
+
+static uint32_t get16(const unsigned char *p)
+{
+    return (uint32_t)p[0] | (uint32_t)p[1] << 8;
 }
 
 static float sum_of(const float *c, int n)
@@ -318,6 +329,59 @@ static void full_checks(neuronte *n)
         most_in(c, W, H, -1, 0) < 0.9f || most_in(c, W, H, -1, H - 1) < 0.9f)
         FAIL("U+253C does not reach all four sides");
 
+    /* A distance net has no edge record, so asking for snapping leaves the
+     * line where it was, and the horizontal stroke still meets the vertical. */
+    {
+        float hline[W * H], vline[W * H];
+        int row = 0, col = 0, x, y;
+        float best;
+        if (neuronte_set_snap(n, -1) != NEURONTE_OK)
+            FAIL("set_snap(-1) on a distance net");
+        neuronte_coverage(n, 0x2500, W, H, 0, hline);
+        if (neuronte_set_snap(n, 64) != NEURONTE_OK)
+            FAIL("set_snap(64)");
+        neuronte_coverage(n, 0x2500, W, H, 0, c);
+        if (memcmp(hline, c, sizeof hline) != 0)
+            FAIL("U+2500 changed when snapping was asked for");
+        neuronte_set_snap(n, 0);
+        neuronte_coverage(n, 0x2500, W, H, 0, c);
+        if (memcmp(hline, c, sizeof hline) != 0)
+            FAIL("U+2500 changed with snapping off");
+        neuronte_set_snap(n, 64);
+        neuronte_coverage(n, 0x2502, W, H, 0, vline);
+        neuronte_set_snap(n, 0);
+        neuronte_coverage(n, 0x2502, W, H, 0, c);
+        if (memcmp(vline, c, sizeof vline) != 0)
+            FAIL("U+2502 changed with snapping off");
+        neuronte_set_snap(n, -1);
+        best = -1.0f;
+        for (y = 0; y < H; y++) {
+            float s = 0;
+            for (x = 0; x < W; x++)
+                s += hline[y * W + x];
+            if (s > best) {
+                best = s;
+                row = y;
+            }
+        }
+        best = -1.0f;
+        for (x = 0; x < W; x++) {
+            float s = 0;
+            for (y = 0; y < H; y++)
+                s += vline[y * W + x];
+            if (s > best) {
+                best = s;
+                col = x;
+            }
+        }
+        if (hline[row * W] < 0.9f || hline[row * W + (W - 1)] < 0.9f)
+            FAIL("U+2500's inked row does not reach both sides");
+        if (vline[col] < 0.9f || vline[(H - 1) * W + col] < 0.9f)
+            FAIL("U+2502's inked column does not reach both ends");
+        if (hline[row * W + col] < 0.9f || vline[row * W + col] < 0.9f)
+            FAIL("U+2500 and U+2502 do not meet");
+    }
+
     /* Blocks. */
     neuronte_coverage(n, 0x2588, W, H, 0, c);
     for (i = 0; i < W * H; i++)
@@ -501,6 +565,398 @@ static void pixel_checks(neuronte *n)
              wrong, worst);
 }
 
+/* A bundle of n whole weight files, no gate, with the given ranges. */
+static unsigned char *bundle_n(const unsigned char **parts, const size_t *lens, int n,
+                               const uint32_t *ranges, uint32_t nranges, uint32_t fallback, size_t *len)
+{
+    size_t off, i;
+    unsigned char *p;
+    *len = 28 + 4 * (size_t)n + 12 * (size_t)nranges;
+    for (i = 0; i < (size_t)n; i++)
+        *len += lens[i];
+    p = malloc(*len);
+    if (!p)
+        return NULL;
+    memcpy(p, "NEURONTE", 8);
+    put32(p + 8, 2);
+    put32(p + 12, (uint32_t)n);
+    put32(p + 16, nranges);
+    put32(p + 20, fallback);
+    put32(p + 24, 0);
+    off = 28;
+    for (i = 0; i < (size_t)n; i++, off += 4)
+        put32(p + off, (uint32_t)lens[i]);
+    for (i = 0; i < nranges; i++, off += 12) {
+        put32(p + off, ranges[3 * i]);
+        put32(p + off + 4, ranges[3 * i + 1]);
+        put32(p + off + 8, ranges[3 * i + 2]);
+    }
+    for (i = 0; i < (size_t)n; i++) {
+        memcpy(p + off, parts[i], lens[i]);
+        off += lens[i];
+    }
+    return p;
+}
+
+/* A distance net of hidden width 8 and zero weights, with the colour file's
+ * tau and parity masks. Coverage of it is 0.5. */
+static unsigned char *mono8(const unsigned char *colour, size_t *len)
+{
+    size_t params = 8 * 90 + 8 + 2 * (8 * 8 + 8) + 8 + 1;
+    unsigned char *p = calloc(1, 204 + 4 * params);
+    if (!p)
+        return NULL;
+    memcpy(p, colour, 32);
+    put32(p + 8, 1);
+    put32(p + 20, 8);
+    memcpy(p + 32, colour + 56, 43 * 4);
+    *len = 204 + 4 * params;
+    return p;
+}
+
+/* The synthetic version 3 file. The four labelled glyphs and the entries
+ * their drawings name, padded out to K with entry 0. */
+static void colour_checks(const unsigned char *data, size_t len, const char *path)
+{
+    static const uint32_t labelled[] = {0xE654, 0xF04C, 0xF007A, 0xF036D};
+    static const uint8_t want[4][3] = {{2, 1, 0}, {0, 0, 0}, {2, 0, 0}, {0, 1, 2}};
+    enum { W = 16, H = 32 };
+    neuronte *n = NULL, *f = NULL;
+    uint32_t Hden, K, R, E, snap;
+    size_t trunk, headn, off, i;
+    int one_edge = 0, g, layer, px;
+    uint8_t pal[96], ent[16];
+    float *masks = NULL, *masks2 = NULL;
+    float cov[W * H], cov2[W * H];
+
+    if (len < 420 || get32(data + 8) != 3) {
+        FAIL("colour checks need a version 3 file");
+        return;
+    }
+    Hden = get32(data + 20);
+    K = get32(data + 32);
+    R = get32(data + 44);
+    E = get32(data + 48);
+    snap = get32(data + 52);
+    if (K < 1 || K > 16 || R < 8 || R % 8 != 0 || snap != 14 || E < 1) {
+        FAIL("colour header K %u R %u snap %u records %u", K, R, snap, E);
+        return;
+    }
+    trunk = 2 * (size_t)Hden * Hden + (93 + (size_t)K) * Hden + K;
+    headn = (size_t)R * (65 + 5 * (size_t)K) + 5 * (size_t)K;
+    expect_open("colour file", data, len, NEURONTE_OK);
+    expect_open("colour one byte short", data, len - 1, NEURONTE_ERR_FORMAT);
+    {
+        unsigned char *copy = malloc(len + 1);
+        if (!copy) {
+            FAIL("out of memory");
+            return;
+        }
+        memcpy(copy, data, len);
+        copy[len] = 0;
+        expect_open("colour one byte long", copy, len + 1, NEURONTE_ERR_FORMAT);
+        copy[0] = 'X';
+        expect_open("colour bad magic", copy, len, NEURONTE_ERR_FORMAT);
+        free(copy);
+    }
+    if (neuronte_open(data, len, &n) != NEURONTE_OK) {
+        FAIL("colour file did not open");
+        return;
+    }
+    if (neuronte_layers(n) != (int)K)
+        FAIL("layers %d, file says %u", neuronte_layers(n), K);
+    if (neuronte_parameters(n) != trunk + headn)
+        FAIL("parameters %zu, trunk %zu head %zu", neuronte_parameters(n), trunk, headn);
+    if (neuronte_palette(n, 0, pal) != NEURONTE_OK || memcmp(pal, data + 228, 96) != 0)
+        FAIL("dark palette differs from the file");
+    if (neuronte_palette(n, 1, pal) != NEURONTE_OK || memcmp(pal, data + 324, 96) != 0)
+        FAIL("light palette differs from the file");
+    if (neuronte_set_theme(n, 2) != NEURONTE_ERR_ARG || neuronte_set_snap(n, -2) != NEURONTE_ERR_ARG)
+        FAIL("theme and snap bounds");
+    if (neuronte_open_file(path, &f) != NEURONTE_OK) {
+        FAIL("open_file refused the colour file");
+    } else {
+        neuronte_coverage(n, 0xF04C, W, H, 0, cov);
+        neuronte_coverage(f, 0xF04C, W, H, 0, cov2);
+        if (memcmp(cov, cov2, sizeof cov) != 0)
+            FAIL("open_file and open disagree on U+F04C");
+        neuronte_close(f);
+    }
+    {
+        char tmp[] = "/tmp/neuronte-colour-XXXXXX";
+        int fd = mkstemp(tmp);
+        if (fd < 0 || write(fd, data, len) != (ssize_t)len) {
+            FAIL("cannot write the colour file");
+        } else {
+            if (write(fd, "", 1) != 1 || neuronte_open_file(tmp, &f) != NEURONTE_ERR_FORMAT)
+                FAIL("a colour file one byte long was accepted");
+            if (ftruncate(fd, (off_t)len - 1) != 0 || neuronte_open_file(tmp, &f) != NEURONTE_ERR_FORMAT)
+                FAIL("a colour file one byte short was accepted");
+            if (ftruncate(fd, 100) != 0 || neuronte_open_file(tmp, &f) != NEURONTE_ERR_FORMAT)
+                FAIL("a colour file cut in its header was accepted");
+        }
+        if (fd >= 0) {
+            close(fd);
+            unlink(tmp);
+        }
+    }
+
+    off = 420 + 4 * (trunk + headn);
+    for (i = 0; i < E; i++) {
+        uint32_t layer_i, t;
+        if (off + 4 > len)
+            break;
+        off += 4;
+        for (layer_i = 0; layer_i < K; layer_i++) {
+            uint32_t nx, ny;
+            if (off + 4 > len)
+                goto edges_done;
+            nx = get16(data + off);
+            ny = get16(data + off + 2);
+            off += 4;
+            if (off + (size_t)(nx + ny) * 8 > len)
+                goto edges_done;
+            for (t = 0; t < nx + ny; t++, off += 8) {
+                uint32_t bits = get32(data + off), side = get32(data + off + 4);
+                float pos;
+                memcpy(&pos, &bits, sizeof pos);
+                if (side > 1 || pos != pos)
+                    FAIL("edge %u of record %zu is damaged", t, i);
+                else
+                    one_edge = 1;
+            }
+        }
+    }
+edges_done:
+    if (off != len || !one_edge)
+        FAIL("edge table did not round-trip (%zu bytes left, edge %d)", len - (off < len ? off : len), one_edge);
+
+    masks = malloc((size_t)K * W * H * sizeof *masks);
+    masks2 = malloc((size_t)K * W * H * sizeof *masks2);
+    if (!masks || !masks2) {
+        FAIL("out of memory");
+        goto bundles;
+    }
+    if (K != 3) {
+        FAIL("the labelled-entry check wants K = 3, the file says %u", K);
+        goto bundles;
+    }
+    for (g = 0; g < 4; g++) {
+        if (neuronte_coverage_layers(n, labelled[g], W, H, 0, masks, ent) != NEURONTE_OK)
+            FAIL("coverage_layers U+%X", labelled[g]);
+        for (layer = 0; layer < (int)K; layer++)
+            if (ent[layer] != want[g][layer])
+                FAIL("U+%X layer %d entry %u, drawings say %u", labelled[g], layer, ent[layer],
+                     want[g][layer]);
+    }
+    if (neuronte_coverage_layers(n, 0x41, W, H, 0, masks, ent) != NEURONTE_OK)
+        FAIL("coverage_layers of an unlabelled scalar");
+    for (layer = 0; layer < (int)K; layer++)
+        if (ent[layer] != 0)
+            FAIL("U+0041 layer %d entry %u", layer, ent[layer]);
+    neuronte_coverage(n, 0xF036D, W, H, 0, cov);
+    if (neuronte_coverage_layers(n, 0xF036D, W, H, 0, masks, ent) != NEURONTE_OK)
+        FAIL("coverage_layers U+F036D");
+    for (px = 0; px < W * H; px++) {
+        float a = 0;
+        for (layer = 0; layer < (int)K; layer++) {
+            float c = masks[(size_t)layer * W * H + px];
+            if (ent[layer] == 1)
+                a *= 1.0f - c;
+            else
+                a = c + a * (1.0f - c);
+        }
+        if (cov[px] != a) {
+            FAIL("coverage and the composited layers differ at %d", px);
+            break;
+        }
+    }
+
+    /* 16 px is not under the file's threshold of 14. Forcing the threshold
+     * above 16 snaps, and this icon's edges already sit on pixels. The
+     * comparison is the masks: the composited alpha of this glyph is full. */
+    if (neuronte_set_snap(n, 0) != NEURONTE_OK)
+        FAIL("set_snap(0)");
+    if (neuronte_coverage_layers(n, 0xF04C, W, H, 0, masks, ent) != NEURONTE_OK)
+        FAIL("U+F04C masks at 16 px");
+    if (neuronte_set_snap(n, 17) != NEURONTE_OK)
+        FAIL("set_snap(17)");
+    if (neuronte_coverage_layers(n, 0xF04C, W, H, 0, masks2, ent) != NEURONTE_OK)
+        FAIL("U+F04C masks with snapping forced on");
+    if (memcmp(masks, masks2, (size_t)K * W * H * sizeof *masks) != 0)
+        FAIL("a grid-aligned icon changed at 16 px with snapping on");
+    {
+        size_t bytes = (size_t)K * 12 * 24 * sizeof *masks;
+        float *saved = malloc(bytes);
+        if (!saved) {
+            FAIL("out of memory");
+        } else {
+            if (neuronte_set_snap(n, -1) != NEURONTE_OK)
+                FAIL("set_snap(-1)");
+            if (neuronte_coverage_layers(n, 0xF04C, 12, 24, 0, masks, ent) != NEURONTE_OK)
+                FAIL("U+F04C masks at 12 px");
+            memcpy(saved, masks, bytes);
+            neuronte_set_snap(n, 0);
+            if (neuronte_coverage_layers(n, 0xF04C, 12, 24, 0, masks2, ent) != NEURONTE_OK)
+                FAIL("U+F04C masks with snapping off");
+            if (memcmp(saved, masks2, bytes) == 0)
+                FAIL("snapping at 12 px left U+F04C unchanged");
+            neuronte_set_snap(n, -1);
+            if (neuronte_coverage_layers(n, 0xF04C, 12, 24, 0, masks2, ent) != NEURONTE_OK)
+                FAIL("U+F04C masks with the file threshold restored");
+            if (memcmp(saved, masks2, bytes) != 0)
+                FAIL("set_snap(-1) did not restore the file threshold");
+            free(saved);
+        }
+    }
+
+    neuronte_set_theme(n, 0);
+    if (neuronte_coverage_layers(n, 0xF036D, W, H, 0, masks, ent) != NEURONTE_OK)
+        FAIL("masks before the theme change");
+    neuronte_set_theme(n, 1);
+    if (neuronte_coverage_layers(n, 0xF036D, W, H, 0, masks2, ent) != NEURONTE_OK)
+        FAIL("masks after the theme change");
+    if (memcmp(masks, masks2, (size_t)K * W * H * sizeof *masks) != 0)
+        FAIL("the theme changed the masks");
+    {
+        uint32_t dark[W * H], light[W * H], again[W * H], fg[W * H];
+        for (px = 0; px < W * H; px++)
+            dark[px] = light[px] = again[px] = fg[px] = 0xFF000000u;
+        neuronte_set_theme(n, 0);
+        neuronte_set_snap(n, -1);
+        neuronte_draw_scalar(n, dark, W, W, H, 0, 0, W, H, 0xF036D, 0xFFFFFFFFu);
+        neuronte_draw_scalar(n, fg, W, W, H, 0, 0, W, H, 0xF04C, 0xFFFFFFFFu);
+        neuronte_set_theme(n, 1);
+        neuronte_draw_scalar(n, light, W, W, H, 0, 0, W, H, 0xF036D, 0xFFFFFFFFu);
+        neuronte_draw_scalar(n, again, W, W, H, 0, 0, W, H, 0xF04C, 0xFFFFFFFFu);
+        if (memcmp(dark, light, sizeof dark) == 0)
+            FAIL("dark and light drew U+F036D the same");
+        if (memcmp(fg, again, sizeof fg) != 0)
+            FAIL("the theme changed an icon painted in the caller's colour");
+        for (px = 0; px < W * H; px++)
+            again[px] = 0xFF000000u;
+        neuronte_set_theme(n, 0);
+        neuronte_draw_scalar(n, again, W, W, H, 0, 0, W, H, 0xF036D, 0xFFFFFFFFu);
+        if (memcmp(dark, again, sizeof dark) != 0)
+            FAIL("returning to the dark theme did not restore the pixels");
+    }
+
+bundles:
+    free(masks);
+    free(masks2);
+    neuronte_close(n);
+    n = NULL;
+    {
+        const unsigned char *one[1];
+        size_t one_len[1];
+        unsigned char *b;
+        size_t blen;
+        one[0] = data;
+        one_len[0] = len;
+        b = bundle_n(one, one_len, 1, NULL, 0, 0, &blen);
+        if (!b || neuronte_open(b, blen, &n) != NEURONTE_OK)
+            FAIL("a bundle of one colour net refused");
+        else if (neuronte_layers(n) != (int)K || neuronte_parameters(n) != trunk + headn)
+            FAIL("one-net colour bundle has %d layers and %zu parameters", neuronte_layers(n),
+                 neuronte_parameters(n));
+        neuronte_close(n);
+        n = NULL;
+        free(b);
+    }
+    {
+        const unsigned char *two[2];
+        size_t two_len[2];
+        unsigned char *b, *alt;
+        size_t blen;
+        two[0] = two[1] = data;
+        two_len[0] = two_len[1] = len;
+        b = bundle_n(two, two_len, 2, NULL, 0, 0, &blen);
+        if (!b || neuronte_open(b, blen, &n) != NEURONTE_OK)
+            FAIL("a bundle of two colour nets with one palette refused");
+        else if (neuronte_parameters(n) != 2 * (trunk + headn))
+            FAIL("two colour nets have %zu parameters", neuronte_parameters(n));
+        neuronte_close(n);
+        n = NULL;
+        free(b);
+        alt = malloc(len);
+        if (!alt) {
+            FAIL("out of memory");
+            return;
+        }
+        memcpy(alt, data, len);
+        alt[228 + 6] ^= 1;
+        two[1] = alt;
+        b = bundle_n(two, two_len, 2, NULL, 0, 0, &blen);
+        expect_open("colour bundle with two palettes", b, blen, NEURONTE_ERR_FORMAT);
+        free(b);
+        memcpy(alt, data, len);
+        put32(alt + 52, 15);
+        b = bundle_n(two, two_len, 2, NULL, 0, 0, &blen);
+        expect_open("colour bundle with two snap thresholds", b, blen, NEURONTE_ERR_FORMAT);
+        free(b);
+        free(alt);
+    }
+    {
+        unsigned char *z;
+        size_t zlen, blen;
+        const unsigned char *parts[2];
+        size_t lens[2];
+        uint32_t range[3] = {0xE654, 0xF036D, 1};
+        unsigned char *b;
+        float *plane;
+        z = mono8(data, &zlen);
+        parts[0] = z;
+        parts[1] = data;
+        lens[0] = zlen;
+        lens[1] = len;
+        b = z ? bundle_n(parts, lens, 2, range, 1, 0, &blen) : NULL;
+        if (!b || neuronte_open(b, blen, &n) != NEURONTE_OK) {
+            FAIL("a bundle of a distance net and a colour net refused");
+        } else {
+            if (neuronte_route(n, 'A') != 0 || neuronte_route(n, 0xF04C) != 1 || neuronte_layers(n) != (int)K)
+                FAIL("mixed bundle routes A to %d and U+F04C to %d, layers %d", neuronte_route(n, 'A'),
+                     neuronte_route(n, 0xF04C), neuronte_layers(n));
+            neuronte_coverage(n, 'A', W, H, 0, cov);
+            for (px = 0; px < W * H; px++)
+                if (cov[px] != 0.5f) {
+                    FAIL("A in the mixed bundle is not the zero net");
+                    break;
+                }
+            neuronte_set_snap(n, 64);
+            neuronte_coverage(n, 'A', W, H, 0, cov2);
+            if (memcmp(cov, cov2, sizeof cov) != 0)
+                FAIL("snapping changed the distance net in the bundle");
+            plane = calloc((size_t)K * W * H, sizeof *plane);
+            if (!plane || neuronte_coverage_layers(n, 'A', W, H, 0, plane, ent) != NEURONTE_OK)
+                FAIL("coverage_layers of A in the mixed bundle");
+            else {
+                for (px = 0; px < W * H; px++)
+                    if (plane[px] != 0.5f) {
+                        FAIL("mixed bundle mask 0 is %g", plane[px]);
+                        break;
+                    }
+                for (layer = 1; layer < (int)K; layer++)
+                    for (px = 0; px < W * H; px++)
+                        if (plane[(size_t)layer * W * H + px] != 0.0f) {
+                            FAIL("mixed bundle mask %d is not empty", layer);
+                            layer = (int)K;
+                            break;
+                        }
+                for (layer = 0; layer < (int)K; layer++)
+                    if (ent[layer] != 0)
+                        FAIL("mixed bundle entry %d is %u", layer, ent[layer]);
+            }
+            free(plane);
+            if (neuronte_palette(n, 0, pal) != NEURONTE_OK || memcmp(pal, data + 228, 96) != 0)
+                FAIL("mixed bundle palette");
+            neuronte_close(n);
+            n = NULL;
+        }
+        free(b);
+        free(z);
+    }
+}
+
 int main(int argc, char **argv)
 {
     unsigned char *data, *copy;
@@ -509,7 +965,7 @@ int main(int argc, char **argv)
     enum { CW = 16, CH = 32, BW = 64, BH = 48 };
     float cov[CW * CH], cov2[CW * CH];
     uint32_t buf[BW * BH], ref[BW * BH];
-    int i, rc, bundled, full = 0, accent = 0, pixel = 0;
+    int i, rc, bundled, full = 0, accent = 0, pixel = 0, colour = 0;
 
     for (i = 2; i < argc; i++) {
         if (strcmp(argv[i], "--full") == 0)
@@ -518,11 +974,13 @@ int main(int argc, char **argv)
             accent = 1;
         else if (strcmp(argv[i], "--pixel") == 0)
             pixel = 1;
+        else if (strcmp(argv[i], "--colour") == 0)
+            colour = 1;
         else
             argc = 0;
     }
     if (argc < 2) {
-        fprintf(stderr, "usage: %s WEIGHTS.nrt [--full] [--accent] [--pixel]\n", argv[0]);
+        fprintf(stderr, "usage: %s WEIGHTS.nrt [--full] [--accent] [--pixel] [--colour]\n", argv[0]);
         return 2;
     }
     data = slurp(argv[1], &len);
@@ -531,6 +989,13 @@ int main(int argc, char **argv)
         return 2;
     }
     copy = malloc(len + 1);
+    if (colour) {
+        colour_checks(data, len, argv[1]);
+        free(copy);
+        free(data);
+        puts(failed ? "test_api: FAILED" : "test_api: passed");
+        return failed;
+    }
     bundled = len >= 12 && data[8] == 2;
     if (bundled)
         goto drawing;
@@ -594,8 +1059,28 @@ drawing:
         printf("cannot open weights (%d)\n", rc);
         return 1;
     }
-    if (!bundled && neuronte_parameters(n) != (len - 204) / 4)
+    if (!bundled && data[8] != 3 && neuronte_parameters(n) != (len - 204) / 4)
         FAIL("parameters %zu for a file of %zu bytes", neuronte_parameters(n), len);
+    if (neuronte_layers(n) != 1)
+        FAIL("a distance file reports %d layers", neuronte_layers(n));
+    {
+        uint8_t pal[96], ent = 7;
+        float plane[CW * CH];
+        if (neuronte_palette(n, 0, pal) != NEURONTE_OK)
+            FAIL("palette on a distance file");
+        for (i = 0; i < 96; i++)
+            if (pal[i]) {
+                FAIL("a distance file palette is not zero");
+                break;
+            }
+        if (neuronte_set_theme(n, 2) != NEURONTE_ERR_ARG || neuronte_set_snap(n, -2) != NEURONTE_ERR_ARG)
+            FAIL("theme and snap bounds on a distance file");
+        if (neuronte_coverage_layers(n, 'A', CW, CH, 0, plane, &ent) != NEURONTE_OK || ent != 0)
+            FAIL("coverage_layers on a distance glyph");
+        neuronte_coverage(n, 'A', CW, CH, 0, cov);
+        if (memcmp(plane, cov, sizeof plane) != 0)
+            FAIL("coverage_layers and coverage disagree on A");
+    }
     if (bundled && (neuronte_nets(n) < 2 || neuronte_parameters(n) == 0 ||
                     4 * neuronte_parameters(n) >= len))
         FAIL("bundle of %d nets, %zu parameters, %zu bytes", neuronte_nets(n), neuronte_parameters(n), len);

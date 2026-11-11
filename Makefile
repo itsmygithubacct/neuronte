@@ -66,6 +66,8 @@ pack: $(ASCII).json $(FULL).json $(NETS) $(GATE)
 	$(PYTHON) train/pack.py $(FULL).json $(FULL).nrt
 	$(PYTHON) train/pack.py --bundle $(SPLIT) $(NETS) --gate $(GATE)
 	cd weights && sha256sum *.json *.nrt > SHA256SUMS
+	# A colour file is packed the same way: python3 train/pack.py colour.json colour.nrt
+	# make test builds a small synthetic one under build/. No icon net is trained here.
 
 test: all $(TESTS)
 	cd weights && sha256sum -c --quiet SHA256SUMS
@@ -77,6 +79,9 @@ test: all $(TESTS)
 	$(PYTHON) tests/check_reference.py build/libneuronte.so $(ASCII).json $(ASCII).nrt
 	$(PYTHON) tests/check_reference.py build/libneuronte.so $(FULL).json $(FULL).nrt
 	$(PYTHON) tests/check_reference.py build/libneuronte.so --bundle $(SPLIT) $(NETS) --gate $(GATE)
+	$(PYTHON) tests/colour_fixture.py build/colour-fixture.nrt
+	./build/test_api build/colour-fixture.nrt --colour
+	$(PYTHON) tests/check_reference.py build/libneuronte.so build/colour-fixture.json build/colour-fixture.nrt
 
 bench: build/neuronte-bench
 	./build/neuronte-bench $(ASCII).nrt

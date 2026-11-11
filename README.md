@@ -77,8 +77,10 @@ a letter and a mark, such as ß æ œ ð þ ø ł đ ħ ŋ ĳ, are drawn in
 | `train/glyphs.py` | The character sets. Makes box drawing and blocks from their Unicode names, Braille from the dot bits, sextants and octants from the cells they fill, accented letters from a letter and a mark, and the target the net learns. `python3 train/glyphs.py` checks the sets |
 | `train/mosaics.py` | Makes `font/octants.txt`, and checks the sextants and the octant patterns encoded elsewhere against the same Unicode data |
 | `train/train.py` | Trains a net on one set. Needs torch, and wants a GPU |
+| `train/colour.py` | Trains a colour net. Needs torch, and wants a GPU. No icon net has been trained |
+| `train/snap.py` | The straight edges of a colour glyph, measured from the drawings when the weights are packed, and the warp that snaps them |
 | `train/gate.py` | Trains the router's gate for a bundle of nets. Needs torch; a CPU is enough |
-| `train/pack.py` | Packs weights JSON into the binary file the C library loads, one net or a bundle. Documents both layouts |
+| `train/pack.py` | Packs weights JSON into the binary file the C library loads: a distance net, a colour net, or a bundle. Documents the three layouts |
 | `weights/` | The trained weights as JSON, the packed files, the scores and `SHA256SUMS`. `neuronte-draw-v2`, `neuronte-symbol-v0`, `neuronte-accent-v1`, `neuronte-pixel-v1`, `neuronte-braille-v0` and `neuronte-gate-v3` are the parts of `neuronte-split-v4`, with `neuronte-ascii-v0`. `neuronte-full-v2` is here so that `make test` and `make bench` run from a clone |
 | `include/neuronte.h`, `src/` | The C library |
 | `tools/neuronte-render.c` | Draws lines of text into a PPM file |
@@ -118,7 +120,14 @@ inner loops twice, plain and AVX2, and picks one by CPU when it loads.
   what `train/pack.py` makes from the JSON. For the bundle, the C router
   must also send each of about 2,100 scalars, both Symbols for Legacy
   Computing blocks among them, to the net a Python router picks, with the
-  gate evaluated in numpy.
+  gate evaluated in numpy;
+- a small synthetic version 3 file round-trips its layer count, palette,
+  palette head and one straight edge, the head names the right entry on
+  every labelled glyph, and the dark and light composites agree with the
+  numpy reference at 12 and 16 pixels, snapped and unsnapped. A
+  grid-aligned icon is unchanged at 16 pixels with snapping on. The
+  version 1 box-drawing checks also show that a horizontal line still
+  meets a vertical one when snapping is asked for.
 
 For `neuronte-full` and `neuronte-split` it also checks that box lines
 reach the cell edges, that █ fills its cell and ▀ the top half, that
@@ -231,6 +240,27 @@ and which one draws a given scalar. `neuronte_coverage()` returns a cell's cover
 drawing it. `neuronte_open()` takes the weights from memory instead of a
 file. The draw calls keep up to 1,024 cells, dropping the least recently
 used, so a handle should not be shared between threads without a lock.
+
+A colour weight file is version 3. It holds K layers that share one
+hidden vector, a palette head that runs once per glyph, and the straight
+edges of the drawings. `neuronte_layers()` is that K (a distance file
+returns 1). `neuronte_set_theme()` selects the dark palette, which the
+handle starts on, or the light one. `neuronte_palette()` copies one
+theme's 32 colours, 96 bytes of R, G, B. `neuronte_set_snap()` snaps a
+colour glyph's straight edges when the cell is narrower than the given
+width. The file stores 14. Passing -1 restores that number, and 0 turns
+snapping off. `neuronte_coverage_layers()` returns each layer's coverage
+and its palette index. The two draw calls composite the layers back to
+front: entry 1 clears, entry 0 uses the colour of the call, and any
+other entry uses the theme's palette. The call's alpha then scales the
+whole glyph. A pixel the glyph left clear is left as it was. Snapping
+applies to a colour glyph that has an edge record. Letters and box
+drawing have none, so a horizontal line still meets a vertical one.
+
+No icon net has been trained. `make test` builds a small synthetic
+version 3 file, with a hand-written field and a palette head that
+remembers the labelled glyphs, and checks that. `font/icons.txt` is still
+waiting for a trained net.
 
 ## The net
 

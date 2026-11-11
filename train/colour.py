@@ -53,7 +53,8 @@ import torch
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import glyphs  # noqa: E402
 import strokes  # noqa: E402
-from colour_sources import drawing_hashes  # noqa: E402
+import checkpoint  # noqa: E402
+from colour_sources import drawing_hashes, scalar, wide_halves  # noqa: E402
 
 p = argparse.ArgumentParser()
 p.add_argument("out")
@@ -71,9 +72,14 @@ p.add_argument("--palette", default=strokes.PALETTE, help="their palette, in the
 p.add_argument("--blank", default="", help="scalars trained to draw nothing: U+XXXX or U+XXXX..U+YYYY, comma separated")
 p.add_argument("--scores-out", help="write full-precision scores and every used layer's counts")
 p.add_argument("--log-every", type=int, default=1000, help="progress interval on stderr (0 disables)")
+p.add_argument("--wide", action="store_true", help="2x2 drawings, train left and right 1x2 halves")
+p.add_argument("--shard", help="strided glyph partition INDEX/COUNT, both halves stay together")
+p.add_argument("--matmul-precision", choices=("highest", "high"), default="highest")
+checkpoint.arguments(p)
 a = p.parse_args()
 torch.manual_seed(a.seed)
 torch.set_default_device(a.device)
+torch.set_float32_matmul_precision(a.matmul_precision)
 
 ENTRY_BITS, PALETTE_SIZE = 5, 32
 THEMES = {"dark": ((0x11, 0x15, 0x1C), (0xE9, 0xE6, 0xDF)), "light": ((0xFA, 0xFA, 0xF7), (0x1E, 0x23, 0x30))}
@@ -90,16 +96,28 @@ if any(f.startswith("..") for f in (DRAWING, PALETTE)):
 SOURCES = {f: sha(os.path.join(strokes.ROOT, f)) for f in (DRAWING, PALETTE)}
 SOURCES.update({f: sha(os.path.join(strokes.ROOT, f)) for f in
                 ("font/code-masks.txt", "train/glyphs.py", "train/strokes.py",
-                 "train/colour.py", "train/colour_sources.py")})
+                 "train/colour.py", "train/colour_sources.py", "train/checkpoint.py")})
+if DRAWING == "font/emoji.txt":
+    SOURCES.update({f: sha(os.path.join(strokes.ROOT, f)) for f in
+                    ("train/emoji.py", "font/icons.txt", "font/emoji-manifest.json")})
 TAU, OCT, W, N, K = 0.15, 6, a.width, a.grid, a.layers
 PAL = strokes.palette(os.path.join(strokes.ROOT, PALETTE))
 ICONS = (glyphs.colour_icons(pal=PAL) if DRAWING == "font/icons.txt" else
          strokes.parse_layers(os.path.join(strokes.ROOT, DRAWING), pal=PAL))
+if a.shard:
+    index, count = map(int, a.shard.split("/"))
+    if not 0 <= index < count:
+        p.error("shard must have 0 <= INDEX < COUNT")
+    ICONS = {c: ICONS[c] for c in sorted(ICONS)[index::count]}
+if a.wide:
+    ICONS = wide_halves(ICONS)
 LABELLED = list(ICONS)
 BLANK = []
 for tok in filter(None, a.blank.split(",")):
     lo, _, hi = tok.partition("..")
     BLANK += [chr(v) for v in range(int(lo[2:], 16), int((hi or lo)[2:], 16) + 1)]
+if a.wide:
+    BLANK = [scalar(c) + offset for c in BLANK for offset in (0, 0x110000)]
 if set(BLANK) & set(ICONS) or len(set(BLANK)) != len(BLANK):
     raise SystemExit("a blank scalar is drawn or repeated")
 ICONS.update({c: [] for c in BLANK})
@@ -115,7 +133,7 @@ FIELD = torch.tensor(np.stack([np.stack([glyphs.field(ICONS[c][k][1], N, a.pen, 
                                          for k in range(K)]) for c in CHARS]).astype(np.float16)).reshape(-1)
 MASKS = strokes.masks()
 MB = torch.tensor([[(m >> i) & 1 for i in range(21)] for m in MASKS], dtype=torch.float32)
-LAB = torch.tensor([ord(c) for c in CHARS])
+LAB = torch.tensor([scalar(c) for c in CHARS])
 SPAN = torch.tensor([1.0, 2.0])
 
 
@@ -175,8 +193,13 @@ GW = torch.cat([torch.full((NL,), 0.5 / NL), torch.full((G - NL,), 0.5 / max(1, 
 params = list(net.parameters()) + list(head.parameters())
 opt = torch.optim.Adam(params, lr=2e-3)
 sched = torch.optim.lr_scheduler.CosineAnnealingLR(opt, a.steps)
+MODELS = {"net": net, "head": head}
+IDENTITY = checkpoint.identity(a, SOURCES)
+first_step, last_metrics = checkpoint.restore(a.resume, MODELS, opt, sched, IDENTITY, a.device) if a.resume else (0, {})
+loss = torch.tensor(last_metrics.get("loss", float("nan")))
+hloss = torch.tensor(last_metrics.get("head_loss", float("nan")))
 started = time.monotonic()
-for step in range(a.steps):
+for step in range(first_step, a.steps):
     cand = torch.rand(G, 1024, 2) * SPAN
     tc = target(gi, cand)
     # Each used layer gets an equal share of the edge points, however short
@@ -199,10 +222,15 @@ for step in range(a.steps):
     (loss + 0.1 * hloss).backward()
     opt.step()
     sched.step()
+    checkpoint.tick(a, step + 1, MODELS, opt, sched, IDENTITY, {"loss": loss, "head_loss": hloss})
     if a.log_every and ((step + 1) % a.log_every == 0 or step + 1 == a.steps):
         print(json.dumps({"step": step + 1, "seconds": round(time.monotonic() - started, 2),
                           "loss": float(loss.detach()), "head_loss": float(hloss.detach())}),
               file=sys.stderr, flush=True)
+
+
+# Scores use ordinary float32 matrix products, even when training used TF32.
+torch.set_float32_matmul_precision("highest")
 
 
 def grid(wpx, ss):
@@ -256,7 +284,7 @@ def composite(cov, ent, theme):
 
 
 def label(g, k):
-    return f"U+{ord(CHARS[g]):04X} layer {k}"
+    return f"U+{scalar(CHARS[g]):04X} layer {k}"
 
 
 with torch.no_grad():
@@ -280,7 +308,7 @@ for wpx, ss in ((12, 2), (16, 2), (32, 1)):
     target_ink, predicted_ink = ti.sum((2, 3)), ni.sum((2, 3))
     detail = {"iou_mean": float(used.mean()), "iou_min": float(used.min()),
               "lost_used": int(((overlap == 0) & USED).sum()),
-              "layers": [{"scalar": f"U+{ord(CHARS[g]):04X}", "layer": k,
+              "layers": [{"scalar": f"U+{scalar(CHARS[g]):04X}", "layer": k,
                           "iou": float(iou[g, k]), "intersection": int(overlap[g, k]),
                           "union": int(u[g, k]), "target_ink": int(target_ink[g, k]),
                           "predicted_ink": int(predicted_ink[g, k])}
@@ -320,9 +348,11 @@ doc = {
     "palette": {name: {"entry": n, "dark": f"#{d[0]:02X}{d[1]:02X}{d[2]:02X}" if d else None,
                        "light": f"#{li[0]:02X}{li[1]:02X}{li[2]:02X}" if li else None}
                 for name, (n, d, li) in PAL.items()},
-    "training": {"set": os.path.splitext(os.path.basename(DRAWING))[0], "labelled": " ".join(f"U+{ord(c):04X}" for c in LABELLED), "sources_sha256": SOURCES,
+    "training": {"set": os.path.splitext(os.path.basename(DRAWING))[0] + ("-" + a.shard.replace("/", "of") if a.shard else ""), "labelled": " ".join(f"U+{scalar(c):04X}" for c in LABELLED), "sources_sha256": SOURCES,
                  "drawing": DRAWING, "palette": PALETTE, "blank": a.blank,
-                 "drawings_sha256": {"version": 1, "glyphs": drawing_hashes(ICONS, map(ord, LABELLED))},
+                 "cell_columns": 2 if a.wide else 1, "shard": a.shard,
+                 "matmul_precision": a.matmul_precision,
+                 "drawings_sha256": {"version": 1, "glyphs": drawing_hashes(ICONS, map(scalar, LABELLED))},
                  "pen_radius": a.pen, "grid": N, "steps": a.steps, "seed": a.seed},
     "layers": layers_of(net, ["l1", "l2", "l3", "out"]),
     "head": layers_of(head, ["h1", "out"]),

@@ -41,6 +41,13 @@ letter. Desktop adapters fall back for unsupported strings and styles.
 | `neuronte-ui28-italic-v0` | the italic at 28 pixels, trained for 40,000 steps: at the default 20,000 no width from 384 to 768 had both seeds exact | printable ASCII and the ellipsis, 96, with their advances | 384 | 331,009 | 1,325,072 bytes |
 | `neuronte-ui32-italic-v0` | the italic at 32 pixels, trained for 40,000 steps; both seeds exact at width 512 | printable ASCII and the ellipsis, 96, with their advances | 512 | 572,417 | 2,290,704 bytes |
 
+RC9 adds the explicitly selected `neuronte-split-v5.nrt`: 1,176 labelled
+scalars, including 49 Greek and 66 Russian letters, in a 1,573,128-byte bundle.
+Its accent-v2 expert passes both-seed script gates and root visual review.
+Latin mean IoU at 16 px changes from .984936529 to .984822170; per-glyph
+regressions are retained. The existing split-v4 default and full-v2 baseline
+are preserved. See [the recipe and validation](weights/neuronte-split-v5.md).
+
 `neuronte-split` draws each character with one small net picked for it.
 It draws ASCII, symbols, blocks and the mosaics four to seven times
 faster than `neuronte-full`, Braille about sixteen times faster, and box
@@ -90,7 +97,7 @@ a letter and a mark, such as ß æ œ ð þ ø ł đ ħ ŋ ĳ, are drawn in
 | `font/strokes.txt` | The ASCII face: each character as pen strokes on a 10 × 20 grid. Written for this project |
 | `font/symbols.txt` | The symbols of the full set, in the same form |
 | `font/marks.txt` | The diacritic marks, keyed by their combining code points |
-| `font/letters.txt` | The Latin letters beyond ASCII that are not a letter plus a mark, and the Greek and Russian Cyrillic letters. The Greek and Cyrillic are not yet in any weights |
+| `font/letters.txt` | The Latin letters beyond ASCII that are not a letter plus a mark, and the Greek and Russian Cyrillic letters. The 49 Greek and 66 Russian Cyrillic letters are trained in RC9 accent-v2 and explicit split-v5 |
 | `font/ui-1.txt` to `font/ui-128.txt` | A proportional face for binary desktop text, printable ASCII and the ellipsis, drawn as pixels for every em from 1 to 128 except 44, each character with its advance in pixels. Stems are one pixel wide through 16, two from 17 through 26, and three from 27. Written for this project. `train/train.py --set ui10` and so on train one net each, and score it pixel by pixel at its size. `train/pack.py --advances` packs a file's advances, bold one pixel more. The nets so far are `neuronte-ui1-v0` through `neuronte-ui39-v0`, one for every em, and `neuronte-ui43-v0`. `font/ui-EM-italic.txt` is that face sheared on the grid so the top sits to the right of the bottom, trained as `uiEMi`, drawn at 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30 and 32 pixels. The italic nets packed so far are `neuronte-ui10-italic-v0`, `ui11`, `ui12`, `ui14`, `ui16`, `ui18`, `ui20`, `ui22`, `ui24`, `ui26`, `ui28`, `ui30` and `ui32` |
 | `font/ui-large.txt`, `font/ui-large-advances.txt` | The same face above 32 pixels: the first-pass strokes the pixel faces were fitted to, drawn once for every em with a pen 3/32 em wide, the 32 px drawing's three-pixel stem, and blended. The advances are the 32 px drawing's in em, bold 0.2 design units (0.02 em) more. `train/train.py --set uilarge` trains the net and scores it by overlap at 32, 48, 64 and 96 pixels. The net is `neuronte-ui-large-v0` |
 | `font/icons.txt` | The icons, as colour layers back to front, each naming a palette entry. Powerline and progress are made in `train/glyphs.py` and are not listed in the file. Trained in `neuronte-icon-v1` |

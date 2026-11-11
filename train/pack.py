@@ -147,7 +147,7 @@ import numpy as np
 import glyphs
 import snap
 import strokes
-from colour_sources import drawing_hashes
+from colour_sources import drawing_hashes, drawing_at, wide_halves
 
 SHAPE = {"position_octaves": 6, "code_bits": 64, "hidden_layers": 3}
 COLOUR_FIXED = 420
@@ -241,7 +241,8 @@ def colour_drawings(doc):
     pal = strokes.palette(os.path.join(ROOT, palette))
     if drawing == "font/icons.txt":
         return glyphs.colour_icons(pal=pal)
-    return strokes.parse_layers(os.path.join(ROOT, drawing), pal)
+    drawings = strokes.parse_layers(os.path.join(ROOT, drawing), pal)
+    return wide_halves(drawings) if doc.get("training", {}).get("cell_columns", 1) == 2 else drawings
 
 
 # The original colour artifacts predate explicit parser/expanded-drawing hashes.
@@ -361,12 +362,12 @@ def edge_records(doc, path, k):
     ruled = set(glyphs.ruled_codepoints()) if colour_sources(doc)[0] == "font/icons.txt" else set()
     recs = []
     for s in sorted(labelled_scalars(doc, path)):
-        ch = chr(s)
-        if ch not in icons:
+        try:
+            drawn = drawing_at(icons, s)
+        except (KeyError, ValueError):
             raise SystemExit(f"{path}: U+{s:04X} is labelled and is not in {colour_sources(doc)[0]}")
         if s in ruled and "train/glyphs.py" not in doc["training"]["sources_sha256"]:
             raise SystemExit(f"{path}: U+{s:04X} is made by rule and training.sources_sha256 has no train/glyphs.py")
-        drawn = icons[ch]
         if len(drawn) > k:
             raise SystemExit(f"{path}: U+{s:04X} has {len(drawn)} layers and K is {k}")
         probed = list(snap.probe(drawn))

@@ -98,21 +98,35 @@ class MultiInk:
         weights = weights or ROOT / 'weights/neuronte-video-masks-v0.nrt'
         with NeuralMasks(weights, library) as net:
             masks = np.stack([net.mask(cp, cell_w, cell_h) for cp in self.planes])
+        # Integer selection is valid only AFTER the actual neural masks are
+        # exactly binary. No coverage is rounded and no geometric mask is
+        # substituted. Fractional models retain the continuous blend below.
+        self.ink_indices = None
+        if np.all((masks == 0) | (masks == 1)):
+            self.ink_indices = (masks[0] + 2*masks[1] + 4*masks[2]).astype(np.intp)
         self.mix = np.stack([np.prod(np.stack([masks[b] if k >> b & 1 else 1 - masks[b] for b in range(3)]), axis=0) for k in range(8)])
 
     def encode(self, rgb):
         p = patches(rgb, self.width, self.height)
         rows, cols = p.shape[:2]
-        means = p.reshape(rows, cols, 4, self.height // 4, 2, self.width // 2, 3).mean(axis=(3, 5))
         out = np.empty((rows, cols, 8, 3), np.uint8)
-        for y, label in enumerate(self.row_labels):
-            out[:, :, label * 2:label * 2 + 2] = np.rint(means[:, :, y]).astype(np.uint8)
+        if (self.width, self.height) == (2, 4):
+            # A subcell already is one RGB8 pixel: avoid a floating-point
+            # mean of a single value and its unnecessary large temporaries.
+            for y, label in enumerate(self.row_labels):
+                out[:, :, label * 2:label * 2 + 2] = p[:, :, y]
+        else:
+            means = p.reshape(rows, cols, 4, self.height // 4, 2, self.width // 2, 3).mean(axis=(3, 5))
+            for y, label in enumerate(self.row_labels):
+                out[:, :, label * 2:label * 2 + 2] = np.rint(means[:, :, y]).astype(np.uint8)
         return out
 
     def decode(self, colours):
         colours = np.asarray(colours)
         if colours.dtype != np.uint8 or colours.ndim != 4 or colours.shape[2:] != (8, 3):
             raise ValueError('colours must be rows x columns x 8 x 3 uint8')
+        if self.ink_indices is not None:
+            return unpatch(np.take(colours, self.ink_indices, axis=2))
         p = np.einsum('rckd,khw->rchwd', colours.astype(np.float32), self.mix, optimize=True)
         return np.clip(np.rint(unpatch(p)), 0, 255).astype(np.uint8)
 

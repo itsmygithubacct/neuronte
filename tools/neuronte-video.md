@@ -70,3 +70,10 @@ inference policy was chosen on validation clips and checked on fresh held-out
 clips, with both seeds retained in research. All footage is original synthetic
 material. Passing these clips does not establish general-purpose performance
 on natural footage; the exhaustive and multi-ink modes remain available.
+
+For exactly binary neural masks, decoding uses cached ink indices derived from
+those masks. This avoids multiplying every pixel by eight one-hot weights.
+It is enabled only after exact binary equality is established; fractional
+masks use the continuous product blend. No mask is rounded. The reproducible
+benchmark reports full-HD encode/decode throughput and a plain-copy reference;
+the Python record-layout work still costs more than a single memory copy.

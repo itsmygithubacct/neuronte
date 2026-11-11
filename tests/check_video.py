@@ -81,6 +81,17 @@ class Video(unittest.TestCase):
         np.testing.assert_array_equal(restricted['colours'],exhaustive['colours'])
         with self.assertRaises(ValueError):model.fit(image,np.full((2,2,1),-1))
 
+    def test_binary_fast_path_matches_neural_blend(self):
+        image=np.random.default_rng(87).integers(0,256,(64,96,3),dtype=np.uint8)
+        for width,height in [(2,4),(4,8),(8,16)]:
+            model=v.MultiInk(cell_w=width,cell_h=height)
+            colours=model.encode(image)
+            fast=model.decode(colours)
+            model.ink_indices=None
+            np.testing.assert_array_equal(fast,model.decode(colours))
+        fractional=v.MultiInk(ROOT/'weights/neuronte-split-v4.nrt')
+        self.assertIsNone(fractional.ink_indices)
+
     def test_helper_numpy_reference(self):
         from neuronte_video_helpers import Helper
         for kind,n in [('speed',24),('quality',51)]:

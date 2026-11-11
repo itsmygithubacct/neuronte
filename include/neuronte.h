@@ -80,6 +80,13 @@ size_t neuronte_utf8_decode(const char *s, size_t len, uint32_t *scalar);
  * 2 when the cell is narrower than 24 pixels, else 1. */
 int neuronte_set_samples(neuronte *n, int per_axis);
 
+/* Binary letters for the draw calls: with on = 1, a pixel more than half
+ * covered is drawn fully in the colour and any other is left alone, so
+ * no edge is blended. 0, the default, blends by coverage. A face drawn
+ * for small binary text is meant to be shown this way. neuronte_coverage()
+ * is not changed by it. */
+int neuronte_set_binary(neuronte *n, int on);
+
 /* Coverage of one character's cell, cell_w * cell_h floats in 0..1,
  * row-major. samples_per_axis 0 is automatic as above. A surrogate or a
  * value above U+10FFFF is drawn as U+FFFD. The cell is the net's 1 x 2
@@ -135,7 +142,8 @@ int neuronte_text_width(const neuronte *n, const char *text, size_t len, int bol
  * is less than an em. A character with no advance is drawn as the
  * table's fallback scalar. Bold is the regular letter struck twice, the
  * second time one pixel to the right: each pixel takes the greater of
- * the two coverages. Pixels outside the buffer are skipped. Returns how
+ * the two coverages, before neuronte_set_binary()'s cut if that is on.
+ * Pixels outside the buffer are skipped. Returns how
  * far the pen moved, which is neuronte_text_width() of the same text,
  * or an error. */
 int neuronte_draw_text(neuronte *n, uint32_t *pixels, int stride, int width, int height,

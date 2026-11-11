@@ -109,6 +109,7 @@ struct neuronte {
     uint32_t gate_masks[NMASK];
     float *gate; /* CODE rows of gate_h (l1, transposed), gate_h bias, nets rows of gate_h, nets bias */
     int samples;
+    int binary; /* the draw calls cut coverage at one half */
     unsigned long tick;
     struct entry cache[SETS][WAYS];
 };
@@ -563,6 +564,14 @@ int neuronte_set_samples(neuronte *n, int per_axis)
     return NEURONTE_OK;
 }
 
+int neuronte_set_binary(neuronte *n, int on)
+{
+    if (!n || on < 0 || on > 1)
+        return NEURONTE_ERR_ARG;
+    n->binary = on;
+    return NEURONTE_OK;
+}
+
 static uint32_t normalize(uint32_t s)
 {
     return (s > 0x10FFFF || (s >= 0xD800 && s <= 0xDFFF)) ? NEURONTE_REPLACEMENT : s;
@@ -824,7 +833,10 @@ int neuronte_draw_scalar(neuronte *n, uint32_t *pixels, int stride, int width, i
         return rc;
     for (py = y < 0 ? -y : 0; py < cell_h && y + py < height; py++)
         for (px = x < 0 ? -x : 0; px < cell_w && x + px < width; px++) {
-            float a = cov[(size_t)py * cell_w + px] * alpha;
+            float c = cov[(size_t)py * cell_w + px], a;
+            if (n->binary)
+                c = c > 0.5f ? 1.0f : 0.0f;
+            a = c * alpha;
             if (a > 0.0f) {
                 uint32_t *d = pixels + (size_t)(y + py) * stride + (x + px);
                 *d = blend(*d, color, a);
@@ -949,6 +961,8 @@ int neuronte_draw_text(neuronte *n, uint32_t *pixels, int stride, int width, int
                     float c = px < cw ? row[px] : 0.0f;
                     if (bold && px > 0 && row[px - 1] > c)
                         c = row[px - 1];
+                    if (n->binary)
+                        c = c > 0.5f ? 1.0f : 0.0f;
                     if (c * alpha > 0.0f) {
                         uint32_t *d = pixels + (size_t)(y + py) * stride + (x + px);
                         *d = blend(*d, color, c * alpha);

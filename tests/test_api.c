@@ -639,6 +639,60 @@ static void draw_text_checks(neuronte *n)
         if (bad || rc != neuronte_text_width(n, "AB?", 3, 1, EM))
             FAIL("draw_text: clipping changed %d pixels, or the width", bad);
     }
+    /* Binary: a pixel is the colour where coverage is more than half, and
+     * untouched elsewhere; bold is the two strikes' pixels together. */
+    {
+        uint32_t one[W * H], two[W * H], bg = 0xFF102030u, fg = 0xFFE0D0C0u;
+        float cov[EM * 2 * EM];
+        int px, py, bad = 0, on = 0;
+        for (i = 0; i < W * H; i++)
+            one[i] = two[i] = got[i] = bg;
+        if (neuronte_set_binary(n, 2) != NEURONTE_ERR_ARG || neuronte_set_binary(n, -1) != NEURONTE_ERR_ARG ||
+            neuronte_set_binary(NULL, 1) != NEURONTE_ERR_ARG || neuronte_set_binary(n, 1) != NEURONTE_OK)
+            FAIL("set_binary argument checks");
+        neuronte_coverage(n, 'B', EM, 2 * EM, 0, cov);
+        neuronte_draw_scalar(n, one, W, W, H, 4, 3, EM, 2 * EM, 'B', fg);
+        neuronte_draw_text(n, two, W, W, H, 4, 3, EM, 0, "B", 1, fg);
+        neuronte_draw_text(n, got, W, W, H, 4, 3, EM, 1, "B", 1, fg);
+        for (py = 0; py < H; py++)
+            for (px = 0; px < W; px++) {
+                int cx = px - 4, cy = py - 3, in = cx >= 0 && cx < EM && cy >= 0 && cy < 2 * EM;
+                int ink = in && cov[cy * EM + cx] > 0.5f;
+                int left = cx >= 1 && cx <= EM && cy >= 0 && cy < 2 * EM && cov[cy * EM + cx - 1] > 0.5f;
+                on += ink;
+                if (one[py * W + px] != (ink ? fg : bg) || two[py * W + px] != one[py * W + px] ||
+                    got[py * W + px] != (ink || left ? fg : bg))
+                    bad++;
+            }
+        if (bad || on == 0)
+            FAIL("binary drawing: %d pixels are not the coverage cut at one half (%d inked)", bad, on);
+        /* A half-clear colour is blended once, at full coverage or not at all. */
+        for (i = 0; i < W * H; i++)
+            one[i] = bg;
+        neuronte_draw_scalar(n, one, W, W, H, 4, 3, EM, 2 * EM, 'B', 0x80FFFFFFu);
+        bad = 0;
+        {
+            uint32_t seen = 0;
+            for (i = 0; i < W * H; i++)
+                if (one[i] != bg) {
+                    if (!seen)
+                        seen = one[i];
+                    if (one[i] != seen)
+                        bad++;
+                }
+            if (bad || !seen)
+                FAIL("binary drawing with a half-clear colour is not one blended colour");
+        }
+        if (neuronte_set_binary(n, 0) != NEURONTE_OK)
+            FAIL("set_binary off");
+        for (i = 0; i < W * H; i++)
+            one[i] = bg;
+        neuronte_draw_scalar(n, one, W, W, H, 4, 3, EM, 2 * EM, 'B', fg);
+        for (i = 0, on = 0; i < W * H; i++)
+            on += one[i] != bg && one[i] != fg;
+        if (on == 0)
+            FAIL("with binary off, no edge pixel is blended");
+    }
     if (neuronte_draw_text(n, got, W, W, H, 0, 0, EM, 2, "A", 1, color) != NEURONTE_ERR_ARG ||
         neuronte_draw_text(n, got, W, W, H, 0, 0, 0, 0, "A", 1, color) != NEURONTE_ERR_ARG ||
         neuronte_draw_text(n, got, W, W, H, 0, 0, NEURONTE_MAX_CELL / 2 + 1, 0, "A", 1, color) != NEURONTE_ERR_ARG ||

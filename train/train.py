@@ -10,8 +10,8 @@ of nodes 1/256 cell width apart and read between them bilinearly.
 
 The pen is the set's own (glyphs.PENS) unless --pen gives one. The
 scores at cell widths 10 to 32 also count pixels, for a
-face shown as binary letters at those sizes (sets ui10 to ui32, each
-judged at its own): how many characters are exactly their
+face shown as binary letters at those sizes (sets ui10 to ui32, and
+the italics ui10i to ui32i, each judged at its own): how many characters are exactly their
 drawing's pixels, and which are not, over all pixels and over the firm
 ones, those whose drawing is not within 0.1 of half covered.
 """

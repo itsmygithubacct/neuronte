@@ -21,8 +21,7 @@ Tiers:
              decomposition, or taken from font/letters.txt.
 
 Sets, each a list of tiers: ascii; draw (box, block, braille); symbol;
-accent; and full (ascii, draw and symbol), the set the shipped full
-weights were trained on.
+accent; and full, which is all of them.
 
 field() gives the target: the signed distance to the ink edge, positive
 inside, divided by tau and clamped to -1..1, at grid nodes 1/n cell width
@@ -422,7 +421,7 @@ SETS = {
     "draw": ["box", "block", "braille"],
     "symbol": ["symbol"],
     "accent": ["accent"],
-    "full": ["ascii", "box", "block", "braille", "symbol"],
+    "full": ["ascii", "box", "block", "braille", "symbol", "accent"],
 }
 
 

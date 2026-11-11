@@ -339,7 +339,7 @@ static int open_side(struct side *d, const char *path)
 
 int main(int argc, char **argv)
 {
-    const char *left = "weights/neuronte-ascii-v0.nrt", *right = "weights/neuronte-full-v1.nrt";
+    const char *left = "weights/neuronte-ascii-v0.nrt", *right = "weights/neuronte-full-v2.nrt";
     struct side d[2];
     int snap = argc >= 3 && strcmp(argv[1], "--snapshot") == 0, w = 1280, h = 800, rc;
 

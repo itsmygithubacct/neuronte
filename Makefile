@@ -6,7 +6,7 @@ LDLIBS = -lm
 PYTHON ?= python3
 
 ASCII = weights/neuronte-ascii-v0
-FULL = weights/neuronte-full-v1
+FULL = weights/neuronte-full-v2
 # The bundle: the ASCII net and the subset nets, with the gate the router
 # asks about characters none of them was trained on.
 DRAW = weights/neuronte-draw-v1
@@ -69,7 +69,7 @@ test: all $(TESTS)
 	cd weights && sha256sum -c --quiet SHA256SUMS
 	./build/test_utf8
 	./build/test_api $(ASCII).nrt
-	./build/test_api $(FULL).nrt --full
+	./build/test_api $(FULL).nrt --full --accent
 	./build/test_api $(SPLIT) --full --accent
 	$(PYTHON) tests/check_reference.py build/libneuronte.so $(ASCII).json $(ASCII).nrt
 	$(PYTHON) tests/check_reference.py build/libneuronte.so $(FULL).json $(FULL).nrt

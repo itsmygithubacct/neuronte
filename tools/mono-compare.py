@@ -8,6 +8,7 @@ import argparse
 import ctypes as ct
 import hashlib
 import json
+import math
 from pathlib import Path
 import sys
 import tempfile
@@ -36,17 +37,29 @@ def main():
                    help='require both new seeds to pass every tier at 16 and 48 px')
     p.add_argument('--out', required=True)
     a = p.parse_args()
+    try:
+        widths = tuple(int(w) for w in a.sizes.split(','))
+    except ValueError:
+        p.error('--sizes must be comma separated positive integers')
+    if not widths or any(w <= 0 for w in widths) or len(set(widths)) != len(widths):
+        p.error('--sizes must be distinct positive integers')
+    if a.minimum_iou is not None:
+        if not math.isfinite(a.minimum_iou) or not 0 <= a.minimum_iou <= 1:
+            p.error('--minimum-iou must be finite and in [0, 1]')
+        if not {16,48} <= set(widths):
+            p.error('--minimum-iou requires both 16 and 48 in --sizes')
     lib = ct.CDLL(str(Path(a.library).resolve()))
     P, I, U = ct.c_void_p, ct.c_int, ct.c_uint32
     lib.neuronte_open_file.argtypes = [ct.c_char_p, ct.POINTER(P)]
     lib.neuronte_close.argtypes = [P]
     lib.neuronte_coverage.argtypes = [P, U, I, I, I, P]
     inputs = {'old': a.baseline, 'new': a.candidate, 'seed1': a.other_seed}
+    documents = {name: json.loads(Path(path).read_text()) for name, path in inputs.items()}
     images = {name: pack.pack(path) for name, path in inputs.items()}
     known = pack.scalars(a.baseline)[1]
     chars = [(c, tier, sh) for c, tier, sh in glyphs.charset(a.set)
              if a.include_new or ord(c) in known]
-    points = {int(w): sample_points(int(w)) for w in a.sizes.split(',')}
+    points = {w: sample_points(w) for w in widths}
     rows = {str(w): [] for w in points}
     with tempfile.TemporaryDirectory(prefix='neuronte-compare-') as temp:
         handles = {}
@@ -102,6 +115,13 @@ def main():
     report = {'characters': len(chars), 'samples': a.samples, 'target_grid': 256,
               'target_samples': 8, 'set': a.set, 'include_new': a.include_new,
               'minimum_iou': a.minimum_iou, 'passed': bool(passed),
+              'target': {'grid':256, 'pen_radius':.075, 'tau':.15,
+                         'field_storage':'float16', 'subpixels_per_axis':8,
+                         'coverage_cutoff':.5},
+              'models': {name: {'shape': {k: v for k,v in d['shape'].items() if k != 'parity_masks'},
+                                'training_target': {k: d['training'].get(k) for k in ('grid','pen_radius')}}
+                         for name,d in documents.items()},
+              'library_sha256': hashlib.sha256(Path(a.library).read_bytes()).hexdigest(),
               'sources_sha256': {f: hashlib.sha256((ROOT/f).read_bytes()).hexdigest()
                                  for f in glyphs.sources(a.set)},
               'weights_sha256': {n: hashlib.sha256(b).hexdigest() for n, b in images.items()},

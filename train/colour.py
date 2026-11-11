@@ -62,11 +62,13 @@ def sha(path):
         return hashlib.sha256(fh.read()).hexdigest()
 
 
-SOURCES = {os.path.relpath(f, strokes.ROOT): sha(f) for f in (strokes.ICONS, strokes.PALETTE)}
+SOURCES = {os.path.relpath(f, strokes.ROOT): sha(f) for f in
+           (strokes.ICONS, strokes.PALETTE, os.path.join(strokes.ROOT, "train", "glyphs.py"))}
 SOURCES["train/colour.py"] = sha(os.path.abspath(__file__))
 TAU, OCT, W, N, K = 0.15, 6, a.width, a.grid, a.layers
 PAL = strokes.palette()
-ICONS = strokes.parse_layers(pal=PAL)
+# Drawings in font/icons.txt, plus the powerline and progress glyphs made by rule.
+ICONS = glyphs.colour_icons(pal=PAL)
 CHARS = list(ICONS)
 G = len(CHARS)
 assert max(len(v) for v in ICONS.values()) <= K, "an icon has more layers than K"

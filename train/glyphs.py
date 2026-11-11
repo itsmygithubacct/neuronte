@@ -34,6 +34,12 @@ inside, divided by tau and clamped to -1..1, at grid nodes 1/n cell width
 apart. Lines and blocks that meet the cell edge run on past it, so
 neighbouring cells join.
 
+Powerline (U+E0A0..U+E0A3, U+E0B0..U+E0BF, U+E0D6, U+E0D7) and progress
+(U+EE00..U+EE0B) are made here by rule, the way the blocks are. Each is
+one foreground layer. Separators and bar pieces run past the cell edge
+so neighbours join. colour_icons() adds them to the drawings in
+font/icons.txt.
+
 python3 train/glyphs.py lists the full set and checks it.
 """
 import math
@@ -486,6 +492,243 @@ def accents():
     return out
 
 
+# Powerline and progress. One foreground layer each. Straight edges sit on
+# 1/16 of the cell, one pixel when the cell is 16 wide. R is that stroke
+# radius. Separators and the progress bar run PAD past an edge they join.
+
+R = 0.0625
+
+
+def _chain(pts, r=R):
+    return [("seg", pts[i][0], pts[i][1], pts[i + 1][0], pts[i + 1][1], r)
+            for i in range(len(pts) - 1)]
+
+
+def _dot(x, y, r):
+    return ("seg", x, y, x, y, r)
+
+
+def _arc_pts(cx, cy, rx, ry, a0, a1, n):
+    pts = []
+    for i in range(n + 1):
+        a = math.radians(a0 + (a1 - a0) * i / n)
+        pts.append((cx + rx * math.cos(a), cy + ry * math.sin(a)))
+    return pts
+
+
+def _mirror(pts):
+    return [(1 - x, y) for x, y in pts]
+
+
+def _lower_left():
+    """Fill below the backslash through the cell corners: full left, full bottom."""
+    return [(-PAD / 2, -PAD), (-PAD, -PAD), (-PAD, 2 + PAD), (1 + PAD / 2, 2 + PAD)]
+
+
+def _upper_left():
+    """Fill above the forward slash: full left, full top."""
+    return [(-PAD, -PAD), (1 + PAD / 2, -PAD), (-PAD / 2, 2 + PAD), (-PAD, 2 + PAD)]
+
+
+def _hard(points_right):
+    """Triangle, base on one side and tip at the other side's centre."""
+    if points_right:
+        return [(-PAD, -PAD), (-PAD, 2 + PAD), (1, 1)]
+    return [(1 + PAD, -PAD), (1 + PAD, 2 + PAD), (0, 1)]
+
+
+def _half_disk(bulge_right):
+    """Half disk. The flat side is the join, so it runs past the cell."""
+    if bulge_right:
+        arc = _arc_pts(0, 1, 1, 1, -90, 90, 32)
+        return [("poly", arc), rect(-PAD, -PAD, 0.02, 2 + PAD)]
+    arc = _arc_pts(1, 1, 1, 1, 90, 270, 32)
+    return [("poly", arc), rect(0.98, -PAD, 1 + PAD, 2 + PAD)]
+
+
+def _half_arc(bulge_right):
+    """The outline of that half disk: the arc only, past the top and bottom."""
+    if bulge_right:
+        pts = _arc_pts(0, 1, 1, 1, -100, 100, 28)
+    else:
+        pts = _arc_pts(1, 1, 1, 1, 80, 280, 28)
+    return _chain(pts)
+
+
+def _chevron(points_right):
+    if points_right:
+        return _chain([(0, 0), (1, 1), (0, 2)])
+    return _chain([(1, 0), (0, 1), (1, 2)])
+
+
+def _slash(backslash):
+    """A thin slant through two opposite corners, running on past both."""
+    if backslash:
+        return _chain([(-PAD, -2 * PAD), (1 + PAD, 2 + 2 * PAD)])
+    return _chain([(1 + PAD, -2 * PAD), (-PAD, 2 + 2 * PAD)])
+
+
+def _inverse(points_right):
+    """The cell minus the hard divider, so the notch is that triangle."""
+    return [rect(-PAD, -PAD, 1 + PAD, 2 + PAD), ("cut", ("poly", _hard(points_right)))]
+
+
+def _branch():
+    return [_dot(0.3125, 1.375, 0.12), _dot(0.3125, 0.625, 0.12), _dot(0.75, 0.625, 0.12),
+            *_chain([(0.3125, 1.30), (0.3125, 0.72)]),
+            *_chain([(0.3125, 1.02), (0.70, 0.70)])]
+
+
+def _line_number():
+    return (_chain([(0.25, 0.75), (0.78, 0.75)]) + _chain([(0.25, 1.0), (0.78, 1.0)])
+            + _chain([(0.25, 1.25), (0.78, 1.25)]))
+
+
+def _lock():
+    arc = _arc_pts(0.5, 0.9375, 0.1875, 0.25, 180, 360, 16)
+    return [rect(0.25, 0.9375, 0.75, 1.5), *_chain(arc), _dot(0.5, 1.1875, 0.07)]
+
+
+def _columns():
+    return (_chain([(0.3125, 0.875), (0.3125, 1.375)]) + _chain([(0.5, 0.5625), (0.5, 1.5)])
+            + _chain([(0.6875, 0.875), (0.6875, 1.375)]))
+
+
+def powerline(cp):
+    """Shapes for one powerline code point. Separators run past the join."""
+    if cp == 0xE0A0:
+        return _branch()
+    if cp == 0xE0A1:
+        return _line_number()
+    if cp == 0xE0A2:
+        return _lock()
+    if cp == 0xE0A3:
+        return _columns()
+    if cp == 0xE0B0:
+        return [("poly", _hard(True))]
+    if cp == 0xE0B1:
+        return _chevron(True)
+    if cp == 0xE0B2:
+        return [("poly", _hard(False))]
+    if cp == 0xE0B3:
+        return _chevron(False)
+    if cp == 0xE0B4:
+        return _half_disk(True)
+    if cp == 0xE0B5:
+        return _half_arc(True)
+    if cp == 0xE0B6:
+        return _half_disk(False)
+    if cp == 0xE0B7:
+        return _half_arc(False)
+    if cp == 0xE0B8:
+        return [("poly", _lower_left())]
+    if cp == 0xE0B9:
+        return _slash(True)
+    if cp == 0xE0BA:
+        return [("poly", _mirror(_lower_left()))]
+    if cp == 0xE0BB:
+        return _slash(False)
+    if cp == 0xE0BC:
+        return [("poly", _upper_left())]
+    if cp == 0xE0BD:          # same stroke as U+E0BB; the extra slot is redundant
+        return _slash(False)
+    if cp == 0xE0BE:
+        return [("poly", _mirror(_upper_left()))]
+    if cp == 0xE0BF:          # same stroke as U+E0B9
+        return _slash(True)
+    if cp == 0xE0D6:          # cell minus the left-pointing divider
+        return _inverse(False)
+    if cp == 0xE0D7:          # cell minus the right-pointing divider
+        return _inverse(True)
+    raise ValueError(f"U+{cp:04X} is not a powerline glyph")
+
+
+# Progress bar. The track is centred, 0.5 tall. A full piece is solid; an
+# empty piece is the same outline, open on the side that joins the next piece.
+# Caps are round. The outer edge of an empty stroke is the edge of the solid.
+
+BAR_TOP, BAR_BOT = 0.75, 1.25
+BAR_R = 0.25
+CAP_X = 0.375                 # centre of a cap whose outer tip is 0.125 in from the cell
+
+
+def _bar_body(x0, x1):
+    return rect(x0, BAR_TOP, x1, BAR_BOT)
+
+
+def _rounded_end(right):
+    """One polygon: round cap plus the bar, so the join has no internal edge."""
+    cx = 1 - CAP_X if right else CAP_X
+    if right:
+        arc = _arc_pts(cx, 1, BAR_R, BAR_R, -90, 90, 24)
+        return ("poly", arc + [(-PAD, BAR_BOT), (-PAD, BAR_TOP)])
+    arc = _arc_pts(cx, 1, BAR_R, BAR_R, 90, 270, 24)
+    return ("poly", arc + [(1 + PAD, BAR_TOP), (1 + PAD, BAR_BOT)])
+
+
+def _cap_outline(right):
+    """Stroke whose outer radius is BAR_R, then the open rails to the join."""
+    cx = 1 - CAP_X if right else CAP_X
+    a0, a1 = (-90, 90) if right else (90, 270)
+    mid = BAR_R - R
+    arc = _chain(_arc_pts(cx, 1, mid, mid, a0, a1, 18))
+    y0, y1 = BAR_TOP + R, BAR_BOT - R
+    if right:
+        rails = _chain([(-PAD, y0), (cx, y0)]) + _chain([(-PAD, y1), (cx, y1)])
+    else:
+        rails = _chain([(cx, y0), (1 + PAD, y0)]) + _chain([(cx, y1), (1 + PAD, y1)])
+    return arc + rails
+
+
+def _spinner(k):
+    a0 = -90 + 60 * k
+    return _chain(_arc_pts(0.5, 1, 0.3125, 0.3125, a0, a0 + 120, 16))
+
+
+def progress(cp):
+    """U+EE00..U+EE02 empty end, middle, end; U+EE03..U+EE05 the full ones; then six spinner frames."""
+    i = cp - 0xEE00
+    y0, y1 = BAR_TOP + R, BAR_BOT - R
+    if i == 0:
+        return _cap_outline(False)
+    if i == 1:
+        return _chain([(-PAD, y0), (1 + PAD, y0)]) + _chain([(-PAD, y1), (1 + PAD, y1)])
+    if i == 2:
+        return _cap_outline(True)
+    if i == 3:
+        return [_rounded_end(False)]
+    if i == 4:
+        return [_bar_body(-PAD, 1 + PAD)]
+    if i == 5:
+        return [_rounded_end(True)]
+    if 6 <= i <= 11:
+        return _spinner(i - 6)
+    raise ValueError(f"U+{cp:04X} is not a progress glyph")
+
+
+def ruled_codepoints():
+    """Powerline, then progress, in code point order."""
+    return ([*range(0xE0A0, 0xE0A4), *range(0xE0B0, 0xE0C0), 0xE0D6, 0xE0D7]
+            + [*range(0xEE00, 0xEE0C)])
+
+
+def ruled(cp):
+    if 0xEE00 <= cp <= 0xEE0B:
+        return progress(cp)
+    return powerline(cp)
+
+
+def colour_icons(pal=None):
+    """Drawings in font/icons.txt, then the ruled glyphs as one fg layer each."""
+    icons = strokes.parse_layers(pal=pal)
+    for cp in ruled_codepoints():
+        ch = chr(cp)
+        if ch in icons:
+            raise ValueError(f"U+{cp:04X} is both drawn and made by rule")
+        icons[ch] = [("fg", ruled(cp))]
+    return icons
+
+
 SETS = {
     "ascii": ["ascii"],
     "draw": ["box", "block", "shade", "braille"],
@@ -662,11 +905,79 @@ if __name__ == "__main__":
         if ((want == 1) & (sd <= 0.02)).any() or ((want == -1) & (sd >= -0.02)).any():
             raise SystemExit(f"U+{cp:04X} does not fill exactly its cells")
     # Colour glyphs: every adjacent pair of layers overlaps where it meets.
-    icons = strokes.parse_layers()
+    # Ruled powerline and progress glyphs are one fg layer on top of the drawings.
+    icons = colour_icons()
+    drawn = strokes.parse_layers()
+    if len(icons) - len(drawn) != len(ruled_codepoints()):
+        raise SystemExit("a ruled glyph collided with a drawing")
     for ch, layers in icons.items():
         for lo, up, bad in layer_seams(layers):
             raise SystemExit(f"U+{ord(ch):04X}: layer {lo + 1} stops at the edge of layer {up + 1} "
                              f"({bad} points) instead of running under it")
+    pen = 0.0625
+
+    def sd_at(shapes, x, y):
+        return float(signed_distance(shapes, np.array([[x, y]]), pen)[0])
+
+    def expect(cp, x, y, inside):
+        got = sd_at(ruled(cp), x, y) > 0
+        if got != inside:
+            raise SystemExit(f"U+{cp:04X} at ({x}, {y}) is {'ink' if got else 'empty'}")
+
+    # Right-pointing divider joins on the left and comes to a tip on the right.
+    expect(0xE0B0, 0.02, 0.3, True)
+    expect(0xE0B0, 0.02, 1.7, True)
+    expect(0xE0B0, 0.85, 1.0, True)
+    expect(0xE0B0, 0.92, 0.25, False)
+    expect(0xE0B2, 0.98, 1.0, True)
+    expect(0xE0B2, 0.15, 1.0, True)
+    expect(0xE0B2, 0.08, 0.25, False)
+    # Half disk: flat side joins, bulge reaches the far edge, corners stay empty.
+    expect(0xE0B4, 0.08, 1.0, True)
+    expect(0xE0B4, 0.92, 1.0, True)
+    expect(0xE0B4, 0.92, 0.2, False)
+    expect(0xE0B6, 0.08, 1.0, True)
+    expect(0xE0B6, 0.08, 0.2, False)
+    # Slants. Lower-left is full along the bottom; upper-left along the top.
+    expect(0xE0B8, 0.1, 1.7, True)
+    expect(0xE0B8, 0.85, 0.25, False)
+    expect(0xE0BC, 0.1, 0.3, True)
+    expect(0xE0BC, 0.85, 1.7, False)
+    expect(0xE0BA, 0.9, 1.7, True)
+    expect(0xE0BA, 0.15, 0.25, False)
+    expect(0xE0BE, 0.9, 0.3, True)
+    expect(0xE0BE, 0.15, 1.7, False)
+    # An inverse is the cell minus its divider, away from the boundary.
+    xs = np.linspace(0.1, 0.9, 17)
+    ys = np.linspace(0.15, 1.85, 24)
+    for cp, inv in ((0xE0B0, 0xE0D7), (0xE0B2, 0xE0D6)):
+        bad = 0
+        for x in xs:
+            for y in ys:
+                a, b = sd_at(ruled(cp), x, y), sd_at(ruled(inv), x, y)
+                if abs(a) < 0.04 or abs(b) < 0.04:
+                    continue
+                bad += (a > 0) == (b > 0)
+        if bad:
+            raise SystemExit(f"U+{inv:04X} matches U+{cp:04X} at {bad} points")
+    # Progress: full middle spans the cell, empty middle is the two rails.
+    expect(0xEE04, 0.0, 1.0, True)
+    expect(0xEE04, 1.0, 1.0, True)
+    expect(0xEE04, 0.5, 0.5, False)
+    expect(0xEE01, 0.5, 0.8125, True)
+    expect(0xEE01, 0.5, 1.1875, True)
+    expect(0xEE01, 0.5, 1.0, False)
+    expect(0xEE03, 0.05, 1.0, False)
+    expect(0xEE03, 0.25, 1.0, True)
+    expect(0xEE03, 0.95, 1.0, True)
+    expect(0xEE05, 0.75, 1.0, True)
+    expect(0xEE05, 0.95, 1.0, False)
+    for cp in ruled_codepoints():
+        ink = int((signed_distance(ruled(cp), nodes(24), pen) > 0).sum())
+        if ink < 8:
+            raise SystemExit(f"U+{cp:04X} is nearly empty ({ink} nodes)")
+        if colour_icons()[chr(cp)] != [("fg", ruled(cp))]:
+            raise SystemExit(f"U+{cp:04X} is not one fg layer")
     counts = {}
     for _, t, _ in full:
         counts[t] = counts.get(t, 0) + 1

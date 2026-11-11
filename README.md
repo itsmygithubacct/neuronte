@@ -69,12 +69,12 @@ a letter and a mark, such as ß æ œ ð þ ø ł đ ħ ŋ ĳ, are drawn in
 | `font/symbols.txt` | The symbols of the full set, in the same form |
 | `font/marks.txt` | The diacritic marks, keyed by their combining code points |
 | `font/letters.txt` | The Latin letters beyond ASCII that are not a letter plus a mark |
-| `font/icons.txt` | The icons, as colour layers back to front, each naming a palette entry. Not yet in any weights |
+| `font/icons.txt` | The icons, as colour layers back to front, each naming a palette entry. Powerline and progress are made in `train/glyphs.py` and are not listed in the file. Not yet in any weights |
 | `font/palette.txt` | The palette for colour glyphs: entry 0 is the cell's foreground, 1 is clear, the rest have a dark-theme and a light-theme colour |
 | `font/code-masks.txt` | The 43 parity masks that turn a scalar into the net's 64 character inputs |
 | `font/octants.txt` | Which cells each octant U+1CD00..U+1CDE5 fills. Made by `train/mosaics.py` from Unicode 16's `UnicodeData.txt`, whose version and sha256 it records |
 | `train/strokes.py` | Reads the stroke files |
-| `train/glyphs.py` | The character sets. Makes box drawing and blocks from their Unicode names, Braille from the dot bits, sextants and octants from the cells they fill, accented letters from a letter and a mark, and the target the net learns. `python3 train/glyphs.py` checks the sets |
+| `train/glyphs.py` | The character sets. Makes box drawing and blocks from their Unicode names, Braille from the dot bits, sextants and octants from the cells they fill, accented letters from a letter and a mark, powerline and progress as one foreground layer, and the target the net learns. `python3 train/glyphs.py` checks the sets |
 | `train/mosaics.py` | Makes `font/octants.txt`, and checks the sextants and the octant patterns encoded elsewhere against the same Unicode data |
 | `train/train.py` | Trains a net on one set. Needs torch, and wants a GPU |
 | `train/gate.py` | Trains the router's gate for a bundle of nets. Needs torch; a CPU is enough |

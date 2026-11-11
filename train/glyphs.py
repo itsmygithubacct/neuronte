@@ -23,18 +23,18 @@ Tiers:
              U+0100..U+017F and the spacing marks, made here from an
              ASCII letter and the marks in font/marks.txt, by the Unicode
              decomposition, or taken from font/letters.txt.
-    ui10     the desktop face, printable ASCII and U+2026, from
-    ui11     font/ui-10.txt and so on: a proportional face for small
-    ui12     binary text, drawn as pixels once for each em, of 10, 11,
-    ...      12, 14, 16, 18, 20, 22, 24, 26, 28, 30 and 32 pixels.
-    ui32     Stems are one pixel wide to 16, two from 18 to 26, and
-             three from 28. Each inked pixel is a round dot, joined to
+    ui9      the desktop face, printable ASCII and U+2026, from
+    ui10     font/ui-9.txt and so on: a proportional face for small
+    ui11     binary text, drawn as pixels once for each em, of 9, 10,
+    ui12     11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30 and 32 pixels.
+    ...      Stems are one pixel wide to 16, two from 18 to 26, and
+    ui32     three from 28. Each inked pixel is a round dot, joined to
              the inked pixel beside it and the one below.
 
 Sets, each a list of tiers: ascii; draw (box, block, shade, braille);
 symbol; accent; full, which is all of those; and three sets for choosing
 how the mosaics join the bundle: pixel (block, mosaic), pixelbraille
-(block, mosaic, braille) and boxshade (box, shade). The sets ui10 to
+(block, mosaic, braille) and boxshade (box, shade). The sets ui9 to
 ui32 are each their tier alone. They share their scalars with ascii and
 with each other, so they join no other set, and their nets no bundle.
 Each has a pen of its own, in PENS, a little over one pixel wide at its em.
@@ -57,7 +57,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import strokes  # noqa: E402
 
 OCTANTS = os.path.join(strokes.ROOT, "font", "octants.txt")
-UI_TOP = {10: 6, 11: 6, 12: 7, 14: 8, 16: 9, 18: 10, 20: 11, 22: 12,
+UI_TOP = {9: 6, 10: 6, 11: 6, 12: 7, 14: 8, 16: 9, 18: 10, 20: 11, 22: 12,
           24: 14, 26: 15, 28: 16, 30: 17, 32: 18}  # per em, the cell row of a desktop-face drawing's first row
 UI = {em: os.path.join(strokes.ROOT, "font", f"ui-{em}.txt") for em in UI_TOP}
 PEN = 0.075                 # the pen radius, in cell widths

@@ -1,4 +1,4 @@
-"""Train a colour glyph net on the layered icons: the experiment between two forms.
+"""Train a colour glyph net on the icons: the drawn ones and those made by rule.
 
 usage: python3 train/colour.py OUT.json --form A|B [--layers K] [--width W]
                                [--steps N] [--device cuda] [--seed S]
@@ -28,7 +28,8 @@ Both carry the palette head: from the 64 code features to each layer's
 palette entry, as 5 bits a layer. It runs once per glyph, so it is not
 part of the per-pixel cost.
 
-Writes the weights as JSON and prints one JSON line of scores:
+Writes the weights as JSON, for form A in the format train/pack.py packs
+(neuronte-colour-weights, version 1), and prints one JSON line of scores:
 - each used layer's IoU at 12, 16 and 32 px, as glyphs are scored, with
   2 x 2 samples below 24 px and 1 above, as the library draws;
 - any unused layer that draws a pixel;
@@ -44,6 +45,7 @@ import json
 import math
 import os
 import sys
+import time
 
 import numpy as np
 import torch
@@ -51,6 +53,7 @@ import torch
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import glyphs  # noqa: E402
 import strokes  # noqa: E402
+from colour_sources import drawing_hashes  # noqa: E402
 
 p = argparse.ArgumentParser()
 p.add_argument("out")
@@ -66,6 +69,8 @@ p.add_argument("--grid", type=int, default=256, help="target grid nodes per cell
 p.add_argument("--drawing", default=strokes.ICONS, help="colour drawings, in the syntax of font/icons.txt")
 p.add_argument("--palette", default=strokes.PALETTE, help="their palette, in the syntax of font/palette.txt")
 p.add_argument("--blank", default="", help="scalars trained to draw nothing: U+XXXX or U+XXXX..U+YYYY, comma separated")
+p.add_argument("--scores-out", help="write full-precision scores and every used layer's counts")
+p.add_argument("--log-every", type=int, default=1000, help="progress interval on stderr (0 disables)")
 a = p.parse_args()
 torch.manual_seed(a.seed)
 torch.set_default_device(a.device)
@@ -83,10 +88,13 @@ DRAWING, PALETTE = (os.path.relpath(os.path.abspath(f), strokes.ROOT) for f in (
 if any(f.startswith("..") for f in (DRAWING, PALETTE)):
     raise SystemExit("the drawing and the palette must be files in the tree")
 SOURCES = {f: sha(os.path.join(strokes.ROOT, f)) for f in (DRAWING, PALETTE)}
-SOURCES["train/colour.py"] = sha(os.path.abspath(__file__))
+SOURCES.update({f: sha(os.path.join(strokes.ROOT, f)) for f in
+                ("font/code-masks.txt", "train/glyphs.py", "train/strokes.py",
+                 "train/colour.py", "train/colour_sources.py")})
 TAU, OCT, W, N, K = 0.15, 6, a.width, a.grid, a.layers
 PAL = strokes.palette(os.path.join(strokes.ROOT, PALETTE))
-ICONS = strokes.parse_layers(os.path.join(strokes.ROOT, DRAWING), pal=PAL)
+ICONS = (glyphs.colour_icons(pal=PAL) if DRAWING == "font/icons.txt" else
+         strokes.parse_layers(os.path.join(strokes.ROOT, DRAWING), pal=PAL))
 LABELLED = list(ICONS)
 BLANK = []
 for tok in filter(None, a.blank.split(",")):
@@ -167,6 +175,7 @@ GW = torch.cat([torch.full((NL,), 0.5 / NL), torch.full((G - NL,), 0.5 / max(1, 
 params = list(net.parameters()) + list(head.parameters())
 opt = torch.optim.Adam(params, lr=2e-3)
 sched = torch.optim.lr_scheduler.CosineAnnealingLR(opt, a.steps)
+started = time.monotonic()
 for step in range(a.steps):
     cand = torch.rand(G, 1024, 2) * SPAN
     tc = target(gi, cand)
@@ -190,6 +199,10 @@ for step in range(a.steps):
     (loss + 0.1 * hloss).backward()
     opt.step()
     sched.step()
+    if a.log_every and ((step + 1) % a.log_every == 0 or step + 1 == a.steps):
+        print(json.dumps({"step": step + 1, "seconds": round(time.monotonic() - started, 2),
+                          "loss": float(loss.detach()), "head_loss": float(hloss.detach())}),
+              file=sys.stderr, flush=True)
 
 
 def grid(wpx, ss):
@@ -249,9 +262,11 @@ def label(g, k):
 with torch.no_grad():
     _, pred = entries(CF)
 head_wrong = int(((pred != ENTRY) & USED).sum())
+head_wrong_all = int((pred != ENTRY).sum())
 res = {"form": a.form, "layers": K, "icons": G, "width": W, "steps": a.steps, "seed": a.seed,
        "params": sum(q.numel() for q in net.parameters()), "head_params": sum(q.numel() for q in head.parameters()),
-       "final_loss": float(loss.detach()), "head_wrong": head_wrong}
+       "final_loss": float(loss.detach()), "head_wrong": head_wrong, "head_wrong_all": head_wrong_all}
+details = {}
 if BLANK:
     res["blanks"] = len(BLANK)
     res["blank_head_wrong"] = int((pred[NL:] != 0).sum())
@@ -261,6 +276,16 @@ for wpx, ss in ((12, 2), (16, 2), (32, 1)):
     u = (ti | ni).sum((2, 3)).float()
     iou = torch.where(u > 0, (ti & ni).sum((2, 3)).float() / u.clamp_min(1), torch.ones_like(u))
     used = iou[USED]
+    overlap = (ti & ni).sum((2, 3))
+    target_ink, predicted_ink = ti.sum((2, 3)), ni.sum((2, 3))
+    detail = {"iou_mean": float(used.mean()), "iou_min": float(used.min()),
+              "lost_used": int(((overlap == 0) & USED).sum()),
+              "layers": [{"scalar": f"U+{ord(CHARS[g]):04X}", "layer": k,
+                          "iou": float(iou[g, k]), "intersection": int(overlap[g, k]),
+                          "union": int(u[g, k]), "target_ink": int(target_ink[g, k]),
+                          "predicted_ink": int(predicted_ink[g, k])}
+                         for g in range(G) for k in range(K) if bool(USED[g, k])]}
+    details[f"w{wpx}_s{ss}"] = detail
     order = iou.masked_fill(~USED, 2).reshape(-1).argsort()[:3]
     r = {"iou_mean": round(float(used.mean()), 4), "iou_min": round(float(used.min()), 4),
          "worst": [label(int(i) // K, int(i) % K) for i in order],
@@ -297,10 +322,15 @@ doc = {
                 for name, (n, d, li) in PAL.items()},
     "training": {"set": os.path.splitext(os.path.basename(DRAWING))[0], "labelled": " ".join(f"U+{ord(c):04X}" for c in LABELLED), "sources_sha256": SOURCES,
                  "drawing": DRAWING, "palette": PALETTE, "blank": a.blank,
+                 "drawings_sha256": {"version": 1, "glyphs": drawing_hashes(ICONS, map(ord, LABELLED))},
                  "pen_radius": a.pen, "grid": N, "steps": a.steps, "seed": a.seed},
     "layers": layers_of(net, ["l1", "l2", "l3", "out"]),
     "head": layers_of(head, ["h1", "out"]),
 }
 with open(a.out, "w") as fh:
     json.dump(doc, fh)
+if a.scores_out:
+    with open(a.scores_out, "w") as fh:
+        json.dump({"summary": res, "per_size": details}, fh, indent=2)
+        fh.write("\n")
 print(json.dumps(res, ensure_ascii=False))

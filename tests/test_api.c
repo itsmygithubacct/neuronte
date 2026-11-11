@@ -1,11 +1,14 @@
 /* Loader refusals, drawing, clipping, blending and bundles. MIT licence.
- * usage: test_api WEIGHTS.nrt [--full] [--accent] [--pixel] [--colour]
+ * usage: test_api WEIGHTS.nrt [--full] [--accent] [--pixel] [--colour [--trained]]
  * --full adds checks of box drawing, blocks and Braille, --accent of
  * accented letters, and --pixel of the sextants and octants, for weights
  * trained on them. Given a one-net file, it also checks the loader's
  * refusals by damaging that file, and builds bundles from it to check the
  * router. Given a bundle, it checks the drawing only. --colour checks a
  * version 3 file: the palette, the head, the edge table and the composite.
+ * With --trained the file is a trained icon net, not the test fixture: K
+ * may be more than 3, and a scalar outside the labelled set may return any
+ * entry, since only the fixture's head is built to return 0 for it.
  * Either way it checks the advance table and the drawing file on images
  * it builds. */
 #define _POSIX_C_SOURCE 200809L
@@ -19,6 +22,7 @@
 #include <unistd.h>
 
 static int failed;
+static int trained_net; /* --trained: a trained colour net, not the fixture */
 #define FAIL(...) (printf("FAIL " __VA_ARGS__), putchar('\n'), failed = 1)
 
 static unsigned char *slurp(const char *path, size_t *len)
@@ -740,21 +744,22 @@ edges_done:
         FAIL("out of memory");
         goto bundles;
     }
-    if (K != 3) {
-        FAIL("the labelled-entry check wants K = 3, the file says %u", K);
+    if (trained_net ? K < 3 : K != 3) {
+        FAIL("the labelled-entry check wants K = 3%s, the file says %u", trained_net ? " or more" : "", K);
         goto bundles;
     }
     for (g = 0; g < 4; g++) {
         if (neuronte_coverage_layers(n, labelled[g], W, H, 0, masks, ent) != NEURONTE_OK)
             FAIL("coverage_layers U+%X", labelled[g]);
-        for (layer = 0; layer < (int)K; layer++)
-            if (ent[layer] != want[g][layer])
-                FAIL("U+%X layer %d entry %u, drawings say %u", labelled[g], layer, ent[layer],
-                     want[g][layer]);
+        for (layer = 0; layer < (int)K; layer++) {
+            unsigned w = layer < 3 ? want[g][layer] : 0;
+            if (ent[layer] != w)
+                FAIL("U+%X layer %d entry %u, drawings say %u", labelled[g], layer, ent[layer], w);
+        }
     }
     if (neuronte_coverage_layers(n, 0x41, W, H, 0, masks, ent) != NEURONTE_OK)
         FAIL("coverage_layers of an unlabelled scalar");
-    for (layer = 0; layer < (int)K; layer++)
+    for (layer = 0; layer < (int)K && !trained_net; layer++)
         if (ent[layer] != 0)
             FAIL("U+0041 layer %d entry %u", layer, ent[layer]);
     neuronte_coverage(n, 0xF036D, W, H, 0, cov);
@@ -1465,11 +1470,13 @@ int main(int argc, char **argv)
             pixel = 1;
         else if (strcmp(argv[i], "--colour") == 0)
             colour = 1;
+        else if (strcmp(argv[i], "--trained") == 0)
+            trained_net = 1;
         else
             argc = 0;
     }
-    if (argc < 2) {
-        fprintf(stderr, "usage: %s WEIGHTS.nrt [--full] [--accent] [--pixel] [--colour]\n", argv[0]);
+    if (argc < 2 || (trained_net && !colour)) {
+        fprintf(stderr, "usage: %s WEIGHTS.nrt [--full] [--accent] [--pixel] [--colour [--trained]]\n", argv[0]);
         return 2;
     }
     data = slurp(argv[1], &len);

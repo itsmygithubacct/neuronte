@@ -102,11 +102,12 @@ One edge record per labelled glyph, sorted by scalar. A record is the
 scalar as u32, then K layer blocks. A block is an x-edge count and a
 y-edge count as u16, then that many x edges and that many y edges. An
 edge is an f32 position in design-cell widths and a u32 side, 1 for
-rising and 0 for falling. The edges come from the drawing the weights
-name in training.drawing, font/icons.txt when they name none, with the
-palette in training.palette, font/palette.txt when none. The packer
-refuses the file when either file's sha256 is not the one in
-training.sources_sha256.
+rising and 0 for falling. The edges come from training.drawing (default
+font/icons.txt), including generated icon rules, and training.palette
+(default font/palette.txt). New weights bind each expanded labelled drawing
+with training.drawings_sha256. Legacy weights require matching drawing-file
+and rule-module hashes in training.sources_sha256. Historical trainer hashes
+remain provenance records rather than blocking unrelated code changes.
 
 An advance table, version 4. An advance is stored in steps of a tenth of
 a design unit:
@@ -143,8 +144,10 @@ import sys
 
 import numpy as np
 
+import glyphs
 import snap
 import strokes
+from colour_sources import drawing_hashes
 
 SHAPE = {"position_octaves": 6, "code_bits": 64, "hidden_layers": 3}
 COLOUR_FIXED = 420
@@ -232,8 +235,23 @@ def colour_sources(doc):
     return training.get("drawing", "font/icons.txt"), training.get("palette", "font/palette.txt")
 
 
+def colour_drawings(doc):
+    """Expand the named drawing, including rules only for the icon collection."""
+    drawing, palette = colour_sources(doc)
+    pal = strokes.palette(os.path.join(ROOT, palette))
+    if drawing == "font/icons.txt":
+        return glyphs.colour_icons(pal=pal)
+    return strokes.parse_layers(os.path.join(ROOT, drawing), pal)
+
+
 def check_sources(doc, path):
-    """The drawings named in the weights are the files in this tree."""
+    """Bind packing to the labelled drawings, not an unrelated trainer edit.
+
+    New nets record expanded per-glyph drawings as well as historical source
+    hashes. Legacy files retain their drawing-file and rule-module checks.
+    Trainer hashes are evidence of how weights were made, not a requirement
+    that future packers run from that same trainer revision.
+    """
     src = doc.get("training", {}).get("sources_sha256")
     for rel in colour_sources(doc):
         if not isinstance(src, dict) or rel not in src:
@@ -241,6 +259,22 @@ def check_sources(doc, path):
     for rel, digest in src.items():
         if not isinstance(rel, str) or os.path.isabs(rel) or ".." in rel.split("/"):
             raise SystemExit(f"{path}: sources_sha256 path {rel!r} is not inside the tree")
+        if not isinstance(digest, str) or len(digest) != 64 or any(c not in "0123456789abcdef" for c in digest):
+            raise SystemExit(f"{path}: sources_sha256 digest for {rel} is not SHA256")
+    drawings = doc["training"].get("drawings_sha256")
+    if drawings is not None:
+        if not isinstance(drawings, dict) or drawings.get("version") != 1:
+            raise SystemExit(f"{path}: unsupported drawings_sha256 version")
+        try:
+            want = drawing_hashes(colour_drawings(doc), labelled_scalars(doc, path))
+        except KeyError as error:
+            raise SystemExit(f"{path}: a labelled drawing is missing: {error}") from None
+        if drawings.get("glyphs") != want:
+            raise SystemExit(f"{path}: labelled drawings do not match training.drawings_sha256")
+        return
+    for rel, digest in src.items():
+        if not rel.startswith("font/") and rel != "train/glyphs.py":
+            continue
         fp = os.path.join(ROOT, rel)
         if not os.path.isfile(fp):
             raise SystemExit(f"{path}: {rel} is not in the tree")
@@ -311,13 +345,15 @@ def _layer_arrays(doc, group, name, rows, cols, path):
 
 def edge_records(doc, path, k):
     """One record per labelled glyph, sorted by scalar, padded out to K layers."""
-    drawing, pal = (os.path.join(ROOT, rel) for rel in colour_sources(doc))
-    icons = strokes.parse_layers(drawing, strokes.palette(pal))
+    icons = colour_drawings(doc)
+    ruled = set(glyphs.ruled_codepoints()) if colour_sources(doc)[0] == "font/icons.txt" else set()
     recs = []
     for s in sorted(labelled_scalars(doc, path)):
         ch = chr(s)
         if ch not in icons:
             raise SystemExit(f"{path}: U+{s:04X} is labelled and is not in {colour_sources(doc)[0]}")
+        if s in ruled and "train/glyphs.py" not in doc["training"]["sources_sha256"]:
+            raise SystemExit(f"{path}: U+{s:04X} is made by rule and training.sources_sha256 has no train/glyphs.py")
         drawn = icons[ch]
         if len(drawn) > k:
             raise SystemExit(f"{path}: U+{s:04X} has {len(drawn)} layers and K is {k}")

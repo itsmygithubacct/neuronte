@@ -33,15 +33,19 @@ Tiers:
     ...      on, at 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30 and 32
     ui32i    pixels. The same pixels, sheared on the grid so the top sits
              to the right of the bottom, with the advance widened to fit.
+    uilarge  the same face above 32 pixels, from font/ui-large.txt: the
+             first-pass strokes, drawn once for every em and blended, with
+             a pen 3/32 em wide, the 32 px drawing's three-pixel stem.
 
 Sets, each a list of tiers: ascii; draw (box, block, shade, braille);
 symbol; accent; full, which is all of those; and three sets for choosing
 how the mosaics join the bundle: pixel (block, mosaic), pixelbraille
 (block, mosaic, braille) and boxshade (box, shade). The sets ui1 to
-ui128, except ui44, and the italic sets ui10i to ui32i, are each their
+ui128, except ui44, the italic sets ui10i to ui32i, and uilarge, are each their
 tier alone. They share their scalars with ascii and with each other, so
 they join no other set, and their nets no bundle.
-Each has a pen of its own, in PENS, a little over one pixel wide at its em.
+Each has a pen of its own, in PENS: a little over one pixel wide at its em
+for pixel faces, and 3/32 em for uilarge.
 
 field() gives the target: the signed distance to the ink edge, positive
 inside, divided by tau and clamped to -1..1, at grid nodes 1/n cell width
@@ -89,6 +93,11 @@ UI_ITALIC = {em: os.path.join(strokes.ROOT, "font", f"ui-{em}-italic.txt")
 PEN = 0.075                 # the pen radius, in cell widths
 PENS = {f"ui{em}": 0.55 / em for em in UI_TOP}  # sets drawn with another: 1.1 pixels wide at their em
 PENS.update({f"ui{em}i": 0.55 / em for em in UI_ITALIC})  # the italic uses the same pen
+UI_LARGE = os.path.join(strokes.ROOT, "font", "ui-large.txt")
+LARGE_FROM = 33             # the least em drawn by uilarge; below it, a pixel face for each em
+LARGE_INK = (0.6, 1.6)      # where uilarge's ink lies in the cell, in em, top to bottom
+LARGE_BASELINE = 1.35       # the centre of uilarge's baseline strokes, in em down the cell
+PENS["uilarge"] = 3 / 64    # 3/32 em wide, three pixels at 32
 PAD = 0.25                  # how far edge lines and blocks run past the cell
 LIGHT, HEAVY = 0.06, 0.12   # half widths of box lines, in cell widths
 DOUBLE = 0.19               # offset of each line of a double line from its centre line
@@ -463,6 +472,19 @@ def traced(rows, em):
     return out + [("seg", *at(c, r), *at(c, r), None) for c, r in sorted(ink - joined)]
 
 
+def large_rows(em):
+    """(top, rows, baseline) of uilarge at an em of em pixels: the first
+    cell row of its ink, how many rows from there hold ink, and the last
+    of those rows that the baseline strokes cover more than half, counted
+    from top. A desktop that draws by a pixel face's UI_TOP and baseline
+    row uses these instead above 32 pixels."""
+    if em < LARGE_FROM:
+        raise ValueError(f"uilarge starts at {LARGE_FROM} pixels, not {em}")
+    top = math.floor(LARGE_INK[0] * em)
+    base = (LARGE_BASELINE + PENS["uilarge"]) * em  # the bottom edge of the baseline strokes
+    return top, math.ceil(LARGE_INK[1] * em) - top, math.floor(base - 0.5) - top
+
+
 # Composed letters.
 LETTERS = os.path.join(strokes.ROOT, "font", "letters.txt")
 MARKS = os.path.join(strokes.ROOT, "font", "marks.txt")
@@ -591,6 +613,7 @@ SETS = {
     "braille": ["braille"],
     **{f"ui{em}": [f"ui{em}"] for em in UI_TOP},
     **{f"ui{em}i": [f"ui{em}i"] for em in UI_ITALIC},
+    "uilarge": ["uilarge"],
 }
 
 
@@ -621,6 +644,11 @@ def tier(name):
     if name == "accent":
         acc = accents()
         return [(c, acc[c]) for c in sorted(acc)]
+    if name == "uilarge":
+        g = strokes.parse(UI_LARGE)
+        if sorted(g) != [chr(c) for c in range(32, 127)] + ["\u2026"]:
+            raise ValueError("ui-large.txt must hold exactly U+0020..U+007E and U+2026")
+        return [(c, g[c]) for c in sorted(g)]
     if name in PENS:
         body = name[2:]
         italic = body.endswith("i")
@@ -740,6 +768,8 @@ def sources(name):
             files.append(f"font/ui-{em}.txt")
         if f"ui{em}i" in tiers:
             files.append(f"font/ui-{em}-italic.txt")
+    if "uilarge" in tiers:
+        files.append("font/ui-large.txt")
     return files + ["train/strokes.py", "train/glyphs.py"]
 
 

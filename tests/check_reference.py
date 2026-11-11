@@ -4,6 +4,7 @@ usage: python3 tests/check_reference.py LIB.so WEIGHTS.json WEIGHTS.nrt
        python3 tests/check_reference.py LIB.so --bundle BUNDLE.nrt NET.json...
                                         [--gate GATE.json] [--fallback I]
        python3 tests/check_reference.py LIB.so --drawing DRAWING.nrt NET.json FACE.txt
+       python3 tests/check_reference.py LIB.so --drawing DRAWING.nrt NET.json ADVANCES.txt
 
 The numpy side reads the JSON weights and works in float64. The C side
 loads the packed file and works in float32. They must agree to 1e-3 in
@@ -17,6 +18,15 @@ font/ui-10.txt, the net is checked the same way at the face's em too.
 Then every character of the face, drawn by neuronte_draw_text() at that
 em with neuronte_set_binary() on, regular and bold, must be exactly the
 face's pixels, and the pen must move by the face's advance.
+
+For a drawing file of one net and an advances file, such as
+font/ui-large-advances.txt, which has no pixels to compare, the net is
+checked the same way at larger cells too. Every advance in the file,
+regular and bold, must be the steps the packer read from the advances
+file, and the pixels it gives at each of the ems in SOFT_EMS. Then
+characters drawn blended by neuronte_draw_text() at those ems, regular
+and bold, must be the numpy coverage composited the same way, to one
+level in 255, and the pen must move by the sum of the advances.
 """
 import ctypes
 import json
@@ -215,6 +225,8 @@ args = sys.argv[1:]
 failed = False
 lib_path = args[0]
 face_em = 0
+soft_adv = None  # {scalar: (regular, bold)} in steps, for a drawing file with an advances file
+SOFT_EMS = (33, 36, 40, 44, 48, 64, 96, 128)
 if args[1:2] == ["--bundle"]:
     nrt_path, rest, gate_path, fallback, json_paths = args[2], iter(args[3:]), None, 0, []
     for a in rest:
@@ -235,8 +247,9 @@ elif args[1:2] == ["--drawing"] and len(args) == 5:
     made, table, gate, fallback = pack.drawing([args[3], face_path])[0], [], None, 0
     face = pack.read_face(face_path)
     if face is None:
-        raise SystemExit(f"{face_path} is not a pixel face")
-    face_em = face[1]
+        soft_adv = pack.read_advances(face_path)
+    else:
+        face_em = face[1]
 elif len(args) == 3:
     json_paths, nrt_path = [args[1]], args[2]
     made, table, gate, fallback = pack.pack(args[1]), [], None, 0
@@ -309,6 +322,9 @@ for s in scalars + list(range(0, 0x3000, 7)) + list(range(0x1CC00, 0x1CEC0, 3)) 
         failed = True
 sizes = [(8, 16, 2), (16, 32, 2), (33, 61, 1)] + ([(face_em, 2 * face_em, 2)] if face_em else [])
 cases = [(s, cw, ch, ss) for s in scalars for cw, ch, ss in sizes]
+if soft_adv:
+    # The face's own characters, at the larger cells it is drawn in.
+    cases += [(ord(c), cw, 2 * cw, 1) for c in "Ag@\u2026" for cw in (48, 64)] + [(ord("g"), 96, 192, 1)]
 worst = 0.0
 for s, cw, ch, ss in cases:
     out = (ctypes.c_float * (cw * ch))()
@@ -473,6 +489,76 @@ if face_em:
                 print(f"FAIL U+{ord(ch_):04X} weight {bold}: {int(((buf != 0) != want).sum())} pixels are not the face's")
                 failed = True
     print(f"check_reference: {drawn} binary letters at {em} px, each exactly its drawing")
+if soft_adv:
+    lib.neuronte_advance_steps.argtypes = [ctypes.c_void_p, ctypes.c_uint32, ctypes.c_int]
+    lib.neuronte_advance.argtypes = [ctypes.c_void_p, ctypes.c_uint32, ctypes.c_int, ctypes.c_int]
+    lib.neuronte_advance_scalar.argtypes = [ctypes.c_void_p, ctypes.c_uint32]
+    lib.neuronte_advance_scalar.restype = ctypes.c_uint32
+    lib.neuronte_advances.argtypes = [ctypes.c_void_p]
+    lib.neuronte_text_width.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_size_t, ctypes.c_int, ctypes.c_int]
+    lib.neuronte_set_binary.argtypes = [ctypes.c_void_p, ctypes.c_int]
+    lib.neuronte_draw_text.argtypes = ([ctypes.c_void_p, ctypes.c_void_p] + [ctypes.c_int] * 7
+                                       + [ctypes.c_char_p, ctypes.c_size_t, ctypes.c_uint32])
+    if lib.neuronte_advances(handle) != len(soft_adv):
+        print(f"FAIL the file has {lib.neuronte_advances(handle)} advances, the advances file {len(soft_adv)}")
+        failed = True
+    measured = 0
+    for v, steps in sorted(soft_adv.items()):
+        for bold in (0, 1):
+            got = lib.neuronte_advance_steps(handle, v, bold)
+            if got != steps[bold]:
+                print(f"FAIL U+{v:04X} weight {bold}: {got} steps, the advances file says {steps[bold]}")
+                failed = True
+            for em in SOFT_EMS:
+                got = lib.neuronte_advance(handle, v, bold, em)
+                measured += 1
+                if got != pack.pixels(steps[bold], em):
+                    print(f"FAIL U+{v:04X} weight {bold} at {em} px: {got} pixels, the packer says "
+                          f"{pack.pixels(steps[bold], em)}")
+                    failed = True
+    for v in (0x4E2D, 0x7F, 0xE9):
+        if v not in soft_adv and lib.neuronte_advance_scalar(handle, v) != 0x3F:
+            print(f"FAIL U+{v:04X} is not measured as the fallback U+003F")
+            failed = True
+    lib.neuronte_set_binary(handle, 0)
+    net = nets[0]
+    texts = ["A", "g", "@", "W", "\u2026", "Ag"]
+    drawn = 0
+    for em in (36, 48, 64):
+        for text in texts:
+            for bold in (0, 1):
+                X, Y = 3, 2
+                pens = [X]
+                for c in text[:-1]:
+                    pens.append(pens[-1] + pack.pixels(soft_adv[ord(c)][bold], em))
+                total = pens[-1] - X + pack.pixels(soft_adv[ord(text[-1])][bold], em)
+                W, H = pens[-1] + em + 2 + 3, 2 * em + 4
+                want = np.zeros((H, W))
+                for c, x in zip(text, pens):
+                    cov = net.coverage(ord(c), em, 2 * em, 1)
+                    if bold:
+                        wide = np.zeros((2 * em, em + 1))
+                        wide[:, :em] = cov
+                        wide[:, 1:] = np.maximum(wide[:, 1:], cov)
+                        cov = wide
+                    area = want[Y:Y + 2 * em, x:x + cov.shape[1]]
+                    area[:] = cov + area * (1 - cov)
+                buf = np.zeros((H, W), np.uint32)
+                data = text.encode()
+                rc = lib.neuronte_draw_text(handle, buf.ctypes.data, W, W, H, X, Y, em, bold, data, len(data),
+                                            0xFFFFFFFF)
+                drawn += 1
+                width = lib.neuronte_text_width(handle, data, len(data), bold, em)
+                if rc != total or width != total:
+                    print(f"FAIL {text!r} weight {bold} at {em} px: the pen moved {rc} and the width is {width}, "
+                          f"want {total}")
+                    failed = True
+                d = int(np.abs((buf >> 24).astype(int) - np.floor(want * 255 + 0.5).astype(int)).max())
+                if d > 1:
+                    print(f"FAIL {text!r} weight {bold} at {em} px: alpha differs by {d} levels")
+                    failed = True
+    print(f"check_reference: {measured} advances at {len(SOFT_EMS)} ems as packed, "
+          f"{drawn} lines drawn blended as numpy composites them")
 lib.neuronte_close(handle)
 print(f"check_reference: {len(cases)} cells, {routes} routes, largest coverage difference {worst:.2e}")
 print("check_reference: FAILED" if failed else "check_reference: passed")

@@ -103,9 +103,11 @@ scalar as u32, then K layer blocks. A block is an x-edge count and a
 y-edge count as u16, then that many x edges and that many y edges. An
 edge is an f32 position in design-cell widths and a u32 side, 1 for
 rising and 0 for falling. The edges come from font/icons.txt and from the
-powerline and progress glyphs train/glyphs.py makes by rule, and the
-packer refuses the file when either file's sha256 is not the one in
-training.sources_sha256.
+powerline and progress glyphs train/glyphs.py makes by rule. New weights
+bind each labelled glyph to its expanded drawing in training.drawings_sha256;
+the packer rejects a changed or missing drawing. Historical source-file
+hashes remain in training.sources_sha256. Legacy weights without expanded
+drawing hashes still require matching drawing-file and rule-module hashes.
 
 An advance table, version 4. An advance is stored in steps of a tenth of
 a design unit:

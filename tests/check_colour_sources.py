@@ -1,6 +1,5 @@
 """Exercise colour drawing provenance across trainer and drawing changes."""
 import copy
-import json
 import os
 import sys
 from unittest.mock import patch
@@ -19,8 +18,15 @@ def reject(doc):
     raise AssertionError("changed drawing provenance was accepted")
 
 
-with open(os.path.join(pack.ROOT, "weights", "neuronte-icon-v0.json")) as fh:
-    old = {"training": json.load(fh)["training"]}
+# Build a legacy-format fixture from this tree. A shipped historical net may
+# correctly fail this check after unrelated generated-glyph code has changed;
+# that must not turn this format regression test into an asset migration.
+icons = glyphs.colour_icons()
+old = {"training": {
+    "labelled": " ".join(f"U+{ord(c):04X}" for c in icons),
+    "sources_sha256": {rel: pack.sha256_file(os.path.join(pack.ROOT, rel))
+                       for rel in ("font/icons.txt", "font/palette.txt", "train/glyphs.py")},
+}}
 # A historical trainer digest is not the identity of the drawings.
 old["training"]["sources_sha256"]["train/colour.py"] = "0" * 64
 pack.check_sources(old, "legacy icon")

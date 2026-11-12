@@ -1,6 +1,6 @@
 """Independent packed C acceptance for the original two-cell emoji bundle.
 
-Usage: check_emoji.py LIB BUNDLE JSON... --out REPORT [--report-only]
+Usage: check_emoji.py LIB BUNDLE JSON... --out REPORT [--manifest FILE] [--report-only]
 
 Scores every half/layer against the recorded float16 training grid and exact
 palette head; unused layers must have zero positive coverage. Intentionally
@@ -8,6 +8,8 @@ empty half layers are reported separately and must also remain empty. Used
 nonempty halves have mean16px IoU >= .990 for each expert, no lost layer or
 zero coverage, and RGB mean error <=2/255 in each theme at12/16/32px.
 A separate float64 numpy evaluation checks sampled halves against the C API.
+--manifest additionally requires the complete 300-scalar/600-half, three-expert
+publication inventory. Without it, individual training shards remain testable.
 """
 import argparse
 import ctypes as ct
@@ -83,12 +85,46 @@ def c_mask(lib,h,s,cw,k,ss=None):
     return cov,list(ent)
 
 
+def publication_inventory(manifest_path, paths):
+    raw=Path(manifest_path).read_bytes();manifest=json.loads(raw)
+    assert manifest['version']==1 and manifest['cell_columns']==2, 'wrong emoji manifest format'
+    listed=[int(item['scalar'].removeprefix('U+'),16) for item in manifest['glyphs']]
+    expected=set(listed)
+    assert len(listed)==len(expected)==300, 'manifest must name exactly 300 distinct source scalars'
+    assert all(0<=s<=0xeffff and not 0xd800<=s<=0xdfff for s in expected), 'invalid wide source scalar'
+    assert len(paths)==3, 'publication requires exactly three experts'
+    owners={};sources={};experts=[]
+    for index,path in enumerate(paths):
+        d=json.loads(Path(path).read_text());t=d['training']
+        assert t.get('cell_columns')==2, 'publication expert is not two-cell'
+        drawing=Path(pack.ROOT)/t['drawing'];palette=Path(pack.ROOT)/t['palette']
+        source=strokes.parse_layers(str(drawing),strokes.palette(str(palette)))
+        assert {ord(c) for c in source}==expected, 'manifest differs from the actual source drawing set'
+        sources[t['drawing']]=hashlib.sha256(drawing.read_bytes()).hexdigest()
+        labels=pack.labelled_scalars(d,path)
+        for code in labels:
+            assert code not in owners, f'duplicate expert ownership U+{code:X}'
+            owners[code]=index
+        experts.append({'name':Path(path).name,'half_labels':len(labels),
+                        'source_scalars':sum(s<0x110000 for s in labels)})
+    required=expected|{0x110000+s for s in expected}
+    missing=required-set(owners);extra=set(owners)-required
+    assert not missing and not extra, f'publication half inventory missing={sorted(missing)} extra={sorted(extra)}'
+    assert len(owners)==600, 'publication requires exactly 600 half labels'
+    assert all(owners[s]==owners[0x110000+s] for s in expected), 'a scalar has halves owned by different experts'
+    return {'passed':True,'source_scalars':300,'half_labels':600,'expert_count':3,
+            'manifest_sha256':hashlib.sha256(raw).hexdigest(),'sources_sha256':sources,
+            'experts':experts,'ownership':{f'U+{s:04X}':owners[s] for s in sorted(expected)}}
+
+
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('lib');p.add_argument('bundle');p.add_argument('nets',nargs='+')
     p.add_argument('--out',required=True);p.add_argument('--report-only',action='store_true')
     p.add_argument('--target-cache',help='reuse hash-bound target coverages across seeds/calibration trials')
+    p.add_argument('--manifest',help='require the complete 300-scalar/600-half publication inventory')
     a=p.parse_args()
+    inventory=publication_inventory(a.manifest,a.nets) if a.manifest else None
     images=[pack.pack(n) for n in a.nets]
     want=pack.bundle(a.nets)[0] if len(a.nets)>1 else images[0]
     assert Path(a.bundle).read_bytes()==want, 'packed bytes differ from reproducible source packing'
@@ -182,7 +218,8 @@ def main():
         assert lib.neuronte_route_half(h,s,half)==-1,'invalid half request accepted'
     lib.neuronte_close(h)
     report={'passed':all(r['passed'] for r in results.values()),'codes':len(known),'scalars':sum(s<0x110000 for s in known),
-            'numpy_max_difference':maxdiff,'composition_max_channel_difference':maxpixel,'experts':results}
+            'numpy_max_difference':maxdiff,'composition_max_channel_difference':maxpixel,'experts':results,
+            'publication_inventory':inventory}
     Path(a.out).write_text(json.dumps(report,indent=2)+'\n')
     print(json.dumps({**{k:v for k,v in report.items() if k!='experts'},'experts':{n:{'passed':v['passed'],'sizes':{w:{k:x for k,x in r.items() if k!='layers'} for w,r in v['sizes'].items()}} for n,v in results.items()}},indent=2))
     if not report['passed'] and not a.report_only:raise SystemExit(1)

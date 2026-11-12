@@ -1,0 +1,2170 @@
+{
+  "release_wave": "RC9",
+  "passed": true,
+  "selected_seed": 0,
+  "selection": "Both seeds of exactly the same recipe pass every native regular/bold source pixel and advance. Seed0 is published consistently.",
+  "new_sizes": [
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    13,
+    15,
+    17,
+    19,
+    21,
+    23,
+    25,
+    27,
+    29,
+    31
+  ],
+  "trained_italic_sizes_after_publication": [
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32
+  ],
+  "fallback_sizes": [
+    1,
+    2
+  ],
+  "binary_acceptance": "96 glyphs x regular/bold x 2 seeds x17sizes =6528 exact C and independently exact desktop/PIL comparisons",
+  "sampling": "below24: native ss1 and consumer ss2 preselection; >=24: consumer ss1. Final actual C/PIL masks mandatory.",
+  "assets": {
+    "3": {
+      "width": 96,
+      "steps": 20000,
+      "postprocess": "",
+      "seed": 0,
+      "seeds": {
+        "0": {
+          "run": "ui3i-w96-s0-n20000",
+          "weights_sha256": "450fbbbed42fa74ebd5508585661780a79d5cbc0df067f2bf6b9ca4b8fdb3067",
+          "nrt_sha256": "804da54d358f84080b96e086b8f5559e44443c9a130593f84b2b522d2c68b4e0",
+          "c_reference_exit": 0,
+          "c_numpy_max_difference": 3.19e-06,
+          "exact_regular_glyphs": 96,
+          "exact_bold_glyphs": 96,
+          "desktop_pil_glyph_comparisons": 192,
+          "desktop_pil_passed": true,
+          "desktop_receipt_sha256": "cbfce04f208578e3ce2eb7321db7f950a8b6593c29d644e15820d34187ce6796"
+        },
+        "1": {
+          "run": "ui3i-w96-s1-n20000",
+          "weights_sha256": "76a6dd1e888845019c9b9b8e51d2687ab0b2d83617f54d5ba55e85c2f45cfae2",
+          "nrt_sha256": "57ba2609f3d8ca0ce70cbc4adf6ce09119de783e5baf3ec97003a27ff4d04d95",
+          "c_reference_exit": 0,
+          "c_numpy_max_difference": 4.4e-06,
+          "exact_regular_glyphs": 96,
+          "exact_bold_glyphs": 96,
+          "desktop_pil_glyph_comparisons": 192,
+          "desktop_pil_passed": true,
+          "desktop_receipt_sha256": "cbfce04f208578e3ce2eb7321db7f950a8b6593c29d644e15820d34187ce6796"
+        }
+      },
+      "target_sha256": "e00f3eb3431e2be855878f0696da7be697725e224905db062538cc47fdf13bb1",
+      "training": {
+        "set": "ui3i",
+        "labelled": "U+0020..U+007E U+2026",
+        "sources_sha256": {
+          "font/ui-3-italic.txt": "e00f3eb3431e2be855878f0696da7be697725e224905db062538cc47fdf13bb1",
+          "train/strokes.py": "31382edcb36b1286b2f56de05dfd2e22b998778abb1a93d68d07a277b47833a2",
+          "train/glyphs.py": "dcebf7f58a9786d78e693d34fc496867980f6fd0bb620dacf222e70d3954578f",
+          "train/train.py": "95d4549afb48045089e49235e93cfefadd4b9e82d15b50394f36381b8044f387",
+          "font/code-masks.txt": "dba7e2a2608534f5203e0c5a0d0173a90e62ad018ba271593c1159180c654e22"
+        },
+        "pen_radius": 0.18333333333333335,
+        "grid": 256,
+        "steps": 20000,
+        "seed": 0,
+        "unlabelled_weight": 0.0
+      },
+      "hashes": {
+        ".json": "450fbbbed42fa74ebd5508585661780a79d5cbc0df067f2bf6b9ca4b8fdb3067",
+        ".nrt": "804da54d358f84080b96e086b8f5559e44443c9a130593f84b2b522d2c68b4e0",
+        ".scores.json": "9aba79ba6f396a724226d0e60a5b20786a700ef58a8d198247caf21620fe207d",
+        ".seed1.scores.json": "4745140a04d7f1f1a6a93330b5fa243cf5f002a0a123074182670805b93cf02c"
+      },
+      "distinct_source_masks": 46,
+      "trainer_source_commit": "a515aa62c0e2a0e9fff4b4b0014ca8713b2b117e"
+    },
+    "4": {
+      "width": 96,
+      "steps": 20000,
+      "postprocess": "",
+      "seed": 0,
+      "seeds": {
+        "0": {
+          "run": "ui4i-w96-s0-n20000",
+          "weights_sha256": "4abf17748c7c03b22f35bfa854775110a53d8c8f04152e512e09b429ae8b26a1",
+          "nrt_sha256": "9881badd3945777cdc2e9e3d6f73a0024eca83def1106656e3c4e0f875ff43f9",
+          "c_reference_exit": 0,
+          "c_numpy_max_difference": 3.61e-06,
+          "exact_regular_glyphs": 96,
+          "exact_bold_glyphs": 96,
+          "desktop_pil_glyph_comparisons": 192,
+          "desktop_pil_passed": true,
+          "desktop_receipt_sha256": "cbfce04f208578e3ce2eb7321db7f950a8b6593c29d644e15820d34187ce6796"
+        },
+        "1": {
+          "run": "ui4i-w96-s1-n20000",
+          "weights_sha256": "14c4ebaa40db24a93d3211f92c4e9c9a559d78130b603268a712ba2e4a49e9d0",
+          "nrt_sha256": "b1ba80eb0b87f83fba7da36c2a6475c1d3175a01c98d5b517fbc5959ad08c0c5",
+          "c_reference_exit": 0,
+          "c_numpy_max_difference": 3.66e-06,
+          "exact_regular_glyphs": 96,
+          "exact_bold_glyphs": 96,
+          "desktop_pil_glyph_comparisons": 192,
+          "desktop_pil_passed": true,
+          "desktop_receipt_sha256": "cbfce04f208578e3ce2eb7321db7f950a8b6593c29d644e15820d34187ce6796"
+        }
+      },
+      "target_sha256": "2727fdc19611b7a608bed50d18bd25bc6875da1fa6ebd8977985879a31c52748",
+      "training": {
+        "set": "ui4i",
+        "labelled": "U+0020..U+007E U+2026",
+        "sources_sha256": {
+          "font/ui-4-italic.txt": "2727fdc19611b7a608bed50d18bd25bc6875da1fa6ebd8977985879a31c52748",
+          "train/strokes.py": "31382edcb36b1286b2f56de05dfd2e22b998778abb1a93d68d07a277b47833a2",
+          "train/glyphs.py": "dcebf7f58a9786d78e693d34fc496867980f6fd0bb620dacf222e70d3954578f",
+          "train/train.py": "95d4549afb48045089e49235e93cfefadd4b9e82d15b50394f36381b8044f387",
+          "font/code-masks.txt": "dba7e2a2608534f5203e0c5a0d0173a90e62ad018ba271593c1159180c654e22"
+        },
+        "pen_radius": 0.1375,
+        "grid": 256,
+        "steps": 20000,
+        "seed": 0,
+        "unlabelled_weight": 0.0
+      },
+      "hashes": {
+        ".json": "4abf17748c7c03b22f35bfa854775110a53d8c8f04152e512e09b429ae8b26a1",
+        ".nrt": "9881badd3945777cdc2e9e3d6f73a0024eca83def1106656e3c4e0f875ff43f9",
+        ".scores.json": "3ad87bd7c490bf0768e2968ba7174a9a5e5cb2fe6462607444aecd4156e725a6",
+        ".seed1.scores.json": "7b4b3de51829aa9ad06eb835c59eeb8de9eb1f2faf4e94d07de667ac49a9d38a"
+      },
+      "distinct_source_masks": 69,
+      "trainer_source_commit": "a515aa62c0e2a0e9fff4b4b0014ca8713b2b117e"
+    },
+    "5": {
+      "width": 96,
+      "steps": 20000,
+      "postprocess": "",
+      "seed": 0,
+      "seeds": {
+        "0": {
+          "run": "ui5i-w96-s0-n20000",
+          "weights_sha256": "785e2d3008a7bdbb0b7289388b8b0faa4427494abcef7e2cda2e45f642229643",
+          "nrt_sha256": "5abdd42373166c9b2f008b89f21674f84fd51b84701abd7b9627531c7db4f6bb",
+          "c_reference_exit": 0,
+          "c_numpy_max_difference": 4.78e-06,
+          "exact_regular_glyphs": 96,
+          "exact_bold_glyphs": 96,
+          "desktop_pil_glyph_comparisons": 192,
+          "desktop_pil_passed": true,
+          "desktop_receipt_sha256": "cbfce04f208578e3ce2eb7321db7f950a8b6593c29d644e15820d34187ce6796"
+        },
+        "1": {
+          "run": "ui5i-w96-s1-n20000",
+          "weights_sha256": "9260b26393022a9e255f01d910d3905727374617856c0b8f3450796a5c0de618",
+          "nrt_sha256": "86ea96aa40c2525f26f9ae97a1b5f8445c76bc5a1c53eeabd225afcc99b97ba6",
+          "c_reference_exit": 0,
+          "c_numpy_max_difference": 4.73e-06,
+          "exact_regular_glyphs": 96,
+          "exact_bold_glyphs": 96,
+          "desktop_pil_glyph_comparisons": 192,
+          "desktop_pil_passed": true,
+          "desktop_receipt_sha256": "cbfce04f208578e3ce2eb7321db7f950a8b6593c29d644e15820d34187ce6796"
+        }
+      },
+      "target_sha256": "03925e8f58c7ff618992af2190dcba91c6021ab965e3c8422a52aa276c7d4284",
+      "training": {
+        "set": "ui5i",
+        "labelled": "U+0020..U+007E U+2026",
+        "sources_sha256": {
+          "font/ui-5-italic.txt": "03925e8f58c7ff618992af2190dcba91c6021ab965e3c8422a52aa276c7d4284",
+          "train/strokes.py": "31382edcb36b1286b2f56de05dfd2e22b998778abb1a93d68d07a277b47833a2",
+          "train/glyphs.py": "dcebf7f58a9786d78e693d34fc496867980f6fd0bb620dacf222e70d3954578f",
+          "train/train.py": "95d4549afb48045089e49235e93cfefadd4b9e82d15b50394f36381b8044f387",
+          "font/code-masks.txt": "dba7e2a2608534f5203e0c5a0d0173a90e62ad018ba271593c1159180c654e22"
+        },
+        "pen_radius": 0.11000000000000001,
+        "grid": 256,
+        "steps": 20000,
+        "seed": 0,
+        "unlabelled_weight": 0.0
+      },
+      "hashes": {
+        ".json": "785e2d3008a7bdbb0b7289388b8b0faa4427494abcef7e2cda2e45f642229643",
+        ".nrt": "5abdd42373166c9b2f008b89f21674f84fd51b84701abd7b9627531c7db4f6bb",
+        ".scores.json": "44922b450d7762894dc10b8359551392573b7ab8c89325fc1c8c79f33b1499a1",
+        ".seed1.scores.json": "e3679863ef4bc55d9417786de0db481358b03a556b943201485673e5bdf2fa41"
+      },
+      "distinct_source_masks": 74,
+      "trainer_source_commit": "a515aa62c0e2a0e9fff4b4b0014ca8713b2b117e"
+    },
+    "6": {
+      "width": 96,
+      "steps": 20000,
+      "postprocess": "",
+      "seed": 0,
+      "seeds": {
+        "0": {
+          "run": "ui6i-w96-s0-n20000",
+          "weights_sha256": "f82e13ad4edb9f76b9a319006ec0155a15d85f97e9c1145b960050fe871fc013",
+          "nrt_sha256": "741ce998a565adbfd46141f87c87208a866f582a61aa55173045262adbc6ac6e",
+          "c_reference_exit": 0,
+          "c_numpy_max_difference": 4.12e-06,
+          "exact_regular_glyphs": 96,
+          "exact_bold_glyphs": 96,
+          "desktop_pil_glyph_comparisons": 192,
+          "desktop_pil_passed": true,
+          "desktop_receipt_sha256": "cbfce04f208578e3ce2eb7321db7f950a8b6593c29d644e15820d34187ce6796"
+        },
+        "1": {
+          "run": "ui6i-w96-s1-n20000",
+          "weights_sha256": "a5f683510dee1526ada937ac3e15bf9516c5a78f8287e098f308dfac15533918",
+          "nrt_sha256": "ca425fc3bb9f41c0d65568c12b0b0cf5cd37cb669da6db34b22d002beac16501",
+          "c_reference_exit": 0,
+          "c_numpy_max_difference": 3.39e-06,
+          "exact_regular_glyphs": 96,
+          "exact_bold_glyphs": 96,
+          "desktop_pil_glyph_comparisons": 192,
+          "desktop_pil_passed": true,
+          "desktop_receipt_sha256": "cbfce04f208578e3ce2eb7321db7f950a8b6593c29d644e15820d34187ce6796"
+        }
+      },
+      "target_sha256": "d387ae55e3589d6b8eb5ee266e6268bb39ab827d3d666eb7b42cf889978ae4d3",
+      "training": {
+        "set": "ui6i",
+        "labelled": "U+0020..U+007E U+2026",
+        "sources_sha256": {
+          "font/ui-6-italic.txt": "d387ae55e3589d6b8eb5ee266e6268bb39ab827d3d666eb7b42cf889978ae4d3",
+          "train/strokes.py": "31382edcb36b1286b2f56de05dfd2e22b998778abb1a93d68d07a277b47833a2",
+          "train/glyphs.py": "dcebf7f58a9786d78e693d34fc496867980f6fd0bb620dacf222e70d3954578f",
+          "train/train.py": "95d4549afb48045089e49235e93cfefadd4b9e82d15b50394f36381b8044f387",
+          "font/code-masks.txt": "dba7e2a2608534f5203e0c5a0d0173a90e62ad018ba271593c1159180c654e22"
+        },
+        "pen_radius": 0.09166666666666667,
+        "grid": 256,
+        "steps": 20000,
+        "seed": 0,
+        "unlabelled_weight": 0.0
+      },
+      "hashes": {
+        ".json": "f82e13ad4edb9f76b9a319006ec0155a15d85f97e9c1145b960050fe871fc013",
+        ".nrt": "741ce998a565adbfd46141f87c87208a866f582a61aa55173045262adbc6ac6e",
+        ".scores.json": "b062b6b062b6fc78762f1fdc83b617727285d09ceab399286f7862104a7bdc89",
+        ".seed1.scores.json": "b90fe15a38ce9bc043b723b3b73fa6dc9b46c79426cc9aab8684ed7d8e46660a"
+      },
+      "distinct_source_masks": 75,
+      "trainer_source_commit": "a515aa62c0e2a0e9fff4b4b0014ca8713b2b117e"
+    },
+    "7": {
+      "width": 96,
+      "steps": 20000,
+      "postprocess": "",
+      "seed": 0,
+      "seeds": {
+        "0": {
+          "run": "ui7i-w96-s0-n20000",
+          "weights_sha256": "981a6ace9244f55ce915af5390fdd081be44a5f5b629f14478fb738f4f1d2959",
+          "nrt_sha256": "4e2bf301b7d2cccc481c2aa7dd23462b6573ed2574166e21ca2b60b2628390bf",
+          "c_reference_exit": 0,
+          "c_numpy_max_difference": 5.54e-06,
+          "exact_regular_glyphs": 96,
+          "exact_bold_glyphs": 96,
+          "desktop_pil_glyph_comparisons": 192,
+          "desktop_pil_passed": true,
+          "desktop_receipt_sha256": "cbfce04f208578e3ce2eb7321db7f950a8b6593c29d644e15820d34187ce6796"
+        },
+        "1": {
+          "run": "ui7i-w96-s1-n20000",
+          "weights_sha256": "f375f564a445919e8cde7f62fde6fd5c20c050454b0744483d14a36b50fad849",
+          "nrt_sha256": "99cc3adf8a8fa983956352b9bc27720edc1bb9299156b6b28242afa6ea8c96a9",
+          "c_reference_exit": 0,
+          "c_numpy_max_difference": 4.41e-06,
+          "exact_regular_glyphs": 96,
+          "exact_bold_glyphs": 96,
+          "desktop_pil_glyph_comparisons": 192,
+          "desktop_pil_passed": true,
+          "desktop_receipt_sha256": "cbfce04f208578e3ce2eb7321db7f950a8b6593c29d644e15820d34187ce6796"
+        }
+      },
+      "target_sha256": "81b92ace79d50552819ef7f7b6a756134213a43c21b0b47ab2a571f2b42763ec",
+      "training": {
+        "set": "ui7i",
+        "labelled": "U+0020..U+007E U+2026",
+        "sources_sha256": {
+          "font/ui-7-italic.txt": "81b92ace79d50552819ef7f7b6a756134213a43c21b0b47ab2a571f2b42763ec",
+          "train/strokes.py": "31382edcb36b1286b2f56de05dfd2e22b998778abb1a93d68d07a277b47833a2",
+          "train/glyphs.py": "dcebf7f58a9786d78e693d34fc496867980f6fd0bb620dacf222e70d3954578f",
+          "train/train.py": "95d4549afb48045089e49235e93cfefadd4b9e82d15b50394f36381b8044f387",
+          "font/code-masks.txt": "dba7e2a2608534f5203e0c5a0d0173a90e62ad018ba271593c1159180c654e22"
+        },
+        "pen_radius": 0.07857142857142858,
+        "grid": 256,
+        "steps": 20000,
+        "seed": 0,
+        "unlabelled_weight": 0.0
+      },
+      "hashes": {
+        ".json": "981a6ace9244f55ce915af5390fdd081be44a5f5b629f14478fb738f4f1d2959",
+        ".nrt": "4e2bf301b7d2cccc481c2aa7dd23462b6573ed2574166e21ca2b60b2628390bf",
+        ".scores.json": "8cdbe6bf84f4a5bc749ef859ec69610074e354ad7117dcc927c2c8d6a786fbea",
+        ".seed1.scores.json": "d1a97627bd6c057a3fb93e4c648dffc86672dfc6df39487d24e10ed51219b29c"
+      },
+      "distinct_source_masks": 89,
+      "trainer_source_commit": "a515aa62c0e2a0e9fff4b4b0014ca8713b2b117e"
+    },
+    "8": {
+      "width": 128,
+      "steps": 40000,
+      "postprocess": "",
+      "seed": 0,
+      "seeds": {
+        "0": {
+          "run": "ui8i-w128-s0-n40000",
+          "weights_sha256": "980498d0708a888c76b79919b14c2223d298df9269c9ec426101aa5e40197d56",
+          "nrt_sha256": "10acbd6c6292716cf4777d62e1dc2226d92fe2d44085c4ea57c963ebbff3e023",
+          "c_reference_exit": 0,
+          "c_numpy_max_difference": 3.63e-06,
+          "exact_regular_glyphs": 96,
+          "exact_bold_glyphs": 96,
+          "desktop_pil_glyph_comparisons": 192,
+          "desktop_pil_passed": true,
+          "desktop_receipt_sha256": "cbfce04f208578e3ce2eb7321db7f950a8b6593c29d644e15820d34187ce6796"
+        },
+        "1": {
+          "run": "ui8i-w128-s1-n40000",
+          "weights_sha256": "0a899350db06d37218e66399d60d288eb29abe230ca8a933aa60962d9686dec7",
+          "nrt_sha256": "28de756ad0e1b0a0934d435959f3ca881a35c7bc435ac3f3f838bc4b4a6f98ca",
+          "c_reference_exit": 0,
+          "c_numpy_max_difference": 3.15e-06,
+          "exact_regular_glyphs": 96,
+          "exact_bold_glyphs": 96,
+          "desktop_pil_glyph_comparisons": 192,
+          "desktop_pil_passed": true,
+          "desktop_receipt_sha256": "cbfce04f208578e3ce2eb7321db7f950a8b6593c29d644e15820d34187ce6796"
+        }
+      },
+      "target_sha256": "7be8e6af8e72ff7f1a2c4f36012ffae1ba82b4c529bb195136cc2421d2602092",
+      "training": {
+        "set": "ui8i",
+        "labelled": "U+0020..U+007E U+2026",
+        "sources_sha256": {
+          "font/ui-8-italic.txt": "7be8e6af8e72ff7f1a2c4f36012ffae1ba82b4c529bb195136cc2421d2602092",
+          "train/strokes.py": "31382edcb36b1286b2f56de05dfd2e22b998778abb1a93d68d07a277b47833a2",
+          "train/glyphs.py": "c388eef5af6a77f3a536b1ad1d5f7b67c6ce9b7cdbdaad58371f42ca9791bb60",
+          "train/train.py": "f1b2ca2d9b531f354f240c37e97c056d36266dd03dfc8a08bdfc1b01623667e9",
+          "train/checkpoint.py": "5f7fc0b2b27e7d9a96a64a9d4a697f593057440456f1bf534e237490a70f9fa1",
+          "font/code-masks.txt": "dba7e2a2608534f5203e0c5a0d0173a90e62ad018ba271593c1159180c654e22"
+        },
+        "pen_radius": 0.06875,
+        "grid": 256,
+        "steps": 40000,
+        "seed": 0,
+        "unlabelled_weight": 0.0
+      },
+      "hashes": {
+        ".json": "980498d0708a888c76b79919b14c2223d298df9269c9ec426101aa5e40197d56",
+        ".nrt": "10acbd6c6292716cf4777d62e1dc2226d92fe2d44085c4ea57c963ebbff3e023",
+        ".scores.json": "8b7152bfe3886d4fc27a960df59dd3db7238761673bddb30d5f831f196f19ac1",
+        ".seed1.scores.json": "c1a642af25b4ddf86a7e20dff6ff9108705c979ccdc6e2123f984b2258a9b419"
+      },
+      "distinct_source_masks": 96,
+      "trainer_source_commit": "ba5a1716104f65d17dda21746cf50b4fb3dae2cd"
+    },
+    "9": {
+      "width": 96,
+      "steps": 20000,
+      "postprocess": "",
+      "seed": 0,
+      "seeds": {
+        "0": {
+          "run": "ui9i-w96-s0-n20000",
+          "weights_sha256": "7e94a510fbebf07edec3572e3c28b9a2f73e91cedb427f6f89df6e494025929f",
+          "nrt_sha256": "9b09fcbfc2e8ca1994bc5a2b81f849a641edb4b628a24733965c0c860c586068",
+          "c_reference_exit": 0,
+          "c_numpy_max_difference": 5.8e-06,
+          "exact_regular_glyphs": 96,
+          "exact_bold_glyphs": 96,
+          "desktop_pil_glyph_comparisons": 192,
+          "desktop_pil_passed": true,
+          "desktop_receipt_sha256": "cbfce04f208578e3ce2eb7321db7f950a8b6593c29d644e15820d34187ce6796"
+        },
+        "1": {
+          "run": "ui9i-w96-s1-n20000",
+          "weights_sha256": "3475bb7cabe721eece04a02a594a57d64b8fdb7a520b30be68abdf9cdd34ee51",
+          "nrt_sha256": "2d2d09026a72baa1efb8d1978f148e51bbcc2b2a814a930f051fc842f8774d5b",
+          "c_reference_exit": 0,
+          "c_numpy_max_difference": 3.89e-06,
+          "exact_regular_glyphs": 96,
+          "exact_bold_glyphs": 96,
+          "desktop_pil_glyph_comparisons": 192,
+          "desktop_pil_passed": true,
+          "desktop_receipt_sha256": "cbfce04f208578e3ce2eb7321db7f950a8b6593c29d644e15820d34187ce6796"
+        }
+      },
+      "target_sha256": "f9caa121389f7a6e26918381d707eba3584e355aefbee952820f7ff147c76502",
+      "training": {
+        "set": "ui9i",
+        "labelled": "U+0020..U+007E U+2026",
+        "sources_sha256": {
+          "font/ui-9-italic.txt": "f9caa121389f7a6e26918381d707eba3584e355aefbee952820f7ff147c76502",
+          "train/strokes.py": "31382edcb36b1286b2f56de05dfd2e22b998778abb1a93d68d07a277b47833a2",
+          "train/glyphs.py": "dcebf7f58a9786d78e693d34fc496867980f6fd0bb620dacf222e70d3954578f",
+          "train/train.py": "95d4549afb48045089e49235e93cfefadd4b9e82d15b50394f36381b8044f387",
+          "font/code-masks.txt": "dba7e2a2608534f5203e0c5a0d0173a90e62ad018ba271593c1159180c654e22"
+        },
+        "pen_radius": 0.061111111111111116,
+        "grid": 256,
+        "steps": 20000,
+        "seed": 0,
+        "unlabelled_weight": 0.0
+      },
+      "hashes": {
+        ".json": "7e94a510fbebf07edec3572e3c28b9a2f73e91cedb427f6f89df6e494025929f",
+        ".nrt": "9b09fcbfc2e8ca1994bc5a2b81f849a641edb4b628a24733965c0c860c586068",
+        ".scores.json": "ca8023bdaf149b6defa11fc9a9786bdd2318e4664c9585de3c5c110557581493",
+        ".seed1.scores.json": "c7a793b89a4996c0f14b05f52d3c781d6b802d9cdd8e875659b729146c51d56c"
+      },
+      "distinct_source_masks": 96,
+      "trainer_source_commit": "a515aa62c0e2a0e9fff4b4b0014ca8713b2b117e"
+    },
+    "13": {
+      "width": 192,
+      "steps": 40000,
+      "postprocess": "",
+      "seed": 0,
+      "seeds": {
+        "0": {
+          "run": "ui13i-w192-s0-n40000",
+          "weights_sha256": "155716fd3caa35c40c00d1e3f60ac85c8f55ced0d3051780cd2ae34eb80e6b3f",
+          "nrt_sha256": "869955a3b68402a1f1e7eadf223257ce7503158a1bcd74ef3d2f6c3103c3e1fe",
+          "c_reference_exit": 0,
+          "c_numpy_max_difference": 4.61e-06,
+          "exact_regular_glyphs": 96,
+          "exact_bold_glyphs": 96,
+          "desktop_pil_glyph_comparisons": 192,
+          "desktop_pil_passed": true,
+          "desktop_receipt_sha256": "cbfce04f208578e3ce2eb7321db7f950a8b6593c29d644e15820d34187ce6796"
+        },
+        "1": {
+          "run": "ui13i-w192-s1-n40000",
+          "weights_sha256": "d9b2d21ee20ce9b77ff00f8f1de787e146de2b154d883d463d516a95fb313ee8",
+          "nrt_sha256": "d5c315f6dc35e7eb733a4ac60dd895574cdb7cfe71325fb3f067f95e9e67fc69",
+          "c_reference_exit": 0,
+          "c_numpy_max_difference": 3.48e-06,
+          "exact_regular_glyphs": 96,
+          "exact_bold_glyphs": 96,
+          "desktop_pil_glyph_comparisons": 192,
+          "desktop_pil_passed": true,
+          "desktop_receipt_sha256": "cbfce04f208578e3ce2eb7321db7f950a8b6593c29d644e15820d34187ce6796"
+        }
+      },
+      "target_sha256": "2b06b45e481c0f0f97ee95a0b0c497728108e0383315e59fd3dce802688aba8b",
+      "training": {
+        "set": "ui13i",
+        "labelled": "U+0020..U+007E U+2026",
+        "sources_sha256": {
+          "font/ui-13-italic.txt": "2b06b45e481c0f0f97ee95a0b0c497728108e0383315e59fd3dce802688aba8b",
+          "train/strokes.py": "31382edcb36b1286b2f56de05dfd2e22b998778abb1a93d68d07a277b47833a2",
+          "train/glyphs.py": "c388eef5af6a77f3a536b1ad1d5f7b67c6ce9b7cdbdaad58371f42ca9791bb60",
+          "train/train.py": "f1b2ca2d9b531f354f240c37e97c056d36266dd03dfc8a08bdfc1b01623667e9",
+          "train/checkpoint.py": "5f7fc0b2b27e7d9a96a64a9d4a697f593057440456f1bf534e237490a70f9fa1",
+          "font/code-masks.txt": "dba7e2a2608534f5203e0c5a0d0173a90e62ad018ba271593c1159180c654e22"
+        },
+        "pen_radius": 0.04230769230769231,
+        "grid": 256,
+        "steps": 40000,
+        "seed": 0,
+        "unlabelled_weight": 0.0
+      },
+      "hashes": {
+        ".json": "155716fd3caa35c40c00d1e3f60ac85c8f55ced0d3051780cd2ae34eb80e6b3f",
+        ".nrt": "869955a3b68402a1f1e7eadf223257ce7503158a1bcd74ef3d2f6c3103c3e1fe",
+        ".scores.json": "f60af99778c5d60ca0efdf9c3970de28f05f7f06555ab9a013328c79b7fe14f2",
+        ".seed1.scores.json": "9066af842d826c09463e6b6491e15ae80178d0453dc76ddecd38c1bc379acea6"
+      },
+      "distinct_source_masks": 96,
+      "trainer_source_commit": "ba5a1716104f65d17dda21746cf50b4fb3dae2cd"
+    },
+    "15": {
+      "width": 128,
+      "steps": 30000,
+      "postprocess": "",
+      "seed": 0,
+      "seeds": {
+        "0": {
+          "run": "ui15i-w128-s0-n30000",
+          "weights_sha256": "351821081aef3920f3b81bff3678df3c443510474a2c26daf9dc96cb88ff3e34",
+          "nrt_sha256": "4e391b199dd53850cd45a92f6156fb9fe0091e5b77edb651841293141837cf34",
+          "c_reference_exit": 0,
+          "c_numpy_max_difference": 4.68e-06,
+          "exact_regular_glyphs": 96,
+          "exact_bold_glyphs": 96,
+          "desktop_pil_glyph_comparisons": 192,
+          "desktop_pil_passed": true,
+          "desktop_receipt_sha256": "cbfce04f208578e3ce2eb7321db7f950a8b6593c29d644e15820d34187ce6796"
+        },
+        "1": {
+          "run": "ui15i-w128-s1-n30000",
+          "weights_sha256": "ca787cd9251951255ad1e85ca4d9504692cfd27e3aef28483c70dcb80bbbfc9b",
+          "nrt_sha256": "2441285bcbfe372738d56e240e80fed121dcebe2de8477007097f72512b3e973",
+          "c_reference_exit": 0,
+          "c_numpy_max_difference": 5.02e-06,
+          "exact_regular_glyphs": 96,
+          "exact_bold_glyphs": 96,
+          "desktop_pil_glyph_comparisons": 192,
+          "desktop_pil_passed": true,
+          "desktop_receipt_sha256": "cbfce04f208578e3ce2eb7321db7f950a8b6593c29d644e15820d34187ce6796"
+        }
+      },
+      "target_sha256": "bb6e0c6016b0eeefd6825d74e6795eb5ca2339e22e79e7f2acc32dee9fb18383",
+      "training": {
+        "set": "ui15i",
+        "labelled": "U+0020..U+007E U+2026",
+        "sources_sha256": {
+          "font/ui-15-italic.txt": "bb6e0c6016b0eeefd6825d74e6795eb5ca2339e22e79e7f2acc32dee9fb18383",
+          "train/strokes.py": "31382edcb36b1286b2f56de05dfd2e22b998778abb1a93d68d07a277b47833a2",
+          "train/glyphs.py": "c388eef5af6a77f3a536b1ad1d5f7b67c6ce9b7cdbdaad58371f42ca9791bb60",
+          "train/train.py": "f1b2ca2d9b531f354f240c37e97c056d36266dd03dfc8a08bdfc1b01623667e9",
+          "train/checkpoint.py": "5f7fc0b2b27e7d9a96a64a9d4a697f593057440456f1bf534e237490a70f9fa1",
+          "font/code-masks.txt": "dba7e2a2608534f5203e0c5a0d0173a90e62ad018ba271593c1159180c654e22"
+        },
+        "pen_radius": 0.03666666666666667,
+        "grid": 256,
+        "steps": 30000,
+        "seed": 0,
+        "unlabelled_weight": 0.0
+      },
+      "hashes": {
+        ".json": "351821081aef3920f3b81bff3678df3c443510474a2c26daf9dc96cb88ff3e34",
+        ".nrt": "4e391b199dd53850cd45a92f6156fb9fe0091e5b77edb651841293141837cf34",
+        ".scores.json": "8a96375310ccb90a1616b469010f57d0d7750affc8fd008cedf6e91dee35173f",
+        ".seed1.scores.json": "285e3af96857727280453752e88c37ea1447db061660607bd5b466463ed10a6a"
+      },
+      "distinct_source_masks": 96,
+      "trainer_source_commit": "ba5a1716104f65d17dda21746cf50b4fb3dae2cd"
+    },
+    "17": {
+      "width": 256,
+      "steps": 40000,
+      "postprocess": "",
+      "seed": 0,
+      "seeds": {
+        "0": {
+          "run": "ui17i-w256-s0-n40000",
+          "weights_sha256": "f42317e6da947d6435b7fee5d7245f2b2456135c4ec616068095a195859daf96",
+          "nrt_sha256": "162c17bfbe1da6ebf14892ad207e20249689c7cb893f9ed304d5cd1862b20000",
+          "c_reference_exit": 0,
+          "c_numpy_max_difference": 3.1e-06,
+          "exact_regular_glyphs": 96,
+          "exact_bold_glyphs": 96,
+          "desktop_pil_glyph_comparisons": 192,
+          "desktop_pil_passed": true,
+          "desktop_receipt_sha256": "cbfce04f208578e3ce2eb7321db7f950a8b6593c29d644e15820d34187ce6796"
+        },
+        "1": {
+          "run": "ui17i-w256-s1-n40000",
+          "weights_sha256": "83101410b007823ca5798861a634f66684fd1110d3caa310f52aaaf06a66df46",
+          "nrt_sha256": "cfad9a7dfc076be212abe97f7fd85bf5094fafdcbc2561966728f02b41b0c621",
+          "c_reference_exit": 0,
+          "c_numpy_max_difference": 2.87e-06,
+          "exact_regular_glyphs": 96,
+          "exact_bold_glyphs": 96,
+          "desktop_pil_glyph_comparisons": 192,
+          "desktop_pil_passed": true,
+          "desktop_receipt_sha256": "cbfce04f208578e3ce2eb7321db7f950a8b6593c29d644e15820d34187ce6796"
+        }
+      },
+      "target_sha256": "a73f3cb88d70c465f67618db38c62e102e53ad907537232bcd270d281b46be4b",
+      "training": {
+        "set": "ui17i",
+        "labelled": "U+0020..U+007E U+2026",
+        "sources_sha256": {
+          "font/ui-17-italic.txt": "a73f3cb88d70c465f67618db38c62e102e53ad907537232bcd270d281b46be4b",
+          "train/strokes.py": "31382edcb36b1286b2f56de05dfd2e22b998778abb1a93d68d07a277b47833a2",
+          "train/glyphs.py": "c388eef5af6a77f3a536b1ad1d5f7b67c6ce9b7cdbdaad58371f42ca9791bb60",
+          "train/train.py": "f1b2ca2d9b531f354f240c37e97c056d36266dd03dfc8a08bdfc1b01623667e9",
+          "train/checkpoint.py": "5f7fc0b2b27e7d9a96a64a9d4a697f593057440456f1bf534e237490a70f9fa1",
+          "font/code-masks.txt": "dba7e2a2608534f5203e0c5a0d0173a90e62ad018ba271593c1159180c654e22"
+        },
+        "pen_radius": 0.03235294117647059,
+        "grid": 256,
+        "steps": 40000,
+        "seed": 0,
+        "unlabelled_weight": 0.0
+      },
+      "hashes": {
+        ".json": "f42317e6da947d6435b7fee5d7245f2b2456135c4ec616068095a195859daf96",
+        ".nrt": "162c17bfbe1da6ebf14892ad207e20249689c7cb893f9ed304d5cd1862b20000",
+        ".scores.json": "1c5d0093471d4580d33cd374b0410b9689e788b66b43ee8740cb24f90f36f088",
+        ".seed1.scores.json": "5f3c7e4eb589fd6f0823b3015286dd8a4a758eb64764ce4775b81708dfbb3488"
+      },
+      "distinct_source_masks": 96,
+      "trainer_source_commit": "ba5a1716104f65d17dda21746cf50b4fb3dae2cd"
+    },
+    "19": {
+      "width": 256,
+      "steps": 40000,
+      "postprocess": "",
+      "seed": 0,
+      "seeds": {
+        "0": {
+          "run": "ui19i-w256-s0-n40000",
+          "weights_sha256": "409be4d17f226f1b642159df07277b2ad0ed37a6a97b3e0d21a5624b413c0487",
+          "nrt_sha256": "d331ceb98af99a2de73ba810d7266507a49c8e6d7175756de53f24b9210efd2e",
+          "c_reference_exit": 0,
+          "c_numpy_max_difference": 3.15e-06,
+          "exact_regular_glyphs": 96,
+          "exact_bold_glyphs": 96,
+          "desktop_pil_glyph_comparisons": 192,
+          "desktop_pil_passed": true,
+          "desktop_receipt_sha256": "cbfce04f208578e3ce2eb7321db7f950a8b6593c29d644e15820d34187ce6796"
+        },
+        "1": {
+          "run": "ui19i-w256-s1-n40000",
+          "weights_sha256": "6ed5447c3948c8576f8018f6f548e8b9b5c25a73f6bf45e8de77c70c9e832d50",
+          "nrt_sha256": "ff68d0b17deb658779fca6f56a56ab6320fa627f3b0058a8535e5f4e1a3eb175",
+          "c_reference_exit": 0,
+          "c_numpy_max_difference": 3.23e-06,
+          "exact_regular_glyphs": 96,
+          "exact_bold_glyphs": 96,
+          "desktop_pil_glyph_comparisons": 192,
+          "desktop_pil_passed": true,
+          "desktop_receipt_sha256": "cbfce04f208578e3ce2eb7321db7f950a8b6593c29d644e15820d34187ce6796"
+        }
+      },
+      "target_sha256": "56b6336e64b82ddcb84c8a43ccdd1e7e410ffe89c70b4113a2d2eef89dc5ef18",
+      "training": {
+        "set": "ui19i",
+        "labelled": "U+0020..U+007E U+2026",
+        "sources_sha256": {
+          "font/ui-19-italic.txt": "56b6336e64b82ddcb84c8a43ccdd1e7e410ffe89c70b4113a2d2eef89dc5ef18",
+          "train/strokes.py": "31382edcb36b1286b2f56de05dfd2e22b998778abb1a93d68d07a277b47833a2",
+          "train/glyphs.py": "c388eef5af6a77f3a536b1ad1d5f7b67c6ce9b7cdbdaad58371f42ca9791bb60",
+          "train/train.py": "f1b2ca2d9b531f354f240c37e97c056d36266dd03dfc8a08bdfc1b01623667e9",
+          "train/checkpoint.py": "5f7fc0b2b27e7d9a96a64a9d4a697f593057440456f1bf534e237490a70f9fa1",
+          "font/code-masks.txt": "dba7e2a2608534f5203e0c5a0d0173a90e62ad018ba271593c1159180c654e22"
+        },
+        "pen_radius": 0.028947368421052635,
+        "grid": 256,
+        "steps": 40000,
+        "seed": 0,
+        "unlabelled_weight": 0.0
+      },
+      "hashes": {
+        ".json": "409be4d17f226f1b642159df07277b2ad0ed37a6a97b3e0d21a5624b413c0487",
+        ".nrt": "d331ceb98af99a2de73ba810d7266507a49c8e6d7175756de53f24b9210efd2e",
+        ".scores.json": "23fa0db337718832dc03bc0c9c2f08e2f76be29e4b1a7a99f078b9d0d310e1d5",
+        ".seed1.scores.json": "cd5f872f72cd57dfa3d10923624704bc340e12ce3f846a50f3007df6cc405f1d"
+      },
+      "distinct_source_masks": 96,
+      "trainer_source_commit": "ba5a1716104f65d17dda21746cf50b4fb3dae2cd"
+    },
+    "21": {
+      "width": 256,
+      "steps": 40000,
+      "postprocess": "",
+      "seed": 0,
+      "seeds": {
+        "0": {
+          "run": "ui21i-w256-s0-n40000",
+          "weights_sha256": "5c2530b02af000073f0016c56876d2df7802eeed92749ec11544f60c8cf47002",
+          "nrt_sha256": "c59298cbf1f746a1bf340b6dbaa4a0da97c9100c59ad581c372ababe7538776a",
+          "c_reference_exit": 0,
+          "c_numpy_max_difference": 3.31e-06,
+          "exact_regular_glyphs": 96,
+          "exact_bold_glyphs": 96,
+          "desktop_pil_glyph_comparisons": 192,
+          "desktop_pil_passed": true,
+          "desktop_receipt_sha256": "cbfce04f208578e3ce2eb7321db7f950a8b6593c29d644e15820d34187ce6796"
+        },
+        "1": {
+          "run": "ui21i-w256-s1-n40000",
+          "weights_sha256": "9a84122522e22179d4590abf54dd3136263382beea74441ed2e2e31706ab5110",
+          "nrt_sha256": "cf30572dc57c55675a36c945e09f39e3c3a7268c64b6ef1f5cd346575bd1db15",
+          "c_reference_exit": 0,
+          "c_numpy_max_difference": 3.54e-06,
+          "exact_regular_glyphs": 96,
+          "exact_bold_glyphs": 96,
+          "desktop_pil_glyph_comparisons": 192,
+          "desktop_pil_passed": true,
+          "desktop_receipt_sha256": "cbfce04f208578e3ce2eb7321db7f950a8b6593c29d644e15820d34187ce6796"
+        }
+      },
+      "target_sha256": "58531c0f7406b5f7089fd7c6564eef7386db42c3f7fae2a8605853797e5b05ab",
+      "training": {
+        "set": "ui21i",
+        "labelled": "U+0020..U+007E U+2026",
+        "sources_sha256": {
+          "font/ui-21-italic.txt": "58531c0f7406b5f7089fd7c6564eef7386db42c3f7fae2a8605853797e5b05ab",
+          "train/strokes.py": "31382edcb36b1286b2f56de05dfd2e22b998778abb1a93d68d07a277b47833a2",
+          "train/glyphs.py": "c388eef5af6a77f3a536b1ad1d5f7b67c6ce9b7cdbdaad58371f42ca9791bb60",
+          "train/train.py": "f1b2ca2d9b531f354f240c37e97c056d36266dd03dfc8a08bdfc1b01623667e9",
+          "train/checkpoint.py": "5f7fc0b2b27e7d9a96a64a9d4a697f593057440456f1bf534e237490a70f9fa1",
+          "font/code-masks.txt": "dba7e2a2608534f5203e0c5a0d0173a90e62ad018ba271593c1159180c654e22"
+        },
+        "pen_radius": 0.02619047619047619,
+        "grid": 256,
+        "steps": 40000,
+        "seed": 0,
+        "unlabelled_weight": 0.0
+      },
+      "hashes": {
+        ".json": "5c2530b02af000073f0016c56876d2df7802eeed92749ec11544f60c8cf47002",
+        ".nrt": "c59298cbf1f746a1bf340b6dbaa4a0da97c9100c59ad581c372ababe7538776a",
+        ".scores.json": "f8488bd3e52d0b45f2f5ced495b7ab009dfee80496a3dbcd96e2979eb4c353f8",
+        ".seed1.scores.json": "9e33da1699aff9adfc17613472d6c4a5c731ccb3210cea5d386e099c7424ce03"
+      },
+      "distinct_source_masks": 96,
+      "trainer_source_commit": "ba5a1716104f65d17dda21746cf50b4fb3dae2cd"
+    },
+    "23": {
+      "width": 256,
+      "steps": 40000,
+      "postprocess": "",
+      "seed": 0,
+      "seeds": {
+        "0": {
+          "run": "ui23i-w256-s0-n40000",
+          "weights_sha256": "d8cea77c833992a7c94231d601cca0c7a2c56c70ca22f2d48af32d692e1355ea",
+          "nrt_sha256": "183aa15b274193888d8675094832ab4f2e5b2d556c89787ad4c8c5a0ed8f4a5b",
+          "c_reference_exit": 0,
+          "c_numpy_max_difference": 3.76e-06,
+          "exact_regular_glyphs": 96,
+          "exact_bold_glyphs": 96,
+          "desktop_pil_glyph_comparisons": 192,
+          "desktop_pil_passed": true,
+          "desktop_receipt_sha256": "cbfce04f208578e3ce2eb7321db7f950a8b6593c29d644e15820d34187ce6796"
+        },
+        "1": {
+          "run": "ui23i-w256-s1-n40000",
+          "weights_sha256": "5a6c2f29c88f96f40c808f65a81f5e4076a537fa92b8490993952b7e085b4098",
+          "nrt_sha256": "995e651ae3785269cc803e7d28c147a6b036ebcfeb5ce51313ce2fd60fe933f3",
+          "c_reference_exit": 0,
+          "c_numpy_max_difference": 4.02e-06,
+          "exact_regular_glyphs": 96,
+          "exact_bold_glyphs": 96,
+          "desktop_pil_glyph_comparisons": 192,
+          "desktop_pil_passed": true,
+          "desktop_receipt_sha256": "cbfce04f208578e3ce2eb7321db7f950a8b6593c29d644e15820d34187ce6796"
+        }
+      },
+      "target_sha256": "2e5f71088ededff5c6abfc376ea965e24cdd79e8bd555a4ab856384776856be5",
+      "training": {
+        "set": "ui23i",
+        "labelled": "U+0020..U+007E U+2026",
+        "sources_sha256": {
+          "font/ui-23-italic.txt": "2e5f71088ededff5c6abfc376ea965e24cdd79e8bd555a4ab856384776856be5",
+          "train/strokes.py": "31382edcb36b1286b2f56de05dfd2e22b998778abb1a93d68d07a277b47833a2",
+          "train/glyphs.py": "c388eef5af6a77f3a536b1ad1d5f7b67c6ce9b7cdbdaad58371f42ca9791bb60",
+          "train/train.py": "f1b2ca2d9b531f354f240c37e97c056d36266dd03dfc8a08bdfc1b01623667e9",
+          "train/checkpoint.py": "5f7fc0b2b27e7d9a96a64a9d4a697f593057440456f1bf534e237490a70f9fa1",
+          "font/code-masks.txt": "dba7e2a2608534f5203e0c5a0d0173a90e62ad018ba271593c1159180c654e22"
+        },
+        "pen_radius": 0.02391304347826087,
+        "grid": 256,
+        "steps": 40000,
+        "seed": 0,
+        "unlabelled_weight": 0.0
+      },
+      "hashes": {
+        ".json": "d8cea77c833992a7c94231d601cca0c7a2c56c70ca22f2d48af32d692e1355ea",
+        ".nrt": "183aa15b274193888d8675094832ab4f2e5b2d556c89787ad4c8c5a0ed8f4a5b",
+        ".scores.json": "8a601c7e50692af6248f5f2224d6cdbd97ccd8b71019910697c31834dc70e7d3",
+        ".seed1.scores.json": "321187ecfe41f43a0f33a53d007295902e7fa5badcbc1cc8ad78f480fc65f258"
+      },
+      "distinct_source_masks": 96,
+      "trainer_source_commit": "ba5a1716104f65d17dda21746cf50b4fb3dae2cd"
+    },
+    "25": {
+      "width": 256,
+      "steps": 40000,
+      "postprocess": "",
+      "seed": 0,
+      "seeds": {
+        "0": {
+          "run": "ui25i-w256-s0-n40000",
+          "weights_sha256": "c5e1099c319baef6dabde5204e0e6c5a533f3c03f5879c3955aa05a20a496d9c",
+          "nrt_sha256": "1099e5f7e154b02b97632a8301d2ccb2d9066e1b72aa2e61da40fcb848a83ab8",
+          "c_reference_exit": 0,
+          "c_numpy_max_difference": 2.49e-06,
+          "exact_regular_glyphs": 96,
+          "exact_bold_glyphs": 96,
+          "desktop_pil_glyph_comparisons": 192,
+          "desktop_pil_passed": true,
+          "desktop_receipt_sha256": "cbfce04f208578e3ce2eb7321db7f950a8b6593c29d644e15820d34187ce6796"
+        },
+        "1": {
+          "run": "ui25i-w256-s1-n40000",
+          "weights_sha256": "310a827f5d8760981d7a0ebdb1d8bc0325bbf6890eeccd99a603c56230c97868",
+          "nrt_sha256": "1b3bfb7ee41e8fffc521237e44eb60f6f1224765b321eef112e38ca220f52a24",
+          "c_reference_exit": 0,
+          "c_numpy_max_difference": 3.02e-06,
+          "exact_regular_glyphs": 96,
+          "exact_bold_glyphs": 96,
+          "desktop_pil_glyph_comparisons": 192,
+          "desktop_pil_passed": true,
+          "desktop_receipt_sha256": "cbfce04f208578e3ce2eb7321db7f950a8b6593c29d644e15820d34187ce6796"
+        }
+      },
+      "target_sha256": "de6254ef5ed3b3afcf6200754e5135db7374de0ffa3e70a55438e288f7575841",
+      "training": {
+        "set": "ui25i",
+        "labelled": "U+0020..U+007E U+2026",
+        "sources_sha256": {
+          "font/ui-25-italic.txt": "de6254ef5ed3b3afcf6200754e5135db7374de0ffa3e70a55438e288f7575841",
+          "train/strokes.py": "31382edcb36b1286b2f56de05dfd2e22b998778abb1a93d68d07a277b47833a2",
+          "train/glyphs.py": "c388eef5af6a77f3a536b1ad1d5f7b67c6ce9b7cdbdaad58371f42ca9791bb60",
+          "train/train.py": "f1b2ca2d9b531f354f240c37e97c056d36266dd03dfc8a08bdfc1b01623667e9",
+          "train/checkpoint.py": "5f7fc0b2b27e7d9a96a64a9d4a697f593057440456f1bf534e237490a70f9fa1",
+          "font/code-masks.txt": "dba7e2a2608534f5203e0c5a0d0173a90e62ad018ba271593c1159180c654e22"
+        },
+        "pen_radius": 0.022000000000000002,
+        "grid": 256,
+        "steps": 40000,
+        "seed": 0,
+        "unlabelled_weight": 0.0
+      },
+      "hashes": {
+        ".json": "c5e1099c319baef6dabde5204e0e6c5a533f3c03f5879c3955aa05a20a496d9c",
+        ".nrt": "1099e5f7e154b02b97632a8301d2ccb2d9066e1b72aa2e61da40fcb848a83ab8",
+        ".scores.json": "8399a2c11238dc54fdb3ad45e61513fe6add2b5d7f4e4fb80e630f1c991eda41",
+        ".seed1.scores.json": "c4f7050205b1adbbfbd28a4dcf529b49425c0f5f2e3c077afcf7fbcbd1e98345"
+      },
+      "distinct_source_masks": 96,
+      "trainer_source_commit": "ba5a1716104f65d17dda21746cf50b4fb3dae2cd"
+    },
+    "27": {
+      "width": 512,
+      "steps": 80000,
+      "postprocess": "biasm005",
+      "seed": 0,
+      "seeds": {
+        "0": {
+          "run": "ui27i-w512-s0-n80000-biasm005",
+          "weights_sha256": "3b136f6c44428faa9781ea2ba3fc7c579a3b9abf6342cf893bd715a1ce3d4aa5",
+          "nrt_sha256": "c9937e96e103e3abf48793329a53df71de2a510e9aabe45fc06c5e3e543b10e1",
+          "c_reference_exit": 0,
+          "c_numpy_max_difference": 2.99e-06,
+          "exact_regular_glyphs": 96,
+          "exact_bold_glyphs": 96,
+          "desktop_pil_glyph_comparisons": 192,
+          "desktop_pil_passed": true,
+          "desktop_receipt_sha256": "cbfce04f208578e3ce2eb7321db7f950a8b6593c29d644e15820d34187ce6796"
+        },
+        "1": {
+          "run": "ui27i-w512-s1-n80000-biasm005",
+          "weights_sha256": "08e93563b328929ba5ca0c7b49f085da6349d7351a7b7861f23c97d335038d86",
+          "nrt_sha256": "da08bfa2522678f4ab969a7e903b028bd2b19e6dfe9ee1b5874065b3b3f2664b",
+          "c_reference_exit": 0,
+          "c_numpy_max_difference": 1.78e-06,
+          "exact_regular_glyphs": 96,
+          "exact_bold_glyphs": 96,
+          "desktop_pil_glyph_comparisons": 192,
+          "desktop_pil_passed": true,
+          "desktop_receipt_sha256": "cbfce04f208578e3ce2eb7321db7f950a8b6593c29d644e15820d34187ce6796"
+        }
+      },
+      "target_sha256": "3ce4b82ec6609efab09e14ab8297c87d128c94fcdc771cb05998ecc08987993b",
+      "training": {
+        "set": "ui27i",
+        "labelled": "U+0020..U+007E U+2026",
+        "sources_sha256": {
+          "font/ui-27-italic.txt": "3ce4b82ec6609efab09e14ab8297c87d128c94fcdc771cb05998ecc08987993b",
+          "train/strokes.py": "31382edcb36b1286b2f56de05dfd2e22b998778abb1a93d68d07a277b47833a2",
+          "train/glyphs.py": "c388eef5af6a77f3a536b1ad1d5f7b67c6ce9b7cdbdaad58371f42ca9791bb60",
+          "train/train.py": "61689df171adc7bff985bafbb18e4f8f3d8cfe4b95c4a21bb53ed41cf5b833d9",
+          "train/checkpoint.py": "ab1a2bd1823e3e281c7db1a9819570386f5511c472c2bf704688abff1e5f6404",
+          "font/code-masks.txt": "dba7e2a2608534f5203e0c5a0d0173a90e62ad018ba271593c1159180c654e22"
+        },
+        "pen_radius": 0.020370370370370372,
+        "grid": 256,
+        "steps": 80000,
+        "seed": 0,
+        "unlabelled_weight": 0.0,
+        "continuation": {
+          "kind": "new-cosine-phase",
+          "parent_checkpoint_sha256": "2dfaef4380f7c7afc9f02740663c7adfb781bfb845a388e2a26e3e34ebfb18e1",
+          "parent_identity": {
+            "arguments": {
+              "set": "ui27i",
+              "width": 512,
+              "steps": 60000,
+              "device": "cuda",
+              "seed": 0,
+              "pen": 0.020370370370370372,
+              "grid": 256,
+              "unlabelled": 0.0,
+              "tau": 0.15,
+              "score_sizes": "27"
+            },
+            "sources_sha256": {
+              "font/ui-27-italic.txt": "3ce4b82ec6609efab09e14ab8297c87d128c94fcdc771cb05998ecc08987993b",
+              "train/strokes.py": "31382edcb36b1286b2f56de05dfd2e22b998778abb1a93d68d07a277b47833a2",
+              "train/glyphs.py": "c388eef5af6a77f3a536b1ad1d5f7b67c6ce9b7cdbdaad58371f42ca9791bb60",
+              "train/train.py": "f1b2ca2d9b531f354f240c37e97c056d36266dd03dfc8a08bdfc1b01623667e9",
+              "train/checkpoint.py": "5f7fc0b2b27e7d9a96a64a9d4a697f593057440456f1bf534e237490a70f9fa1",
+              "font/code-masks.txt": "dba7e2a2608534f5203e0c5a0d0173a90e62ad018ba271593c1159180c654e22"
+            }
+          },
+          "parent_steps": 60000,
+          "phase_steps": 20000,
+          "phase_initial_lr": 0.0002,
+          "optimizer_state_retained": true,
+          "rng_state_retained": true
+        },
+        "output_bias_calibration": {
+          "version": 1,
+          "method": "add float32 offsets to output-layer biases",
+          "source_sha256": "fefb1a05a5f205ec7e4cfcf2e1fb65d91f94f032ba6f7778212b110e500f3539",
+          "tool_sha256": "393ff5db66d648244a5833b6bfa9b9201b852b9b918cdca54a2394c422317334",
+          "offsets": [
+            -0.05
+          ],
+          "bias_before": [
+            -0.29300636053085327
+          ],
+          "bias_after": [
+            -0.3430063724517822
+          ],
+          "units": "normalized signed distance; physical shift is tau times offset",
+          "acceptance": "requires independent packed C and visual validation"
+        }
+      },
+      "hashes": {
+        ".json": "3b136f6c44428faa9781ea2ba3fc7c579a3b9abf6342cf893bd715a1ce3d4aa5",
+        ".nrt": "c9937e96e103e3abf48793329a53df71de2a510e9aabe45fc06c5e3e543b10e1",
+        ".scores.json": "53476c1c322dab1f9ebc31cd06de0e07a4f0d2df22ca524541fdedb09efa9710",
+        ".seed1.scores.json": "bda07a5e375883fd53f5d9a3e8e0f131428cf5ad532b100823fc7c78ea6c5c98"
+      },
+      "distinct_source_masks": 96,
+      "trainer_source_commit": "467f11151a8f120a0ba0d43debae6acba08a692e"
+    },
+    "29": {
+      "width": 384,
+      "steps": 40000,
+      "postprocess": "",
+      "seed": 0,
+      "seeds": {
+        "0": {
+          "run": "ui29i-w384-s0-n40000",
+          "weights_sha256": "3fe4ebaea6d34ada3eb9cd52856d4a44eef0af821b325234bd7fab001a079858",
+          "nrt_sha256": "f03d6f2fc2a7d61444e498b62825ef854ffdefd6efd5f42897bd7fe86bce916c",
+          "c_reference_exit": 0,
+          "c_numpy_max_difference": 2.52e-06,
+          "exact_regular_glyphs": 96,
+          "exact_bold_glyphs": 96,
+          "desktop_pil_glyph_comparisons": 192,
+          "desktop_pil_passed": true,
+          "desktop_receipt_sha256": "cbfce04f208578e3ce2eb7321db7f950a8b6593c29d644e15820d34187ce6796"
+        },
+        "1": {
+          "run": "ui29i-w384-s1-n40000",
+          "weights_sha256": "45290f54847e01214ff56cb81069cb2ba4de5cb2a2d7f691e1a4821c1fe57141",
+          "nrt_sha256": "fee87ebfc61b604a7dbd4019d4d0ba648a14255568dcce70a00bf62400489261",
+          "c_reference_exit": 0,
+          "c_numpy_max_difference": 3.59e-06,
+          "exact_regular_glyphs": 96,
+          "exact_bold_glyphs": 96,
+          "desktop_pil_glyph_comparisons": 192,
+          "desktop_pil_passed": true,
+          "desktop_receipt_sha256": "cbfce04f208578e3ce2eb7321db7f950a8b6593c29d644e15820d34187ce6796"
+        }
+      },
+      "target_sha256": "b40a5e3ed665b451b54c39253d250cc9b95ca9e23398dac6e4436d4040b60509",
+      "training": {
+        "set": "ui29i",
+        "labelled": "U+0020..U+007E U+2026",
+        "sources_sha256": {
+          "font/ui-29-italic.txt": "b40a5e3ed665b451b54c39253d250cc9b95ca9e23398dac6e4436d4040b60509",
+          "train/strokes.py": "31382edcb36b1286b2f56de05dfd2e22b998778abb1a93d68d07a277b47833a2",
+          "train/glyphs.py": "c388eef5af6a77f3a536b1ad1d5f7b67c6ce9b7cdbdaad58371f42ca9791bb60",
+          "train/train.py": "f1b2ca2d9b531f354f240c37e97c056d36266dd03dfc8a08bdfc1b01623667e9",
+          "train/checkpoint.py": "5f7fc0b2b27e7d9a96a64a9d4a697f593057440456f1bf534e237490a70f9fa1",
+          "font/code-masks.txt": "dba7e2a2608534f5203e0c5a0d0173a90e62ad018ba271593c1159180c654e22"
+        },
+        "pen_radius": 0.018965517241379314,
+        "grid": 256,
+        "steps": 40000,
+        "seed": 0,
+        "unlabelled_weight": 0.0
+      },
+      "hashes": {
+        ".json": "3fe4ebaea6d34ada3eb9cd52856d4a44eef0af821b325234bd7fab001a079858",
+        ".nrt": "f03d6f2fc2a7d61444e498b62825ef854ffdefd6efd5f42897bd7fe86bce916c",
+        ".scores.json": "b157f4cf568db4b09a2cffd2875d90f3a0604201f4260fde0d214fab542ab561",
+        ".seed1.scores.json": "18a2f4e8b004f683a24f6cd2dc188f7d1a654ffb560e4e2bfe3974e995c827ad"
+      },
+      "distinct_source_masks": 96,
+      "trainer_source_commit": "ba5a1716104f65d17dda21746cf50b4fb3dae2cd"
+    },
+    "31": {
+      "width": 512,
+      "steps": 40000,
+      "postprocess": "",
+      "seed": 0,
+      "seeds": {
+        "0": {
+          "run": "ui31i-w512-s0-n40000",
+          "weights_sha256": "c6e5c64661b010205e8ee1ea9df4426bbe6b7053e31e398048de59cb534a7b6d",
+          "nrt_sha256": "6a3b8df4aadc39e8170831f1e518556d967a492c3655d995a7c0c165d48bb532",
+          "c_reference_exit": 0,
+          "c_numpy_max_difference": 1.74e-06,
+          "exact_regular_glyphs": 96,
+          "exact_bold_glyphs": 96,
+          "desktop_pil_glyph_comparisons": 192,
+          "desktop_pil_passed": true,
+          "desktop_receipt_sha256": "cbfce04f208578e3ce2eb7321db7f950a8b6593c29d644e15820d34187ce6796"
+        },
+        "1": {
+          "run": "ui31i-w512-s1-n40000",
+          "weights_sha256": "d7e5b89f172c63adff8dee7c3625a4845a6e6dc20239d18d237bf6a79e4a9b33",
+          "nrt_sha256": "1add8d19e61326da29326f5bf96282c964e68ee35de19491e17ebb57c6ae6d82",
+          "c_reference_exit": 0,
+          "c_numpy_max_difference": 1.67e-06,
+          "exact_regular_glyphs": 96,
+          "exact_bold_glyphs": 96,
+          "desktop_pil_glyph_comparisons": 192,
+          "desktop_pil_passed": true,
+          "desktop_receipt_sha256": "cbfce04f208578e3ce2eb7321db7f950a8b6593c29d644e15820d34187ce6796"
+        }
+      },
+      "target_sha256": "f3c2c85ce83f0bce72a9c22de58ced105487ab3d815c3631e0b88f3ca7d52286",
+      "training": {
+        "set": "ui31i",
+        "labelled": "U+0020..U+007E U+2026",
+        "sources_sha256": {
+          "font/ui-31-italic.txt": "f3c2c85ce83f0bce72a9c22de58ced105487ab3d815c3631e0b88f3ca7d52286",
+          "train/strokes.py": "31382edcb36b1286b2f56de05dfd2e22b998778abb1a93d68d07a277b47833a2",
+          "train/glyphs.py": "c388eef5af6a77f3a536b1ad1d5f7b67c6ce9b7cdbdaad58371f42ca9791bb60",
+          "train/train.py": "f1b2ca2d9b531f354f240c37e97c056d36266dd03dfc8a08bdfc1b01623667e9",
+          "train/checkpoint.py": "5f7fc0b2b27e7d9a96a64a9d4a697f593057440456f1bf534e237490a70f9fa1",
+          "font/code-masks.txt": "dba7e2a2608534f5203e0c5a0d0173a90e62ad018ba271593c1159180c654e22"
+        },
+        "pen_radius": 0.017741935483870968,
+        "grid": 256,
+        "steps": 40000,
+        "seed": 0,
+        "unlabelled_weight": 0.0
+      },
+      "hashes": {
+        ".json": "c6e5c64661b010205e8ee1ea9df4426bbe6b7053e31e398048de59cb534a7b6d",
+        ".nrt": "6a3b8df4aadc39e8170831f1e518556d967a492c3655d995a7c0c165d48bb532",
+        ".scores.json": "a12622cc6c6c72ed1439c8aea482e45f1dff61f98037731511335c8c7d001e36",
+        ".seed1.scores.json": "21f6c27eff5217df64e13f943907a92cafef3b4412161802bde711831384219c"
+      },
+      "distinct_source_masks": 96,
+      "trainer_source_commit": "ba5a1716104f65d17dda21746cf50b4fb3dae2cd"
+    }
+  },
+  "source_aliases": {
+    "3": {
+      "distinct_masks": 46,
+      "alias_groups": [
+        [
+          {
+            "scalar": "U+0021",
+            "advance": 2
+          },
+          {
+            "scalar": "U+0029",
+            "advance": 2
+          },
+          {
+            "scalar": "U+0049",
+            "advance": 2
+          },
+          {
+            "scalar": "U+005D",
+            "advance": 2
+          },
+          {
+            "scalar": "U+0069",
+            "advance": 2
+          },
+          {
+            "scalar": "U+006A",
+            "advance": 2
+          },
+          {
+            "scalar": "U+006C",
+            "advance": 2
+          },
+          {
+            "scalar": "U+007C",
+            "advance": 2
+          }
+        ],
+        [
+          {
+            "scalar": "U+0023",
+            "advance": 3
+          },
+          {
+            "scalar": "U+0047",
+            "advance": 3
+          },
+          {
+            "scalar": "U+0053",
+            "advance": 3
+          }
+        ],
+        [
+          {
+            "scalar": "U+0028",
+            "advance": 3
+          },
+          {
+            "scalar": "U+005B",
+            "advance": 3
+          },
+          {
+            "scalar": "U+007B",
+            "advance": 3
+          }
+        ],
+        [
+          {
+            "scalar": "U+002A",
+            "advance": 3
+          },
+          {
+            "scalar": "U+007E",
+            "advance": 3
+          }
+        ],
+        [
+          {
+            "scalar": "U+002C",
+            "advance": 1
+          },
+          {
+            "scalar": "U+002E",
+            "advance": 1
+          }
+        ],
+        [
+          {
+            "scalar": "U+002D",
+            "advance": 2
+          },
+          {
+            "scalar": "U+005F",
+            "advance": 2
+          }
+        ],
+        [
+          {
+            "scalar": "U+0030",
+            "advance": 3
+          },
+          {
+            "scalar": "U+0032",
+            "advance": 3
+          },
+          {
+            "scalar": "U+0033",
+            "advance": 3
+          },
+          {
+            "scalar": "U+0034",
+            "advance": 3
+          },
+          {
+            "scalar": "U+0036",
+            "advance": 3
+          },
+          {
+            "scalar": "U+0038",
+            "advance": 3
+          },
+          {
+            "scalar": "U+0064",
+            "advance": 3
+          }
+        ],
+        [
+          {
+            "scalar": "U+0035",
+            "advance": 3
+          },
+          {
+            "scalar": "U+0045",
+            "advance": 3
+          }
+        ],
+        [
+          {
+            "scalar": "U+0039",
+            "advance": 3
+          },
+          {
+            "scalar": "U+003F",
+            "advance": 3
+          }
+        ],
+        [
+          {
+            "scalar": "U+003A",
+            "advance": 1
+          },
+          {
+            "scalar": "U+003B",
+            "advance": 1
+          }
+        ],
+        [
+          {
+            "scalar": "U+003D",
+            "advance": 2
+          },
+          {
+            "scalar": "U+003E",
+            "advance": 2
+          },
+          {
+            "scalar": "U+0063",
+            "advance": 2
+          },
+          {
+            "scalar": "U+0065",
+            "advance": 2
+          },
+          {
+            "scalar": "U+0067",
+            "advance": 2
+          },
+          {
+            "scalar": "U+006E",
+            "advance": 2
+          },
+          {
+            "scalar": "U+006F",
+            "advance": 2
+          },
+          {
+            "scalar": "U+0070",
+            "advance": 2
+          },
+          {
+            "scalar": "U+0071",
+            "advance": 2
+          },
+          {
+            "scalar": "U+0073",
+            "advance": 2
+          },
+          {
+            "scalar": "U+0075",
+            "advance": 2
+          },
+          {
+            "scalar": "U+007A",
+            "advance": 2
+          }
+        ],
+        [
+          {
+            "scalar": "U+0040",
+            "advance": 3
+          },
+          {
+            "scalar": "U+0042",
+            "advance": 3
+          },
+          {
+            "scalar": "U+0052",
+            "advance": 3
+          }
+        ],
+        [
+          {
+            "scalar": "U+0043",
+            "advance": 3
+          },
+          {
+            "scalar": "U+004F",
+            "advance": 3
+          },
+          {
+            "scalar": "U+0051",
+            "advance": 3
+          }
+        ],
+        [
+          {
+            "scalar": "U+0046",
+            "advance": 3
+          },
+          {
+            "scalar": "U+0066",
+            "advance": 3
+          }
+        ],
+        [
+          {
+            "scalar": "U+0048",
+            "advance": 3
+          },
+          {
+            "scalar": "U+004D",
+            "advance": 3
+          }
+        ],
+        [
+          {
+            "scalar": "U+004C",
+            "advance": 2
+          },
+          {
+            "scalar": "U+005C",
+            "advance": 2
+          }
+        ],
+        [
+          {
+            "scalar": "U+004E",
+            "advance": 3
+          },
+          {
+            "scalar": "U+0057",
+            "advance": 3
+          },
+          {
+            "scalar": "U+0058",
+            "advance": 3
+          }
+        ],
+        [
+          {
+            "scalar": "U+0056",
+            "advance": 3
+          },
+          {
+            "scalar": "U+0059",
+            "advance": 3
+          }
+        ],
+        [
+          {
+            "scalar": "U+0062",
+            "advance": 2
+          },
+          {
+            "scalar": "U+0068",
+            "advance": 2
+          },
+          {
+            "scalar": "U+006B",
+            "advance": 2
+          },
+          {
+            "scalar": "U+0074",
+            "advance": 2
+          }
+        ],
+        [
+          {
+            "scalar": "U+006D",
+            "advance": 3
+          },
+          {
+            "scalar": "U+0077",
+            "advance": 3
+          },
+          {
+            "scalar": "U+0078",
+            "advance": 3
+          }
+        ],
+        [
+          {
+            "scalar": "U+0076",
+            "advance": 3
+          },
+          {
+            "scalar": "U+0079",
+            "advance": 3
+          }
+        ]
+      ]
+    },
+    "4": {
+      "distinct_masks": 69,
+      "alias_groups": [
+        [
+          {
+            "scalar": "U+0021",
+            "advance": 2
+          },
+          {
+            "scalar": "U+0049",
+            "advance": 2
+          },
+          {
+            "scalar": "U+0069",
+            "advance": 2
+          },
+          {
+            "scalar": "U+006C",
+            "advance": 2
+          }
+        ],
+        [
+          {
+            "scalar": "U+0023",
+            "advance": 4
+          },
+          {
+            "scalar": "U+0047",
+            "advance": 4
+          },
+          {
+            "scalar": "U+0053",
+            "advance": 4
+          }
+        ],
+        [
+          {
+            "scalar": "U+0026",
+            "advance": 3
+          },
+          {
+            "scalar": "U+0032",
+            "advance": 3
+          },
+          {
+            "scalar": "U+0033",
+            "advance": 3
+          },
+          {
+            "scalar": "U+0038",
+            "advance": 3
+          }
+        ],
+        [
+          {
+            "scalar": "U+0028",
+            "advance": 3
+          },
+          {
+            "scalar": "U+007B",
+            "advance": 3
+          }
+        ],
+        [
+          {
+            "scalar": "U+0029",
+            "advance": 2
+          },
+          {
+            "scalar": "U+005D",
+            "advance": 2
+          },
+          {
+            "scalar": "U+006A",
+            "advance": 2
+          },
+          {
+            "scalar": "U+007C",
+            "advance": 2
+          }
+        ],
+        [
+          {
+            "scalar": "U+002A",
+            "advance": 3
+          },
+          {
+            "scalar": "U+007E",
+            "advance": 3
+          }
+        ],
+        [
+          {
+            "scalar": "U+0034",
+            "advance": 4
+          },
+          {
+            "scalar": "U+0064",
+            "advance": 4
+          }
+        ],
+        [
+          {
+            "scalar": "U+0035",
+            "advance": 4
+          },
+          {
+            "scalar": "U+0042",
+            "advance": 4
+          },
+          {
+            "scalar": "U+0052",
+            "advance": 4
+          }
+        ],
+        [
+          {
+            "scalar": "U+003D",
+            "advance": 3
+          },
+          {
+            "scalar": "U+0063",
+            "advance": 3
+          },
+          {
+            "scalar": "U+0065",
+            "advance": 3
+          },
+          {
+            "scalar": "U+006F",
+            "advance": 3
+          },
+          {
+            "scalar": "U+0073",
+            "advance": 3
+          },
+          {
+            "scalar": "U+0078",
+            "advance": 3
+          },
+          {
+            "scalar": "U+007A",
+            "advance": 3
+          }
+        ],
+        [
+          {
+            "scalar": "U+0043",
+            "advance": 4
+          },
+          {
+            "scalar": "U+004F",
+            "advance": 4
+          },
+          {
+            "scalar": "U+0051",
+            "advance": 4
+          }
+        ],
+        [
+          {
+            "scalar": "U+0048",
+            "advance": 4
+          },
+          {
+            "scalar": "U+004E",
+            "advance": 4
+          }
+        ],
+        [
+          {
+            "scalar": "U+004B",
+            "advance": 4
+          },
+          {
+            "scalar": "U+0058",
+            "advance": 4
+          }
+        ],
+        [
+          {
+            "scalar": "U+0062",
+            "advance": 3
+          },
+          {
+            "scalar": "U+006B",
+            "advance": 3
+          }
+        ]
+      ]
+    },
+    "5": {
+      "distinct_masks": 74,
+      "alias_groups": [
+        [
+          {
+            "scalar": "U+0021",
+            "advance": 3
+          },
+          {
+            "scalar": "U+0049",
+            "advance": 3
+          },
+          {
+            "scalar": "U+0069",
+            "advance": 3
+          },
+          {
+            "scalar": "U+006C",
+            "advance": 3
+          }
+        ],
+        [
+          {
+            "scalar": "U+0028",
+            "advance": 3
+          },
+          {
+            "scalar": "U+005B",
+            "advance": 3
+          },
+          {
+            "scalar": "U+007C",
+            "advance": 3
+          }
+        ],
+        [
+          {
+            "scalar": "U+0030",
+            "advance": 4
+          },
+          {
+            "scalar": "U+0032",
+            "advance": 4
+          },
+          {
+            "scalar": "U+0033",
+            "advance": 4
+          },
+          {
+            "scalar": "U+0038",
+            "advance": 4
+          },
+          {
+            "scalar": "U+0039",
+            "advance": 4
+          }
+        ],
+        [
+          {
+            "scalar": "U+0036",
+            "advance": 4
+          },
+          {
+            "scalar": "U+0045",
+            "advance": 4
+          }
+        ],
+        [
+          {
+            "scalar": "U+0042",
+            "advance": 5
+          },
+          {
+            "scalar": "U+0047",
+            "advance": 5
+          },
+          {
+            "scalar": "U+0051",
+            "advance": 5
+          },
+          {
+            "scalar": "U+0053",
+            "advance": 5
+          }
+        ],
+        [
+          {
+            "scalar": "U+0044",
+            "advance": 5
+          },
+          {
+            "scalar": "U+004F",
+            "advance": 5
+          }
+        ],
+        [
+          {
+            "scalar": "U+0061",
+            "advance": 4
+          },
+          {
+            "scalar": "U+0065",
+            "advance": 4
+          },
+          {
+            "scalar": "U+006E",
+            "advance": 4
+          },
+          {
+            "scalar": "U+006F",
+            "advance": 4
+          },
+          {
+            "scalar": "U+0073",
+            "advance": 4
+          },
+          {
+            "scalar": "U+0075",
+            "advance": 4
+          },
+          {
+            "scalar": "U+007A",
+            "advance": 4
+          }
+        ],
+        [
+          {
+            "scalar": "U+0062",
+            "advance": 4
+          },
+          {
+            "scalar": "U+0068",
+            "advance": 4
+          },
+          {
+            "scalar": "U+006B",
+            "advance": 4
+          }
+        ]
+      ]
+    },
+    "6": {
+      "distinct_masks": 75,
+      "alias_groups": [
+        [
+          {
+            "scalar": "U+0021",
+            "advance": 3
+          },
+          {
+            "scalar": "U+0049",
+            "advance": 3
+          },
+          {
+            "scalar": "U+0069",
+            "advance": 3
+          }
+        ],
+        [
+          {
+            "scalar": "U+0028",
+            "advance": 3
+          },
+          {
+            "scalar": "U+005B",
+            "advance": 3
+          },
+          {
+            "scalar": "U+007C",
+            "advance": 3
+          }
+        ],
+        [
+          {
+            "scalar": "U+0030",
+            "advance": 5
+          },
+          {
+            "scalar": "U+0032",
+            "advance": 5
+          },
+          {
+            "scalar": "U+0033",
+            "advance": 5
+          },
+          {
+            "scalar": "U+0038",
+            "advance": 5
+          },
+          {
+            "scalar": "U+0039",
+            "advance": 5
+          }
+        ],
+        [
+          {
+            "scalar": "U+0036",
+            "advance": 5
+          },
+          {
+            "scalar": "U+0045",
+            "advance": 5
+          }
+        ],
+        [
+          {
+            "scalar": "U+0042",
+            "advance": 5
+          },
+          {
+            "scalar": "U+0047",
+            "advance": 5
+          },
+          {
+            "scalar": "U+0051",
+            "advance": 5
+          },
+          {
+            "scalar": "U+0053",
+            "advance": 5
+          }
+        ],
+        [
+          {
+            "scalar": "U+0044",
+            "advance": 5
+          },
+          {
+            "scalar": "U+004F",
+            "advance": 5
+          }
+        ],
+        [
+          {
+            "scalar": "U+0061",
+            "advance": 5
+          },
+          {
+            "scalar": "U+0065",
+            "advance": 5
+          },
+          {
+            "scalar": "U+006E",
+            "advance": 5
+          },
+          {
+            "scalar": "U+006F",
+            "advance": 5
+          },
+          {
+            "scalar": "U+0073",
+            "advance": 5
+          },
+          {
+            "scalar": "U+0075",
+            "advance": 5
+          },
+          {
+            "scalar": "U+007A",
+            "advance": 5
+          }
+        ],
+        [
+          {
+            "scalar": "U+0062",
+            "advance": 5
+          },
+          {
+            "scalar": "U+0068",
+            "advance": 5
+          },
+          {
+            "scalar": "U+006B",
+            "advance": 5
+          }
+        ]
+      ]
+    },
+    "7": {
+      "distinct_masks": 89,
+      "alias_groups": [
+        [
+          {
+            "scalar": "U+0021",
+            "advance": 3
+          },
+          {
+            "scalar": "U+0049",
+            "advance": 3
+          },
+          {
+            "scalar": "U+0069",
+            "advance": 3
+          }
+        ],
+        [
+          {
+            "scalar": "U+0028",
+            "advance": 3
+          },
+          {
+            "scalar": "U+005B",
+            "advance": 3
+          },
+          {
+            "scalar": "U+007C",
+            "advance": 3
+          }
+        ],
+        [
+          {
+            "scalar": "U+0033",
+            "advance": 5
+          },
+          {
+            "scalar": "U+0038",
+            "advance": 5
+          }
+        ],
+        [
+          {
+            "scalar": "U+0042",
+            "advance": 6
+          },
+          {
+            "scalar": "U+0053",
+            "advance": 6
+          }
+        ],
+        [
+          {
+            "scalar": "U+0044",
+            "advance": 6
+          },
+          {
+            "scalar": "U+004F",
+            "advance": 6
+          }
+        ]
+      ]
+    },
+    "8": {
+      "distinct_masks": 96,
+      "alias_groups": []
+    },
+    "9": {
+      "distinct_masks": 96,
+      "alias_groups": []
+    },
+    "13": {
+      "distinct_masks": 96,
+      "alias_groups": []
+    },
+    "15": {
+      "distinct_masks": 96,
+      "alias_groups": []
+    },
+    "17": {
+      "distinct_masks": 96,
+      "alias_groups": []
+    },
+    "19": {
+      "distinct_masks": 96,
+      "alias_groups": []
+    },
+    "21": {
+      "distinct_masks": 96,
+      "alias_groups": []
+    },
+    "23": {
+      "distinct_masks": 96,
+      "alias_groups": []
+    },
+    "25": {
+      "distinct_masks": 96,
+      "alias_groups": []
+    },
+    "27": {
+      "distinct_masks": 96,
+      "alias_groups": []
+    },
+    "29": {
+      "distinct_masks": 96,
+      "alias_groups": []
+    },
+    "31": {
+      "distinct_masks": 96,
+      "alias_groups": []
+    }
+  },
+  "visual_reviews": [
+    {
+      "reviewed_utc": "2026-11-12T00:10:14.513618+00:00",
+      "image": "italic-accepted-sixteen.png",
+      "sha256": "2e4e338e4cb777f7f5fbda99b21bfa743407d7d6afbe1cd64d8805c3a5f9e803",
+      "reviewer": "root agent",
+      "scope": "sample text at7sizes, source/seed0/seed1, regular/bold; not all96characters or all17sizes",
+      "sizes": [
+        3,
+        4,
+        8,
+        13,
+        17,
+        25,
+        31
+      ],
+      "visual_blockers": [],
+      "observations": [
+        "Rows visually agree across source and both packed seeds.",
+        "13px @ remains intact;25px and31px show coherent slant, counters and punctuation.",
+        "3px and4px grids are inherently coarse; no readability claim."
+      ],
+      "final_27px_review_pending": true,
+      "user_approval": false
+    },
+    {
+      "reviewed_utc": "2026-11-12T00:26:45.569963+00:00",
+      "image": "ui27-calibrated-both-seeds.png",
+      "sha256": "689f786601db473d8e114b30fbff82f72dd3750b1674d6c08e1414bba665578c",
+      "scope": "selected text Ag MWxy 09!? $ @&, source/both C seeds regular+bold at27; exhaustive192 masks/advances independently checked by coverage",
+      "visual_blockers": [],
+      "observations": [
+        "Source and both corrected seeds visually match.",
+        "Dollar sign, M, counters and slant show no visible defect."
+      ],
+      "trials": [
+        {
+          "run": "ui27i-w512-s0-n80000-biasm005",
+          "seed": 0,
+          "nrt_sha256": "c9937e96e103e3abf48793329a53df71de2a510e9aabe45fc06c5e3e543b10e1",
+          "model_json_sha256": "3b136f6c44428faa9781ea2ba3fc7c579a3b9abf6342cf893bd715a1ce3d4aa5",
+          "recipe": {
+            "width": 512,
+            "steps": 80000,
+            "tau": 0.15,
+            "grid": 256,
+            "pen_radius": 0.020370370370370372,
+            "unlabelled_weight": 0.0,
+            "continuation": {
+              "kind": "new-cosine-phase",
+              "parent_steps": 60000,
+              "phase_steps": 20000,
+              "phase_initial_lr": 0.0002,
+              "optimizer_state_retained": true,
+              "rng_state_retained": true
+            },
+            "output_bias_calibration": {
+              "version": 1,
+              "method": "add float32 offsets to output-layer biases",
+              "offsets": [
+                -0.05
+              ],
+              "units": "normalized signed distance; physical shift is tau times offset"
+            }
+          },
+          "target_sha256": "3ce4b82ec6609efab09e14ab8297c87d128c94fcdc771cb05998ecc08987993b",
+          "width": 512,
+          "steps": 80000,
+          "glyph_comparisons": 192
+        },
+        {
+          "run": "ui27i-w512-s1-n80000-biasm005",
+          "seed": 1,
+          "nrt_sha256": "da08bfa2522678f4ab969a7e903b028bd2b19e6dfe9ee1b5874065b3b3f2664b",
+          "model_json_sha256": "08e93563b328929ba5ca0c7b49f085da6349d7351a7b7861f23c97d335038d86",
+          "recipe": {
+            "width": 512,
+            "steps": 80000,
+            "tau": 0.15,
+            "grid": 256,
+            "pen_radius": 0.020370370370370372,
+            "unlabelled_weight": 0.0,
+            "continuation": {
+              "kind": "new-cosine-phase",
+              "parent_steps": 60000,
+              "phase_steps": 20000,
+              "phase_initial_lr": 0.0002,
+              "optimizer_state_retained": true,
+              "rng_state_retained": true
+            },
+            "output_bias_calibration": {
+              "version": 1,
+              "method": "add float32 offsets to output-layer biases",
+              "offsets": [
+                -0.05
+              ],
+              "units": "normalized signed distance; physical shift is tau times offset"
+            }
+          },
+          "target_sha256": "3ce4b82ec6609efab09e14ab8297c87d128c94fcdc771cb05998ecc08987993b",
+          "width": 512,
+          "steps": 80000,
+          "glyph_comparisons": 192
+        }
+      ],
+      "user_approval": false
+    }
+  ],
+  "user_approval": false,
+  "failed_trials": [
+    {
+      "run": "ui13i-w128-s1-n30000",
+      "gate": false,
+      "em": 13,
+      "seed": 1,
+      "exact": 96,
+      "sampling_exact": {
+        "1": 96,
+        "2": 95
+      }
+    },
+    {
+      "run": "ui27i-w384-s0-n40000",
+      "gate": false,
+      "em": 27,
+      "seed": 0,
+      "exact": 95,
+      "sampling_exact": {
+        "1": 95
+      }
+    },
+    {
+      "run": "ui27i-w512-s1-n60000",
+      "gate": false,
+      "em": 27,
+      "seed": 1,
+      "exact": 95,
+      "sampling_exact": {
+        "1": 95
+      }
+    },
+    {
+      "run": "ui27i-w512-s1-n80000",
+      "gate": false,
+      "em": 27,
+      "seed": 1,
+      "exact": 95,
+      "sampling_exact": {
+        "1": 95
+      }
+    },
+    {
+      "run": "ui8i-w96-s0-n20000",
+      "gate": false,
+      "em": 8,
+      "seed": 0,
+      "exact": 95,
+      "sampling_exact": {
+        "1": 95,
+        "2": 96
+      }
+    }
+  ],
+  "preserved_baselines": "All previous JSON/NRT assets, including the13 existing italic sizes, remain byte-identical."
+}

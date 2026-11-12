@@ -671,6 +671,12 @@ dashed lines can fade to almost nothing; the default there is 2 × 2.
 MIT. See [LICENSE](LICENSE). The weights are part of the project and are
 under the same licence.
 
+[PROVENANCE.md](PROVENANCE.md) says where every drawing and weight file
+comes from and what has been checked.
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) carries the Unicode
+notice. [TRAINING_MANIFEST.md](TRAINING_MANIFEST.md) lists how each
+weight file was trained; `tools/training-manifest.py` writes it.
+
 ## Video experiments
 
 [The video tool](tools/neuronte-video.md) fits two-ink terminal cells or

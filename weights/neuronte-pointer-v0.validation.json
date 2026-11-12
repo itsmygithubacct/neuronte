@@ -1,0 +1,165 @@
+{
+  "scalar": "U+100001",
+  "seeds": {
+    "0": {
+      "16": {
+        "layers": [
+          {
+            "iou": 1.0,
+            "intersection": 118,
+            "union": 118,
+            "target_ink": 118,
+            "predicted_ink": 118
+          },
+          {
+            "iou": 1.0,
+            "intersection": 78,
+            "union": 78,
+            "target_ink": 78,
+            "predicted_ink": 78
+          }
+        ],
+        "numpy_max_error": 3.782408058983222e-07,
+        "border_alpha_max": 0.0,
+        "tip_error_pixels": 1,
+        "first_visible_xy": [
+          1,
+          1
+        ],
+        "visible_components": 1,
+        "contrast_pixels": {
+          "dark": 76,
+          "light": 36
+        },
+        "composite_mean_error_255": {
+          "dark": 0.46819752640947954,
+          "light": 0.9569522266994568
+        },
+        "passed": true
+      },
+      "32": {
+        "layers": [
+          {
+            "iou": 0.9981203007518797,
+            "intersection": 531,
+            "union": 532,
+            "target_ink": 532,
+            "predicted_ink": 531
+          },
+          {
+            "iou": 0.9965986394557823,
+            "intersection": 293,
+            "union": 294,
+            "target_ink": 293,
+            "predicted_ink": 294
+          }
+        ],
+        "numpy_max_error": 7.836636942704089e-07,
+        "border_alpha_max": 0.0,
+        "tip_error_pixels": 0,
+        "first_visible_xy": [
+          3,
+          3
+        ],
+        "visible_components": 1,
+        "contrast_pixels": {
+          "dark": 292,
+          "light": 237
+        },
+        "composite_mean_error_255": {
+          "dark": 0.4968959178926369,
+          "light": 1.0035977802590423
+        },
+        "passed": true
+      }
+    },
+    "1": {
+      "16": {
+        "layers": [
+          {
+            "iou": 1.0,
+            "intersection": 118,
+            "union": 118,
+            "target_ink": 118,
+            "predicted_ink": 118
+          },
+          {
+            "iou": 1.0,
+            "intersection": 78,
+            "union": 78,
+            "target_ink": 78,
+            "predicted_ink": 78
+          }
+        ],
+        "numpy_max_error": 3.805347347229926e-07,
+        "border_alpha_max": 0.0,
+        "tip_error_pixels": 1,
+        "first_visible_xy": [
+          1,
+          1
+        ],
+        "visible_components": 1,
+        "contrast_pixels": {
+          "dark": 76,
+          "light": 36
+        },
+        "composite_mean_error_255": {
+          "dark": 0.4696603572116054,
+          "light": 0.9150023738445157
+        },
+        "passed": true
+      },
+      "32": {
+        "layers": [
+          {
+            "iou": 1.0,
+            "intersection": 532,
+            "union": 532,
+            "target_ink": 532,
+            "predicted_ink": 532
+          },
+          {
+            "iou": 0.9932203389830508,
+            "intersection": 293,
+            "union": 295,
+            "target_ink": 293,
+            "predicted_ink": 295
+          }
+        ],
+        "numpy_max_error": 9.049455181875388e-07,
+        "border_alpha_max": 0.0,
+        "tip_error_pixels": 0,
+        "first_visible_xy": [
+          3,
+          3
+        ],
+        "visible_components": 1,
+        "contrast_pixels": {
+          "dark": 291,
+          "light": 237
+        },
+        "composite_mean_error_255": {
+          "dark": 0.5026822571349321,
+          "light": 0.9999891387064964
+        },
+        "passed": true
+      }
+    }
+  },
+  "passed": true,
+  "sha256": {
+    "font/pointer.txt": "62921107358dfc4fbaf0285c69837173a34eb3d610e9c8a7c347c3068c7a6f87",
+    "font/pointer-palette.txt": "4b76488603e2578839c1e121d182760c83e6bba821746bec9f23390e106ca9e4",
+    "tools/pointer-preview.py": "a93d9d35e9c1155535639f706ed24ce3366daacf273b9203597761af727f59b0",
+    "weights/neuronte-pointer-v0.json": "8d7b16cd52b9f280055debd0fee4c499d62ed3297449bff301ccb36ddcf8f71f",
+    "weights/neuronte-pointer-v0.raw.json": "a71d34fe8da4ee52fa09aa558107bbc21ef34458f14eb76697ec829863f1ecd5",
+    "weights/neuronte-pointer-v0.scores.json": "99be0495b5234fe125c7a2629bd5101af23984f07ef7cb38ee88e228a955df26",
+    "weights/neuronte-pointer-v0.seed1.json": "4bbddebee4793d886bf567c0942f72475c25c3f90ceecf636e72ec3d52855f4b",
+    "weights/neuronte-pointer-v0.seed1.raw.json": "97727aa8480904a033a3d228c5af048be92dea29525d06d6db8b6a88bc7ee399",
+    "weights/neuronte-pointer-v0.seed1.scores.json": "455318b0ae79de15cb8f593c0eaeb68d51a140af59523010844ee3b25a1cb686",
+    "weights/neuronte-pointer-v0.nrt": "bc2bd5ed584ed1aa44b94f3bec2824ed0bd4409e6f0c009605f530d14508c4ea",
+    "weights/neuronte-pointer-v0.raw.nrt": "ccf62db1f0a9b196f5c0e6555b37571525217b9be0e08911486fe9b5052d1629",
+    "weights/neuronte-pointer-v0.seed1.nrt": "744cceced55c62db1bf012f9651bfbda76452629a18de172c7543fe3315253af",
+    "weights/neuronte-pointer-v0.seed1.raw.nrt": "51c9d08a96ab09cfcca015caa6e2d6637ad6db695c432cd6a464fc9f8f22d8f6"
+  }
+}

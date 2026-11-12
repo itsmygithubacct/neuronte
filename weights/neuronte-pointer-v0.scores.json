@@ -1,0 +1,143 @@
+{
+  "summary": {
+    "form": "A",
+    "layers": 2,
+    "icons": 1,
+    "width": 64,
+    "steps": 20000,
+    "seed": 0,
+    "params": 14274,
+    "head_params": 1210,
+    "final_loss": 0.0033159665763378143,
+    "head_wrong": 0,
+    "head_wrong_all": 0,
+    "w12_s2": {
+      "iou_mean": 1.0,
+      "iou_min": 1.0,
+      "worst": [
+        "U+100001 layer 0",
+        "U+100001 layer 1"
+      ],
+      "stray_unused": 0,
+      "dark": {
+        "mean_err": 1.19,
+        "off_gt32": 0.0
+      },
+      "light": {
+        "mean_err": 1.65,
+        "off_gt32": 0.0
+      }
+    },
+    "w16_s2": {
+      "iou_mean": 0.9504,
+      "iou_min": 0.9008,
+      "worst": [
+        "U+100001 layer 0",
+        "U+100001 layer 1"
+      ],
+      "stray_unused": 0,
+      "dark": {
+        "mean_err": 0.62,
+        "off_gt32": 0.0
+      },
+      "light": {
+        "mean_err": 1.03,
+        "off_gt32": 0.0
+      }
+    },
+    "w32_s1": {
+      "iou_mean": 0.9927,
+      "iou_min": 0.9888,
+      "worst": [
+        "U+100001 layer 0",
+        "U+100001 layer 1"
+      ],
+      "stray_unused": 0,
+      "dark": {
+        "mean_err": 0.65,
+        "off_gt32": 0.0015
+      },
+      "light": {
+        "mean_err": 1.06,
+        "off_gt32": 0.0015
+      }
+    }
+  },
+  "per_size": {
+    "w12_s2": {
+      "iou_mean": 1.0,
+      "iou_min": 1.0,
+      "lost_used": 0,
+      "layers": [
+        {
+          "scalar": "U+100001",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 72,
+          "union": 72,
+          "target_ink": 72,
+          "predicted_ink": 72
+        },
+        {
+          "scalar": "U+100001",
+          "layer": 1,
+          "iou": 1.0,
+          "intersection": 40,
+          "union": 40,
+          "target_ink": 40,
+          "predicted_ink": 40
+        }
+      ]
+    },
+    "w16_s2": {
+      "iou_mean": 0.9503816366195679,
+      "iou_min": 0.9007633328437805,
+      "lost_used": 0,
+      "layers": [
+        {
+          "scalar": "U+100001",
+          "layer": 0,
+          "iou": 0.9007633328437805,
+          "intersection": 118,
+          "union": 131,
+          "target_ink": 118,
+          "predicted_ink": 131
+        },
+        {
+          "scalar": "U+100001",
+          "layer": 1,
+          "iou": 1.0,
+          "intersection": 78,
+          "union": 78,
+          "target_ink": 78,
+          "predicted_ink": 78
+        }
+      ]
+    },
+    "w32_s1": {
+      "iou_mean": 0.9927127361297607,
+      "iou_min": 0.9888268113136292,
+      "lost_used": 0,
+      "layers": [
+        {
+          "scalar": "U+100001",
+          "layer": 0,
+          "iou": 0.9888268113136292,
+          "intersection": 531,
+          "union": 537,
+          "target_ink": 532,
+          "predicted_ink": 536
+        },
+        {
+          "scalar": "U+100001",
+          "layer": 1,
+          "iou": 0.9965986609458923,
+          "intersection": 293,
+          "union": 294,
+          "target_ink": 293,
+          "predicted_ink": 294
+        }
+      ]
+    }
+  }
+}

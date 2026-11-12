@@ -1,0 +1,5 @@
+# Fixed pointer contrast, identical on both themes.
+0 fg
+1 clear
+2 black #000000 #000000
+3 white #FFFFFF #FFFFFF

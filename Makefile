@@ -234,6 +234,8 @@ test-rc9-quality: all
 
 test: all $(TESTS) test-rc9 test-rc9-quality
 	cd weights && sha256sum -c --quiet SHA256SUMS
+	# The pointer net keeps its own list, with paths from the top of the tree.
+	sha256sum -c --quiet weights/neuronte-pointer-v0.sha256
 	$(PYTHON) train/glyphs.py > /dev/null
 	./build/test_utf8
 	./build/test_api $(ASCII).nrt

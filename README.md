@@ -185,7 +185,9 @@ packed files. Video has its separate `make test-video` target.
 
 `make test` checks, for every weight file, that:
 
-- the weights match `weights/SHA256SUMS`;
+- the weights match `weights/SHA256SUMS`, and the pointer net's files,
+  which are not in that list, match `weights/neuronte-pointer-v0.sha256`.
+  That is the only check `make test` makes of the pointer net;
 - UTF-8 decoding follows Unicode's maximal-subpart rule, so a bad byte
   becomes one U+FFFD and never swallows the next character;
 - the loader refuses a short, long or damaged file, or one of a shape it
@@ -450,30 +452,31 @@ python3 train/pack.py --bundle split.nrt ascii.json draw.json symbol.json accent
 
 `make bench` runs `neuronte-bench FULL BUNDLE`, which times each class of
 characters drawn by `neuronte-full` alone and by the bundle, whose time
-includes its router. One thread, no cache, on a machine with a load
-average of about 8 from other work, so times move by about 20 percent
-from run to run and the ratios by less. Milliseconds per cell, one run:
+includes its router. One thread, no cache, i7-9850H, AVX2 path, on a
+machine with a load average of 3 to 4 from other work, so times move
+from run to run and the ratios by less. Milliseconds per cell, one run,
+made in the same sitting as the table under [Speed](#speed):
 
 | Class | Drawn in the bundle by | Cell | `full` | `split` | Faster |
 |---|---|---|---:|---:|---:|
-| ASCII, 95 | `ascii`, 128 | 8 × 16, 2 × 2 samples | 3.46 | 0.85 | 4.1× |
-| | | 16 × 32, 2 × 2 | 13.4 | 2.9 | 4.6× |
-| | | 48 × 96, 1 | 30.3 | 6.6 | 4.6× |
-| box drawing and shades, 131 | `draw`, 192 | 8 × 16, 2 × 2 | 3.15 | 1.53 | 2.1× |
-| | | 16 × 32, 2 × 2 | 12.5 | 5.8 | 2.1× |
-| | | 48 × 96, 1 | 28.1 | 13.9 | 2.0× |
-| symbols, 49 | `symbol`, 128 | 8 × 16, 2 × 2 | 3.21 | 0.84 | 3.8× |
-| | | 16 × 32, 2 × 2 | 12.9 | 3.2 | 4.1× |
-| | | 48 × 96, 1 | 29.3 | 7.3 | 4.0× |
-| accented, 191 | `accent`, 192 | 8 × 16, 2 × 2 | 3.21 | 1.56 | 2.1× |
-| | | 16 × 32, 2 × 2 | 12.8 | 6.1 | 2.1× |
-| | | 48 × 96, 1 | 29.5 | 13.3 | 2.2× |
-| blocks and mosaics, 327 | `pixel`, 128 | 8 × 16, 2 × 2 | 4.31 | 0.65 | 6.7× |
-| | | 16 × 32, 2 × 2 | 17.6 | 2.5 | 7.0× |
-| | | 48 × 96, 1 | 38.7 | 6.0 | 6.5× |
-| Braille, 256 | `braille`, 48 | 8 × 16, 2 × 2 | 3.64 | 0.23 | 15.9× |
-| | | 16 × 32, 2 × 2 | 14.3 | 0.72 | 19.9× |
-| | | 48 × 96, 1 | 31.2 | 1.9 | 16.4× |
+| ASCII, 95 | `ascii`, 128 | 8 × 16, 2 × 2 samples | 3.21 | 0.76 | 4.2× |
+| | | 16 × 32, 2 × 2 | 12.51 | 2.72 | 4.6× |
+| | | 48 × 96, 1 | 28.20 | 5.81 | 4.8× |
+| box drawing and shades, 131 | `draw`, 192 | 8 × 16, 2 × 2 | 2.92 | 1.41 | 2.1× |
+| | | 16 × 32, 2 × 2 | 11.73 | 5.73 | 2.0× |
+| | | 48 × 96, 1 | 25.91 | 12.94 | 2.0× |
+| symbols, 49 | `symbol`, 128 | 8 × 16, 2 × 2 | 2.95 | 0.81 | 3.6× |
+| | | 16 × 32, 2 × 2 | 12.08 | 3.42 | 3.5× |
+| | | 48 × 96, 1 | 28.63 | 6.93 | 4.1× |
+| accented, 191 | `accent`, 192 | 8 × 16, 2 × 2 | 3.10 | 1.53 | 2.0× |
+| | | 16 × 32, 2 × 2 | 12.77 | 5.85 | 2.2× |
+| | | 48 × 96, 1 | 28.27 | 13.68 | 2.1× |
+| blocks and mosaics, 327 | `pixel`, 128 | 8 × 16, 2 × 2 | 4.22 | 0.63 | 6.7× |
+| | | 16 × 32, 2 × 2 | 17.03 | 2.34 | 7.3× |
+| | | 48 × 96, 1 | 36.60 | 5.21 | 7.0× |
+| Braille, 256 | `braille`, 48 | 8 × 16, 2 × 2 | 3.34 | 0.19 | 18.0× |
+| | | 16 × 32, 2 × 2 | 13.24 | 0.72 | 18.5× |
+| | | 48 × 96, 1 | 29.12 | 1.49 | 19.6× |
 
 ASCII and the mosaics are drawn by nets of the same width, and the
 difference between them is mostly noise; an earlier run under heavier
@@ -484,8 +487,8 @@ scored.
 A net's hidden layers cost about the square of its width: 128 does a
 sixth of the work of 320, and 192 a little over a third. The measured
 gain is smaller than that because the first layer and the per-cell work
-cost the same in both. The router takes 15 to 36 nanoseconds per call
-through the table, and about a microsecond when the gate has to answer,
+cost the same in both. The router takes 15 to 23 nanoseconds per call
+through the table, and about 0.7 microseconds when the gate has to answer,
 both far under a millisecond cell, and the draw calls route only on a
 cache miss.
 
@@ -604,16 +607,17 @@ be smaller still there.
 
 ## Speed
 
-One thread, i7-9850H, AVX2 path, no cache, with a load average of 14 to
-15 from other work. Milliseconds per cell, one run of `neuronte-bench`
-on each file:
+One thread, i7-9850H, AVX2 path, no cache, with a load average of 3 to
+4 from other work. Milliseconds per cell, one run of `neuronte-bench`
+on each file, in the same sitting as the per-class table above, so the
+two can be compared:
 
 | Cell | Samples per pixel | `ascii`, 128 | `full`, 320 |
 |---|---|---:|---:|
-| 8 × 16 | 2 × 2 | 1.28 | 5.00 |
-| 16 × 32 | 2 × 2 | 4.71 | 19.8 |
-| 32 × 64 | 1 | 4.94 | 20.2 |
-| 48 × 96 | 1 | 11.1 | 45.9 |
+| 8 × 16 | 2 × 2 | 0.73 | 3.28 |
+| 16 × 32 | 2 × 2 | 2.67 | 12.7 |
+| 32 × 64 | 1 | 2.96 | 12.9 |
+| 48 × 96 | 1 | 6.79 | 27.9 |
 
 The nets of `neuronte-split` that are 128 wide cost what `ascii` does,
 and those 192 wide about twice that; see the table above. Earlier

@@ -48,10 +48,17 @@ p.add_argument("--tau", type=float, default=0.15, help="distance normalization i
 p.add_argument("--score-sizes", help="comma-separated cell widths; default: the historical size inventory")
 p.add_argument("--scores-out", help="write scores including every character's overlap counts")
 p.add_argument("--log-every", type=int, default=1000)
+p.add_argument("--continue-from", help="completed checkpoint for an explicitly restarted cosine phase")
+p.add_argument("--continue-source", help="immutable parent source export, verified against checkpoint hashes")
+p.add_argument("--continue-lr", type=float, default=2e-4, help="initial learning rate for the new continuation phase")
 checkpoint.arguments(p)
 a = p.parse_args()
 if a.steps < 1 or a.tau <= 0 or not math.isfinite(a.tau):
     p.error("steps and finite tau must be positive")
+if bool(a.continue_from)!=bool(a.continue_source) or (a.continue_from and a.resume):
+    p.error("--continue-from and --continue-source must be paired and cannot be combined with --resume")
+if not math.isfinite(a.continue_lr) or a.continue_lr<=0:
+    p.error("continuation learning rate must be finite and positive")
 if a.pen is None:
     a.pen = glyphs.PENS.get(a.set, glyphs.PEN)
 torch.manual_seed(a.seed)
@@ -118,7 +125,13 @@ opt = torch.optim.Adam(net.parameters(), lr=2e-3)
 sched = torch.optim.lr_scheduler.CosineAnnealingLR(opt, a.steps)
 MODELS = {"net": net}
 IDENTITY = checkpoint.identity(a, SOURCES)
-first_step, last_metrics = checkpoint.restore(a.resume, MODELS, opt, sched, IDENTITY, a.device) if a.resume else (0, {})
+if a.continue_from:
+    first_step,last_metrics=checkpoint.continue_phase(a.continue_from,MODELS,opt,IDENTITY,a.device,a.continue_source,a.continue_lr)
+    for group in opt.param_groups:
+        group['lr']=a.continue_lr;group['initial_lr']=a.continue_lr
+    sched=torch.optim.lr_scheduler.CosineAnnealingLR(opt,a.steps-first_step)
+else:
+    first_step, last_metrics = checkpoint.restore(a.resume, MODELS, opt, sched, IDENTITY, a.device) if a.resume else (0, {})
 loss = torch.tensor(last_metrics.get("loss", float("nan")))
 started = time.monotonic()
 for step in range(first_step, a.steps):
@@ -215,6 +228,7 @@ doc = {
                       "weight": f32(l.weight), "bias": f32(l.bias)}
                for name, l in zip(["l1", "l2", "l3", "out"], lin)},
 }
+if 'continuation' in IDENTITY:doc['training']['continuation']=IDENTITY['continuation']
 with open(a.out, "w") as fh:
     json.dump(doc, fh)
 
@@ -222,6 +236,7 @@ with open(a.out, "w") as fh:
 res = {"set": a.set, "chars": G, "width": W, "steps": a.steps, "seed": a.seed, "pen": a.pen,
        "unlabelled": a.unlabelled, "params": sum(q.numel() for q in net.parameters()),
        "final_loss": float(loss.detach())}
+if 'continuation' in IDENTITY:res['continuation']=IDENTITY['continuation']
 tier_idx = {t: torch.tensor([i for i, x in enumerate(TIERS) if x == t]) for t in dict.fromkeys(TIERS)}
 for name, lo, hi in (("greek", 0x370, 0x3ff), ("cyrillic", 0x400, 0x4ff), ("latin", 0xc0, 0x2ff)):
     indices = [i for i, c in enumerate(CHARS) if lo <= ord(c) <= hi]

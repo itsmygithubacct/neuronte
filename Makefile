@@ -24,6 +24,8 @@ RC9_SPLIT = weights/neuronte-split-v5.nrt
 RC9_FULL = weights/neuronte-full-v3
 RC9_ITALIC_SIZES = 3 4 5 6 7 8 9 13 15 17 19 21 23 25 27 29 31
 RC9_ITALIC_JSON = $(foreach em,$(RC9_ITALIC_SIZES),weights/neuronte-ui$(em)-italic-v0.json)
+RC9_EMOJI = weights/neuronte-emoji-v0.nrt
+RC9_EMOJI_NETS = weights/neuronte-emoji-e0-v0.json weights/neuronte-emoji-e1-v0.json weights/neuronte-emoji-e2-v0.json
 RC9_NETS = $(ASCII).json $(DRAW).json $(SYMBOL).json $(RC9_ACCENT).json $(PIXEL).json $(BRAILLE).json
 # The desktop face: one drawing file for each em, a net and the advances
 # of that em's pixel face.
@@ -133,7 +135,7 @@ $(DEMOS): build/%: demo/%.c demo/common.h build/demo-common.o build/libneuronte.
 # Rebuild the packed weights from the JSON the trainers write.
 pack: pack-rc9
 
-pack-rc9: pack-rc9-italics $(RC9_NETS) $(RC9_GATE) $(RC9_FULL).json
+pack-rc9: pack-rc9-italics pack-rc9-emoji $(RC9_NETS) $(RC9_GATE) $(RC9_FULL).json
 	$(PYTHON) train/pack.py $(RC9_ACCENT).json $(RC9_ACCENT).nrt
 	$(PYTHON) train/pack.py --bundle $(RC9_SPLIT) $(RC9_NETS) --gate $(RC9_GATE)
 	$(PYTHON) train/pack.py $(RC9_FULL).json $(RC9_FULL).nrt
@@ -142,6 +144,9 @@ pack-rc9-italics: $(RC9_ITALIC_JSON)
 	@set -e; for em in $(RC9_ITALIC_SIZES); do \
 		$(PYTHON) train/pack.py --drawing weights/neuronte-ui$$em-italic-v0.nrt weights/neuronte-ui$$em-italic-v0.json font/ui-$$em-italic.txt; \
 	done
+
+pack-rc9-emoji: $(RC9_EMOJI_NETS)
+	$(PYTHON) tools/pack-bundle-members.py $(RC9_EMOJI) $(RC9_EMOJI_NETS)
 
 pack: $(ASCII).json $(FULL).json $(NETS) $(GATE) $(UI1).json $(UI2).json $(UI3).json $(UI4).json $(UI5).json $(UI6).json $(UI7).json $(UI8).json $(UI9).json $(UI10).json $(UI10I).json $(UI11).json $(UI11I).json $(UI12).json $(UI12I).json $(UI13).json $(UI14).json $(UI14I).json $(UI15).json $(UI16).json $(UI16I).json $(UI17).json $(UI18).json $(UI18I).json $(UI19).json $(UI20).json $(UI20I).json $(UI21).json $(UI22).json $(UI22I).json $(UI23).json $(UI24).json $(UI24I).json $(UI25).json $(UI26).json $(UI26I).json $(UI27).json $(UI28).json $(UI29).json $(UI30).json $(UI30I).json $(UI31).json $(UI32).json $(UI33).json $(UI34).json $(UI35).json $(UI36).json $(UI37).json $(UI38).json $(UI39).json $(UI43).json $(UILARGE).json $(FLAME).json $(ICON).json $(UI28I).json $(UI32I).json
 	$(PYTHON) train/pack.py $(ASCII).json $(ASCII).nrt
@@ -212,7 +217,10 @@ test-rc9-italics: all
 		$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing weights/neuronte-ui$$em-italic-v0.nrt weights/neuronte-ui$$em-italic-v0.json font/ui-$$em-italic.txt; \
 	done
 
-test-rc9: test-rc9-italics all $(TESTS)
+test-rc9-emoji: all
+	$(PYTHON) tests/check_emoji.py build/libneuronte.so $(RC9_EMOJI) $(RC9_EMOJI_NETS) --manifest font/emoji-manifest.json --target-cache build/emoji-target-cache --out build/emoji-publication-check.json
+
+test-rc9: test-rc9-italics test-rc9-emoji all $(TESTS)
 	$(PYTHON) tests/check_reference.py build/libneuronte.so $(RC9_ACCENT).json $(RC9_ACCENT).nrt
 	$(PYTHON) tests/check_reference.py build/libneuronte.so --bundle $(RC9_SPLIT) $(RC9_NETS) --gate $(RC9_GATE)
 	$(PYTHON) tests/check_scripts.py build/libneuronte.so $(RC9_SPLIT) $(RC9_ACCENT).json
@@ -309,7 +317,7 @@ bench: build/neuronte-bench
 clean:
 	rm -rf build
 
-.PHONY: all demo pack pack-rc9 pack-rc9-italics test test-rc9 test-rc9-italics test-rc9-quality bench clean
+.PHONY: all demo pack pack-rc9 pack-rc9-italics pack-rc9-emoji test test-rc9 test-rc9-italics test-rc9-emoji test-rc9-quality bench clean
 
 # Video is an optional Python/numpy/scipy tool; its tests are separate from
 # the dependency-light C/font acceptance suite.

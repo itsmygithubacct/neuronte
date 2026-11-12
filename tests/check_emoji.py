@@ -126,7 +126,7 @@ def main():
     a=p.parse_args()
     inventory=publication_inventory(a.manifest,a.nets) if a.manifest else None
     images=[pack.pack(n) for n in a.nets]
-    want=pack.bundle(a.nets)[0] if len(a.nets)>1 else images[0]
+    want=pack._bundle_images(a.nets,images)[0] if len(a.nets)>1 else images[0]
     assert Path(a.bundle).read_bytes()==want, 'packed bytes differ from reproducible source packing'
     lib,h=bind(a.lib,a.bundle); k=lib.neuronte_layers(h)
     assert lib.neuronte_set_snap(h,0)==0

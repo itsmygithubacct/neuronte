@@ -556,11 +556,17 @@ def load_gate(path, names):
 
 
 def bundle(nets, gate=None, fallback=0):
+    return _bundle_images(nets, [pack(p) for p in nets], gate, fallback)
+
+
+def _bundle_images(nets, images, gate=None, fallback=0):
+    """Assemble already packed members; callers must bind them to their sources."""
+    if len(images) != len(nets):
+        raise SystemExit("packed member inventory differs from source inventory")
     if not 1 <= len(nets) <= 16:
         raise SystemExit("a bundle holds 1 to 16 nets")
     if not 0 <= fallback < len(nets):
         raise SystemExit(f"fallback {fallback} is not one of the {len(nets)} nets")
-    images = [pack(p) for p in nets]
     sigs = [s for s in (colour_signature(im) for im in images) if s is not None]
     if any(s != sigs[0] for s in sigs):
         raise SystemExit("colour nets in one bundle must carry the same palette and snap threshold")

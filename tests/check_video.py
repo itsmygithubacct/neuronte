@@ -279,6 +279,18 @@ class Video(unittest.TestCase):
                 self.assertNotIn(b'c',header);self.assertNotIn(b'r',header)
                 self.assertEqual(len(pixels),17*13*3)
 
+    def test_player_untimed_does_not_wait_for_or_drop_source_frames(self):
+        import time
+        with tempfile.TemporaryDirectory() as temp:
+            stats=Path(temp)/'stats.json'
+            begin=time.monotonic()
+            code,out,err=self.player('--untimed','--frames','5','--fps','.5','--stats',str(stats))
+            self.assertEqual(code,0,err)
+            self.assertLess(time.monotonic()-begin,5)  # normal playback needs eight seconds
+            self.assertEqual(len(self.pixel_frames(out)),5)
+            summary=json.loads(stats.read_text())
+            self.assertEqual(summary['dropped'],0);self.assertFalse(summary['sound'])
+
     def test_player_pixels_and_cells(self):
         import re,base64,zlib
         code,out,err=self.player('--frames','3')

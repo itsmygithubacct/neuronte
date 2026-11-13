@@ -124,6 +124,9 @@ needs.
 time in the file, the clock, how late it was shown, when it was written, and the milliseconds spent reading, fitting, drawing,
 packing and writing, or that it was dropped or skipped); `--stats FILE`
 writes the totals. `--input-fd N` takes keys from a descriptor, for scripts.
+`--untimed` disables sound, clock waits and late-frame dropping for throughput
+measurements; `--frames N` bounds the work. Shared-memory backpressure still
+applies, so a benchmark consumer must read and unlink each published frame.
 
 ## Optional learned helpers
 

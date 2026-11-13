@@ -362,6 +362,7 @@ def main():
     p.add_argument('--fps', type=float, help='default: the file\'s own rate')
     p.add_argument('--start', type=float, default=0, help='begin at this many seconds')
     p.add_argument('--frames', type=int, help='stop after this many source frames')
+    p.add_argument('--untimed', action='store_true', help='benchmark: process every frame as fast as possible, without sound')
     p.add_argument('--loop', action='store_true')
     p.add_argument('--no-audio', action='store_true', help='play no sound and keep time by the wall clock')
     p.add_argument('--audio-output', help='mpv audio output, such as pulse or null')
@@ -455,7 +456,7 @@ def main():
     began = time.perf_counter()
     try:
         out.write(b'\x1b[?1049h\x1b[?25l\x1b[2J'); out.flush()
-        if not a.no_audio and not a.lavfi and has_sound and player:
+        if not a.no_audio and not a.untimed and not a.lavfi and has_sound and player:
             try: clock = Sound(player, a.video, a.start, a.loop, a.audio_output, a.audio_delay, held=True)
             except OSError as exc: notes.append(f'no sound: {exc}')
         if clock is None: clock = WallClock(a.start); clock.pause(True)
@@ -506,7 +507,7 @@ def main():
                 restart(0.); clock.seek(0.); continue
             pts = origin + index / fps; index += 1; count += 1
             now = clock.time(); record = dict(n=count, t=round(time.monotonic(), 6), pts=round(pts, 4), clock=round(now, 4), read_ms=round((t1 - t0) * 1e3, 3))
-            if now > pts + 1 / fps and shown:               # late: skip the work, keep the clock
+            if not a.untimed and now > pts + 1 / fps and shown:  # late: skip the work, keep the clock
                 dropped += 1; record['dropped'] = True
                 if log: log.write(json.dumps(record) + '\n')
                 continue
@@ -528,10 +529,10 @@ def main():
             if payload is None:                             # the terminal is behind: skip, do not queue
                 skipped += 1; record['skipped'] = True
                 if log: log.write(json.dumps(record) + '\n')
-                wait = pts - clock.time()                   # still keep to the clock, or the file would race past
+                wait = 0. if a.untimed else pts - clock.time()
                 if wait > 0: time.sleep(min(wait, 1.))
                 continue
-            wait = pts - clock.time()
+            wait = 0. if a.untimed else pts - clock.time()
             if wait > 0: time.sleep(min(wait, 1.))
             lateness = (clock.time() - pts) * 1e3
             out.write(payload); out.flush(); t5 = time.perf_counter(); shown += 1; wire += len(payload); late.append(lateness)
@@ -546,7 +547,9 @@ def main():
         for number in (signal.SIGTERM, signal.SIGHUP, signal.SIGINT): signal.signal(number, signal.SIG_IGN)   # a second signal must not cut this short
         elapsed = time.perf_counter() - began
         tail = presenter.close()                            # first: the pictures in /dev/shm are the one thing nobody else removes
-        if source and source.poll() is None: source.kill()
+        if source:
+            if source.poll() is None: source.kill()
+            source.wait()
         if clock: clock.close()
         keys.close()
         if log: log.close()

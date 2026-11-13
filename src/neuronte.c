@@ -71,6 +71,8 @@
  * Define NEURONTE_NO_CLONES to build one portable path only. */
 #if defined(__x86_64__) && (defined(__GNUC__) || defined(__clang__)) && \
     !defined(NEURONTE_NO_CLONES) && defined(__ELF__)
+#include <immintrin.h>
+#define NEURONTE_AVX2 1
 #define HOT __attribute__((target_clones("avx2", "default")))
 #else
 #define HOT
@@ -1194,10 +1196,70 @@ static void axis_part(const struct net *n, int axis, double t, float *out)
     }
 }
 
+/* Common model widths use a bounded list of active rows and 64 outputs at
+ * a time. Other widths and CPUs keep the portable loop below. */
+#ifdef NEURONTE_AVX2
+__attribute__((target("avx2")))
+static void dense_avx2(const float *restrict w, const float *restrict b,
+                       const float *restrict in, float *restrict out, int h)
+{
+    const float *rows[256];
+    float values[256];
+    int count = 0;
+    /* Store before advancing: compact in input order without a branch for
+     * every zero. Even with all inputs active, the last store is at h - 1. */
+    for (int i = 0; i < h; i++) {
+        rows[count] = w + (size_t)i * h;
+        values[count] = in[i];
+        count += in[i] != 0.0f;
+    }
+    /* Keep one output block in registers across all active rows. Separate
+     * multiplies and adds preserve the portable loop's accumulation order. */
+    for (int o = 0; o < h; o += 64) {
+        __m256 acc0 = _mm256_loadu_ps(b + o + 0);
+        __m256 acc1 = _mm256_loadu_ps(b + o + 8);
+        __m256 acc2 = _mm256_loadu_ps(b + o + 16);
+        __m256 acc3 = _mm256_loadu_ps(b + o + 24);
+        __m256 acc4 = _mm256_loadu_ps(b + o + 32);
+        __m256 acc5 = _mm256_loadu_ps(b + o + 40);
+        __m256 acc6 = _mm256_loadu_ps(b + o + 48);
+        __m256 acc7 = _mm256_loadu_ps(b + o + 56);
+        for (int i = 0; i < count; i++) {
+            const float *row = rows[i] + o;
+            __m256 a = _mm256_set1_ps(values[i]);
+            acc0 = _mm256_add_ps(acc0, _mm256_mul_ps(a, _mm256_loadu_ps(row + 0)));
+            acc1 = _mm256_add_ps(acc1, _mm256_mul_ps(a, _mm256_loadu_ps(row + 8)));
+            acc2 = _mm256_add_ps(acc2, _mm256_mul_ps(a, _mm256_loadu_ps(row + 16)));
+            acc3 = _mm256_add_ps(acc3, _mm256_mul_ps(a, _mm256_loadu_ps(row + 24)));
+            acc4 = _mm256_add_ps(acc4, _mm256_mul_ps(a, _mm256_loadu_ps(row + 32)));
+            acc5 = _mm256_add_ps(acc5, _mm256_mul_ps(a, _mm256_loadu_ps(row + 40)));
+            acc6 = _mm256_add_ps(acc6, _mm256_mul_ps(a, _mm256_loadu_ps(row + 48)));
+            acc7 = _mm256_add_ps(acc7, _mm256_mul_ps(a, _mm256_loadu_ps(row + 56)));
+        }
+        /* MAXPS selects its second operand for NaN and equal zeros, just
+         * as the portable ReLU turns NaN and negative zero into +0. */
+        _mm256_storeu_ps(out + o + 0, _mm256_max_ps(acc0, _mm256_setzero_ps()));
+        _mm256_storeu_ps(out + o + 8, _mm256_max_ps(acc1, _mm256_setzero_ps()));
+        _mm256_storeu_ps(out + o + 16, _mm256_max_ps(acc2, _mm256_setzero_ps()));
+        _mm256_storeu_ps(out + o + 24, _mm256_max_ps(acc3, _mm256_setzero_ps()));
+        _mm256_storeu_ps(out + o + 32, _mm256_max_ps(acc4, _mm256_setzero_ps()));
+        _mm256_storeu_ps(out + o + 40, _mm256_max_ps(acc5, _mm256_setzero_ps()));
+        _mm256_storeu_ps(out + o + 48, _mm256_max_ps(acc6, _mm256_setzero_ps()));
+        _mm256_storeu_ps(out + o + 56, _mm256_max_ps(acc7, _mm256_setzero_ps()));
+    }
+}
+#endif
+
 HOT static void dense(const float *restrict w, const float *restrict b, const float *restrict in,
                       float *restrict out, int h)
 {
     int i, o;
+#ifdef NEURONTE_AVX2
+    if (h <= 256 && h % 64 == 0 && __builtin_cpu_supports("avx2")) {
+        dense_avx2(w, b, in, out, h);
+        return;
+    }
+#endif
     memcpy(out, b, (size_t)h * sizeof *out);
     for (i = 0; i < h; i++) {
         float a = in[i];

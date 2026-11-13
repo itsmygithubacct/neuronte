@@ -17,7 +17,7 @@ fails if this file is out of date.
   of its input and of the tool that made it.
 - **JSON, packed**: the first 16 hex digits of the SHA-256 of the weight
   file and of its packed `.nrt`, if one is shipped. The full hashes of
-  the 297 files it lists are in `weights/SHA256SUMS`. The pointer net's
+  the 309 files it lists are in `weights/SHA256SUMS`. The pointer net's
   files are not in that list; theirs are in
   `weights/neuronte-pointer-v0.sha256`.
 
@@ -32,7 +32,7 @@ fails if this file is out of date.
 - No training run has been repeated by a third party. Two seeds were
   trained by the project for the models whose `seed1` files are here.
 
-## Weight files (93)
+## Weight files (101)
 
 | Weight file | Set or drawing | Steps | Seed | Unlabelled weight | Pen radius | Sources hashed | After training | JSON | Packed |
 |---|---|---:|---:|---:|---:|---|---|---|---|
@@ -56,6 +56,14 @@ fails if this file is out of date.
 | `neuronte-pointer-v0.seed1.json` | pointer | 20000 | 1 | - | 0.075 | `font/code-masks.txt`, `font/pointer-palette.txt`, `font/pointer.txt`, `train/checkpoint.py`, `train/colour.py`, `train/colour_sources.py`, `train/glyphs.py`, `train/strokes.py` | coverage_calibration | `4bbddebee4793d88` | `744cceced55c62db` |
 | `neuronte-pointer-v0.seed1.raw.json` | pointer | 20000 | 1 | - | 0.075 | `font/code-masks.txt`, `font/pointer-palette.txt`, `font/pointer.txt`, `train/checkpoint.py`, `train/colour.py`, `train/colour_sources.py`, `train/glyphs.py`, `train/strokes.py` | - | `97727aa8480904a0` | `51c9d08a96ab09cf` |
 | `neuronte-symbol-v0.json` | symbol | 20000 | 0 | 1.0 | 0.075 | `font/symbols.txt`, `train/glyphs.py`, `train/strokes.py` | - | `981629fc7e61c49c` | - |
+| `neuronte-symbol-v1-g0.json` | symbol-repertoire | 80000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/symbols.txt`, `train/glyphs.py`, `train/strokes.py` | - | `c4d1d5d23d5adf1c` | - |
+| `neuronte-symbol-v1-g0.seed1.json` | symbol-repertoire | 80000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/symbols.txt`, `train/glyphs.py`, `train/strokes.py` | - | `522029f52830492c` | - |
+| `neuronte-symbol-v1-g1.json` | symbol-repertoire | 80000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/symbols.txt`, `train/glyphs.py`, `train/strokes.py` | - | `b1e41f192067ba0d` | - |
+| `neuronte-symbol-v1-g1.seed1.json` | symbol-repertoire | 80000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/symbols.txt`, `train/glyphs.py`, `train/strokes.py` | - | `f1bc475623cd2afb` | - |
+| `neuronte-symbol-v1-g2.json` | symbol-repertoire | 80000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/symbols.txt`, `train/glyphs.py`, `train/strokes.py` | - | `422ee8cbba1ff3be` | - |
+| `neuronte-symbol-v1-g2.seed1.json` | symbol-repertoire | 80000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/symbols.txt`, `train/glyphs.py`, `train/strokes.py` | - | `300fa393d4b15b65` | - |
+| `neuronte-symbol-v1-g3.json` | symbol-repertoire | 80000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/symbols.txt`, `train/glyphs.py`, `train/strokes.py` | - | `c314b7cfa0d1315b` | - |
+| `neuronte-symbol-v1-g3.seed1.json` | symbol-repertoire | 80000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/symbols.txt`, `train/glyphs.py`, `train/strokes.py` | - | `26460df1f75f2fa3` | - |
 | `neuronte-ui-large-v0.json` | uilarge | 20000 | 0 | 0.0 | 0.046875 | `font/ui-large.txt`, `train/glyphs.py`, `train/strokes.py` | - | `2b914704f7c4b81f` | `00736e339edc6eda` |
 | `neuronte-ui1-v0.json` | ui1 | 20000 | 0 | 0.0 | 0.55 | `font/ui-1.txt`, `train/glyphs.py`, `train/strokes.py` | - | `589a33bbdac6d0b6` | `74792e9cf615c7d1` |
 | `neuronte-ui10-italic-v0.json` | ui10i | 20000 | 0 | 0.0 | 0.05500000000000001 | `font/ui-10-italic.txt`, `train/glyphs.py`, `train/strokes.py` | - | `df1ae419c09ceb7c` | `f734c7bc51cd18fe` |
@@ -136,3 +144,4 @@ fails if this file is out of date.
 |---|---|---:|
 | `neuronte-full-v3.validation.json` | `d05f14f6c0d0e6ed2077d6007b4a5f588e4ca802` | 1 |
 | `neuronte-split-v5.validation.json` | `d05f14f6c0d0e6ed2077d6007b4a5f588e4ca802` | 0 |
+| `neuronte-symbol-v1.validation.json` | `be17cff1b03315ba6c2c2bde8b39f3b11618f34f` | 0 |

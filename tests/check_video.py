@@ -416,11 +416,14 @@ class Video(unittest.TestCase):
     def player(self,*args,keys=(),source=None,grid=True,timeout=60,ready=None,ready_timeout=20,extra_env=None):
         """Run the player off a terminal.
 
-        keys are (seconds to wait, bytes) written to its key pipe. With ready set
-        (screen, frame, backpressure, or log), those waits and `timeout` start at
-        that milestone. Startup has its own ready_timeout and is not part of the
-        timed playback interval. Output is drained while the player runs, so a
-        full pipe cannot stall it.
+        keys are (seconds to wait, bytes) written to its key pipe. `timeout` is
+        one monotonic deadline from the observed milestone, or from spawn when
+        ready is None. It covers the key schedule and the wait for exit. Startup
+        has its own ready_timeout and is not part of that deadline. A requested
+        milestone that never arrives, including because the player already
+        exited, fails with the exit code and stderr. Output is drained while the
+        player runs. A reader that raises or is still running after its join is
+        not a sample.
         """
         import shutil,threading,time
         if not shutil.which('ffmpeg') or not shutil.which('ffprobe'):self.skipTest('ffmpeg is not installed')
@@ -429,51 +432,123 @@ class Video(unittest.TestCase):
         env=dict(os.environ,COLUMNS='80',LINES='24');env.pop('KITTY_WINDOW_ID',None)
         if extra_env:env.update(extra_env)
         r,w=os.pipe()
-        child=subprocess.Popen(cmd+['--input-fd',str(r)],stdout=subprocess.PIPE,stderr=subprocess.PIPE,env=env,pass_fds=[r])
+        try:
+            child=subprocess.Popen(cmd+['--input-fd',str(r)],stdout=subprocess.PIPE,stderr=subprocess.PIPE,env=env,pass_fds=[r])
+        except BaseException:
+            os.close(r);os.close(w);raise
         os.close(r)
-        box={'out':bytearray(),'err':bytearray()};lock=threading.Lock()
-        def pump(stream,key):
+        box={'out':bytearray(),'err':bytearray(),'faults':[]};lock=threading.Lock()
+        def pump(stream,key,name):
             # os.read returns the bytes already written. BufferedReader.read
             # waits until its whole request is full, so a short milestone
             # (the alternate screen, one shared-memory name) stays invisible
-            # until the player exits.
+            # until the player exits. A failed read is recorded and is not a sample.
             fd=stream.fileno()
             try:
                 while True:
                     chunk=os.read(fd,65536)
                     if not chunk:break
                     with lock:box[key]+=chunk
-            except Exception:
-                pass
+            except Exception as exc:
+                with lock:box['faults'].append(f'{name}: {type(exc).__name__}: {exc}')
             finally:
-                stream.close()
-        threads=[threading.Thread(target=pump,args=(child.stdout,'out'),daemon=True),
-                 threading.Thread(target=pump,args=(child.stderr,'err'),daemon=True)]
-        for thread in threads:thread.start()
+                try:stream.close()
+                except Exception as exc:
+                    with lock:box['faults'].append(f'{name} close: {type(exc).__name__}: {exc}')
+        def faults():
+            with lock:return list(box['faults'])
+        def descendants(pid):
+            try:text=Path(f'/proc/{pid}/task/{pid}/children').read_text()
+            except OSError:return []
+            found=[]
+            for token in text.split():
+                try:kid=int(token)
+                except ValueError:continue
+                found.extend(descendants(kid));found.append(kid)
+            return found
+        threads=[];problems=[];missed=None;stop=False
         self.player_pid=child.pid
         start=time.monotonic();self.player_mark={'start':start,'ready':start,'done':start}
         try:
+            for stream,key,name in ((child.stdout,'out','player-out'),(child.stderr,'err','player-err')):
+                thread=threading.Thread(target=pump,args=(stream,key,name),name=name,daemon=True)
+                thread.start();threads.append(thread)
             if ready:
                 limit=start+ready_timeout
-                while True:
+                while not stop:
                     with lock:output=bytes(box['out'])
                     if self.playback_ready(ready,output,args):
                         self.player_mark['ready']=time.monotonic();break
-                    if child.poll() is not None:break
+                    if child.poll() is not None:
+                        missed=ready;stop=True;break
+                    if faults():
+                        stop=True;break
                     if time.monotonic()>=limit:
-                        raise AssertionError(f'player was not {ready} within {ready_timeout}s ({len(output)} bytes seen)')
+                        problems.append(f'player was not {ready} within {ready_timeout}s ({len(output)} bytes seen)')
+                        stop=True;break
                     time.sleep(.02)
-            for wait,key in keys:
-                time.sleep(wait)
-                if child.poll() is None:
+                origin=self.player_mark['ready']
+            else:origin=start
+            if not stop:
+                # One deadline from the milestone (or spawn). Key delays are
+                # sliced so a long sleep cannot outlive it, and so a player
+                # that exits during a key is returned instead of burned into
+                # a false deadline.
+                deadline=origin+timeout
+                where='readiness' if ready else 'spawn'
+                exceeded=f'playback deadline exceeded ({timeout}s from {where})'
+                for wait,key in keys:
+                    if faults() or child.poll() is not None:
+                        stop=True;break
+                    if time.monotonic()>=deadline:
+                        problems.append(exceeded);stop=True;break
+                    remaining=wait
+                    while remaining>0:
+                        if faults():
+                            stop=True;break
+                        if child.poll() is not None:break
+                        left=deadline-time.monotonic()
+                        if left<=0:
+                            problems.append(exceeded);stop=True;break
+                        step=min(.05,remaining,left)
+                        time.sleep(step);remaining-=step
+                    if stop or child.poll() is not None:break
                     try:os.write(w,key)
                     except BrokenPipeError:pass
-            child.wait(timeout=timeout)
+                while not stop and child.poll() is None:
+                    if faults():
+                        stop=True;break
+                    left=deadline-time.monotonic()
+                    if left<=0:
+                        problems.append(exceeded);stop=True;break
+                    time.sleep(min(.05,left))
         finally:
-            os.close(w)
-            if child.poll() is None:child.kill();child.wait()
+            kill_note=None
+            try:os.close(w)
+            except OSError:pass
+            if child.poll() is None:
+                for pid in descendants(child.pid)+[child.pid]:
+                    try:os.kill(pid,9)
+                    except OSError:pass
+                try:child.wait(timeout=3)
+                except subprocess.TimeoutExpired:kill_note='player did not exit after kill'
             for thread in threads:thread.join(timeout=2)
+            stuck=[thread.name for thread in threads if thread.is_alive()]
+            with lock:
+                seen=list(box['faults']);err=bytes(box['err'])
+            if missed is not None:
+                snippet=' '.join(err.decode('utf-8','replace').split())
+                if len(snippet)>400:snippet=snippet[-400:]
+                text=f'player exited before {missed} (exit {child.returncode})'
+                if snippet:text+=': '+snippet
+                problems.insert(0,text)
+            reader=[]
+            if seen:reader.append('output reader failed: '+'; '.join(seen))
+            if stuck:reader.append('output reader did not finish: '+', '.join(stuck))
+            if reader:problems.append('; '.join(reader))
+            if kill_note:problems.append(kill_note)
             self.player_mark['done']=time.monotonic()
+        if problems:raise AssertionError('; '.join(problems))
         return child.returncode,bytes(box['out']),bytes(box['err'])
 
     def test_player_drains_noisy_decoder_and_reports_its_last_error(self):
@@ -736,6 +811,71 @@ class Video(unittest.TestCase):
             self.assertFalse(Path(f'/proc/{self.player_pid}').exists())
             time.sleep(.05)
             self.assertEqual(self.shared_paths(self.player_pid),[])
+
+    def test_playback_deadline_includes_the_wait_for_a_scheduled_key(self):
+        """A key delay past the deadline fails before that delay elapses.
+
+        Sleeping the whole key first, then applying the timeout only to the
+        exit wait, lets this player take the quit and return success.
+        """
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory() as temp:
+            fake=Path(temp)/'ffmpeg'
+            fake.write_text('#!/usr/bin/env python3\nimport time\ntime.sleep(30)\n')
+            fake.chmod(0o755)
+            with patch.dict(os.environ,PATH=temp+os.pathsep+os.environ['PATH']):
+                with self.assertRaises(AssertionError) as caught:
+                    self.player('--no-audio',keys=[(3,b'q')],timeout=.4,ready='screen',ready_timeout=15)
+            self.assertIn('playback deadline exceeded',str(caught.exception))
+            self.assertLess(self.player_mark['done']-self.player_mark['ready'],1.2)
+            self.assertFalse(Path(f'/proc/{self.player_pid}').exists())
+
+    def test_player_exit_before_the_frame_is_a_failure(self):
+        with self.assertRaises(AssertionError) as caught:
+            self.player(source='nosuchsource=1',ready='frame',ready_timeout=15,timeout=5)
+        message=str(caught.exception)
+        self.assertIn('exited before frame',message)
+        self.assertIn('exit 2',message)
+        self.assertIn('no video stream',message)
+        self.assertFalse(Path(f'/proc/{self.player_pid}').exists())
+
+    def test_output_reader_exception_is_not_a_sample(self):
+        from unittest.mock import patch
+        import time
+        real=os.read
+        def hooked(fd,size):
+            if size==65536:raise OSError(5,'Input/output error')
+            return real(fd,size)
+        with patch('os.read',side_effect=hooked):
+            started=time.monotonic()
+            with self.assertRaises(AssertionError) as caught:
+                self.player('--frames','1',timeout=2)
+            elapsed=time.monotonic()-started
+        self.assertIn('Input/output error',str(caught.exception))
+        self.assertIn('reader',str(caught.exception))
+        self.assertLess(elapsed,1.5)
+        self.assertFalse(Path(f'/proc/{self.player_pid}').exists())
+
+    def test_output_reader_that_does_not_finish_is_not_a_sample(self):
+        from unittest.mock import patch
+        import threading,time
+        real=os.read;gate=threading.Event()
+        def hooked(fd,size):
+            if size==65536:
+                gate.wait(30);return b''
+            return real(fd,size)
+        started=time.monotonic()
+        try:
+            with patch('os.read',side_effect=hooked):
+                with self.assertRaises(AssertionError) as caught:
+                    self.player('--no-audio',ready='frame',ready_timeout=.3,timeout=1)
+            elapsed=time.monotonic()-started
+        finally:gate.set()
+        message=str(caught.exception)
+        self.assertIn('did not finish',message)
+        self.assertIn('not frame',message)
+        self.assertLess(elapsed,8)
+        self.assertFalse(Path(f'/proc/{self.player_pid}').exists())
 
     def test_slow_decoder_start_does_not_consume_pause_or_seek(self):
         """The first decoder is late. Pause and seek still land on playback time."""

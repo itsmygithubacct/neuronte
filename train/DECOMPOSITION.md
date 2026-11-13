@@ -47,3 +47,12 @@ groups and exact interrupted/resumed CPU training. Set
 `DECOMPOSE_TEST_DEVICE=cuda` to run the independent-gradient comparison
 on CUDA. Timing, quality and production selection belong to the
 experiment's external research record, not the trainer's output loss.
+
+`known_bundle.py BASE.nrt OUT.nrt REPLACEMENT.json... --expert INDEX`
+appends complete known-character replacements to an existing version2 bundle.
+Original members remain byte-identical for unknown and unrelated glyphs.
+Only the selected expert's table entries move. The packer preserves original
+gate rows and appends suppressed outputs after establishing conservative
+activation/output bounds. `--allow-partial` explicitly permits mixed-width
+fallback. The provenance sidecar binds the original bytes, replacements,
+new ranges and output hash. Validate resulting quality before deployment.

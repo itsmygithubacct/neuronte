@@ -17,6 +17,23 @@ spec=importlib.util.spec_from_file_location('cli',ROOT/'tools/neuronte-video.py'
 cli=importlib.util.module_from_spec(spec); spec.loader.exec_module(cli)
 
 class Video(unittest.TestCase):
+    def test_full_mode_accepts_ascii_tiles_and_preserves_other_glyphs(self):
+        for w,h in ((5,11),(8,16)):
+            original_cps,original=v.candidates('full',w,h,ROOT/'weights/neuronte-split-v5.nrt')
+            for design in ('groups','spatial'):
+                full=ROOT/f'weights/neuronte-split-ascii-{design}-v1.nrt'
+                cps,masks=v.candidates('full',w,h,full)
+                np.testing.assert_array_equal(cps,original_cps)
+                ascii_rows=(cps>=32)&(cps<=126)
+                self.assertEqual(int(ascii_rows.sum()),95)
+                np.testing.assert_array_equal(masks[~ascii_rows],original[~ascii_rows])
+                with v.NeuralMasks(ROOT/f'weights/neuronte-ascii-{design}-v1.nrt') as net:
+                    direct=np.stack([net.mask(int(cp),w,h).ravel() for cp in cps[ascii_rows]])
+                np.testing.assert_array_equal(masks[ascii_rows],direct)
+                self.assertFalse(np.array_equal(masks[ascii_rows],original[ascii_rows]))
+        fitted=v.TwoInk('full',w,h,full)
+        np.testing.assert_array_equal(fitted.masks,masks.astype(np.float64))
+
     def test_octant_manifest(self):
         chars=v.octant_characters()
         self.assertEqual(len(set(chars.values())),256)

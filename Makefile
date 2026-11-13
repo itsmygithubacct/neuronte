@@ -277,6 +277,25 @@ test-ui-metadata:
 test-widths: build/libneuronte.so build/test_widths
 	./build/test_widths
 	$(PYTHON) tests/check_widths.py build/libneuronte.so
+	$(PYTHON) tests/check_bundle_counts.py build/libneuronte.so
+
+test-tiled: build/libneuronte.so build/stream/libneuronte.so build/test_tiled
+	./build/test_tiled
+	$(PYTHON) tests/check_tiled.py build/libneuronte.so --stream build/stream/libneuronte.so
+
+.PHONY: test-tiled
+
+test-known-bundle: build/libneuronte.so
+	$(PYTHON) tests/check_known_bundle.py build/libneuronte.so
+
+.PHONY: test-known-bundle
+
+test-ascii-next: build/libneuronte.so build/test_api
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_ascii_next.py build/libneuronte.so
+	./build/test_api weights/neuronte-split-ascii-groups-v1.nrt --full --accent --pixel
+	./build/test_api weights/neuronte-split-ascii-spatial-v1.nrt --full --accent --pixel
+
+.PHONY: test-ascii-next
 
 test-tiled: build/libneuronte.so build/stream/libneuronte.so build/test_tiled
 	./build/test_tiled

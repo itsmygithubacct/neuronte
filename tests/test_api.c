@@ -281,8 +281,8 @@ static void bundle_checks(const unsigned char *data, size_t len)
         expect_open("bundle one byte short", b, blen - 1, NEURONTE_ERR_FORMAT);
         put32(b + 12, 0);
         expect_open("bundle of 0 nets", b, blen, NEURONTE_ERR_FORMAT);
-        put32(b + 12, 17);
-        expect_open("bundle of 17 nets", b, blen, NEURONTE_ERR_FORMAT);
+        put32(b + 12, 129);
+        expect_open("bundle of 129 nets", b, blen, NEURONTE_ERR_FORMAT);
         put32(b + 12, 2);
         /* The two lengths moved by 4 each way: the total is right, the
          * nets are not. */

@@ -200,27 +200,85 @@ class Video(unittest.TestCase):
             path=Path(temp)/'helper.json';path.write_text(json.dumps(doc))
             with self.assertRaisesRegex(ValueError,'invalid video helper layer'):Helper(path,'speed')
 
-    def test_player_pixels_and_cells(self):
-        import shutil,re,base64,zlib
+    def player(self,*args,keys=(),source=None):
+        """Run the player off a terminal; keys are (seconds to wait, bytes) written to its key pipe."""
+        import shutil,time
         if not shutil.which('ffmpeg') or not shutil.which('ffprobe'):self.skipTest('ffmpeg is not installed')
-        cmd=[sys.executable,str(ROOT/'tools/neuronte-play.py'),'color=c=red:size=32x48:rate=10[a];color=c=blue:size=32x48:rate=10[b];[a][b]hstack','--lavfi','--cols','6','--rows','3','--frames','2']
-        env=dict(os.environ,COLUMNS='80',LINES='24')
-        result=subprocess.run(cmd,capture_output=True,env=env)
-        self.assertEqual(result.returncode,0,result.stderr)
-        self.assertIn(b'2 frames shown',result.stderr)
-        frames=re.findall(rb'\x1b_Ga=T,f=24,o=z,s=48,v=48,i=\d+,p=1,c=6,r=3,C=1,q=2,m=0;([^\x1b]*)\x1b\\',result.stdout)
-        self.assertEqual(len(frames),2)
+        cmd=[sys.executable,str(ROOT/'tools/neuronte-play.py'),source or 'color=c=red:size=32x48:rate=10[a];color=c=blue:size=32x48:rate=10[b];[a][b]hstack']
+        cmd+=([] if source else ['--lavfi'])+['--cols','6','--rows','3','--no-status',*args]
+        env=dict(os.environ,COLUMNS='80',LINES='24');env.pop('KITTY_WINDOW_ID',None)
+        r,w=os.pipe()
+        with tempfile.TemporaryFile() as picture:   # a file, so the player never waits on us while we wait to press keys
+            child=subprocess.Popen(cmd+['--input-fd',str(r)],stdout=picture,stderr=subprocess.PIPE,env=env,pass_fds=[r]);os.close(r)
+            try:
+                for wait,key in keys:
+                    time.sleep(wait)
+                    if child.poll() is None:os.write(w,key)
+                _,err=child.communicate(timeout=60)
+            finally:
+                os.close(w)
+                if child.poll() is None:child.kill()
+            picture.seek(0);out=picture.read()
+        return child.returncode,out,err
+
+    def test_player_pixels_and_cells(self):
+        import re,base64,zlib
+        code,out,err=self.player('--frames','3')
+        self.assertEqual(code,0,err);self.assertIn(b'3 frames shown',err)
+        # Every picture is complete under a new id before the one before it is deleted,
+        # all inside one synchronized update: the terminal is never left with no picture.
+        updates=re.findall(rb'\x1b\[\?2026h(.*?)\x1b\[\?2026l',out,re.S)
+        ids=[]
+        for n,update in enumerate(updates[:3]):
+            sent=re.findall(rb'\x1b_Ga=T,f=24,s=48,v=48,i=(\d+),p=1,c=6,r=3,z=-1,C=1,q=2,o=z,m=0;([^\x1b]*)\x1b\\',update)
+            self.assertEqual(len(sent),1);ids.append(sent[0][0])
+            deleted=re.findall(rb'\x1b_Ga=d,d=I,i=(\d+),q=2;',update)
+            self.assertEqual(deleted,[ids[n-1]] if n else [])
+            if deleted:self.assertLess(update.index(b'a=T'),update.index(b'a=d'))
+        self.assertEqual(len(ids),3);self.assertNotEqual(ids[0],ids[1]);self.assertEqual(ids[0],ids[2])
         # Red on the left and blue on the right must come back that way round.
-        image=np.frombuffer(zlib.decompress(base64.standard_b64decode(frames[0])),np.uint8).reshape(48,48,3).astype(int)
+        image=np.frombuffer(zlib.decompress(base64.standard_b64decode(sent[0][1])),np.uint8).reshape(48,48,3).astype(int)
         self.assertLessEqual(int(np.abs(image[:,:24]-[255,0,0]).max()),8)
         self.assertLessEqual(int(np.abs(image[:,24:]-[0,0,255]).max()),8)
-        self.assertTrue(result.stdout.startswith(b'\x1b[?1049h'));self.assertTrue(result.stdout.endswith(b'\x1b[?25h\x1b[?1049l'))
-        result=subprocess.run(cmd+['--mode','cells'],capture_output=True,env=env)
-        self.assertEqual(result.returncode,0,result.stderr)
-        self.assertNotIn(b'\x1b_G'+b'a=T',result.stdout)
-        self.assertEqual(result.stdout.count(b'\x1b[48;2;'),18);self.assertIn(b'\x1b[11;38H',result.stdout)   # centred in 80 x 24   # 6 x 3 cells, sent once; the second frame is unchanged
-        bad=subprocess.run(cmd[:2]+['nosuchsource=1']+cmd[3:],capture_output=True)
-        self.assertEqual(bad.returncode,2);self.assertNotIn(b'Traceback',bad.stderr)
+        self.assertTrue(out.startswith(b'\x1b[?1049h'));self.assertTrue(out.endswith(b'\x1b[?25h\x1b[?1049l'))
+        for i in set(ids):self.assertIn(b'a=d,d=I,i='+i+b',q=2;',out[out.rindex(b'\x1b[?2026l',0,len(out)-8)-400:])
+        code,out,err=self.player('--frames','2','--mode','cells')
+        self.assertEqual(code,0,err)
+        self.assertNotIn(b'\x1b_G'+b'a=T',out)
+        self.assertEqual(out.count(b'\x1b[48;2;'),18);self.assertIn(b'\x1b[11;38H',out)   # 6 x 3 cells, centred in 80 x 24, sent once
+        code,out,err=self.player(source='nosuchsource=1')
+        self.assertEqual(code,2);self.assertNotIn(b'Traceback',err)
+
+    def test_player_shared_memory_backpressure(self):
+        import glob
+        before=set(glob.glob('/dev/shm/neuronte-play-*'))
+        code,out,err=self.player('--frames','8','--transport','shm')
+        self.assertEqual(code,0,err)
+        # Nothing reads the objects here, so three are written, the rest are skipped, and all are removed at exit.
+        self.assertEqual(out.count(b',t=s;'),3);self.assertIn(b'5 skipped for a busy terminal',err)
+        self.assertEqual(set(glob.glob('/dev/shm/neuronte-play-*')),before)
+
+    def test_player_sound_seek_and_pause(self):
+        import shutil
+        if not (shutil.which('kilix-mpv') or shutil.which('mpv')):self.skipTest('mpv is not installed')
+        with tempfile.TemporaryDirectory() as temp:
+            clip=str(Path(temp)/'clip.mkv');log=Path(temp)/'log.jsonl'
+            made=subprocess.run(['ffmpeg','-v','error','-y','-f','lavfi','-i','testsrc2=size=64x48:rate=20','-f','lavfi','-i','sine=frequency=440',
+                                 '-t','30','-c:v','mpeg4','-g','10','-c:a','pcm_s16le',clip],capture_output=True)
+            if made.returncode:self.skipTest('ffmpeg cannot make the clip')
+            code,out,err=self.player('--audio-output','null','--log',str(log),source=clip,
+                                     keys=[(1.5,b'\x1b[C'),(1.2,b' '),(1.0,b' '),(1.0,b'\x1b[D'),(1.2,b'\x1b[A'),(.8,b'q')])
+            self.assertEqual(code,0,err);self.assertIn(b'sound on',err)
+            rows=[json.loads(line) for line in log.read_text().splitlines()]
+            jumps=[round(b['pts']-a['pts']) for a,b in zip(rows,rows[1:]) if abs(b['pts']-a['pts'])>1]
+            self.assertEqual(jumps[:2],[5,-5]);self.assertGreaterEqual(jumps[2],15)   # +5 s, -5 s, then +60 s held to the end
+            shown=[r for r in rows if 'late_ms' in r]
+            # The picture follows the sound's position: after each seek it is shown within three frames of it.
+            self.assertLess(float(np.median([abs(r['late_ms']) for r in shown])),150)
+            # The second of pause shows no frames: about 1 s of file time is missing from the wall time.
+            self.assertGreater(max(b['wall']-a['wall'] for a,b in zip(shown,shown[1:])),.8)
+            # and the sound was held too: the picture resumes where it stopped, with no file time skipped.
+            self.assertEqual([round(b['pts']-a['pts'],2) for a,b in zip(shown,shown[1:]) if .5<b['pts']-a['pts']<3],[])
 
     def test_exact_video_asset(self):
         result=v.exactness()

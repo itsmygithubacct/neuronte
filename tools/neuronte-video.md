@@ -54,19 +54,33 @@ baseline under the research plan's quality, stability and speed criteria.
 ## Playing a file
 
 `python3 tools/neuronte-play.py FILE` plays a video in the terminal. ffmpeg
-decodes and scales it to the terminal's grid, keeping the picture's shape,
-and the player shows it at the file's own frame rate. Frames that cannot be
-shown in time are dropped, so playback keeps to the clock and never runs
-slow. `q` or Ctrl-C quits and space pauses; `--audio` also plays the sound
-through ffplay, started together and not resynchronised afterwards.
+decodes and scales it to the terminal's grid, keeping the picture's shape.
+The sound is played by mpv with no picture (`kilix-mpv` when it is
+installed, else `mpv`), and its playback position is the clock the picture
+follows; without either, or with `--no-audio`, the wall clock is used.
+Frames that cannot be shown in time are dropped, so playback never runs slow.
+
+Keys: `q` quit, space pause, left and right 5 seconds, down and up 60 seconds,
+home restart, `m` mute, `9` and `0` volume. A seek moves the sound and
+restarts the decoder at the same position; a pause holds both. One row of
+text under the picture shows the position (`--no-status` removes it). A
+resized terminal is refitted.
 
 The default, `--mode pixels`, gives every cell eight colours in a 2 × 4
 arrangement of blocks, mixed by the three video masks drawn at 8 × 16 pixels
 a cell, and sends the result with the kitty graphics protocol. The file is
-scaled to one pixel a block, so the fit is exact. It needs a terminal with
-that protocol. On one laptop core a 200 × 56 grid played at 30 frames a
-second with 2 of 120 frames dropped; that is one measurement, on a
-synthetic clip.
+scaled to one pixel a block, so the fit is exact. Pictures are presented the
+way `kilix-mpv` and `kitty-framebuffer` present them: each is complete under
+its own image id before the one before it is deleted, inside one synchronized
+update. For a local kitty or Kilix the pixels go through three shared-memory
+objects that the terminal unlinks as it reads them; if all three are still
+unread the frame is skipped, not queued. Elsewhere, and with `--transport
+inline`, they are compressed and sent through the terminal's own stream.
+
+Measured once, on one laptop, in a background Kilix tab of 196 × 55 cells
+with a synthetic 640 × 360 clip at 30 frames a second: shared memory showed
+237 of 240 frames, median 5 ms after their time; inline showed 204, median
+33 ms after, because compressing and encoding 3.8 MB a frame took 19 ms.
 
 `--mode cells` writes one character and two colours a cell as ordinary
 truecolour text, which any truecolour terminal shows in its own font; in a
@@ -75,6 +89,11 @@ is far from real time: an 80 × 24 grid showed 2 frames a second with
 the 328 block characters. `--characters full` searches the whole bundle and
 `--helper` adds the speed helper; both are slower still than the picture
 needs.
+
+`--log FILE` writes one JSON line per source frame (its time, the clock, how
+late it was shown, and the milliseconds spent reading, fitting, drawing,
+packing and writing, or that it was dropped or skipped); `--stats FILE`
+writes the totals. `--input-fd N` takes keys from a descriptor, for scripts.
 
 ## Optional learned helpers
 

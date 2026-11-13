@@ -2,9 +2,10 @@
 """Play a video in the terminal, drawn by Neuronte. See neuronte-video.md.
 
 ffmpeg decodes and scales the file; each frame is fitted to terminal cells
-with the nets' own coverage masks and shown at the file's frame rate.
-Frames that cannot be shown in time are dropped, so playback keeps pace
-with the clock (and with --audio) instead of slowing down.
+with the nets' own coverage masks. Sound is played by mpv (kilix-mpv when it
+is installed), and its playback position is the clock the picture follows,
+so seeking and pausing move both together. Frames that cannot be shown in
+time are dropped instead of slowing playback down.
 
   pixels  (default) every cell is split into 2 x 4 blocks with eight
           colours, mixed by three Neuronte masks drawn at 8 x 16 pixels a
@@ -14,19 +15,23 @@ with the clock (and with --audio) instead of slowing down.
           truecolour text, so the terminal's own font draws it. This is an
           exhaustive search and shows a few frames a second at best.
 
-Keys: q or Ctrl-C quits, space pauses.
+Keys: q quit, space pause, left/right 5 s, down/up 60 s, home restart,
+m mute, 9 and 0 volume.
 """
 import argparse
 import base64
 import fcntl
 import json
 import os
+import secrets
 import select
 import shutil
 import signal
+import socket
 import struct
 import subprocess
 import sys
+import tempfile
 import termios
 import time
 import tty
@@ -36,18 +41,23 @@ from neuronte_video import TwoInk, MultiInk, ROOT
 
 CELL = (8, 16)                      # pixels drawn per terminal cell
 BLOCKS = (2, 4)                     # colours fitted per cell in pixels mode, across and down
-IMAGE_ID = 0x4e52                   # one kitty image, replaced every frame
+KEYS = {b'\x1b[C': 'right', b'\x1b[D': 'left', b'\x1b[A': 'up', b'\x1b[B': 'down', b'\x1b[H': 'home',
+        b'\x1b[1~': 'home', b'\x1bOC': 'right', b'\x1bOD': 'left', b'\x1bOA': 'up', b'\x1bOB': 'down',
+        b'\x1bOH': 'home', b' ': 'pause', b'q': 'quit', b'\x03': 'quit', b'm': 'mute', b'9': 'quieter', b'0': 'louder'}
+SEEK = {'right': 5, 'left': -5, 'up': 60, 'down': -60}
 
 
 def probe(path, lavfi):
-    cmd = ['ffprobe', '-v', 'error', '-select_streams', 'v:0', '-show_entries',
-           'stream=width,height,r_frame_rate', '-of', 'json']
+    cmd = ['ffprobe', '-v', 'error', '-show_entries', 'stream=codec_type,width,height,r_frame_rate:format=duration', '-of', 'json']
     out = subprocess.run(cmd + (['-f', 'lavfi'] if lavfi else []) + [path], capture_output=True, text=True)
     try:
-        stream = json.loads(out.stdout)['streams'][0]
+        doc = json.loads(out.stdout)
+        stream = next(s for s in doc['streams'] if s.get('codec_type') == 'video')
         num, den = map(int, stream['r_frame_rate'].split('/'))
-        return int(stream['width']), int(stream['height']), num / den
-    except (KeyError, IndexError, ValueError, ZeroDivisionError):
+        duration = float(doc.get('format', {}).get('duration') or 0)
+        sound = any(s.get('codec_type') == 'audio' for s in doc['streams'])
+        return int(stream['width']), int(stream['height']), num / den, duration, sound
+    except (KeyError, IndexError, ValueError, ZeroDivisionError, StopIteration):
         raise ValueError(f'ffprobe found no video stream in {path}: {out.stderr.strip()}')
 
 
@@ -71,27 +81,70 @@ def fit(width, height, cols, rows, ratio):
     return c, r
 
 
-def graphics(frame, cols, rows, left, top):
-    """One kitty graphics transmit-and-place, replacing the last frame."""
-    h, w = frame.shape[:2]
-    data = base64.standard_b64encode(zlib.compress(frame.tobytes(), 1))
-    head = f'a=T,f=24,o=z,s={w},v={h},i={IMAGE_ID},p=1,c={cols},r={rows},C=1,q=2,'
-    out = [f'\x1b[{top};{left}H'.encode()]
-    for start in range(0, len(data), 4096):
-        more = int(start + 4096 < len(data))
-        out.append(b'\x1b_G' + (head if not start else '').encode() + f'm={more};'.encode() + data[start:start+4096] + b'\x1b\\')
-    return b''.join(out)
+def shared_memory_reaches_terminal():
+    """True when the terminal is a local kitty or Kilix that can read /dev/shm."""
+    if os.environ.get('SSH_CONNECTION') or os.environ.get('TMUX'): return False
+    return bool(os.environ.get('KITTY_WINDOW_ID')) and os.access('/dev/shm', os.W_OK)
+
+
+class Presenter:
+    """Sends pictures the way kilix-mpv and kitty-framebuffer do: the new
+    image is complete under its own id before the previous one is deleted,
+    inside one synchronized update, so the terminal never shows a gap."""
+
+    def __init__(self, out, transport):
+        self.out, self.transport = out, transport
+        base = 0x4e520000 | secrets.randbelow(0x7fff) << 1
+        self.ids = (base, base + 1); self.current = None
+        self.names = [f'neuronte-play-{os.getpid()}-{secrets.token_hex(6)}-{i}' for i in range(3)]
+        self.slot = 0; self.skipped = 0
+
+    def frame(self, frame, cols, rows, left, top):
+        """The bytes that replace the picture, or None when the terminal has
+        not yet taken the earlier frames (shared memory only)."""
+        h, w = frame.shape[:2]
+        new = self.ids[0] if self.current != self.ids[0] else self.ids[1]
+        head = f'a=T,f=24,s={w},v={h},i={new},p=1,c={cols},r={rows},z=-1,C=1,q=2'
+        out = [b'\x1b[?2026h', f'\x1b[{top};{left}H'.encode()]
+        if self.transport == 'shm':
+            name = None
+            for tries in range(3):              # the terminal unlinks a name once it has read it
+                candidate = self.names[(self.slot + tries) % 3]
+                try:
+                    fd = os.open('/dev/shm/' + candidate, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+                except FileExistsError:
+                    continue
+                with os.fdopen(fd, 'wb') as f: f.write(frame.tobytes())
+                name = candidate; self.slot = (self.slot + tries + 1) % 3; break
+            if name is None:
+                self.skipped += 1; return None
+            out.append(f'\x1b_G{head},t=s;'.encode() + base64.standard_b64encode(name.encode()) + b'\x1b\\')
+        else:
+            data = base64.standard_b64encode(zlib.compress(frame.tobytes(), 1))
+            for start in range(0, len(data), 4096):
+                more = int(start + 4096 < len(data))
+                out.append(b'\x1b_G' + (head + ',o=z,' if not start else '').encode() + f'm={more};'.encode() + data[start:start+4096] + b'\x1b\\')
+        if self.current is not None: out.append(f'\x1b_Ga=d,d=I,i={self.current},q=2;\x1b\\'.encode())
+        out.append(b'\x1b[?2026l'); self.current = new
+        return b''.join(out)
+
+    def close(self):
+        tail = b''.join(f'\x1b_Ga=d,d=I,i={i},q=2;\x1b\\'.encode() for i in self.ids)
+        for name in self.names:
+            try: os.unlink('/dev/shm/' + name)
+            except OSError: pass
+        return tail
 
 
 def text(renderer, cells, previous, left, top):
-    """The changed cells as cursor-addressed truecolour text."""
-    out = []
+    """The changed cells as cursor-addressed truecolour text, in one synchronized update."""
+    out = ['\x1b[?2026h']
     for y, x in np.ndindex(cells['indices'].shape):
         i = cells['indices'][y, x]; c = cells['colours'][y, x]
         if previous is not None and i == previous['indices'][y, x] and np.array_equal(c, previous['colours'][y, x]): continue
         bg, fg = c
         out.append(f'\x1b[{y+top};{x+left}H\x1b[38;2;{fg[0]};{fg[1]};{fg[2]}m\x1b[48;2;{bg[0]};{bg[1]};{bg[2]}m' + chr(int(renderer.scalars[i])))
-    return (''.join(out) + '\x1b[0m').encode()
+    return (''.join(out) + '\x1b[0m\x1b[?2026l').encode()
 
 
 def read_exact(stream, size):
@@ -104,24 +157,137 @@ def read_exact(stream, size):
 
 
 class Keys:
-    """q, Ctrl-C and space from the terminal, without echo; a no-op off a tty."""
-    def __init__(self):
-        self.fd = None
+    """Named keys from the terminal (or --input-fd), without echo; nothing off a tty."""
+    def __init__(self, fd=None):
+        self.fd = self.saved = None; self.owned = fd is None
         try:
-            fd = os.open('/dev/tty', os.O_RDONLY)
-            self.saved = termios.tcgetattr(fd); tty.setcbreak(fd); self.fd = fd
+            self.fd = os.open('/dev/tty', os.O_RDONLY) if fd is None else fd
+            if os.isatty(self.fd):
+                self.saved = termios.tcgetattr(self.fd); tty.setcbreak(self.fd)
         except OSError:
-            pass
+            self.fd = None
 
     def read(self, wait=0):
         if self.fd is None:
             if wait: time.sleep(wait)
-            return b''
-        return os.read(self.fd, 16) if select.select([self.fd], [], [], wait)[0] else b''
+            return []
+        if not select.select([self.fd], [], [], wait)[0]: return []
+        data = os.read(self.fd, 64)
+        if not data:                            # a closed pipe: stop asking
+            self.fd = None; return []
+        found = []
+        while data:
+            for seq in sorted(KEYS, key=len, reverse=True):
+                if data.startswith(seq):
+                    found.append(KEYS[seq]); data = data[len(seq):]; break
+            else:
+                data = data[1:]
+        return found
 
     def close(self):
-        if self.fd is not None:
-            termios.tcsetattr(self.fd, termios.TCSADRAIN, self.saved); os.close(self.fd); self.fd = None
+        if self.fd is not None and self.saved is not None: termios.tcsetattr(self.fd, termios.TCSADRAIN, self.saved)
+        if self.fd is not None and self.owned: os.close(self.fd)
+        self.fd = None
+
+
+class WallClock:
+    """The position when nothing plays sound: time since the start, less pauses."""
+    volume = None
+    def __init__(self, start=0.): self.base = time.perf_counter() - start; self.held = None
+    def time(self): return (self.held if self.held is not None else time.perf_counter()) - self.base
+    def pause(self, on):
+        if on and self.held is None: self.held = time.perf_counter()
+        elif not on and self.held is not None: self.base += time.perf_counter() - self.held; self.held = None
+    def seek(self, position): self.base = (self.held if self.held is not None else time.perf_counter()) - position
+    def mute(self): pass
+    def louder(self, step): pass
+    def close(self): pass
+
+
+class Sound:
+    """mpv playing the file's sound with no picture. Its playback position is
+    the clock; pausing and seeking it moves the picture with it."""
+    def __init__(self, player, path, start, loop, output, delay):
+        self.dir = tempfile.mkdtemp(prefix='neuronte-play-'); self.path = os.path.join(self.dir, 'mpv.sock')
+        cmd = [player, '--no-config', '--no-video', '--no-terminal', '--really-quiet', f'--input-ipc-server={self.path}',
+               f'--start={start}', '--keep-open=no', '--audio-display=no'] + (['--loop-file=inf'] if loop else []) \
+            + ([f'--ao={output}'] if output else []) + ['--', path]
+        self.child = subprocess.Popen(cmd, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        self.sock = None; self.buffer = b''; self.delay = delay; self.last = start; self.request = 0; self.volume = 100
+        end = time.perf_counter() + 5
+        while time.perf_counter() < end and self.child.poll() is None:
+            try:
+                s = socket.socket(socket.AF_UNIX); s.connect(self.path); s.settimeout(.5); self.sock = s; break
+            except OSError:
+                s.close(); time.sleep(.02)
+        if self.sock is None: self.close(); raise OSError(f'{player} did not start')
+        end = time.perf_counter() + 5           # the position is unknown until the sound is open
+        while time.perf_counter() < end and self.ask('get_property', 'time-pos') is None and self.alive(): time.sleep(.02)
+
+    def alive(self): return self.sock is not None and self.child.poll() is None
+
+    def ask(self, *command):
+        if self.sock is None: return None
+        self.request += 1
+        try:
+            self.sock.sendall(json.dumps(dict(command=list(command), request_id=self.request)).encode() + b'\n')
+            while True:
+                while b'\n' not in self.buffer:
+                    part = self.sock.recv(65536)
+                    if not part: raise OSError('closed')
+                    self.buffer += part
+                line, self.buffer = self.buffer.split(b'\n', 1)
+                reply = json.loads(line)
+                if reply.get('request_id') == self.request: return reply.get('data') if reply.get('error') == 'success' else None
+        except (OSError, ValueError):
+            try: self.sock.close()
+            except OSError: pass
+            self.sock = None; return None
+
+    def time(self):
+        position = self.ask('get_property', 'time-pos')
+        if position is not None: self.last = position - self.delay
+        return self.last
+
+    def pause(self, on): self.ask('set_property', 'pause', bool(on))
+    def mute(self): self.ask('cycle', 'mute')
+    def louder(self, step):
+        self.volume = max(0, min(130, self.volume + step)); self.ask('set_property', 'volume', self.volume)
+
+    def seek(self, position):
+        self.ask('seek', position, 'absolute+exact'); end = time.perf_counter() + 2
+        while time.perf_counter() < end and self.alive():      # wait for it to land, so the picture is not judged against the old position
+            now = self.ask('get_property', 'time-pos')
+            if now is not None and abs(now - position) < .5 and not self.ask('get_property', 'seeking'): break
+            time.sleep(.01)
+        self.last = position
+
+    def close(self):
+        if self.sock is not None:
+            self.ask('quit')
+            if self.sock is not None: self.sock.close()
+            self.sock = None
+        if self.child.poll() is None:
+            try: self.child.wait(timeout=1)
+            except subprocess.TimeoutExpired: self.child.terminate()
+        shutil.rmtree(self.dir, ignore_errors=True)
+
+
+def clock_text(seconds):
+    seconds = max(0, int(seconds)); return f'{seconds // 3600}:{seconds // 60 % 60:02}:{seconds % 60:02}' if seconds >= 3600 else f'{seconds // 60}:{seconds % 60:02}'
+
+
+def status(position, duration, paused, volume, cols, row):
+    """One row of text under the picture: state, position, a bar, the volume."""
+    left = ('paused ' if paused else '') + clock_text(position) + (' / ' + clock_text(duration) if duration else '')
+    right = f'vol {volume}' if volume is not None else ''
+    room = cols - len(left) - len(right) - 4
+    bar = ''
+    if duration and room >= 8:
+        done = min(room, max(0, round(room * position / duration)))
+        bar = ' ' + '━' * done + '─' * (room - done) + ' '
+    line = (' ' + left + bar + right)[:cols]
+    return f'\x1b[{row};1H\x1b[0;38;2;200;200;200;48;2;24;24;24m{line.ljust(cols)}\x1b[0m'.encode()
 
 
 def main():
@@ -131,31 +297,37 @@ def main():
     p.add_argument('--cols', type=int, help='grid width in cells; default: fit the terminal')
     p.add_argument('--rows', type=int)
     p.add_argument('--fps', type=float, help='default: the file\'s own rate')
+    p.add_argument('--start', type=float, default=0, help='begin at this many seconds')
     p.add_argument('--frames', type=int, help='stop after this many source frames')
     p.add_argument('--loop', action='store_true')
-    p.add_argument('--audio', action='store_true', help='also play the sound with ffplay; started together, not resynchronised')
+    p.add_argument('--no-audio', action='store_true', help='play no sound and keep time by the wall clock')
+    p.add_argument('--audio-output', help='mpv audio output, such as pulse or null')
+    p.add_argument('--audio-delay', type=float, default=0, help='seconds the picture runs behind the sound\'s position')
+    p.add_argument('--transport', choices=['auto', 'shm', 'inline'], default='auto',
+                   help='pixels mode: shared memory for a local kitty or Kilix, else inline')
+    p.add_argument('--no-status', action='store_true', help='no row of text under the picture')
     p.add_argument('--characters', choices=['portable', 'full'], default='portable',
                    help='cells mode: the 328 block characters, or every character of the bundle (slower)')
     p.add_argument('--helper', action='store_true', help='cells mode with --characters full: use the learned speed helper')
-    p.add_argument('--lavfi', action='store_true', help='the video argument is an ffmpeg lavfi source, such as testsrc2')
+    p.add_argument('--lavfi', action='store_true', help='the video argument is an ffmpeg lavfi source, such as testsrc2; no sound')
+    p.add_argument('--input-fd', type=int, help='read keys from this descriptor instead of the terminal')
+    p.add_argument('--log', help='write one JSON line of timings per source frame')
+    p.add_argument('--stats', help='write a JSON summary at the end')
     p.add_argument('--weights'); p.add_argument('--library')
     a = p.parse_args()
-    for tool in ['ffmpeg', 'ffprobe'] + (['ffplay'] if a.audio else []):
+    for tool in ['ffmpeg', 'ffprobe']:
         if not shutil.which(tool): p.error(f'{tool} is required and was not found')
     if a.helper and (a.mode != 'cells' or a.characters != 'full'): p.error('--helper requires --mode cells --characters full')
     library = a.library or ROOT / 'build/libneuronte.so'
     if not os.path.exists(library): p.error(f'{library} is missing; run make first, or pass --library')
-    width, height, rate = probe(a.video, a.lavfi)
+    width, height, rate, duration, has_sound = probe(a.video, a.lavfi)
     fps = a.fps or rate
     if not 0 < fps <= 240: p.error('frame rate must be above 0 and at most 240')
-    cols, rows, ratio = terminal()
-    grid_c, grid_r = fit(width, height, a.cols or cols, a.rows or rows, ratio)
-    if a.cols: grid_c = a.cols
-    if a.rows: grid_r = a.rows
-    if grid_c < 1 or grid_r < 1: p.error('--cols and --rows must be positive')
-    unit = BLOCKS if a.mode == 'pixels' else CELL          # what ffmpeg scales one cell to
-    w, h = grid_c * unit[0], grid_r * unit[1]
-    left, top = max(1, (cols - grid_c) // 2 + 1), max(1, (rows - grid_r) // 2 + 1)
+    if a.start < 0 or (duration and a.start >= duration): p.error('--start is outside the file')
+    transport = a.transport if a.transport != 'auto' else ('shm' if shared_memory_reaches_terminal() else 'inline')
+    player = next((x for x in ('kilix-mpv', 'mpv') if shutil.which(x)), None)
+    notes = []
+    if not a.no_audio and not a.lavfi and has_sound and player is None: notes.append('no sound: neither kilix-mpv nor mpv is installed')
 
     helper = None
     if a.mode == 'pixels':
@@ -172,66 +344,139 @@ def main():
             if helper.doc.get('scalar_bundle_sha256') != hashlib.sha256(open(bundle, 'rb').read()).hexdigest():
                 p.error('the speed helper was trained against a different bundle')
 
-    decode = ['ffmpeg', '-v', 'error', '-nostdin'] + (['-stream_loop', '-1'] if a.loop and not a.lavfi else []) \
-        + (['-f', 'lavfi'] if a.lavfi else []) + ['-i', a.video, '-an', '-vf', f'fps={fps},scale={w}:{h}:flags=area',
-           '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-']
     out = sys.stdout.buffer
-    keys = Keys(); source = sound = None; shown = dropped = count = 0; failure = ''
-    signal.signal(signal.SIGTERM, lambda *_: sys.exit(0))
+    geometry = {}
+
+    def layout():
+        cols, rows, ratio = terminal()
+        room = rows - (0 if a.no_status or rows < 4 else 1)
+        grid_c, grid_r = fit(width, height, a.cols or cols, a.rows or room, ratio)
+        if a.cols: grid_c = a.cols
+        if a.rows: grid_r = a.rows
+        unit = BLOCKS if a.mode == 'pixels' else CELL          # what ffmpeg scales one cell to
+        geometry.update(cols=cols, rows=rows, c=grid_c, r=grid_r, w=grid_c * unit[0], h=grid_r * unit[1],
+                        left=max(1, (cols - grid_c) // 2 + 1), top=max(1, (room - grid_r) // 2 + 1),
+                        status=None if a.no_status or rows < 4 else rows)
+    layout()
+    if geometry['c'] < 1 or geometry['r'] < 1: p.error('--cols and --rows must be positive')
+
+    def decoder(position):
+        g = geometry
+        cmd = ['ffmpeg', '-v', 'error', '-nostdin'] + (['-f', 'lavfi'] if a.lavfi else ['-ss', f'{position:.3f}']) \
+            + ['-i', a.video, '-an', '-sn', '-vf', f'fps={fps},scale={g["w"]}:{g["h"]}:flags=area', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-']
+        return subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+    keys = Keys(a.input_fd); presenter = Presenter(out, transport)
+    source = clock = None; shown = dropped = count = skipped = seeks = 0; failure = ''; resized = []
+    log = open(a.log, 'w', buffering=1) if a.log else None; late = []; cost = dict(read=0., fit=0., draw=0., pack=0., write=0.); wire = 0
+    for number in (signal.SIGTERM, signal.SIGHUP):          # leave through finally, so the terminal and the sound are put back
+        signal.signal(number, lambda *_: sys.exit(0))
+    signal.signal(signal.SIGWINCH, lambda *_: resized.append(1))
+    began = time.perf_counter()
     try:
         out.write(b'\x1b[?1049h\x1b[?25l\x1b[2J'); out.flush()
-        source = subprocess.Popen(decode, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        if a.audio:
-            sound = subprocess.Popen(['ffplay', '-nodisp', '-autoexit', '-loglevel', 'quiet'] + (['-loop', '0'] if a.loop else []) + [a.video],
-                                     stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
-        started = time.perf_counter(); previous = None
+        if not a.no_audio and not a.lavfi and has_sound and player:
+            try: clock = Sound(player, a.video, a.start, a.loop, a.audio_output, a.audio_delay)
+            except OSError as exc: notes.append(f'no sound: {exc}')
+        if clock is None: clock = WallClock(a.start)
+        origin = a.start; index = 0; previous = None; paused = False; drawn = -1.
+        source = decoder(origin)
+
+        def restart(position):
+            nonlocal source, origin, index, previous
+            source.kill(); source.wait()
+            origin = position; index = 0; previous = None; source = decoder(origin)
+
         while a.frames is None or count < a.frames:
-            key = keys.read()
-            if b' ' in key:                         # pause: hold the clock, and the sound with it
-                paused = time.perf_counter()
-                if sound: sound.send_signal(signal.SIGSTOP)
-                while True:
-                    key = keys.read(.1)
-                    if key: break
-                if sound: sound.send_signal(signal.SIGCONT)
-                started += time.perf_counter() - paused
-            if b'q' in key or b'\x03' in key: break
-            raw = read_exact(source.stdout, w * h * 3)
-            if raw is None:                         # the end, or ffmpeg gave up: say which
-                if source.wait(): failure = source.stderr.read().decode(errors='replace').strip()
-                break
-            due = started + count / fps; count += 1
-            now = time.perf_counter()
-            if now > due + 1 / fps and shown:       # late: skip the work, keep the clock
-                dropped += 1; continue
-            frame = np.frombuffer(raw, np.uint8).reshape(h, w, 3)
+            for key in keys.read(.05 if paused else 0):
+                if key == 'quit': raise KeyboardInterrupt
+                if key == 'pause':
+                    paused = not paused; clock.pause(paused); drawn = -1.
+                elif key == 'mute': clock.mute()
+                elif key in ('quieter', 'louder'): clock.louder(5 if key == 'louder' else -5); drawn = -1.
+                elif (key in SEEK or key == 'home') and not a.lavfi:
+                    target = 0. if key == 'home' else clock.time() + SEEK[key]
+                    target = max(0., min(target, max(0., duration - 1)) if duration else target)
+                    clock.seek(target); restart(target); seeks += 1; drawn = -1.
+                    if paused:                              # show where we landed, then hold
+                        raw = read_exact(source.stdout, geometry['w'] * geometry['h'] * 3)
+                        if raw is not None:
+                            frame = np.frombuffer(raw, np.uint8).reshape(geometry['h'], geometry['w'], 3); index = 1
+                            payload = presenter.frame(renderer.decode(fitter.encode(frame)), geometry['c'], geometry['r'], geometry['left'], geometry['top']) \
+                                if a.mode == 'pixels' else text(renderer, renderer.fit(frame), None, geometry['left'], geometry['top'])
+                            if payload: out.write(payload)
+            if resized:
+                del resized[:]; layout(); out.write(b'\x1b[2J'); restart(clock.time()); drawn = -1.
+            now = clock.time()
+            if geometry['status'] and int(now) != int(drawn):
+                out.write(status(now, duration, paused, clock.volume, geometry['cols'], geometry['status'])); out.flush(); drawn = now
+            if paused: continue
+            t0 = time.perf_counter()
+            raw = read_exact(source.stdout, geometry['w'] * geometry['h'] * 3)
+            t1 = time.perf_counter()
+            if raw is None:                                 # the end, or ffmpeg gave up: say which
+                if source.wait(): failure = source.stderr.read().decode(errors='replace').strip(); break
+                if not a.loop: break
+                clock.seek(0.); restart(0.); continue
+            pts = origin + index / fps; index += 1; count += 1
+            now = clock.time(); record = dict(n=count, pts=round(pts, 4), clock=round(now, 4), read_ms=round((t1 - t0) * 1e3, 3))
+            if now > pts + 1 / fps and shown:               # late: skip the work, keep the clock
+                dropped += 1; record['dropped'] = True
+                if log: log.write(json.dumps(record) + '\n')
+                continue
+            frame = np.frombuffer(raw, np.uint8).reshape(geometry['h'], geometry['w'], 3)
             if a.mode == 'pixels':
-                payload = graphics(renderer.decode(fitter.encode(frame)), grid_c, grid_r, left, top)
+                colours = fitter.encode(frame); t2 = time.perf_counter()
+                picture = renderer.decode(colours); t3 = time.perf_counter()
+                payload = presenter.frame(picture, geometry['c'], geometry['r'], geometry['left'], geometry['top'])
             else:
                 if helper is not None:
                     k = helper.doc['inference']['candidates']
                     scores = helper(features(frame))
-                    cells = renderer.fit(frame, np.argpartition(scores, -k, axis=1)[:, -k:].reshape(grid_r, grid_c, k))
+                    cells = renderer.fit(frame, np.argpartition(scores, -k, axis=1)[:, -k:].reshape(geometry['r'], geometry['c'], k))
                 else:
                     cells = renderer.fit(frame)
-                payload = text(renderer, cells, previous, left, top); previous = cells
-            wait = due - time.perf_counter()
-            if wait > 0: time.sleep(wait)
-            out.write(payload); out.flush(); shown += 1
-        elapsed = time.perf_counter() - started
+                t2 = t3 = time.perf_counter()
+                payload = text(renderer, cells, previous, geometry['left'], geometry['top']); previous = cells
+            t4 = time.perf_counter()
+            if payload is None:                             # the terminal is behind: skip, do not queue
+                skipped += 1; record['skipped'] = True
+                if log: log.write(json.dumps(record) + '\n')
+                wait = pts - clock.time()                   # still keep to the clock, or the file would race past
+                if wait > 0: time.sleep(min(wait, 1.))
+                continue
+            wait = pts - clock.time()
+            if wait > 0: time.sleep(min(wait, 1.))
+            lateness = (clock.time() - pts) * 1e3
+            out.write(payload); out.flush(); t5 = time.perf_counter(); shown += 1; wire += len(payload); late.append(lateness)
+            for name, value in zip(('read', 'fit', 'draw', 'pack'), (t1 - t0, t2 - t1, t3 - t2, t4 - t3)): cost[name] += value
+            cost['write'] += t5 - t4 - max(0., min(wait, 1.))
+            record.update(fit_ms=round((t2 - t1) * 1e3, 3), draw_ms=round((t3 - t2) * 1e3, 3), pack_ms=round((t4 - t3) * 1e3, 3),
+                          write_ms=round((t5 - t4 - max(0., min(wait, 1.))) * 1e3, 3), late_ms=round(lateness, 3), bytes=len(payload), wall=round(t5 - began, 4))
+            if log: log.write(json.dumps(record) + '\n')
     except (KeyboardInterrupt, BrokenPipeError):
-        elapsed = time.perf_counter() - started if 'started' in dir() else 0
+        pass
     finally:
-        for child in (source, sound):
-            if child and child.poll() is None:
-                child.send_signal(signal.SIGCONT); child.terminate()
+        elapsed = time.perf_counter() - began
+        if source and source.poll() is None: source.kill()
+        if clock: clock.close()
         keys.close()
+        if log: log.close()
         try:
-            out.write(f'\x1b_Ga=d,d=I,i={IMAGE_ID},q=2\x1b\\\x1b[0m\x1b[?25h\x1b[?1049l'.encode()); out.flush()
+            out.write(presenter.close() + b'\x1b[?2026l\x1b[0m\x1b[?25h\x1b[?1049l'); out.flush()
         except (BrokenPipeError, ValueError):
-            pass
-    print(f'{shown} frames shown, {dropped} dropped, {shown/elapsed if elapsed else 0:.1f} per second; '
-          f'{grid_c} x {grid_r} cells, {a.mode}', file=sys.stderr)
+            presenter.close()
+    late = np.array(late or [0.])
+    summary = dict(shown=shown, dropped=dropped, skipped_terminal_busy=skipped, source_frames=count, seeks=seeks, seconds=round(elapsed, 3),
+                   shown_per_second=round(shown / elapsed, 2) if elapsed else 0, grid=[geometry['c'], geometry['r']], mode=a.mode,
+                   transport=transport if a.mode == 'pixels' else 'text', sound=type(clock).__name__ == 'Sound' if clock else False,
+                   late_ms=dict(median=round(float(np.median(late)), 2), p95=round(float(np.percentile(late, 95)), 2), max=round(float(late.max()), 2)),
+                   mean_ms={k: round(v / shown * 1e3, 3) if shown else 0 for k, v in cost.items()}, wire_bytes=wire, notes=notes)
+    if a.stats:
+        with open(a.stats, 'w') as f: f.write(json.dumps(summary, indent=1) + '\n')
+    print(f'{shown} frames shown, {dropped} dropped, {skipped} skipped for a busy terminal, {summary["shown_per_second"]:.1f} per second; '
+          f'{geometry["c"]} x {geometry["r"]} cells, {a.mode}, {summary["transport"]}, sound {"on" if summary["sound"] else "off"}'
+          + ''.join('; ' + n for n in notes), file=sys.stderr)
     if failure:
         print(f'ffmpeg stopped early: {failure}', file=sys.stderr); return 1
     return 0

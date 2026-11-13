@@ -74,6 +74,7 @@ struct neuronte_media {
     int64_t last_frame_pts, last_frame_duration_est;
     AVRational last_frame_tb;
     uint64_t frames_decoded, decode_errors;
+    int preroll;                       /* discard non-reference pictures only before a seek */
 
     /* Filter graph (ffmpeg_filter.c) */
     char *filters;
@@ -724,6 +725,13 @@ static int decode(neuronte_media *m, AVPacket *pkt, AVFrame *frame)
 {
     if (pkt && pkt->size == 0)
         return 0;
+    /* A seek still decodes every reference picture. Non-reference H.264
+     * pictures well before the trim point cannot contribute output pixels.
+     * Keep the final second of preroll, including its timing history. */
+    if (m->preroll && (!pkt || pkt->pts == AV_NOPTS_VALUE ||
+                      av_compare_ts(pkt->pts, pkt->time_base, -1, (AVRational){1, 1}) >= 0))
+        m->preroll = 0;
+    m->dec->skip_frame = m->preroll ? AVDISCARD_NONREF : AVDISCARD_DEFAULT;
     int ret = avcodec_send_packet(m->dec, pkt);
     if (ret < 0 && !(ret == AVERROR_EOF && !pkt)) {
         if (ret == AVERROR(EAGAIN))
@@ -1011,6 +1019,7 @@ int neuronte_media_open(neuronte_media **out, const char *url, const char *start
             goto fail;
     }
     m->dec->flags |= AV_CODEC_FLAG_COPY_OPAQUE;
+    m->preroll = start_us > 0 && m->dec->codec_id == AV_CODEC_ID_H264;
     m->apply_cropping = m->dec->apply_cropping;
     m->dec->apply_cropping = 0;
     if ((ret = avcodec_open2(m->dec, codec, NULL)) < 0) {

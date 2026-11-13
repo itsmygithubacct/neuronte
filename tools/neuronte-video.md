@@ -152,6 +152,13 @@ and seek opens and probes the file again, as a new process would, so no
 frame depends on what was read before; what is saved is the process start,
 its library loading and the pipe.
 
+For an H.264 seek, the decoder skips non-reference pictures more than a
+second before the target. It still decodes every reference picture and
+fully decodes the final second before the trim point, preserving the
+frames and timing at the target. Missing packet timestamps disable this
+shortcut for the rest of the seek. Playback from zero and other codecs
+keep the normal decode path.
+
 The library declines what it does not reproduce, and the player then runs
 the command as before: formats with discontinuous or no timestamps
 (MPEG-TS, raw elementary streams), files whose only picture is a cover,
@@ -176,7 +183,9 @@ duplicates), odd sizes, a late start time, irregular timestamps and a change
 of rate, 10-bit HEVC, a rotation matrix, VP9 that changes size mid-stream,
 ASF, FLV and AVI; starts at zero, inside a group of pictures, on keyframes
 and past the end; both layouts, Lanczos and area scaling, chroma location
-and thread counts. It checks that declined inputs are declined and played
+and thread counts. Deep seeks into long H.264 groups, with reference
+B-pictures, coarse timestamps and large timestamp gaps, compare every
+remaining frame. It checks that declined inputs are declined and played
 by the command, compares the player's pictures with both decoders, including
 after a paused seek, and runs `tests/test_media.c` (arguments, errors,
 timeouts, closing while the thread decodes or waits, two decoders at once)

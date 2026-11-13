@@ -62,6 +62,16 @@ class Media(unittest.TestCase):
         # Long enough to seek in while playing
         ffmpeg('-f', 'lavfi', '-i', 'testsrc2=s=320x180:r=30:d=12', '-f', 'lavfi', '-i', 'sine=f=330:d=12',
                *x264, '-g', '60', '-c:a', 'aac', '-shortest', d / 'long.mp4')
+        # Long preroll with both reference and non-reference B pictures.
+        # A coarse time base and a large timestamp gap also exercise duration
+        # inference when the seek begins between groups of pictures.
+        ffmpeg('-f', 'lavfi', '-i', 'testsrc2=s=320x180:r=30:d=10', *x264,
+               '-x264-params', 'keyint=300:min-keyint=300:scenecut=0:bframes=3:b-adapt=0:b-pyramid=normal',
+               '-video_track_timescale', '30', d / 'long-gop.mp4')
+        ffmpeg('-i', d / 'long-gop.mp4', '-vf', "setpts=PTS+if(gte(N\\,90)\\,5/TB\\,0)",
+               '-fps_mode', 'passthrough', *x264,
+               '-x264-params', 'keyint=300:min-keyint=300:scenecut=0:bframes=3:b-adapt=0:b-pyramid=normal',
+               '-video_track_timescale', '30', d / 'gap-gop.mp4')
         # One stream: the command does not duplicate frames before the first
         ffmpeg('-f', 'lavfi', '-i', 'testsrc2=s=320x180:r=30:d=3', *x264, '-bf', '2', '-g', '45', d / 'video.mp4')
         # Timestamps that start late
@@ -134,6 +144,14 @@ class Media(unittest.TestCase):
                     with self.subTest(name=name, start=start, layout=layout):
                         total += self.check(name, start, size, layout)
         self.assertGreater(total, 1000)
+
+    def test_long_preroll_preserves_every_frame_after_the_seek(self):
+        for name, positions in [('long-gop.mp4', [2.033, 4.9, 7.23, 9.7]),
+                                ('gap-gop.mp4', [2.8, 4.9, 7.0, 8.1, 11.3])]:
+            for start in positions:
+                for layout in ('gbrp', 'rgb24'):
+                    with self.subTest(name=name, start=start, layout=layout):
+                        self.check(name, start, (97, 55), layout)
 
     def test_cell_scaling_threads_and_chroma_also_match(self):
         self.check('av.mp4', 1.37, (96, 64), 'rgb24', exact=False)

@@ -90,6 +90,8 @@ def main():
     p.add_argument('--out', type=Path, required=True)
     p.add_argument('--baseline', type=Path)
     p.add_argument('--sizes', default='8x16,16x32,48x96')
+    p.add_argument('--samples', type=int, choices=(0, 1, 2, 3), default=0,
+                   help='0 is native automatic sampling; 1 matches the video consumer')
     a = p.parse_args()
     a.out.mkdir(parents=True, exist_ok=True)
     metadata = json.loads((a.teacher / 'teacher.json').read_text())
@@ -112,8 +114,11 @@ def main():
     baseline = json.loads(a.baseline.read_text()) if a.baseline else None
     if baseline and baseline['teacher'] != metadata:
         raise ValueError('baseline teacher differs')
+    if baseline and (baseline['samples'] != a.samples or baseline.get('complete') is False):
+        raise ValueError('baseline sampling differs or evaluation is incomplete')
     result = {'model_sha256': digest(a.model), 'library_sha256': digest(a.library),
-              'teacher': metadata, 'samples': 0, 'sizes': {}, 'passed': True,
+              'teacher': metadata, 'samples': a.samples, 'sizes': {}, 'passed': True,
+              'requested_sizes': [f'{w}x{h}' for w, h in sizes], 'complete': False,
               'baseline_sha256': digest(a.baseline) if a.baseline else None}
     try:
         for w, h in sizes:
@@ -127,7 +132,7 @@ def main():
                 truth = teacher_masks(fields, w, h)
             coverage = np.empty((len(scalars), h, w), np.float32)
             for i, c in enumerate(scalars):
-                if lib.neuronte_coverage(handle, c, w, h, 0, coverage[i].ctypes.data):
+                if lib.neuronte_coverage(handle, c, w, h, a.samples, coverage[i].ctypes.data):
                     raise ValueError(f'coverage failed for {c}')
             if not np.isfinite(coverage).all() or coverage.min() < 0 or coverage.max() > 1:
                 raise ValueError('invalid native coverage')
@@ -142,6 +147,8 @@ def main():
             print(json.dumps({'size': key, 'groups': row['groups'], 'failure_count': len(row['failures'])}), flush=True)
     finally:
         lib.neuronte_close(handle)
+    result['complete'] = True
+    (a.out / 'quality.json').write_text(json.dumps(result, indent=2) + '\n')
     # Quality failure is a retained experimental outcome, not a broken run.
     print(json.dumps({'complete': True, 'passed': result['passed']}), flush=True)
 

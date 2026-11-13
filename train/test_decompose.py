@@ -20,7 +20,7 @@ class DecompositionTests(unittest.TestCase):
         n = 16
         yy, xx = np.mgrid[0:2*n+1, 0:n+1]/n
         full = np.stack((xx+3*yy, 2*xx-yy))
-        for count in d.COUNTS:
+        for count in d.DEVELOPMENT_COUNTS:
             groups = d.specs('repertoire', count)
             self.assertEqual([c for group in groups for c in group['scalars']], d.SCALARS)
             self.assertLessEqual(max(len(g['scalars']) for g in groups)-min(len(g['scalars']) for g in groups), 1)

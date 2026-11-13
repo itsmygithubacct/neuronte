@@ -15,7 +15,8 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
 COUNTS = (4, 8, 16, 64)
-GRIDS = {4: (2, 2), 8: (2, 4), 16: (4, 4), 64: (8, 8)}
+DEVELOPMENT_COUNTS = (1, 2) + COUNTS
+GRIDS = {1: (1, 1), 2: (1, 2), 4: (2, 2), 8: (2, 4), 16: (4, 4), 64: (8, 8)}
 SCALARS = list(range(32, 127))
 
 
@@ -24,7 +25,7 @@ def digest(path):
 
 
 def specs(mode, count):
-    if mode not in ('spatial', 'repertoire') or count not in COUNTS:
+    if mode not in ('spatial', 'repertoire') or count not in DEVELOPMENT_COUNTS:
         raise ValueError('unsupported ASCII decomposition')
     cols, rows = GRIDS[count]
     out = []
@@ -277,7 +278,7 @@ def main():
     parser.add_argument('operation',choices=('prepare','train'))
     parser.add_argument('directory',type=Path)
     parser.add_argument('--mode',choices=('spatial','repertoire'),default='spatial')
-    parser.add_argument('--parts',type=int,choices=COUNTS,default=4)
+    parser.add_argument('--parts',type=int,choices=DEVELOPMENT_COUNTS,default=4)
     parser.add_argument('--seeds',default='0,1')
     parser.add_argument('--steps',type=int,default=20000)
     parser.add_argument('--start',type=int,default=0)

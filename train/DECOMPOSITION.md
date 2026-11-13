@@ -8,6 +8,12 @@ its region of every glyph. Repertoire groups divide the ordered 95
 characters into contiguous groups whose sizes differ by at most one;
 one group draws a complete glyph.
 
+The fixed comparison matrix remains 4/8/16/64 parts. The trainer additionally
+accepts one part for a newly trained 1×128 control and two parts for 2×64
+development after evaluating that matrix. Two spatial parts are top/bottom
+halves. Keep these additional recipes and any changed unlabelled loss weight
+in separate experiment directories, with their own identities and manifests.
+
 Prepare the immutable FP16 teacher and coverage masks once:
 
 ```sh

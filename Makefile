@@ -33,6 +33,12 @@ RC9_ITALIC_JSON = $(foreach em,$(RC9_ITALIC_SIZES),weights/neuronte-ui$(em)-ital
 RC9_EMOJI = weights/neuronte-emoji-v0.nrt
 RC9_EMOJI_NETS = weights/neuronte-emoji-e0-v0.json weights/neuronte-emoji-e1-v0.json weights/neuronte-emoji-e2-v0.json
 RC9_NETS = $(NETS)
+# RC9 Braille: the tiled Braille expert, a version 6 file, and split-v6,
+# which is split-v5 with only its Braille member replaced. Video full mode
+# draws with split-v6; the video helpers stay bound to split-v5.
+BRAILLE_V1 = weights/neuronte-braille-v1
+SPLIT_V6 = weights/neuronte-split-v6.nrt
+NETS_V6 = $(ASCII).json $(DRAW).json $(SYMBOL).json $(ACCENT).json $(PIXEL).json $(BRAILLE_V1).json
 # The desktop face: one drawing file for each em, a net and the advances
 # of that em's pixel face.
 UI1 = weights/neuronte-ui1-v0
@@ -152,9 +158,11 @@ $(DEMOS): build/%: demo/%.c demo/common.h build/demo-common.o build/libneuronte.
 # Rebuild the packed weights from the JSON the trainers write.
 pack: pack-rc9
 
-pack-rc9: pack-rc9-italics pack-rc9-emoji $(RC9_NETS) $(RC9_GATE) $(RC9_FULL).json
+pack-rc9: pack-rc9-italics pack-rc9-emoji $(RC9_NETS) $(RC9_GATE) $(RC9_FULL).json $(BRAILLE_V1).json
 	$(PYTHON) train/pack.py $(RC9_ACCENT).json $(RC9_ACCENT).nrt
 	$(PYTHON) train/pack.py --bundle $(RC9_SPLIT) $(RC9_NETS) --gate $(RC9_GATE)
+	$(PYTHON) train/pack.py $(BRAILLE_V1).json $(BRAILLE_V1).nrt
+	$(PYTHON) train/pack.py --bundle $(SPLIT_V6) $(NETS_V6) --gate $(RC9_GATE)
 	$(PYTHON) train/pack.py $(RC9_FULL).json $(RC9_FULL).nrt
 
 pack-rc9-italics: $(RC9_ITALIC_JSON)
@@ -238,7 +246,7 @@ test-rc9-italics: all
 test-rc9-emoji: all
 	$(PYTHON) tests/check_emoji.py build/libneuronte.so $(RC9_EMOJI) $(RC9_EMOJI_NETS) --manifest font/emoji-manifest.json --target-cache build/emoji-target-cache --out build/emoji-publication-check.json
 
-test-rc9: test-rc9-italics test-rc9-emoji all $(TESTS)
+test-rc9: test-rc9-italics test-rc9-emoji test-rc9-braille all $(TESTS)
 	$(PYTHON) tests/check_reference.py build/libneuronte.so $(RC9_ACCENT).json $(RC9_ACCENT).nrt
 	$(PYTHON) tests/check_reference.py build/libneuronte.so --bundle $(RC9_SPLIT) $(RC9_NETS) --gate $(RC9_GATE)
 	$(PYTHON) tests/check_scripts.py build/libneuronte.so $(RC9_SPLIT) $(RC9_ACCENT).json
@@ -246,6 +254,14 @@ test-rc9: test-rc9-italics test-rc9-emoji all $(TESTS)
 	$(PYTHON) tests/check_reference.py build/libneuronte.so $(RC9_FULL).json $(RC9_FULL).nrt
 	$(PYTHON) tests/check_scripts.py build/libneuronte.so $(RC9_FULL).nrt $(RC9_FULL).json --standalone
 	./build/test_api $(RC9_FULL).nrt --full --accent
+
+test-rc9-braille: build/libneuronte.so build/stream/libneuronte.so build/test_api
+	$(PYTHON) tests/check_tiled.py build/libneuronte.so --stream build/stream/libneuronte.so --tiled $(BRAILLE_V1).json $(BRAILLE_V1).nrt
+	$(PYTHON) tests/check_reference.py build/libneuronte.so $(BRAILLE_V1).json $(BRAILLE_V1).nrt
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --bundle $(SPLIT_V6) $(NETS_V6) --gate $(RC9_GATE)
+	$(PYTHON) tests/check_braille_v1.py build/libneuronte.so $(BRAILLE_V1).nrt $(SPLIT_V6) $(SPLIT)
+	$(PYTHON) tests/check_scripts.py build/libneuronte.so $(SPLIT_V6) $(RC9_ACCENT).json
+	./build/test_api $(SPLIT_V6) --full --accent --pixel
 
 test-rc9-quality: all
 	$(PYTHON) tools/mono-compare.py --library build/libneuronte.so --baseline weights/neuronte-full-v2.json --candidate $(RC9_FULL).json --set full --include-new --sizes 16,48 --samples 0 --minimum-iou .98 --out build/full-v3-quality.json
@@ -357,7 +373,7 @@ bench: build/neuronte-bench
 clean:
 	rm -rf build
 
-.PHONY: all demo pack pack-rc9 pack-rc9-italics pack-rc9-emoji test test-rc9 test-rc9-italics test-rc9-emoji test-rc9-quality bench clean
+.PHONY: all demo pack pack-rc9 pack-rc9-italics pack-rc9-emoji test test-rc9 test-rc9-italics test-rc9-emoji test-rc9-braille test-rc9-quality bench clean
 
 # Video is an optional Python/numpy/scipy tool; its tests are separate from
 # the dependency-light C/font acceptance suite.

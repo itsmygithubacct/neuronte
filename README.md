@@ -23,6 +23,7 @@ letter. Desktop adapters fall back for unsupported strings and styles.
 | Weights | Use | Characters | Hidden width | Parameters | File |
 |---|---|---|---:|---:|---:|
 | `neuronte-split-v5` | the font to use | 1,176, over six nets and a router; [recipe and validation](weights/neuronte-split-v5.md) | 48, 128, 192 and 256 | 392,716 | 1,573,128 bytes |
+| `neuronte-split-v6` | RC9 Braille: split-v5 with its Braille net replaced by the tiled `neuronte-braille-v1`; the video player's full-mode bundle; [recipe and validation](weights/neuronte-braille-v1.md) | 1,176, over six nets and a router | 6, 128, 192 and 256 | 384,232 | 1,539,388 bytes |
 | `neuronte-split-v4` | the default before Greek and Russian, kept; most measurements below were made on it | 1,061, over six nets and a router | 48, 128 and 192 | 329,356 | 1,319,616 bytes |
 | `neuronte-full-v3` | explicit RC9 monolithic font; [quality and baseline comparison](weights/neuronte-full-v3.md) | 878, including the Greek and Russian additions | 384 | 331,009 | 1,324,240 bytes |
 | `neuronte-full-v2` | the baseline `split` is measured against | 763 of them in one net, all but the sextants and octants | 320 | 234,881 | 939,728 bytes |
@@ -59,6 +60,18 @@ every size; the per-glyph changes are retained. An accented, Greek or
 Russian cell costs about 1.6 times what it did, because that net is 256 wide.
 split-v4 and the full-v2 baseline are kept and still checked by `make test`.
 See [the recipe and validation](weights/neuronte-split-v5.md).
+
+`neuronte-split-v6.nrt` is split-v5 with one part replaced: its Braille net
+is `neuronte-braille-v1`, a version 6 tiled net in which one net 6 wide
+draws all eight dots, 637 parameters in place of 9,121. The other five nets,
+the gate and the ranges are byte for byte split-v5's, so every other
+character comes out the same. All 256 patterns are exact at 8 x 16, 16 x 32
+and 48 x 96, and uncached Braille coverage is 4.5 to 21 times faster than
+split-v5's on two x86 hosts and 11 to 40 times on an ARM board, least at
+25 x 49. Its antialiasing is not better everywhere: mean coverage error is
+higher at 48 x 96. The video player's full mode draws with split-v6; its
+learned helpers are bound to split-v5, which stays. See
+[the recipe and validation](weights/neuronte-braille-v1.md).
 
 RC9 also ships the separate `neuronte-emoji-v0.nrt` colour bundle: 300 original
 single-scalar emoji, 600 left/right half labels, three experts, and up to six
@@ -142,7 +155,7 @@ a letter and a mark, such as ß æ œ ð þ ø ł đ ħ ŋ ĳ, are drawn in
 | `train/snap.py` | The straight edges of a colour glyph, measured from the drawings when the weights are packed, and the warp that snaps them |
 | `train/gate.py` | Trains the router's gate for a bundle of nets. Needs torch; a CPU is enough |
 | `train/pack.py` | Packs weights JSON into the binary file the C library loads: a distance net, a colour net, a bundle, an advance table, or a drawing file. A pixel face such as `font/ui-10.txt` packs as an advance table, bold one pixel more. Documents the layouts |
-| `weights/` | The trained weights as JSON, the packed files, the scores and `SHA256SUMS`. `neuronte-draw-v2`, `neuronte-symbol-v0`, `neuronte-accent-v1`, `neuronte-pixel-v1`, `neuronte-braille-v0` and `neuronte-gate-v3` are the parts of `neuronte-split-v4`, with `neuronte-ascii-v0`. `neuronte-full-v2` is here so that `make test` and `make bench` run from a clone. `neuronte-ui1-v0` through `neuronte-ui39-v0`, one for every em, and `neuronte-ui43-v0` are the desktop face, each a drawing file of one net and its advances. `neuronte-uiEM-italic-v0` covers every integer native italic size 3–32. `neuronte-ui-large-v0` is the scalable upright face from 33 px; `neuronte-flame-v0`, `neuronte-icon-v1` and `neuronte-emoji-v0` are separate colour files |
+| `weights/` | The trained weights as JSON, the packed files, the scores and `SHA256SUMS`. `neuronte-draw-v2`, `neuronte-symbol-v0`, `neuronte-accent-v1`, `neuronte-pixel-v1`, `neuronte-braille-v0` and `neuronte-gate-v3` are the parts of `neuronte-split-v4`, with `neuronte-ascii-v0`. `neuronte-full-v2` is here so that `make test` and `make bench` run from a clone. `neuronte-ui1-v0` through `neuronte-ui39-v0`, one for every em, and `neuronte-ui43-v0` are the desktop face, each a drawing file of one net and its advances. `neuronte-uiEM-italic-v0` covers every integer native italic size 3–32. `neuronte-braille-v1` is the tiled Braille part of `neuronte-split-v6`. `neuronte-ui-large-v0` is the scalable upright face from 33 px; `neuronte-flame-v0`, `neuronte-icon-v1` and `neuronte-emoji-v0` are separate colour files |
 | `include/neuronte.h`, `src/` | The C library |
 | `tools/neuronte-render.c` | Draws lines of text into a PPM file |
 | `tools/neuronte-bench.c` | Times a net per cell, or a full net against a bundle per class of character |
@@ -442,6 +455,8 @@ characters, with a router in front. This section describes
 `neuronte-accent-v2` (318 characters: the 203 below and 115 Greek and
 Russian letters; 256 wide, 155,137 parameters) and `neuronte-gate-v4`
 (68 ranges). Its figures are in [its own page](weights/neuronte-split-v5.md).
+`neuronte-split-v6` is split-v5 with its Braille net replaced by the tiled
+`neuronte-braille-v1` ([its page](weights/neuronte-braille-v1.md)).
 split-v4:
 
 | Net | Characters | Hidden width | Parameters |

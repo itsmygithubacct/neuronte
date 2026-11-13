@@ -381,7 +381,8 @@ class Video(unittest.TestCase):
         cmd=[sys.executable,str(ROOT/'tools/neuronte-video.py'),'--width','8','--height','16','--mode','full','--helper','speed']
         old=['--helper-model',str(ROOT/'weights/neuronte-video-speed-v0.json')]
         frame=bytes(384)
-        # Defaults: split-v5 with the v1 helper.
+        # Without --weights the v1 helper runs on its own bundle, split-v5,
+        # not the default split-v6 (whose SHA256 it would refuse).
         self.assertEqual(subprocess.run(cmd,input=frame,capture_output=True).returncode,0)
         # The v0 helper is refused with split-v5 and still runs with split-v4.
         result=subprocess.run(cmd+old,input=frame,capture_output=True)
@@ -394,6 +395,29 @@ class Video(unittest.TestCase):
             doc=json.loads((ROOT/'weights/neuronte-video-speed-v0.json').read_text());doc['scalar_manifest']='split-v5'
             path=Path(temp)/'helper.json';path.write_text(json.dumps(doc))
             with self.assertRaisesRegex(ValueError,'invalid video helper layer'):Helper(path,'speed')
+
+    def test_full_mode_draws_braille_with_split_v6(self):
+        # split-v6 is split-v5 with only its Braille expert replaced, so every
+        # other candidate is unchanged and every Braille candidate is the
+        # tiled braille-v1 net's own mask.
+        self.assertEqual(v.DEFAULT_BUNDLE,ROOT/'weights/neuronte-split-v6.nrt')
+        self.assertEqual(v.HELPER_BUNDLE,ROOT/'weights/neuronte-split-v5.nrt')
+        self.assertEqual(v.cell_bundle(),v.DEFAULT_BUNDLE)
+        self.assertEqual(v.cell_bundle(helper=True),v.HELPER_BUNDLE)
+        self.assertEqual(v.cell_bundle('x.nrt',True),Path('x.nrt'))
+        for w,h in [(8,16),(5,11),(24,48)]:
+            cps,new=v.candidates('full',w,h)
+            old_cps,old=v.candidates('full',w,h,v.HELPER_BUNDLE)
+            np.testing.assert_array_equal(cps,old_cps)
+            braille=(cps>=0x2800)&(cps<=0x28ff)
+            self.assertEqual(int(braille.sum()),256)
+            np.testing.assert_array_equal(new[~braille],old[~braille])
+            with v.NeuralMasks(ROOT/'weights/neuronte-braille-v1.nrt') as net:
+                alone=np.stack([net.mask(int(cp),w,h).ravel() for cp in cps[braille]])
+            np.testing.assert_array_equal(new[braille],alone)
+            self.assertFalse(np.array_equal(new[braille],old[braille]))
+        two=v.TwoInk('full',8,16)
+        np.testing.assert_array_equal(two.masks,v.candidates('full',8,16)[1].astype(np.float64))
 
     def player(self,*args,keys=(),source=None,grid=True,timeout=60):
         """Run the player off a terminal; keys are (seconds to wait, bytes) written to its key pipe."""

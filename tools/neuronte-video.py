@@ -7,7 +7,7 @@ from pathlib import Path
 import sys
 import time
 import numpy as np
-from neuronte_video import TwoInk, MultiInk, exactness, ROOT
+from neuronte_video import TwoInk, MultiInk, exactness, ROOT, cell_bundle
 
 
 def read_frame(stream, size):
@@ -47,7 +47,8 @@ def main():
     except ValueError: p.error('--cell must be WIDTHxHEIGHT')
     if w < 1 or h < 1 or a.width % w or a.height % h: p.error('frame must divide exactly into positive cells')
     if a.level == 'multi' and a.output == 'ansi': p.error('multi-ink requires RGB output')
-    renderer = (MultiInk(a.weights,a.library,w,h) if a.level == 'multi' else TwoInk(a.mode,w,h,a.weights,a.library,a.margin))
+    # A helper is bound to the bundle it was trained on; without --weights, use that one.
+    renderer = (MultiInk(a.weights,a.library,w,h) if a.level == 'multi' else TwoInk(a.mode,w,h,cell_bundle(a.weights,a.helper!='none'),a.library,a.margin))
     if a.require_exact and renderer.ink_indices is None:
         p.error('neural masks are fractional at the selected cell size')
     helper=None
@@ -57,7 +58,7 @@ def main():
         from neuronte_video_helpers import Helper,features,quality_cells
         helper=Helper(a.helper_model or ROOT/f'weights/neuronte-video-{a.helper}-v1.json',a.helper,runtime=True)
         expected=helper.doc.get('scalar_bundle_sha256')
-        actual=hashlib.sha256(Path(a.weights or ROOT/'weights/neuronte-split-v5.nrt').read_bytes()).hexdigest()
+        actual=hashlib.sha256(cell_bundle(a.weights,True).read_bytes()).hexdigest()
         if not expected or expected!=actual:p.error('helper scalar manifest/weights differ from the selected bundle')
     elif a.helper_model:p.error('--helper-model requires a helper')
     count=0; error=0.; previous=None; previous_frame=None; started=time.perf_counter()

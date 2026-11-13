@@ -18,6 +18,21 @@ sys.path.insert(0, str(ROOT / 'train'))
 import glyphs
 
 
+# Full mode draws every scalar of this bundle. split-v6 is split-v5 with its
+# Braille expert replaced by the tiled neuronte-braille-v1; its other five
+# experts, gate and ranges are byte-identical.
+DEFAULT_BUNDLE = ROOT / 'weights/neuronte-split-v6.nrt'
+# The v1 speed and quality helpers were trained on split-v5's masks and are
+# bound to its SHA256. With a helper and no --weights, the players use it.
+HELPER_BUNDLE = ROOT / 'weights/neuronte-split-v5.nrt'
+
+
+def cell_bundle(weights=None, helper=False):
+    """The bundle two-ink cells are fitted with: --weights when given, else
+    split-v5 when a helper is on (the helper is bound to it), else the default."""
+    return Path(weights) if weights else HELPER_BUNDLE if helper else DEFAULT_BUNDLE
+
+
 class NeuralMasks:
     def __init__(self, weights=None, library=None):
         self.lib = C.CDLL(str(library or ROOT / 'build/libneuronte.so'))
@@ -25,7 +40,7 @@ class NeuralMasks:
         self.lib.neuronte_close.argtypes = [C.c_void_p]
         self.lib.neuronte_coverage.argtypes = [C.c_void_p, C.c_uint32, C.c_int, C.c_int, C.c_int, C.POINTER(C.c_float)]
         self.handle = C.c_void_p()
-        path = Path(weights or ROOT / 'weights/neuronte-split-v5.nrt')
+        path = Path(weights or DEFAULT_BUNDLE)
         if self.lib.neuronte_open_file(str(path).encode(), C.byref(self.handle)):
             raise ValueError(f'cannot load {path}')
 
@@ -432,7 +447,7 @@ def candidates(mode, width, height, weights=None, library=None):
     if mode != 'full': raise ValueError('mode must be portable or full')
     # Use the loaded bundle's explicit routing ranges, so newly trained
     # bundles cannot silently be searched with an obsolete scalar manifest.
-    path = Path(weights or ROOT / 'weights/neuronte-split-v5.nrt')
+    path = Path(weights or DEFAULT_BUNDLE)
     with NeuralMasks(path, library) as net:
         data = path.read_bytes()
         if len(data) < 28 or struct.unpack_from('<I', data, 8)[0] != 2:
@@ -441,7 +456,9 @@ def candidates(mode, width, height, weights=None, library=None):
         lengths = struct.unpack_from(f'<{nets}I', data, 28)
         member = len(data) - sum(lengths)
         for length in lengths:
-            if struct.unpack_from('<I', data, member + 8)[0] != 1:
+            # Version 1 distance nets and version 6 tiled nets (made of
+            # version 1 nets) are monochrome.
+            if struct.unpack_from('<I', data, member + 8)[0] not in (1, 6):
                 raise ValueError('full two-ink mode requires monochrome nets; fixed-colour bundles cannot use arbitrary foreground/background fits')
             member += length
         offset = 28 + 4 * nets

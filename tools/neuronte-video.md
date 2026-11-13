@@ -9,8 +9,11 @@ size exactly. No implicit resizing or cropping is performed.
 terminal cells. `--output rgb` writes reconstructed RGB24 frames. Full mode
 uses the loaded bundle’s explicit scalar ranges and its actual C coverage masks;
 portable mode uses the 328 ideal geometric masks. Full mode must be displayed
-with that same Neuronte bundle to reproduce the fitted image. Full mode requires a monochrome bundle with explicit scalar ranges; split-v5 is the
-default. A standalone net without a manifest is rejected. Fixed-colour members are
+with that same Neuronte bundle to reproduce the fitted image. Full mode requires a monochrome bundle with explicit scalar ranges. split-v6 is the
+default: split-v5 with its Braille expert replaced by the tiled
+`neuronte-braille-v1`, every other expert, the gate and the ranges byte-identical.
+The learned helpers are bound to split-v5, so with `--helper` and no `--weights`
+both tools use split-v5. A standalone net without a manifest is rejected. Fixed-colour members are
 also rejected, including single-layer colour nets: their palette cannot be
 reproduced by an arbitrary foreground/background fit.
 

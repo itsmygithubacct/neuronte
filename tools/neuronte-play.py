@@ -43,7 +43,7 @@ import numpy as np
 # Installed payloads are verified source trees. Keep runtime imports from
 # adding __pycache__ files that would make the next upgrade see local changes.
 sys.dont_write_bytecode = True
-from neuronte_video import TwoInk, MultiInk, MediaDecoder, decoder_command, ROOT
+from neuronte_video import TwoInk, MultiInk, MediaDecoder, decoder_command, ROOT, cell_bundle
 
 try: LIBC = ctypes.CDLL(None)        # loaded now, so a child has nothing to load between fork and exec
 except OSError: LIBC = None
@@ -518,12 +518,14 @@ def main():
         renderer = fitter if a.pixel_size else MultiInk(a.weights, library, *CELL)
     else:
         fitter = None
-        renderer = TwoInk(a.characters, *CELL, a.weights, library)
+        # The speed helper is bound to the bundle it was trained on (split-v5);
+        # without --weights, cells use that bundle when the helper is on.
+        bundle = cell_bundle(a.weights, a.helper)
+        renderer = TwoInk(a.characters, *CELL, bundle, library)
         if a.helper:
             import hashlib
             from neuronte_video_helpers import Helper, features
             helper = Helper(ROOT / 'weights/neuronte-video-speed-v1.json', 'speed', runtime=True)
-            bundle = a.weights or ROOT / 'weights/neuronte-split-v5.nrt'
             if helper.doc.get('scalar_bundle_sha256') != hashlib.sha256(open(bundle, 'rb').read()).hexdigest():
                 p.error('the speed helper was trained against a different bundle')
 

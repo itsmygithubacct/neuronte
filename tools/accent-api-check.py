@@ -18,7 +18,14 @@ def main():
     p.add_argument('--package', type=Path, required=True)
     p.add_argument('--out', type=Path, required=True)
     p.add_argument('--sizes', default='1x2,3x5,7x13,8x16,16x32,23x47,24x48,25x49,33x61,48x96')
+    p.add_argument('--samples', default='0,1,3', help='comma-separated sample counts; 0 is automatic')
     a = p.parse_args()
+    try:
+        sample_counts = [int(x) for x in a.samples.split(',')]
+        if len(set(sample_counts)) != len(sample_counts) or any(x not in range(9) for x in sample_counts):
+            raise ValueError()
+    except ValueError:
+        p.error('samples must be distinct integers from 0 through 8')
     package = json.loads((a.package / 'package.json').read_text())
     model = a.package / package['file']
     assert hashlib.sha256(model.read_bytes()).hexdigest() == package['sha256']
@@ -32,7 +39,7 @@ def main():
     rows = []
     for size in a.sizes.split(','):
         w, h = map(int, size.split('x'))
-        for samples in (0, 1, 3):
+        for samples in sample_counts:
             handle = ct.c_void_p()
             assert lib.neuronte_open_file(str(model.resolve()).encode(), ct.byref(handle)) == 0
             expected = []

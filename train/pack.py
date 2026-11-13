@@ -134,6 +134,27 @@ A drawing file, version 5:
                   its length
         the M members, in that order with nothing between them, each a
                   whole version 1, 3 or 4 file; at most one is version 4
+
+A tiled net, version 6, packed from a neuronte-tiled-weights JSON. The
+design cell is cut by C + 1 column edges (0 to 1) and R + 1 row edges
+(0 to 2) into C x R tiles. Each tile is drawn by one of M version 1 nets
+from a code made of the bits b = scalar - first: "place" gives
+base | (b & mask), "extract" gives base plus the bits of b under mask,
+packed to the low end. A net's tau is for its tile's width. It may stand
+alone or be a bundle member; the bundle router sends it whole scalars.
+
+    0   8 bytes   "NEURONTE"
+    8   u32       format version, 6
+    12  u32       columns C, 1 to 16
+    16  u32       rows R, 1 to 16
+    20  u32       nets M, 1 to 64 and at most C x R
+    24  u32       first scalar
+    28  u32       last scalar, at least first, at most U+1FFFFF
+    32  f32       C + 1 column edges, 0 first, 1 last, rising
+        f32       R + 1 row edges, 0 first, 2 last, rising
+        C x R x 4 u32  per tile, row-major: net, mask, base, extract (0 or 1)
+        M x u32   the length of each net
+        the M nets, each a whole version 1 file; every net draws a tile
 """
 import decimal
 import hashlib
@@ -183,6 +204,10 @@ def length(h):
 def load(path):
     with open(path) as fh:
         doc = json.load(fh)
+    return load_doc(doc, path)
+
+
+def load_doc(doc, path):
     if doc.get("format") != "neuronte-weights" or doc.get("version") != 1:
         raise SystemExit(f"{path}: not a version 1 Neuronte weights file")
     shape = doc["shape"]
@@ -210,7 +235,10 @@ def load(path):
 
 def pack_v1(path):
     """The version 1 image of one distance net."""
-    h, tau, masks, weights = load(path)
+    return image_v1(*load(path))
+
+
+def image_v1(h, tau, masks, weights):
     out = bytearray(b"NEURONTE")
     out += struct.pack("<5I", 1, 6, 64, h, 3)
     out += struct.pack("<f", tau)
@@ -440,13 +468,98 @@ def pack_colour(path, doc):
     return bytes(out)
 
 
+TILE_AXIS = 16
+TILE_NETS = 64
+
+
+def _code_value(tok, where):
+    """A u32 from "U+XXXX", "0x..", or an int."""
+    if isinstance(tok, int) and not isinstance(tok, bool):
+        return tok
+    if isinstance(tok, str) and tok[:2] in ("U+", "0x"):
+        try:
+            return int(tok[2:], 16)
+        except ValueError:
+            pass
+    raise SystemExit(f"{where}: {tok!r} is not U+XXXX, 0x.. or an integer")
+
+
+def tiled_layout(doc, path):
+    """Validated (first, last, columns, rows, tiles) of a tiled weights file.
+
+    tiles is row-major [(net, mask, base, extract)]."""
+    if doc.get("format") != "neuronte-tiled-weights" or doc.get("version") != 1:
+        raise SystemExit(f"{path}: not a version 1 tiled weights file")
+    first, last = (_code_value(doc.get(k), f"{path} {k}") for k in ("first", "last"))
+    if not 0 <= first <= last <= 0x1FFFFF:
+        raise SystemExit(f"{path}: scalars {first:#x}..{last:#x} are not an increasing 21-bit range")
+    axes = []
+    for key, end in (("columns", 1.0), ("rows", 2.0)):
+        edges = doc.get(key)
+        if not isinstance(edges, list) or not 2 <= len(edges) <= TILE_AXIS + 1:
+            raise SystemExit(f"{path}: {key} must list 2 to {TILE_AXIS + 1} edges")
+        f32 = [float(np.float32(e)) for e in edges]
+        if any(float(e) != v for e, v in zip(edges, f32)):
+            raise SystemExit(f"{path}: {key} edges must be exact float32 values")
+        if f32[0] != 0.0 or f32[-1] != end or any(b <= a for a, b in zip(f32, f32[1:])):
+            raise SystemExit(f"{path}: {key} edges must rise strictly from 0 to {end:g}")
+        axes.append(f32)
+    nets = doc.get("nets")
+    if not isinstance(nets, list) or not 1 <= len(nets) <= TILE_NETS:
+        raise SystemExit(f"{path}: nets must list 1 to {TILE_NETS} distance nets")
+    tiles = doc.get("tiles")
+    cols, rows = len(axes[0]) - 1, len(axes[1]) - 1
+    if not isinstance(tiles, list) or len(tiles) != cols * rows:
+        raise SystemExit(f"{path}: {cols} x {rows} edges need {cols * rows} tiles, row-major")
+    if len(nets) > cols * rows:
+        raise SystemExit(f"{path}: more nets than tiles")
+    out = []
+    for i, t in enumerate(tiles):
+        where = f"{path} tile {i}"
+        if not isinstance(t, dict) or set(t) != {"net", "mask", "base", "code"}:
+            raise SystemExit(f"{where}: needs exactly net, mask, base and code")
+        net, mask, base = t["net"], _code_value(t["mask"], where), _code_value(t["base"], where)
+        if not (type(net) is int and 0 <= net < len(nets)):
+            raise SystemExit(f"{where}: net {net!r} is not one of the {len(nets)} nets")
+        if t["code"] not in ("place", "extract"):
+            raise SystemExit(f"{where}: code is place or extract")
+        extract = t["code"] == "extract"
+        if not (0 <= mask <= 0x1FFFFF and 0 <= base <= 0x1FFFFF):
+            raise SystemExit(f"{where}: mask and base must be 21-bit values")
+        if extract and base + (1 << bin(mask).count("1")) - 1 > 0x1FFFFF:
+            raise SystemExit(f"{where}: extracted codes pass U+1FFFFF")
+        out.append((net, mask, base, int(extract)))
+    unused = set(range(len(nets))) - {t[0] for t in out}
+    if unused:
+        raise SystemExit(f"{path}: nets {sorted(unused)} draw no tile")
+    return first, last, axes[0], axes[1], out
+
+
+def pack_tiled(path, doc):
+    """The version 6 image of a tiled distance net."""
+    first, last, xs, ys, tiles = tiled_layout(doc, path)
+    images = [image_v1(*load_doc(net, f"{path} net {i}")) for i, net in enumerate(doc["nets"])]
+    out = bytearray(b"NEURONTE")
+    out += struct.pack("<6I", 6, len(xs) - 1, len(ys) - 1, len(images), first, last)
+    out += struct.pack(f"<{len(xs)}f", *xs) + struct.pack(f"<{len(ys)}f", *ys)
+    for t in tiles:
+        out += struct.pack("<4I", *t)
+    out += struct.pack(f"<{len(images)}I", *map(len, images))
+    for im in images:
+        out += im
+    return bytes(out)
+
+
 def pack(path):
-    """The version 1 image of a distance net, or the version 3 image of form A."""
+    """The version 1 image of a distance net, the version 3 image of form A,
+    or the version 6 image of a tiled distance net."""
     with open(path) as fh:
         doc = json.load(fh)
     fmt = doc.get("format")
     if fmt == "neuronte-weights":
         return pack_v1(path)
+    if fmt == "neuronte-tiled-weights":
+        return pack_tiled(path, doc)
     if fmt == "neuronte-colour-weights":
         return pack_colour(path, doc)
     if fmt == "neuronte-colour-weights-experimental" or doc.get("shape", {}).get("form") == "B":

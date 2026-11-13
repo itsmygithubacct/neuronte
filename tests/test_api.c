@@ -292,8 +292,8 @@ static void bundle_checks(const unsigned char *data, size_t len)
         put32(b + 28, (uint32_t)len);
         put32(b + 32, (uint32_t)zlen);
         expect_open("bundle restored", b, blen, NEURONTE_OK);
-        put32(b + 28 + 8 + 12 + len + 20, 100); /* net 1 hidden width */
-        expect_open("a net of width 100 in a bundle", b, blen, NEURONTE_ERR_SHAPE);
+        put32(b + 28 + 8 + 12 + len + 20, 1025); /* net 1 hidden width */
+        expect_open("a net of width 1025 in a bundle", b, blen, NEURONTE_ERR_SHAPE);
         free(b);
 
         gb = bundle(data, len, z, zlen, az, 1, 0, G, gate, data, &gl);
@@ -1435,7 +1435,7 @@ static void advance_checks(const unsigned char *net, size_t netlen)
         expect_file("drawing file of a net, a table and a net, from a file", d, dlen, NEURONTE_OK);
         expect_file("that file one byte long", d, dlen + 1, NEURONTE_ERR_FORMAT);
         expect_file("that file one byte short", d, dlen - 1, NEURONTE_ERR_FORMAT);
-        d[16 + 8 * 3 + 20] ^= 0xFF; /* the first net's hidden width */
+        put32(d + 16 + 8 * 3 + 20, 1025); /* unsupported hidden width */
         expect_open("drawing file whose net is damaged", d, dlen, NEURONTE_ERR_SHAPE);
         free(d);
         /* A net with no table still has no advances. */
@@ -1511,8 +1511,8 @@ int main(int argc, char **argv)
     memcpy(copy, data, len);
     put32(copy + 20, 64);
     expect_open("hidden width 64 in a file of another width", copy, len, NEURONTE_ERR_FORMAT);
-    put32(copy + 20, 100);
-    expect_open("hidden width 100", copy, len, NEURONTE_ERR_SHAPE);
+    put32(copy + 20, 1025);
+    expect_open("hidden width 1025", copy, len, NEURONTE_ERR_SHAPE);
     put32(copy + 20, 0);
     expect_open("hidden width 0", copy, len, NEURONTE_ERR_SHAPE);
     put32(copy + 20, 2048);

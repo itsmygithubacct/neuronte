@@ -97,7 +97,7 @@ FLAME = weights/neuronte-flame-v0
 ICON = weights/neuronte-icon-v1
 OBJS = build/neuronte.o build/utf8.o build/video.o
 TOOLS = build/neuronte-render build/neuronte-bench
-TESTS = build/test_utf8 build/test_api
+TESTS = build/test_utf8 build/test_api build/test_tiled
 
 all: build/libneuronte.a build/libneuronte.so $(TOOLS)
 
@@ -118,6 +118,17 @@ build/%: tools/%.c build/libneuronte.a
 
 build/test_%: tests/test_%.c build/libneuronte.a
 	$(CC) $(NRT_CFLAGS) -o $@ $< build/libneuronte.a $(LDLIBS)
+
+# The library again, with every tiled sample evaluated where it is summed
+# instead of kept per tile; its coverage must be the same, bit for bit.
+STREAM_OBJS = $(OBJS:build/%=build/stream/%)
+
+build/stream/%.o: src/%.c include/neuronte.h
+	mkdir -p build/stream
+	$(CC) $(NRT_CFLAGS) -DNEURONTE_TILE_KEEP_MAX=0 -c -o $@ $<
+
+build/stream/libneuronte.so: $(STREAM_OBJS)
+	$(CC) $(LDFLAGS) -shared -o $@ $^ $(LDLIBS)
 
 # The terminal demo links kitty-framebuffer (MIT), compiled from its source
 # tree into build/ so that tree is left untouched. Needs zlib and pthreads.
@@ -251,9 +262,15 @@ test-widths: build/libneuronte.so build/test_widths
 	./build/test_widths
 	$(PYTHON) tests/check_widths.py build/libneuronte.so
 
+test-tiled: build/libneuronte.so build/stream/libneuronte.so build/test_tiled
+	./build/test_tiled
+	$(PYTHON) tests/check_tiled.py build/libneuronte.so --stream build/stream/libneuronte.so
+
+.PHONY: test-tiled
+
 .PHONY: test-widths
 
-test: all $(TESTS) test-widths test-rc9 test-rc9-quality test-ui-metadata test-bench-errors
+test: all $(TESTS) test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors
 	cd weights && sha256sum -c --quiet SHA256SUMS
 	# The pointer net keeps its own list, with paths from the top of the tree.
 	sha256sum -c --quiet weights/neuronte-pointer-v0.sha256

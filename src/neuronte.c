@@ -29,6 +29,14 @@
  * proportional face, regular and bold, in steps of a hundredth of an em.
  * A drawing file (version 5) is a directory of whole images: nets, at
  * most one advance table, and colour nets.
+ *
+ * A tiled net (version 6) is one distance glyph cut into a grid of
+ * rectangles of the design cell. Each tile is drawn by one of the version 1
+ * nets the image carries, from a code made of some of the scalar's bits.
+ * Every sample of the whole cell is taken where it falls, in the local
+ * coordinates of the tile holding it, so the cell need not divide evenly
+ * into tiles. It opens by itself and as a bundle member, and draws as one
+ * net: one call per glyph, one cache entry per glyph.
  */
 #include "neuronte.h"
 
@@ -64,6 +72,16 @@
 #define COLOUR_FIXED 420
 #define MAX_E 65536
 #define MAX_MEMBER (32u * 1024u * 1024u) /* a wide colour net, plus its edge table */
+#define TILED_HEAD 32
+#define MAX_TILE_AXIS 16 /* columns, and rows, of a tiled net */
+#define MAX_TILE_NETS 64
+/* A tiled glyph keeps the samples of each distinct tile it evaluates when
+ * the cell has at most this many samples, so tiles with the same net, code
+ * and local positions are evaluated once. Larger cells are evaluated
+ * sample by sample with the same arithmetic, in the same order. */
+#ifndef NEURONTE_TILE_KEEP_MAX
+#define NEURONTE_TILE_KEEP_MAX (1u << 22)
+#endif
 
 /* On x86-64 with GCC or Clang, build the inner loops twice, plain and
  * AVX2, and let the loader pick by CPU at run time. Built as ISO C, the
@@ -112,8 +130,10 @@ struct colour {
     int nrecs;
 };
 
+struct tiled;
+
 struct net {
-    int h;          /* hidden width */
+    int h;          /* hidden width; 0 for a tiled net */
     float *w1_pos;  /* POS rows of h: column i of l1, as a row */
     float *w1_code; /* CODE rows of h */
     float *b1;
@@ -126,7 +146,24 @@ struct net {
     float tau;
     uint32_t masks[NMASK];
     struct colour *col; /* set for a version 3 net, otherwise NULL */
+    struct tiled *tl;   /* set for a version 6 net, otherwise NULL */
     float mem[];        /* the arrays above point into this */
+};
+
+/* One tile: the net that draws it and how its code is made from the bits
+ * b = scalar - first. Place: base | (b & mask). Extract: base plus the bits
+ * of b under mask, packed down to the low end. */
+struct tile {
+    uint32_t net, mask, base, extract;
+};
+
+struct tiled {
+    uint32_t first, last;
+    int cols, rows, nnets;
+    double xe[MAX_TILE_AXIS + 1]; /* column edges, 0 to 1 */
+    double ye[MAX_TILE_AXIS + 1]; /* row edges, 0 to 2 */
+    struct tile tile[MAX_TILE_AXIS * MAX_TILE_AXIS];
+    struct net *net[MAX_TILE_NETS];
 };
 
 struct range {
@@ -232,6 +269,7 @@ static int net_open(const unsigned char *p, size_t len, struct net **out)
     if (!n)
         return NEURONTE_ERR_NOMEM;
     n->col = NULL;
+    n->tl = NULL;
     m = n->mem;
     n->h = h;
     n->w1_pos = m;
@@ -321,11 +359,24 @@ static void colour_free(struct colour *c)
     free(c);
 }
 
+static void net_free(struct net *n);
+
+static void tiled_free(struct tiled *t)
+{
+    int i;
+    if (!t)
+        return;
+    for (i = 0; i < t->nnets; i++)
+        net_free(t->net[i]);
+    free(t);
+}
+
 static void net_free(struct net *n)
 {
     if (!n)
         return;
     colour_free(n->col);
+    tiled_free(n->tl);
     free(n);
 }
 
@@ -412,6 +463,7 @@ static int colour_open(const unsigned char *p, size_t len, struct net **out)
         return NEURONTE_ERR_NOMEM;
     }
     n->col = c;
+    n->tl = NULL;
     m = n->mem;
     n->h = h;
     n->w1_pos = m;
@@ -577,6 +629,116 @@ bad:
     return NEURONTE_ERR_FORMAT;
 }
 
+/* The bytes a tiled net needs before its nets, from its first 28 bytes,
+ * or 0 if the counts are out of range. */
+static size_t tiled_prefix(const unsigned char *p)
+{
+    uint32_t c = rd32(p + 12), r = rd32(p + 16), m = rd32(p + 20);
+    if (c < 1 || c > MAX_TILE_AXIS || r < 1 || r > MAX_TILE_AXIS || m < 1 || m > MAX_TILE_NETS ||
+        m > c * r)
+        return 0;
+    return TILED_HEAD + 4 * ((size_t)c + 1 + r + 1) + 16 * (size_t)c * r + 4 * (size_t)m;
+}
+
+/* The length of a tiled net from its first tiled_prefix() bytes, or 0. */
+static size_t tiled_len(const unsigned char *p)
+{
+    size_t prefix = tiled_prefix(p), total = prefix, i;
+    uint32_t m = rd32(p + 20);
+    for (i = 0; total && i < m; i++) {
+        uint32_t len = rd32(p + prefix - 4 * (size_t)m + 4 * i);
+        if (len < HEADER || len > MAX_MEMBER)
+            return 0;
+        total += len;
+    }
+    return total;
+}
+
+static int popcount32(uint32_t v)
+{
+    int n = 0;
+    for (; v; v &= v - 1)
+        n++;
+    return n;
+}
+
+/* A version 6 image: edges, tiles, then the version 1 nets they name. */
+static int tiled_open(const unsigned char *p, size_t len, struct net **out)
+{
+    struct tiled *t;
+    struct net *n;
+    const unsigned char *q;
+    size_t prefix, off;
+    uint32_t used[MAX_TILE_NETS];
+    int i, rc;
+
+    if (len < TILED_HEAD || memcmp(p, "NEURONTE", 8) != 0 || rd32(p + 8) != 6 ||
+        (prefix = tiled_prefix(p)) == 0 || len < prefix || tiled_len(p) != len)
+        return NEURONTE_ERR_FORMAT;
+    t = calloc(1, sizeof *t);
+    n = calloc(1, sizeof *n);
+    if (!t || !n) {
+        free(t);
+        free(n);
+        return NEURONTE_ERR_NOMEM;
+    }
+    n->tl = t;
+    t->cols = (int)rd32(p + 12);
+    t->rows = (int)rd32(p + 16);
+    t->first = rd32(p + 24);
+    t->last = rd32(p + 28);
+    rc = NEURONTE_ERR_FORMAT;
+    if (t->first > t->last || t->last > 0x1FFFFF)
+        goto fail;
+    q = p + TILED_HEAD;
+    for (i = 0; i <= t->cols; i++, q += 4) {
+        float e = rdf(q);
+        if (!isfinite(e) || (i == 0 && e != 0.0f) || (i == t->cols && e != 1.0f) ||
+            (i > 0 && !((double)e > t->xe[i - 1])))
+            goto fail;
+        t->xe[i] = e;
+    }
+    for (i = 0; i <= t->rows; i++, q += 4) {
+        float e = rdf(q);
+        if (!isfinite(e) || (i == 0 && e != 0.0f) || (i == t->rows && e != 2.0f) ||
+            (i > 0 && !((double)e > t->ye[i - 1])))
+            goto fail;
+        t->ye[i] = e;
+    }
+    memset(used, 0, sizeof used);
+    for (i = 0; i < t->cols * t->rows; i++, q += 16) {
+        struct tile *tl = &t->tile[i];
+        tl->net = rd32(q);
+        tl->mask = rd32(q + 4);
+        tl->base = rd32(q + 8);
+        tl->extract = rd32(q + 12);
+        if (tl->net >= rd32(p + 20) || tl->mask > 0x1FFFFF || tl->base > 0x1FFFFF || tl->extract > 1)
+            goto fail;
+        /* Every code a tile can make must fit the nets' 21-bit input. */
+        if (tl->extract && (uint32_t)(0x1FFFFF - tl->base) < (1u << popcount32(tl->mask)) - 1u)
+            goto fail;
+        used[tl->net] = 1;
+    }
+    off = prefix;
+    for (i = 0; i < (int)rd32(p + 20); i++) {
+        size_t ml = rd32(p + prefix - 4 * (size_t)rd32(p + 20) + 4 * (size_t)i);
+        const unsigned char *m = p + off;
+        if (!used[i] || rd32(m + 8) != 1 || memcmp(m, "NEURONTE", 8) != 0)
+            goto fail;
+        rc = net_open(m, ml, &t->net[i]);
+        if (rc != NEURONTE_OK)
+            goto fail;
+        t->nnets++;
+        rc = NEURONTE_ERR_FORMAT;
+        off += ml;
+    }
+    *out = n;
+    return NEURONTE_OK;
+fail:
+    net_free(n);
+    return rc;
+}
+
 static int member_open(const unsigned char *p, size_t len, struct net **out)
 {
     if (len < 12 || memcmp(p, "NEURONTE", 8) != 0)
@@ -585,6 +747,8 @@ static int member_open(const unsigned char *p, size_t len, struct net **out)
         return net_open(p, len, out);
     if (rd32(p + 8) == 3)
         return colour_open(p, len, out);
+    if (rd32(p + 8) == 6)
+        return tiled_open(p, len, out);
     return NEURONTE_ERR_FORMAT;
 }
 
@@ -794,7 +958,7 @@ int neuronte_open(const void *data, size_t len, neuronte **out)
     if (len < MIN_IMAGE || memcmp(p, "NEURONTE", 8) != 0)
         return NEURONTE_ERR_FORMAT;
     ver = rd32(p + 8);
-    if (ver != 1 && ver != 2 && ver != 3 && ver != 4 && ver != 5)
+    if (ver < 1 || ver > 6)
         return NEURONTE_ERR_FORMAT;
     n = calloc(1, sizeof *n);
     if (!n)
@@ -809,8 +973,11 @@ int neuronte_open(const void *data, size_t len, neuronte **out)
         n->nets = rc == NEURONTE_OK;
     } else if (ver == 4) {
         rc = adv_open(p, len, n);
-    } else {
+    } else if (ver == 5) {
         rc = drawing_open(p, len, n);
+    } else {
+        rc = tiled_open(p, len, &n->net[0]);
+        n->nets = rc == NEURONTE_OK;
     }
     if (rc == NEURONTE_OK)
         rc = adopt(n);
@@ -964,6 +1131,9 @@ int neuronte_open_file(const char *path, neuronte **out)
     else if (got == sizeof head && rd32(head + 8) == 5) {
         prefix = drawing_prefix(head);
         whole = drawing_len;
+    } else if (got == sizeof head && rd32(head + 8) == 6) {
+        prefix = tiled_prefix(head);
+        whole = tiled_len;
     }
     if (prefix) {
         /* A drawing file of one member has a prefix shorter than the head
@@ -1020,10 +1190,15 @@ size_t neuronte_parameters(const neuronte *n)
         return 0;
     for (i = 0; i < n->nets; i++) {
         struct colour *c = n->net[i]->col;
+        struct tiled *t = n->net[i]->tl;
         if (c)
             total += trunk_floats((size_t)n->net[i]->h, (size_t)c->k) +
                      head_floats((size_t)c->r, (size_t)c->k);
-        else
+        else if (t) {
+            int j;
+            for (j = 0; j < t->nnets; j++)
+                total += params((size_t)t->net[j]->h);
+        } else
             total += params((size_t)n->net[i]->h);
     }
     return total + (n->gate_h ? gate_params((size_t)n->gate_h, (size_t)n->nets) : 0);
@@ -1566,6 +1741,206 @@ int neuronte_route_half(const neuronte *n, uint32_t scalar, int half)
     return route(n, code);
 }
 
+static uint32_t tile_code(const struct tiled *t, const struct tile *tl, uint32_t s)
+{
+    uint32_t b = s - t->first, v = 0, bit = 1, m;
+    if (!tl->extract)
+        return tl->base | (b & tl->mask);
+    for (m = tl->mask; m; m &= m - 1, bit <<= 1)
+        if (b & (m & -m))
+            v |= bit;
+    return tl->base + v;
+}
+
+/* Where the samples of one axis fall among its tiles. edge[] is in the
+ * axis's own units (scale 1 for x, 2 for y); a sample at (i + 0.5) / n of
+ * the axis belongs to tile k when edge[k] <= its position < edge[k + 1].
+ * first[k] is its first sample and pos[] the samples' local positions,
+ * 0 to scale, in sample order. The arithmetic is that of an untiled net
+ * when a tile's edges fall on whole samples. */
+static void tile_axis(const double *edge, int tiles, int n, double scale, int *first, double *pos)
+{
+    int k, i;
+    first[0] = 0;
+    for (k = 1; k < tiles; k++) {
+        double at = ceil(edge[k] / scale * (double)n - 0.5);
+        first[k] = at < 0.0 ? 0 : at > (double)n ? n : (int)at;
+        if (first[k] < first[k - 1])
+            first[k] = first[k - 1];
+    }
+    first[tiles] = n;
+    for (k = 0; k < tiles; k++) {
+        double off = edge[k] / scale * (double)n;
+        double span = (edge[k + 1] - edge[k]) / scale * (double)n;
+        for (i = first[k]; i < first[k + 1]; i++)
+            pos[i] = ((double)i + 0.5 - off) / span * scale;
+    }
+}
+
+/* The first tile on the axis, at or before k, whose samples have the same
+ * count, width and local positions as tile k's. */
+static int axis_class(const int *first, const double *pos, const double *edge, int k)
+{
+    int j, n = first[k + 1] - first[k];
+    for (j = 0; j < k; j++)
+        if (first[j + 1] - first[j] == n && edge[j + 1] - edge[j] == edge[k + 1] - edge[k] &&
+            (n == 0 || memcmp(pos + first[j], pos + first[k], (size_t)n * sizeof *pos) == 0))
+            return j;
+    return k;
+}
+
+static int tiled_coverage(const struct tiled *t, uint32_t s, int cell_w, int cell_h, int ss,
+                          float *coverage)
+{
+    int sw = cell_w * ss, sh = cell_h * ss, nt = t->cols * t->rows;
+    int cx[MAX_TILE_AXIS + 1], ry[MAX_TILE_AXIS + 1], cc[MAX_TILE_AXIS], rc_[MAX_TILE_AXIS];
+    int owner[MAX_TILE_AXIS * MAX_TILE_AXIS], i, j, k, r, c, px, py, rc = NEURONTE_ERR_NOMEM;
+    uint32_t code[MAX_TILE_AXIS * MAX_TILE_AXIS];
+    float slope[MAX_TILE_AXIS], *chars[MAX_TILE_AXIS * MAX_TILE_AXIS];
+    float **xparts = NULL, **yparts = NULL, *frag[MAX_TILE_AXIS * MAX_TILE_AXIS];
+    float *scratch = NULL;
+    double *xpos = NULL, *ypos = NULL;
+    int *col_of = NULL, *row_of = NULL;
+    int keep = (size_t)sw * (size_t)sh <= NEURONTE_TILE_KEEP_MAX, hmax = 1;
+
+    memset(chars, 0, sizeof chars);
+    memset(frag, 0, sizeof frag);
+    xpos = malloc((size_t)sw * sizeof *xpos);
+    ypos = malloc((size_t)sh * sizeof *ypos);
+    col_of = malloc((size_t)sw * sizeof *col_of);
+    row_of = malloc((size_t)sh * sizeof *row_of);
+    xparts = calloc((size_t)t->nnets * t->cols, sizeof *xparts);
+    yparts = calloc((size_t)t->nnets * t->rows, sizeof *yparts);
+    if (!xpos || !ypos || !col_of || !row_of || !xparts || !yparts)
+        goto done;
+    tile_axis(t->xe, t->cols, sw, 1.0, cx, xpos);
+    tile_axis(t->ye, t->rows, sh, 2.0, ry, ypos);
+    for (c = 0; c < t->cols; c++) {
+        cc[c] = axis_class(cx, xpos, t->xe, c);
+        for (i = cx[c]; i < cx[c + 1]; i++)
+            col_of[i] = c;
+    }
+    for (r = 0; r < t->rows; r++) {
+        rc_[r] = axis_class(ry, ypos, t->ye, r);
+        for (j = ry[r]; j < ry[r + 1]; j++)
+            row_of[j] = r;
+    }
+    for (i = 0; i < t->nnets; i++)
+        if (t->net[i]->h > hmax)
+            hmax = t->net[i]->h;
+    scratch = malloc(3 * (size_t)hmax * sizeof *scratch);
+    if (!scratch)
+        goto done;
+    /* The coverage ramp is as wide as one sample of the whole cell: a
+     * tile's tau is for its own width, so the slope uses that width. */
+    for (c = 0; c < t->cols; c++)
+        slope[c] = (float)((t->xe[c + 1] - t->xe[c]) * (double)cell_w);
+    /* Code, and the first tile with the same net, code and samples. */
+    for (k = 0; k < nt; k++) {
+        const struct tile *tl = &t->tile[k];
+        r = k / t->cols;
+        c = k % t->cols;
+        code[k] = tile_code(t, tl, s);
+        owner[k] = k;
+        for (j = 0; j < k; j++)
+            if (owner[j] == j && t->tile[j].net == tl->net && code[j] == code[k] &&
+                cc[j % t->cols] == cc[c] && rc_[j / t->cols] == rc_[r]) {
+                owner[k] = j;
+                break;
+            }
+        if (cx[c + 1] == cx[c] || ry[r + 1] == ry[r] || owner[k] != k)
+            continue;
+        {
+            const struct net *n = t->net[tl->net];
+            size_t h = (size_t)n->h;
+            float **xp = &xparts[tl->net * t->cols + cc[c]], **yp = &yparts[tl->net * t->rows + rc_[r]];
+            chars[k] = malloc(h * sizeof **chars);
+            if (!chars[k])
+                goto done;
+            char_part(n, code[k], chars[k]);
+            if (!*xp) {
+                int a = cc[c];
+                *xp = malloc((size_t)(cx[a + 1] - cx[a]) * h * sizeof **xp);
+                if (!*xp)
+                    goto done;
+                for (i = cx[a]; i < cx[a + 1]; i++)
+                    axis_part(n, 0, xpos[i], *xp + (size_t)(i - cx[a]) * h);
+            }
+            if (!*yp) {
+                int a = rc_[r];
+                *yp = malloc((size_t)(ry[a + 1] - ry[a]) * h * sizeof **yp);
+                if (!*yp)
+                    goto done;
+                for (j = ry[a]; j < ry[a + 1]; j++)
+                    axis_part(n, 1, ypos[j], *yp + (size_t)(j - ry[a]) * h);
+            }
+            if (keep) {
+                int nx = cx[c + 1] - cx[c], ny = ry[r + 1] - ry[r], li, lj;
+                float sl = n->tau * slope[c] * (float)ss, *f;
+                f = frag[k] = malloc((size_t)nx * (size_t)ny * sizeof *f);
+                if (!f)
+                    goto done;
+                for (lj = 0; lj < ny; lj++)
+                    for (li = 0; li < nx; li++) {
+                        float v = 0.5f + sl * field(n, chars[k], *xp + (size_t)li * h,
+                                                    *yp + (size_t)lj * h, scratch);
+                        *f++ = v < 0.0f ? 0.0f : v > 1.0f ? 1.0f : v;
+                    }
+            }
+        }
+    }
+    /* Sum each pixel's samples in the order an untiled net sums them. */
+    for (py = 0; py < cell_h; py++)
+        for (px = 0; px < cell_w; px++) {
+            float acc = 0.0f;
+            for (j = py * ss; j < py * ss + ss; j++)
+                for (i = px * ss; i < px * ss + ss; i++) {
+                    int tk, ok;
+                    r = row_of[j];
+                    c = col_of[i];
+                    tk = r * t->cols + c;
+                    ok = owner[tk];
+                    if (keep) {
+                        acc += frag[ok][(size_t)(j - ry[r]) * (size_t)(cx[c + 1] - cx[c]) +
+                                        (size_t)(i - cx[c])];
+                    } else {
+                        const struct tile *tl = &t->tile[tk];
+                        const struct net *n = t->net[tl->net];
+                        size_t h = (size_t)n->h;
+                        float v = 0.5f + n->tau * slope[c] * (float)ss *
+                                             field(n, chars[ok],
+                                                   xparts[tl->net * t->cols + cc[c]] +
+                                                       (size_t)(i - cx[c]) * h,
+                                                   yparts[tl->net * t->rows + rc_[r]] +
+                                                       (size_t)(j - ry[r]) * h,
+                                                   scratch);
+                        acc += v < 0.0f ? 0.0f : v > 1.0f ? 1.0f : v;
+                    }
+                }
+            coverage[(size_t)py * cell_w + px] = acc / (float)(ss * ss);
+        }
+    rc = NEURONTE_OK;
+done:
+    for (k = 0; k < nt; k++) {
+        free(chars[k]);
+        free(frag[k]);
+    }
+    if (xparts)
+        for (i = 0; i < t->nnets * t->cols; i++)
+            free(xparts[i]);
+    if (yparts)
+        for (i = 0; i < t->nnets * t->rows; i++)
+            free(yparts[i]);
+    free(xparts);
+    free(yparts);
+    free(scratch);
+    free(xpos);
+    free(ypos);
+    free(col_of);
+    free(row_of);
+    return rc;
+}
+
 static int coverage_code(const neuronte *hd, uint32_t scalar, int cell_w, int cell_h,
                           int samples_per_axis, float *coverage)
 {
@@ -1580,6 +1955,8 @@ static int coverage_code(const neuronte *hd, uint32_t scalar, int cell_w, int ce
     if (ss == 0)
         ss = auto_samples(cell_w);
     n = hd->net[route(hd, scalar)];
+    if (n->tl)
+        return tiled_coverage(n->tl, scalar, cell_w, cell_h, ss, coverage);
     if (n->col) {
         size_t plane = (size_t)cell_w * cell_h;
         int k = n->col->k, rc;

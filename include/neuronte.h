@@ -54,7 +54,13 @@ enum {
  * pen steps of a proportional face and no net. A drawing file holds
  * monochrome or colour nets and at most one advance table. A scalar is
  * drawn by the first net in a drawing file; use a bundle when scalars
- * need routing between different nets. */
+ * need routing between different nets.
+ *
+ * A tiled net (format version 6) is one monochrome net made of up to 64
+ * smaller ones, each drawing a rectangle of the cell from chosen bits of
+ * the scalar. It opens alone or as a bundle member, and every call below
+ * treats it as one net: one coverage or draw call per glyph, cached
+ * whole. */
 int neuronte_open(const void *data, size_t len, neuronte **out);
 int neuronte_open_file(const char *path, neuronte **out);
 void neuronte_close(neuronte *n);

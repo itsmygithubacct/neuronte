@@ -213,8 +213,10 @@ time in the file, the clock, how late it was shown, when it was written, and the
 packing and writing, or that it was dropped or skipped); `--stats FILE`
 writes the totals. `--input-fd N` takes keys from a descriptor, for scripts.
 `--untimed` disables sound, clock waits and late-frame dropping for throughput
-measurements; `--frames N` bounds the work. Shared-memory backpressure still
-applies, so a benchmark consumer must read and unlink each published frame.
+measurements; `--frames N` bounds the work. When the shared-memory slots are
+full, untimed playback keeps the current frame and waits for a slot while
+still handling controls. A benchmark consumer must read and unlink each
+published frame. Timed playback skips frames when the terminal falls behind.
 The scaler defaults to one worker to reduce CPU overhead at terminal sizes.
 `--filter-threads 0` restores ffmpeg's automatic worker count; higher counts
 can help throughput at larger resolutions. This changes scheduling, not the

@@ -627,6 +627,8 @@ def main():
             # Packed pictures stay pending until their full deadline, including
             # pauses and rates below one frame per second.
             wait = .05 if paused and not preview else 0.
+            if a.untimed and pending is not None and pending['payload'] is None:
+                wait = .001                        # retry backpressure without spinning or blocking controls
             if pending is not None and not paused and not a.untimed:
                 wait = max(0., min(.05, pending['pts'] - clock.time()))
             for key in keys.read(wait):
@@ -698,9 +700,19 @@ def main():
                 t4 = time.perf_counter()
                 pending = dict(payload=payload, pts=pts, record=record,
                                costs=(read_time, t2 - t1, t3 - t2, t4 - t3))
+                if payload is None and a.untimed:
+                    pending['picture'] = picture   # keep this frame until the consumer has space
                 read_time = 0.
             if not a.untimed and clock.time() < pending['pts']: continue
             payload, pts, record = pending['payload'], pending['pts'], pending['record']
+            if payload is None and a.untimed:
+                retry = time.perf_counter()
+                payload = present_pixels(pending['picture'])
+                costs = pending['costs']
+                pending['costs'] = (*costs[:3], costs[3] + time.perf_counter() - retry)
+                if payload is None: continue
+                pending['payload'] = payload
+                del pending['picture']
             if payload is None:                             # the terminal is behind: skip, do not queue
                 skipped += 1; record['skipped'] = True; pending = None
                 if log: log.write(json.dumps(record) + '\n')

@@ -655,6 +655,55 @@ class Video(unittest.TestCase):
         self.assertEqual(out.count(b',t=s;'),3);self.assertIn(b'5 skipped for a busy terminal',err)
         self.assertEqual(set(glob.glob('/dev/shm/neuronte-play-*')),before)
 
+    def test_untimed_player_keeps_every_frame_when_the_consumer_stalls(self):
+        import base64,re,select,time
+        with tempfile.TemporaryDirectory() as temp:
+            stats=Path(temp)/'stats.json'
+            cmd=[sys.executable,str(ROOT/'tools/neuronte-play.py'),'testsrc2=size=32x24:rate=30',
+                 '--lavfi','--no-audio','--pixel-size','17x13','--frames','8','--transport','shm',
+                 '--no-status','--untimed','--stats',str(stats)]
+            with subprocess.Popen(cmd,stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.PIPE) as child:
+                data=b'';paths=[];frames=[];stalled=False;deadline=time.monotonic()+10
+                try:
+                    while time.monotonic()<deadline and len(frames)<8:
+                        if select.select([child.stdout],[],[],.1)[0]:
+                            chunk=os.read(child.stdout.fileno(),4096)
+                            if not chunk:break
+                            data+=chunk
+                        while True:
+                            match=re.search(rb',t=s;([^\x1b]+)\x1b\\',data)
+                            if match is None:break
+                            paths.append(Path('/dev/shm')/base64.b64decode(match[1]).decode())
+                            data=data[match.end():]
+                        if not stalled and len(paths)==3:
+                            time.sleep(.15)  # all slots occupied: frame four must remain pending
+                            self.assertIsNone(child.poll(),'player skipped the remaining frames')
+                            stalled=True
+                        if stalled:
+                            while paths:
+                                path=paths.pop(0);frames.append(path.read_bytes());path.unlink()
+                    _,err=child.communicate(timeout=3)
+                    self.assertEqual(child.returncode,0,err)
+                    self.assertTrue(stalled)
+                    self.assertEqual(len(frames),8)
+                    self.assertTrue(all(len(frame)==17*13*3 for frame in frames))
+                    summary=json.loads(stats.read_text())
+                    self.assertEqual((summary['source_frames'],summary['shown'],summary['skipped_terminal_busy']),
+                                     (8,8,0))
+                finally:
+                    if child.poll() is None:child.kill();child.wait()
+                    for path in Path('/dev/shm').glob(f'neuronte-play-{child.pid}-*'):path.unlink(missing_ok=True)
+
+    def test_untimed_player_can_quit_while_the_consumer_is_blocked(self):
+        import time
+        began=time.monotonic()
+        code,out,err=self.player('--untimed','--frames','8','--transport','shm',
+                                 '--no-audio',keys=[(1.,b'q')],timeout=3)
+        self.assertEqual(code,0,err)
+        self.assertLess(time.monotonic()-began,3)
+        self.assertEqual(out.count(b',t=s;'),3)
+        self.assertIn(b'0 skipped for a busy terminal',err)
+
     def test_player_waits_for_the_terminal_to_take_the_final_shared_frame(self):
         import base64,re,select,time
         cmd=[sys.executable,str(ROOT/'tools/neuronte-play.py'),'color=c=red:size=32x48:rate=10',

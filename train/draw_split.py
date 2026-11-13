@@ -56,7 +56,15 @@ def groups(scalars, parts):
     return [scalars[n*i//parts:n*(i+1)//parts] for i in range(parts)]
 
 
-def specs(design, scalars, width=None):
+def specs(design, scalars, width=None, custom=None):
+    if design == 'custom':
+        if not custom or not width:
+            raise ValueError('a custom design needs --groups-file, --tag and --width')
+        tag, chosen = custom
+        if sorted(sum(chosen, [])) != sorted(set(sum(chosen, []))) or not set(sum(chosen, [])) <= set(scalars):
+            raise ValueError('custom groups must be disjoint labelled scalars')
+        return [{'name': f'draw-{tag}-p{i}', 'design': tag, 'index': i, 'width': width,
+                 'region': [0., 1., 0., 2.], 'scalars': sorted(g)} for i, g in enumerate(chosen)]
     if design not in DESIGNS:
         raise ValueError(f'unknown draw design {design!r}')
     kind, parts, cols, rows = DESIGNS[design]
@@ -109,7 +117,10 @@ def train(args):
     seeds = [int(x) for x in args.seeds.split(',')]
     if not seeds or len(set(seeds)) != len(seeds):
         raise ValueError('seeds must be distinct')
-    members = [{**spec, 'seed': seed} for seed in seeds for spec in specs(args.design, scalars, args.width)]
+    custom = None
+    if args.design == 'custom':
+        custom = (args.tag, json.loads(Path(args.groups_file).read_text()))
+    members = [{**spec, 'seed': seed} for seed in seeds for spec in specs(args.design, scalars, args.width, custom)]
     full = np.load(args.directory/'teacher.npy', allow_pickle=False)
     index = {s: i for i, s in enumerate(scalars)}
     model_count, glyph_count = len(members), max(len(m['scalars']) for m in members)
@@ -164,7 +175,7 @@ def train(args):
                 'labelled_samples': 256, 'candidate_samples': 1024, 'unlabelled_samples': 256, 'unlabelled_scalars': 64,
                 'optimizer': 'Adam 0.002, cosine', 'gradient_reduction': 'sum of independent per-model losses',
                 'rng_policy': 'original initialization per seed, shared draws within a seed and padded glyph-count group'}
-    stem = f'{args.design}-w{width}-s{"_".join(map(str, seeds))}'
+    stem = f'{args.tag if custom else args.design}-w{width}-s{"_".join(map(str, seeds))}'
     checkpoint = args.directory/(stem+'.pt')
     first, last = 0, []
     if args.resume and checkpoint.exists():
@@ -252,7 +263,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('operation', choices=('prepare', 'train', 'specs'))
     parser.add_argument('directory', type=Path)
-    parser.add_argument('--design', choices=sorted(DESIGNS), default='R4')
+    parser.add_argument('--design', choices=sorted(DESIGNS)+['custom'], default='R4')
+    parser.add_argument('--groups-file', help='custom design: JSON list of scalar lists, one per net')
+    parser.add_argument('--tag', help='custom design name, lower case letters and digits')
     parser.add_argument('--width', type=int, help='override the per-net width (default: budget / parts)')
     parser.add_argument('--seeds', default='0,1')
     parser.add_argument('--steps', type=int, default=20000)
@@ -268,6 +281,8 @@ def main():
         parser.error('invalid training counts or loss weight')
     if args.width is not None and not 1 <= args.width <= 1024:
         parser.error('width must be 1 to 1024')
+    if args.design == 'custom' and not (args.groups_file and args.tag and args.tag.isalnum() and args.tag.islower()):
+        parser.error('a custom design needs --groups-file and a lower-case alphanumeric --tag')
     if args.operation == 'prepare':
         prepare(args.directory)
     elif args.operation == 'specs':

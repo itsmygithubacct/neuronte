@@ -116,6 +116,17 @@ until the next read; a successful stream ending in a partial frame is an error.
 The player continues draining bounded diagnostics and handling controls while
 waiting for decoder output or a presentation deadline.
 
+When that kernel applies, ffmpeg writes planar `gbrp` samples rather than
+packed `rgb24`, and `neuronte_video_planes_rgb24` packs the three planes in
+the same pass that applies the learned selections. FFmpeg's scaler computes
+both layouts with the same arithmetic, but on x86 its packed full-chroma
+output is scalar while its planar output has SIMD paths, so the planar
+decode costs less CPU at the same size. The tests require identical samples
+from the installed ffmpeg in both layouts at its native CPU level, with SIMD
+disabled and with SSE2 only. `--decoded-format rgb24` restores the packed
+decode; fractional models and libraries without the planar kernel use it
+automatically. The summary JSON records `decoded_format`.
+
 Playback and benchmarks share `decoder_command`. FFmpeg uses one scaling
 worker and one rawvideo output worker. Codec threading remains automatic;
 `--decoder-threads N` lets a caller trade codec parallelism for lower memory

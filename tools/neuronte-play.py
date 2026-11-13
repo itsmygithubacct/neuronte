@@ -427,6 +427,8 @@ def main():
     p.add_argument('--fps', type=float, help='default: the file\'s own rate')
     p.add_argument('--filter-threads', type=int, default=1, help='scaling workers (default: 1; 0 lets ffmpeg choose)')
     p.add_argument('--decoder-threads', type=int, default=0, help='codec workers (default: 0 lets ffmpeg choose; fewer use less memory)')
+    p.add_argument('--decoded-format', choices=['auto', 'rgb24', 'gbrp'], default='auto',
+                   help='--pixel-size: the RGB layout ffmpeg writes; auto takes planar gbrp when the native compositor packs it')
     p.add_argument('--start', type=float, default=0, help='begin at this many seconds')
     p.add_argument('--frames', type=int, help='stop after this many source frames')
     p.add_argument('--untimed', action='store_true', help='benchmark: process every frame as fast as possible, without sound')
@@ -448,6 +450,7 @@ def main():
     a = p.parse_args()
     if a.pixel_size and (a.mode != 'pixels' or a.cols is not None or a.rows is not None):
         p.error('--pixel-size requires pixels mode and cannot be combined with --cols or --rows')
+    if a.decoded_format != 'auto' and not a.pixel_size: p.error('--decoded-format requires --pixel-size')
     if a.filter_threads < 0: p.error('--filter-threads must be nonnegative')
     if a.decoder_threads < 0: p.error('--decoder-threads must be nonnegative')
     for tool in ['ffmpeg', 'ffprobe']:
@@ -471,6 +474,7 @@ def main():
         fitter = MultiInk(a.weights, library, *BLOCKS)
         renderer = fitter if a.pixel_size else MultiInk(a.weights, library, *CELL)
     else:
+        fitter = None
         renderer = TwoInk(a.characters, *CELL, a.weights, library)
         if a.helper:
             import hashlib
@@ -479,6 +483,13 @@ def main():
             bundle = a.weights or ROOT / 'weights/neuronte-split-v5.nrt'
             if helper.doc.get('scalar_bundle_sha256') != hashlib.sha256(open(bundle, 'rb').read()).hexdigest():
                 p.error('the speed helper was trained against a different bundle')
+
+    # Both layouts carry the same RGB samples; planes skip ffmpeg's slower
+    # packed conversion and are packed by the compositor instead.
+    decoded = 'rgb24'
+    if a.pixel_size:
+        decoded = fitter.natural_input_format() if a.decoded_format == 'auto' else a.decoded_format
+    planar = decoded == 'gbrp'
 
     out = sys.stdout.buffer
     geometry = {}
@@ -505,7 +516,7 @@ def main():
         g = geometry
         cmd = decoder_command(a.video, g['w'], g['h'], fps, start=position, chroma=chroma,
                               lavfi=a.lavfi, exact_pixels=bool(a.pixel_size), filter_threads=a.filter_threads,
-                              decoder_threads=a.decoder_threads)
+                              decoder_threads=a.decoder_threads, pix_fmt=decoded)
         return Decoder(cmd)
 
     def draw_pixels(colours):
@@ -520,8 +531,10 @@ def main():
 
     def render_natural(frame):
         nonlocal output_frame
-        if output_frame is None or output_frame.shape != frame.shape:
-            output_frame = np.empty_like(frame)
+        shape = (geometry['h'], geometry['w'], 3)
+        if output_frame is None or output_frame.shape != shape:
+            output_frame = np.empty(shape, np.uint8)
+        if planar: return renderer.render_gbrp(frame, out=output_frame)
         return renderer.render_rgb24(frame, out=output_frame)
 
     presenter = Presenter(out, transport)
@@ -594,7 +607,8 @@ def main():
                         break
                     if not a.loop or paused: break
                     restart(0.); clock.seek(0.); continue
-                frame = np.frombuffer(raw, np.uint8).reshape(geometry['h'], geometry['w'], 3)
+                shape = (3, geometry['h'], geometry['w']) if planar else (geometry['h'], geometry['w'], 3)
+                frame = np.frombuffer(raw, np.uint8).reshape(shape)
                 if preview and paused:                      # a paused seek/resize gets one picture, then holds
                     if a.mode == 'pixels':
                         picture = render_natural(frame) if a.pixel_size else draw_pixels(fitter.encode(pad_cells(frame, fitter)))
@@ -672,7 +686,7 @@ def main():
                    transport=transport if a.mode == 'pixels' else 'text', sound=type(clock).__name__ == 'Sound' if clock else False,
                    late_ms=dict(median=round(float(np.median(late)), 2), p95=round(float(np.percentile(late, 95)), 2), max=round(float(late.max()), 2)),
                    mean_ms={k: round(v / shown * 1e3, 3) if shown else 0 for k, v in cost.items()}, wire_bytes=wire, notes=notes)
-    summary.update(decoded_size=[geometry['w'], geometry['h']],
+    summary.update(decoded_size=[geometry['w'], geometry['h']], decoded_format=decoded,
                    image_size=(list(a.pixel_size) if a.pixel_size else
                                [geometry['c'] * CELL[0], geometry['r'] * CELL[1]]) if a.mode == 'pixels' else None)
     if a.stats:

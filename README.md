@@ -5,6 +5,12 @@ UTF-8. The net writes that character's pixels into a buffer the caller
 owns. No font file, glyph table or bitmap atlas is consulted. The
 weights are the font.
 
+Version-1 distance models accept hidden widths divisible by four from 8 to
+1024, including width 12. The native loops use the declared width without
+padding to a larger model. Older readers requiring multiples of eight reject
+the newly supported widths. Colour-model widths retain their multiple-of-eight
+requirement. `make test-widths` checks narrow distance models and their packing.
+
 Games, the OS and `soft-raster` link the library and pass in the buffer.
 The same buffer can be shown in a Kilix terminal or in a GUI window. The
 library does not open the window or take the terminal.

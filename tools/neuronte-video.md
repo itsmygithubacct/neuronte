@@ -58,7 +58,11 @@ decodes and scales it to the terminal's grid, keeping the picture's shape.
 The sound is played by mpv with no picture (`kilix-mpv` when it is
 installed, else `mpv`), and its playback position is the clock the picture
 follows; without either, or with `--no-audio`, the wall clock is used.
-Frames that cannot be shown in time are dropped, so playback never runs slow.
+mpv reports that position in steps of about 50 ms, too coarse to time
+pictures by, so the player times them on a steady local clock that it keeps
+in step with the sound, checking ten times a second. The sound waits for the
+first picture at the start and after every seek. Frames that cannot be shown
+in time are dropped, so playback never runs slow.
 
 Keys: `q` quit, space pause, left and right 5 seconds, down and up 60 seconds,
 home restart, `m` mute, `9` and `0` volume. A seek moves the sound and
@@ -82,6 +86,16 @@ with a synthetic 640 × 360 clip at 30 frames a second: shared memory showed
 237 of 240 frames, median 5 ms after their time; inline showed 204, median
 33 ms after, because compressing and encoding 3.8 MB a frame took 19 ms.
 
+Measured again with the side-by-side run in kilix-benchmark (a 1920 × 1080
+H.264 file at 30 frames a second, a pane of 105 × 56 cells, three runs of
+20 s with two seeks each, sound sent to a null output): the terminal took
+29.5 pictures a second, 95% of
+them within 38 ms of the one before; none was dropped for lateness; the
+picture was within 0.3 ms of the player's interpolated clock for 95% of frames. The player
+used 0.40 of a core, 0.28 of it ffmpeg decoding and scaling and 0.12 the
+player itself, and 290 MB. Before the steady clock, the same run showed 130
+gaps longer than one and a half frame periods in 20 s, and 17 dropped frames.
+
 `--mode cells` writes one character and two colours a cell as ordinary
 truecolour text, which any truecolour terminal shows in its own font; in a
 Neuronte terminal the nets draw it. It is the exhaustive two-ink fit and
@@ -90,8 +104,8 @@ the 328 block characters. `--characters full` searches the whole bundle and
 `--helper` adds the speed helper; both are slower still than the picture
 needs.
 
-`--log FILE` writes one JSON line per source frame (its time, the clock, how
-late it was shown, and the milliseconds spent reading, fitting, drawing,
+`--log FILE` writes one JSON line per source frame (the monotonic time, its
+time in the file, the clock, how late it was shown, when it was written, and the milliseconds spent reading, fitting, drawing,
 packing and writing, or that it was dropped or skipped); `--stats FILE`
 writes the totals. `--input-fd N` takes keys from a descriptor, for scripts.
 

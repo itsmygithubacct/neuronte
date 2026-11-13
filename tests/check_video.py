@@ -280,6 +280,182 @@ class Video(unittest.TestCase):
             # and the sound was held too: the picture resumes where it stopped, with no file time skipped.
             self.assertEqual([round(b['pts']-a['pts'],2) for a,b in zip(shown,shown[1:]) if .5<b['pts']-a['pts']<3],[])
 
+    def sound_clip(self,temp,rate=30):
+        import shutil
+        if not (shutil.which('kilix-mpv') or shutil.which('mpv')):self.skipTest('mpv is not installed')
+        clip=str(Path(temp)/'clip.mkv')
+        made=subprocess.run(['ffmpeg','-v','error','-y','-f','lavfi','-i',f'testsrc2=size=64x48:rate={rate}','-f','lavfi','-i','sine=frequency=440',
+                             '-t','30','-c:v','mpeg4','-g','10','-c:a','pcm_s16le',clip],capture_output=True)
+        if made.returncode:self.skipTest('ffmpeg cannot make the clip')
+        return clip
+
+    def test_player_keeps_even_time_by_the_sound(self):
+        with tempfile.TemporaryDirectory() as temp:
+            clip=self.sound_clip(temp);log=Path(temp)/'log.jsonl'
+            code,out,err=self.player('--audio-output','null','--log',str(log),'--frames','100',source=clip)
+            self.assertEqual(code,0,err);self.assertIn(b'sound on',err)
+            rows=[json.loads(line) for line in log.read_text().splitlines()]
+            # The sound waits for the first picture, so nothing is late or dropped at the start.
+            self.assertEqual([r['n'] for r in rows[:30] if r.get('dropped')],[])
+            self.assertLess(abs(rows[0]['late_ms']),40)
+            # mpv reports its position in steps of about 50 ms; pictures must still come one period apart.
+            shown=[r['shown'] for r in rows if 'shown' in r]
+            gaps=np.diff(shown[5:])*1e3
+            self.assertGreater(len(gaps),80)
+            self.assertGreater(float(np.mean(np.abs(gaps-1000/30)<12)),.8,np.round(gaps[:40],1).tolist())
+            # and the picture stays with the sound over the whole run
+            late=np.array([r['late_ms'] for r in rows if 'late_ms' in r])
+            self.assertLess(float(np.percentile(np.abs(late),95)),25,np.round(late[:40],1).tolist())
+
+    FAKE_SOUND=r"""#!/usr/bin/env python3
+# Stands in for mpv: a position that runs at SPEED and is reported in 50 ms steps.
+import json,os,socket,sys,time
+path=next(a.split('=',1)[1] for a in sys.argv if a.startswith('--input-ipc-server='))
+speed=float(os.environ['FAKE_SPEED']);base=time.monotonic();at=float(next(a.split('=',1)[1] for a in sys.argv if a.startswith('--start=')));paused=False
+server=socket.socket(socket.AF_UNIX);server.bind(path);server.listen(1);c,_=server.accept();buffer=b''
+while True:
+    data=c.recv(4096)
+    if not data:break
+    buffer+=data
+    while b'\n' in buffer:
+        line,buffer=buffer.split(b'\n',1);q=json.loads(line);cmd=q['command'];value=None
+        true=at if paused else at+speed*(time.monotonic()-base)
+        if cmd[0]=='seek':at=float(cmd[1]);base=time.monotonic()
+        elif cmd[0]=='set_property' and cmd[1]=='pause':at=true;base=time.monotonic();paused=bool(cmd[2])
+        elif cmd[-1]=='time-pos':value=int(true/.05)*.05
+        elif cmd[-1]=='true-pos':value=true
+        elif cmd[-1]=='seeking':value=False
+        c.sendall(json.dumps(dict(request_id=q['request_id'],error='success',data=value)).encode()+b'\n')
+        if cmd[0]=='quit':sys.exit(0)
+"""
+
+    def fake_sound(self,temp,speed,start=3.):
+        import importlib.util
+        fake=Path(temp)/'fake-mpv';fake.write_text(self.FAKE_SOUND);fake.chmod(0o755)
+        spec=importlib.util.spec_from_file_location('neuronte_play',ROOT/'tools/neuronte-play.py');play=importlib.util.module_from_spec(spec);spec.loader.exec_module(play)
+        old=os.environ.get('FAKE_SPEED');os.environ['FAKE_SPEED']=str(speed)
+        try:sound=play.Sound(str(fake),'unused',start,False,None,0.)
+        finally:
+            if old is None:del os.environ['FAKE_SPEED']
+            else:os.environ['FAKE_SPEED']=old
+        self.addCleanup(sound.close)
+        return sound
+
+    def test_sound_clock_is_steady_and_follows_a_sound_that_runs_fast(self):
+        import time
+        with tempfile.TemporaryDirectory() as temp:
+            sound=self.fake_sound(temp,1.02)
+            seen=[];end=time.perf_counter()+4
+            while time.perf_counter()<end:
+                seen.append((time.perf_counter(),sound.time()));time.sleep(.005)
+            steps=np.diff([t for _,t in seen])/np.diff([w for w,_ in seen])
+            # between checks the clock runs with the wall clock: no 50 ms stairs
+            self.assertLess(float(np.percentile(np.abs(steps-1),90)),.2)
+            self.assertGreater(float(np.mean(np.diff([t for _,t in seen])>0)),.95)
+            # and it has followed the sound, which gained 80 ms on the wall clock in that time
+            self.assertLess(abs(sound.time()-sound.ask('get_property','true-pos')),.045)
+
+    def test_sound_clock_lands_on_a_seek_and_holds_while_paused(self):
+        import time
+        with tempfile.TemporaryDirectory() as temp:
+            sound=self.fake_sound(temp,1.)
+            for _ in range(5):sound.time();time.sleep(.03)
+            sound.seek(40.)
+            self.assertLess(abs(sound.time()-40.),.08)
+            sound.pause(True);held=sound.time();time.sleep(.3)
+            self.assertEqual(sound.time(),held)
+            sound.pause(False);time.sleep(.2)
+            self.assertLess(abs(sound.time()-held-.2),.05)
+
+    def test_a_killed_player_takes_its_sound_and_decoder_with_it(self):
+        import signal,time
+        with tempfile.TemporaryDirectory() as temp:
+            clip=self.sound_clip(temp)
+            cmd=[sys.executable,str(ROOT/'tools/neuronte-play.py'),clip,'--cols','6','--rows','3','--no-status','--audio-output','null','--loop']
+            r,w=os.pipe()
+            with tempfile.TemporaryFile() as picture:
+                child=subprocess.Popen(cmd+['--input-fd',str(r)],stdout=picture,stderr=subprocess.DEVNULL,env=dict(os.environ,COLUMNS='80',LINES='24'),pass_fds=[r]);os.close(r)
+                started=[]
+                try:
+                    end=time.time()+20
+                    while time.time()<end and len(started)<2:       # the sound and the decoder
+                        time.sleep(.05)
+                        try:started=[int(x) for x in Path(f'/proc/{child.pid}/task/{child.pid}/children').read_text().split()]
+                        except OSError:started=[]
+                    self.assertEqual(len(started),2)
+                    child.send_signal(signal.SIGKILL);child.wait(timeout=5)   # no chance to tidy up
+                    end=time.time()+5
+                    def alive(pid):
+                        try:return Path(f'/proc/{pid}/stat').read_text().rsplit(')',1)[1].split()[0]!='Z'
+                        except OSError:return False
+                    while time.time()<end and any(alive(pid) for pid in started):time.sleep(.05)
+                    self.assertEqual([pid for pid in started if alive(pid)],[])
+                finally:
+                    os.close(w)
+                    if child.poll() is None:child.kill()
+                    for pid in started:
+                        try:os.kill(pid,signal.SIGKILL)
+                        except OSError:pass
+
+    @unittest.skipUnless(sys.platform.startswith('linux'), 'needs Linux parent-death signals')
+    def test_child_dies_if_player_exits_before_child_setup(self):
+        import select,signal,time
+        ready_r,ready_w=os.pipe();go_r,go_w=os.pipe()
+        script=r'''
+import importlib.util,os,subprocess,sys
+sys.path.insert(0,sys.argv[1])
+spec=importlib.util.spec_from_file_location('play',sys.argv[1]+'/neuronte-play.py')
+play=importlib.util.module_from_spec(spec);spec.loader.exec_module(play)
+def wait_before_setup():
+    os.write(int(sys.argv[2]),str(os.getpid()).encode()+b'\n')
+    os.read(int(sys.argv[3]),1)
+    play.with_us()
+subprocess.Popen([sys.executable,'-c','import time;time.sleep(60)'],preexec_fn=wait_before_setup)
+'''
+        parent=subprocess.Popen([sys.executable,'-c',script,str(ROOT/'tools'),str(ready_w),str(go_r)],
+                                pass_fds=[ready_w,go_r],stderr=subprocess.PIPE)
+        os.close(ready_w);os.close(go_r);child=None
+        try:
+            self.assertTrue(select.select([ready_r],[],[],10)[0], 'child never reached setup')
+            child=int(os.read(ready_r,100).strip())
+            parent.kill();parent.wait(timeout=5)
+            os.write(go_w,b'x')
+            def alive():
+                try:return Path(f'/proc/{child}/stat').read_text().rsplit(')',1)[1].split()[0]!='Z'
+                except OSError:return False
+            end=time.monotonic()+5
+            while alive() and time.monotonic()<end:time.sleep(.02)
+            self.assertFalse(alive(), 'child survived the player dying before parent-death setup')
+        finally:
+            os.close(ready_r);os.close(go_w)
+            if parent.poll() is None:parent.kill();parent.wait(timeout=5)
+            parent.stderr.close()
+            if child is not None:
+                try:os.kill(child,signal.SIGKILL)
+                except OSError:pass
+
+    def test_player_leaves_no_shared_memory_when_the_window_goes(self):
+        import signal,time,glob
+        with tempfile.TemporaryDirectory() as temp:
+            clip=self.sound_clip(temp)
+            cmd=[sys.executable,str(ROOT/'tools/neuronte-play.py'),clip,'--cols','6','--rows','3','--no-status','--audio-output','null','--transport','shm','--loop']
+            r,w=os.pipe()
+            with tempfile.TemporaryFile() as picture:
+                child=subprocess.Popen(cmd+['--input-fd',str(r)],stdout=picture,stderr=subprocess.PIPE,env=dict(os.environ,COLUMNS='80',LINES='24'),pass_fds=[r]);os.close(r)
+                try:
+                    mine=f'/dev/shm/neuronte-play-{child.pid}-*'
+                    end=time.time()+20
+                    while time.time()<end and len(glob.glob(mine))<3:time.sleep(.05)
+                    self.assertEqual(len(glob.glob(mine)),3)      # nobody reads them here, so three wait
+                    child.send_signal(signal.SIGHUP);time.sleep(.05);child.send_signal(signal.SIGTERM)   # a closing terminal sends more than one
+                    child.wait(timeout=20)
+                finally:
+                    os.close(w)
+                    if child.poll() is None:child.kill()
+                    child.stderr.close()
+                self.assertEqual(glob.glob(mine),[])
+                picture.seek(0);self.assertTrue(picture.read().endswith(b'\x1b[?1049l'))   # and the terminal is put back
+
     def test_exact_video_asset(self):
         result=v.exactness()
         self.assertEqual(result['points'],2048)

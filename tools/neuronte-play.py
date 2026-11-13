@@ -20,6 +20,7 @@ m mute, 9 and 0 volume.
 """
 import argparse
 import base64
+import ctypes
 import fcntl
 import json
 import os
@@ -39,12 +40,26 @@ import zlib
 import numpy as np
 from neuronte_video import TwoInk, MultiInk, ROOT
 
+try: LIBC = ctypes.CDLL(None)        # loaded now, so a child has nothing to load between fork and exec
+except OSError: LIBC = None
+PLAYER_PID = os.getpid()
 CELL = (8, 16)                      # pixels drawn per terminal cell
 BLOCKS = (2, 4)                     # colours fitted per cell in pixels mode, across and down
 KEYS = {b'\x1b[C': 'right', b'\x1b[D': 'left', b'\x1b[A': 'up', b'\x1b[B': 'down', b'\x1b[H': 'home',
         b'\x1b[1~': 'home', b'\x1bOC': 'right', b'\x1bOD': 'left', b'\x1bOA': 'up', b'\x1bOB': 'down',
         b'\x1bOH': 'home', b' ': 'pause', b'q': 'quit', b'\x03': 'quit', b'm': 'mute', b'9': 'quieter', b'0': 'louder'}
 SEEK = {'right': 5, 'left': -5, 'up': 60, 'down': -60}
+
+
+def with_us():
+    """Run in a child before it starts: ask the kernel to end it when the
+    player dies, however the player dies. Without this a killed player leaves
+    the sound playing."""
+    try: LIBC.prctl(1, signal.SIGTERM)                      # PR_SET_PDEATHSIG
+    except Exception: pass
+    # The signal is not retroactive: the player may have died after fork,
+    # before the child registered it. Do not launch an orphan in that case.
+    if os.getppid() != PLAYER_PID: os._exit(0)
 
 
 def probe(path, lavfi):
@@ -207,13 +222,14 @@ class WallClock:
 class Sound:
     """mpv playing the file's sound with no picture. Its playback position is
     the clock; pausing and seeking it moves the picture with it."""
-    def __init__(self, player, path, start, loop, output, delay):
+    def __init__(self, player, path, start, loop, output, delay, held=False):
         self.dir = tempfile.mkdtemp(prefix='neuronte-play-'); self.path = os.path.join(self.dir, 'mpv.sock')
         cmd = [player, '--no-config', '--no-video', '--no-terminal', '--really-quiet', f'--input-ipc-server={self.path}',
-               f'--start={start}', '--keep-open=no', '--audio-display=no'] + (['--loop-file=inf'] if loop else []) \
+               f'--start={start}', '--keep-open=no', '--audio-display=no'] + (['--pause'] if held else []) + (['--loop-file=inf'] if loop else []) \
             + ([f'--ao={output}'] if output else []) + ['--', path]
-        self.child = subprocess.Popen(cmd, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        self.child = subprocess.Popen(cmd, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, preexec_fn=with_us)
         self.sock = None; self.buffer = b''; self.delay = delay; self.last = start; self.request = 0; self.volume = 100
+        self.offsets = []; self.offset = None; self.checked = 0.; self.held = start if held else None
         end = time.perf_counter() + 5
         while time.perf_counter() < end and self.child.poll() is None:
             try:
@@ -245,11 +261,30 @@ class Sound:
             self.sock = None; return None
 
     def time(self):
-        position = self.ask('get_property', 'time-pos')
-        if position is not None: self.last = position - self.delay
+        """The sound's position, read off a steady local clock that is kept
+        in step with it. mpv reports its position in jumps of tens of
+        milliseconds, far too coarse to time pictures by; between those
+        jumps the true position runs ahead of the reported one, so the
+        largest recent difference is the one to follow."""
+        if self.held is not None: return self.held - self.delay
+        now = time.perf_counter()
+        if self.offset is None or now - self.checked >= .1:
+            before = time.perf_counter(); position = self.ask('get_property', 'time-pos'); after = time.perf_counter()
+            self.checked = after; now = after
+            if position is not None:
+                self.offsets = (self.offsets + [position - (before + after) / 2])[-20:]
+                best = max(self.offsets)
+                if self.offset is None or abs(best - self.offset) > .25: self.offset = best; self.offsets = [best]   # a jump: follow at once
+                else: self.offset += .1 * (best - self.offset)
+            elif self.offset is None: return self.last
+        self.last = now + self.offset - self.delay
         return self.last
 
-    def pause(self, on): self.ask('set_property', 'pause', bool(on))
+    def pause(self, on):
+        if on and self.held is None: self.held = self.time() + self.delay
+        self.ask('set_property', 'pause', bool(on))
+        if not on and self.held is not None:
+            self.offset = self.held - time.perf_counter(); self.offsets = [self.offset]; self.checked = time.perf_counter(); self.held = None
     def mute(self): self.ask('cycle', 'mute')
     def louder(self, step):
         self.volume = max(0, min(130, self.volume + step)); self.ask('set_property', 'volume', self.volume)
@@ -260,7 +295,9 @@ class Sound:
             now = self.ask('get_property', 'time-pos')
             if now is not None and abs(now - position) < .5 and not self.ask('get_property', 'seeking'): break
             time.sleep(.01)
-        self.last = position
+        self.last = position - self.delay
+        if self.held is not None: self.held = position
+        else: self.offset = position - time.perf_counter(); self.offsets = [self.offset]; self.checked = time.perf_counter()
 
     def close(self):
         if self.sock is not None:
@@ -364,7 +401,7 @@ def main():
         g = geometry
         cmd = ['ffmpeg', '-v', 'error', '-nostdin'] + (['-f', 'lavfi'] if a.lavfi else ['-ss', f'{position:.3f}']) \
             + ['-i', a.video, '-an', '-sn', '-vf', f'fps={fps},scale={g["w"]}:{g["h"]}:flags=area', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-']
-        return subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        return subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, preexec_fn=with_us)
 
     keys = Keys(a.input_fd); presenter = Presenter(out, transport)
     source = clock = None; shown = dropped = count = skipped = seeks = 0; failure = ''; resized = []
@@ -376,30 +413,33 @@ def main():
     try:
         out.write(b'\x1b[?1049h\x1b[?25l\x1b[2J'); out.flush()
         if not a.no_audio and not a.lavfi and has_sound and player:
-            try: clock = Sound(player, a.video, a.start, a.loop, a.audio_output, a.audio_delay)
+            try: clock = Sound(player, a.video, a.start, a.loop, a.audio_output, a.audio_delay, held=True)
             except OSError as exc: notes.append(f'no sound: {exc}')
-        if clock is None: clock = WallClock(a.start)
+        if clock is None: clock = WallClock(a.start); clock.pause(True)
         origin = a.start; index = 0; previous = None; paused = False; drawn = -1.
-        source = decoder(origin)
+        source = decoder(origin); waiting = True    # the clock is held until the first picture is in hand
 
         def restart(position):
-            nonlocal source, origin, index, previous
+            nonlocal source, origin, index, previous, waiting
             source.kill(); source.wait()
+            if not waiting and not paused: clock.pause(True)
+            waiting = True
             origin = position; index = 0; previous = None; source = decoder(origin)
 
         while a.frames is None or count < a.frames:
             for key in keys.read(.05 if paused else 0):
                 if key == 'quit': raise KeyboardInterrupt
                 if key == 'pause':
-                    paused = not paused; clock.pause(paused); drawn = -1.
+                    paused = not paused; drawn = -1.
+                    if not waiting: clock.pause(paused)
                 elif key == 'mute': clock.mute()
                 elif key in ('quieter', 'louder'): clock.louder(5 if key == 'louder' else -5); drawn = -1.
                 elif (key in SEEK or key == 'home') and not a.lavfi:
                     target = 0. if key == 'home' else clock.time() + SEEK[key]
                     target = max(0., min(target, max(0., duration - 1)) if duration else target)
-                    clock.seek(target); restart(target); seeks += 1; drawn = -1.
+                    restart(target); clock.seek(target); seeks += 1; drawn = -1.
                     if paused:                              # show where we landed, then hold
-                        raw = read_exact(source.stdout, geometry['w'] * geometry['h'] * 3)
+                        raw = read_exact(source.stdout, geometry['w'] * geometry['h'] * 3); waiting = False
                         if raw is not None:
                             frame = np.frombuffer(raw, np.uint8).reshape(geometry['h'], geometry['w'], 3); index = 1
                             payload = presenter.frame(renderer.decode(fitter.encode(frame)), geometry['c'], geometry['r'], geometry['left'], geometry['top']) \
@@ -414,12 +454,15 @@ def main():
             t0 = time.perf_counter()
             raw = read_exact(source.stdout, geometry['w'] * geometry['h'] * 3)
             t1 = time.perf_counter()
+            if waiting:
+                waiting = False
+                if not paused: clock.pause(False)
             if raw is None:                                 # the end, or ffmpeg gave up: say which
                 if source.wait(): failure = source.stderr.read().decode(errors='replace').strip(); break
                 if not a.loop: break
-                clock.seek(0.); restart(0.); continue
+                restart(0.); clock.seek(0.); continue
             pts = origin + index / fps; index += 1; count += 1
-            now = clock.time(); record = dict(n=count, pts=round(pts, 4), clock=round(now, 4), read_ms=round((t1 - t0) * 1e3, 3))
+            now = clock.time(); record = dict(n=count, t=round(time.monotonic(), 6), pts=round(pts, 4), clock=round(now, 4), read_ms=round((t1 - t0) * 1e3, 3))
             if now > pts + 1 / fps and shown:               # late: skip the work, keep the clock
                 dropped += 1; record['dropped'] = True
                 if log: log.write(json.dumps(record) + '\n')
@@ -452,20 +495,22 @@ def main():
             for name, value in zip(('read', 'fit', 'draw', 'pack'), (t1 - t0, t2 - t1, t3 - t2, t4 - t3)): cost[name] += value
             cost['write'] += t5 - t4 - max(0., min(wait, 1.))
             record.update(fit_ms=round((t2 - t1) * 1e3, 3), draw_ms=round((t3 - t2) * 1e3, 3), pack_ms=round((t4 - t3) * 1e3, 3),
-                          write_ms=round((t5 - t4 - max(0., min(wait, 1.))) * 1e3, 3), late_ms=round(lateness, 3), bytes=len(payload), wall=round(t5 - began, 4))
+                          write_ms=round((t5 - t4 - max(0., min(wait, 1.))) * 1e3, 3), late_ms=round(lateness, 3), bytes=len(payload), wall=round(t5 - began, 4), shown=round(time.monotonic(), 6))
             if log: log.write(json.dumps(record) + '\n')
     except (KeyboardInterrupt, BrokenPipeError):
         pass
     finally:
+        for number in (signal.SIGTERM, signal.SIGHUP, signal.SIGINT): signal.signal(number, signal.SIG_IGN)   # a second signal must not cut this short
         elapsed = time.perf_counter() - began
+        tail = presenter.close()                            # first: the pictures in /dev/shm are the one thing nobody else removes
         if source and source.poll() is None: source.kill()
         if clock: clock.close()
         keys.close()
         if log: log.close()
         try:
-            out.write(presenter.close() + b'\x1b[?2026l\x1b[0m\x1b[?25h\x1b[?1049l'); out.flush()
-        except (BrokenPipeError, ValueError):
-            presenter.close()
+            out.write(tail + b'\x1b[?2026l\x1b[0m\x1b[?25h\x1b[?1049l'); out.flush()
+        except (OSError, ValueError):
+            pass
     late = np.array(late or [0.])
     summary = dict(shown=shown, dropped=dropped, skipped_terminal_busy=skipped, source_frames=count, seeks=seeks, seconds=round(elapsed, 3),
                    shown_per_second=round(shown / elapsed, 2) if elapsed else 0, grid=[geometry['c'], geometry['r']], mode=a.mode,

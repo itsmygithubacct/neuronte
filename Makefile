@@ -269,6 +269,11 @@ test-tiled: build/libneuronte.so build/stream/libneuronte.so build/test_tiled
 
 .PHONY: test-tiled
 
+test-known-bundle: build/libneuronte.so
+	$(PYTHON) tests/check_known_bundle.py build/libneuronte.so
+
+.PHONY: test-known-bundle
+
 .PHONY: test-widths
 
 test: all $(TESTS) test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors

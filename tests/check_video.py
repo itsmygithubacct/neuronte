@@ -328,6 +328,30 @@ class Video(unittest.TestCase):
         self.assertEqual(out.count(b',t=s;'),3);self.assertIn(b'5 skipped for a busy terminal',err)
         self.assertEqual(set(glob.glob('/dev/shm/neuronte-play-*')),before)
 
+    def test_player_waits_for_the_terminal_to_take_the_final_shared_frame(self):
+        import base64,re,select,time
+        cmd=[sys.executable,str(ROOT/'tools/neuronte-play.py'),'color=c=red:size=32x48:rate=10',
+             '--lavfi','--no-audio','--pixel-size','17x13','--frames','1','--transport','shm','--no-status']
+        with subprocess.Popen(cmd,stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.PIPE) as child:
+            data=b'';deadline=time.monotonic()+10;path=None
+            try:
+                while time.monotonic()<deadline:
+                    if select.select([child.stdout],[],[],.1)[0]:
+                        data+=os.read(child.stdout.fileno(),4096)
+                        match=re.search(rb',t=s;([^\x1b]+)\x1b\\',data)
+                        if match:
+                            path=Path('/dev/shm')/base64.b64decode(match[1]).decode();break
+                    if child.poll() is not None:break
+                self.assertIsNotNone(path,'no shared frame')
+                time.sleep(.04)  # terminal scheduling delay after the player flushes
+                self.assertEqual(path.stat().st_size,17*13*3)
+                path.unlink()  # actual consumer acknowledgment
+                _,err=child.communicate(timeout=3)
+                self.assertEqual(child.returncode,0,err)
+            finally:
+                if child.poll() is None:child.kill();child.wait()
+                if path:path.unlink(missing_ok=True)
+
     def test_player_sound_seek_and_pause(self):
         import shutil
         if not (shutil.which('kilix-mpv') or shutil.which('mpv')):self.skipTest('mpv is not installed')

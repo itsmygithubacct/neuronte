@@ -167,7 +167,15 @@ class Presenter:
         out.append(b'\x1b[?2026l'); self.current = new
         return b''.join(out)
 
-    def close(self):
+    def close(self, drain=.2):
+        # A flushed graphics command can still be waiting in the terminal's
+        # input queue. Give it a bounded chance to read/unlink the last image
+        # before removing unread objects, including after --frames completes.
+        if self.transport == 'shm':
+            deadline = time.monotonic() + drain
+            while any(os.path.exists('/dev/shm/' + name) for name in self.names):
+                if time.monotonic() >= deadline: break
+                time.sleep(.001)
         tail = b''.join(f'\x1b_Ga=d,d=I,i={i},q=2;\x1b\\'.encode() for i in self.ids)
         for name in self.names:
             try: os.unlink('/dev/shm/' + name)
@@ -488,7 +496,7 @@ def main():
                             frame = np.frombuffer(raw, np.uint8).reshape(geometry['h'], geometry['w'], 3); index = 1
                             payload = present_pixels(draw_pixels(fitter.encode(pad_cells(frame, fitter)))) \
                                 if a.mode == 'pixels' else text(renderer, renderer.fit(frame), None, geometry['left'], geometry['top'])
-                            if payload: out.write(payload)
+                            if payload: out.write(payload); out.flush()
             if resized:
                 del resized[:]; layout(); out.write(b'\x1b[2J'); restart(clock.time()); drawn = -1.
             now = clock.time()

@@ -72,6 +72,16 @@ int neuronte_video_rgb24(const uint8_t *src, size_t src_bytes, size_t src_stride
                         uint8_t *dst, size_t dst_bytes, size_t dst_stride,
                         int width, int height, const uint8_t ink_indices[8]);
 
+/* The same composition from three 8-bit planes, such as FFmpeg's gbrp
+ * output, packed into RGB24 in one pass. The planes share src_stride and
+ * each has plane_bytes readable. The planes may alias one another (a gray
+ * source passes one plane three times) but none may overlap the output.
+ * Returns NEURONTE_OK or NEURONTE_ERR_ARG; on error no output is written. */
+int neuronte_video_planes_rgb24(const uint8_t *red, const uint8_t *green, const uint8_t *blue,
+                                size_t plane_bytes, size_t src_stride,
+                                uint8_t *dst, size_t dst_bytes, size_t dst_stride,
+                                int width, int height, const uint8_t ink_indices[8]);
+
 /* The number of weights and biases, over all nets and the router's gate,
  * or 0 for NULL. A colour net counts its trunk and its palette head. */
 size_t neuronte_parameters(const neuronte *n);

@@ -106,6 +106,12 @@ class MultiInk:
                                          C.c_void_p, C.c_size_t, C.c_size_t,
                                          C.c_int, C.c_int, C.c_void_p]
             self.native_rgb24.restype = C.c_int
+        self.native_planes = getattr(self.library, 'neuronte_video_planes_rgb24', None)
+        if self.native_planes is not None:
+            self.native_planes.argtypes = [C.c_void_p, C.c_void_p, C.c_void_p, C.c_size_t, C.c_size_t,
+                                          C.c_void_p, C.c_size_t, C.c_size_t,
+                                          C.c_int, C.c_int, C.c_void_p]
+            self.native_planes.restype = C.c_int
         # Integer selection is valid only AFTER the actual neural masks are
         # exactly binary. No coverage is rounded and no geometric mask is
         # substituted. Fractional models retain the continuous blend below.
@@ -163,6 +169,50 @@ class MultiInk:
             np.copyto(out, self.decode(self.encode(padded))[:height, :width])
         return out
 
+    def natural_input_format(self):
+        """The decoded layout render_natural takes at the lowest cost.
+
+        FFmpeg's planar gbrp output is the same scaled and converted image
+        as packed rgb24 (tests/check_video.py compares them on the installed
+        FFmpeg) but its conversion runs faster. Planes only pay off when the
+        native compositor packs them while applying the learned selection.
+        """
+        return ('gbrp' if self.native_planes is not None and self.ink_indices is not None
+                and (self.width, self.height) == (2, 4) else 'rgb24')
+
+    def render_gbrp(self, planes, out=None):
+        """render_rgb24 for G, B and R planes (FFmpeg gbrp order), shape 3xHxW.
+
+        The native path packs the planes and applies the actual learned
+        selection in one pass. Otherwise the planes are packed first and the
+        packed path runs unchanged, including fractional models.
+        """
+        planes = np.asarray(planes)
+        if ((self.width, self.height) != (2, 4) or planes.dtype != np.uint8 or
+                planes.ndim != 3 or planes.shape[0] != 3 or min(planes.shape[1:]) < 1):
+            raise ValueError('natural planar rendering requires 2x4 cells and nonempty 3xHxW uint8')
+        height, width = planes.shape[1:]
+        if out is None:
+            out = np.empty((height, width, 3), np.uint8)
+        if (not isinstance(out, np.ndarray) or out.shape != (height, width, 3) or
+                out.dtype != np.uint8 or not out.flags.c_contiguous or not out.flags.writeable):
+            raise ValueError('output must be a writable contiguous RGB array of the planes\' size')
+        if np.shares_memory(planes, out):
+            raise ValueError('source and output must not overlap')
+        if self.native_planes is None or self.ink_indices is None:
+            return self.render_rgb24(np.stack((planes[2], planes[0], planes[1]), axis=-1), out)
+        planes = np.ascontiguousarray(planes)
+        indices = np.ascontiguousarray(self.ink_indices, dtype=np.uint8)
+        if indices.shape != (4, 2):
+            raise ValueError('binary ink map must be 4x2')
+        base, plane = planes.ctypes.data, planes.strides[0]
+        result = self.native_planes(base + 2 * plane, base, base + plane, plane, planes.strides[1],
+                                    out.ctypes.data, out.nbytes, out.strides[0],
+                                    width, height, indices.ctypes.data)
+        if result:
+            raise ValueError(f'native planar composition failed: {result}')
+        return out
+
     def decode(self, colours):
         colours = np.asarray(colours)
         if colours.dtype != np.uint8 or colours.ndim != 4 or colours.shape[2:] != (8, 3):
@@ -185,13 +235,14 @@ class MultiInk:
 class RGBFrameReader:
     """Read complete RGB frames into one reusable array.
 
-    A returned frame is valid until the next read. EOF before a frame returns
+    Packed frames are HxWx3; planar (gbrp) frames are 3xHxW, G, B, R. A
+    returned frame is valid until the next read. EOF before a frame returns
     None; EOF within a frame is an error rather than an apparently clean end.
     """
-    def __init__(self, width, height):
+    def __init__(self, width, height, planar=False):
         if width < 1 or height < 1:
             raise ValueError('frame size must be positive')
-        self.frame = np.empty((height, width, 3), np.uint8)
+        self.frame = np.empty((3, height, width) if planar else (height, width, 3), np.uint8)
         self.buffer = memoryview(self.frame).cast('B')
 
     def read(self, stream):
@@ -206,18 +257,24 @@ class RGBFrameReader:
         return self.frame
 
 
+DECODED_FORMATS = ('rgb24', 'gbrp')
+
+
 def decoder_command(video, width, height, fps, *, start=0., chroma=None,
                     lavfi=False, exact_pixels=True, filter_threads=1,
-                    decoder_threads=0, output_threads=1):
+                    decoder_threads=0, output_threads=1, pix_fmt='rgb24'):
     """Build the shared RGB decoder command used by playback and benchmarks.
 
     Decoder threads precede the input; rawvideo encoder threads follow it.
     Keeping these separate makes startup buffering and CPU costs measurable.
+    pix_fmt gbrp writes the same RGB samples as three planes, G, B, R.
     """
     if (width < 1 or height < 1 or not math.isfinite(fps) or fps <= 0 or
             not math.isfinite(start) or start < 0 or
             min(filter_threads, decoder_threads, output_threads) < 0):
         raise ValueError('invalid video geometry, timing or thread count')
+    if pix_fmt not in DECODED_FORMATS:
+        raise ValueError('decoded format must be rgb24 or gbrp')
     flags = 'lanczos+accurate_rnd+full_chroma_int+full_chroma_inp' if exact_pixels else 'area'
     scale = f'scale={width}:{height}:flags={flags}'
     if chroma is not None:
@@ -228,7 +285,7 @@ def decoder_command(video, width, height, fps, *, start=0., chroma=None,
             '-threads:v', str(decoder_threads),
             *(['-f', 'lavfi'] if lavfi else ['-ss', f'{start:.3f}']),
             '-i', str(video), '-an', '-sn', '-vf', f'fps={fps},{scale}',
-            '-threads:v', str(output_threads), '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-']
+            '-threads:v', str(output_threads), '-f', 'rawvideo', '-pix_fmt', pix_fmt, '-']
 
 
 def candidates(mode, width, height, weights=None, library=None):

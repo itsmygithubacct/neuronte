@@ -131,6 +131,80 @@ class Video(unittest.TestCase):
         model=v.MultiInk()
         np.testing.assert_array_equal(model.render_rgb24(image[:,::-1]), image[:,::-1])
 
+    def test_planar_rendering_matches_packed_for_learned_exchanged_and_fractional_maps(self):
+        rng = np.random.default_rng(1113)
+        def planes_of(image):  # FFmpeg gbrp order
+            return np.ascontiguousarray(image.transpose(2, 0, 1)[[1, 2, 0]])
+        for width, height in ((1,1), (1,9), (7,1), (15,5), (16,4), (17,13), (945,531)):
+            image = rng.integers(0,256,(height,width,3),dtype=np.uint8)
+            planes = planes_of(image)
+            model = v.MultiInk()
+            self.assertIsNotNone(model.native_planes)
+            self.assertEqual(model.natural_input_format(), 'gbrp')
+            packed = model.render_rgb24(image)
+            output = np.empty_like(image)
+            self.assertIs(model.render_gbrp(planes, output), output)
+            np.testing.assert_array_equal(output, packed)
+            native, model.native_planes = model.native_planes, None    # numpy packing, then the packed path
+            self.assertEqual(model.natural_input_format(), 'rgb24')
+            np.testing.assert_array_equal(model.render_gbrp(planes), packed)
+            model.native_planes = native
+            # A strided view of the planes is accepted and gives the same pixels.
+            wide = np.zeros((3, height, width + 3), np.uint8); wide[:, :, :width] = planes
+            np.testing.assert_array_equal(model.render_gbrp(wide[:, :, :width]), packed)
+        for exchange in (1, 2, 4, 3, 7):
+            model = v.MultiInk()
+            model.ink_indices = model.ink_indices ^ exchange
+            model.mix = model.mix[np.arange(8) ^ exchange]
+            rendered = model.render_gbrp(planes)
+            self.assertFalse(np.array_equal(rendered, image))
+            np.testing.assert_array_equal(rendered, model.render_rgb24(image))
+            model.ink_indices = None   # the learned continuous blend, independently
+            padded = np.pad(image,((0,-height%4),(0,-width%2),(0,0)),mode='edge')
+            np.testing.assert_array_equal(rendered, model.decode(model.encode(padded))[:height,:width])
+        fractional = v.MultiInk(ROOT/'weights/neuronte-split-v4.nrt')
+        self.assertIsNone(fractional.ink_indices)
+        self.assertEqual(fractional.natural_input_format(), 'rgb24')
+        small = image[:13, :17]
+        np.testing.assert_array_equal(fractional.render_gbrp(planes_of(small)), fractional.render_rgb24(small))
+        model = v.MultiInk()
+        with self.assertRaisesRegex(ValueError, 'overlap'):
+            buffer = np.zeros(3*13*17*2, np.uint8)
+            model.render_gbrp(buffer[:3*13*17].reshape(3,13,17), buffer[3*13*17-1:-1].reshape(13,17,3))
+        for bad in (np.zeros((2,4,4),np.uint8), np.zeros((3,4,4),np.uint16), np.zeros((3,0,4),np.uint8)):
+            with self.assertRaises(ValueError): model.render_gbrp(bad)
+        with self.assertRaises(ValueError): model.render_gbrp(planes_of(small), np.empty((13,17,4),np.uint8))
+        frozen = np.empty((13,17,3),np.uint8); frozen.flags.writeable = False
+        with self.assertRaises(ValueError): model.render_gbrp(planes_of(small), frozen)
+
+    def test_installed_ffmpeg_writes_the_same_samples_as_planes_and_packed(self):
+        """The player decodes gbrp for speed; it must equal FFmpeg's rgb24 bytes.
+
+        Checked here on the installed FFmpeg, at its normal SIMD level and with
+        forced plain-C and SSE2 code paths, with noise that clips every channel.
+        """
+        import platform
+        sources = ['nullsrc=s=320x180:r=30,format=yuv420p,geq=lum=random(1)*255:cb=random(2)*255:cr=random(3)*255',
+                   'testsrc2=s=1280x720:r=30,format=yuv420p', 'smptehdbars=s=640x360:r=30,format=yuv420p10le']
+        levels = [[]] + ([['-cpuflags', '0'], ['-cpuflags', 'sse2']] if platform.machine() in ('x86_64', 'AMD64') else [['-cpuflags', '0']])
+        for source in sources:
+            for width, height, chroma in ((945, 531, 'left'), (161, 91, 'center'), (17, 13, None)):
+                outputs = {}
+                for fmt in v.DECODED_FORMATS:
+                    command = v.decoder_command(source, width, height, 30, lavfi=True, chroma=chroma, pix_fmt=fmt)
+                    command[-1:-1] = ['-frames:v', '2']
+                    for level in levels:
+                        outputs[fmt, tuple(level)] = subprocess.check_output(command[:1] + level + command[1:])
+                # Each comparison is within one SIMD level: FFmpeg's levels need
+                # not agree with each other, and player and reference share one.
+                for level in levels:
+                    packed = np.frombuffer(outputs['rgb24', tuple(level)], np.uint8).reshape(2, height, width, 3)
+                    g, b, r = np.frombuffer(outputs['gbrp', tuple(level)], np.uint8).reshape(2, 3, height, width).transpose(1, 0, 2, 3)
+                    with self.subTest(source=source[:24], size=(width, height), level=level):
+                        same = np.stack([r, g, b], -1) == packed
+                        self.assertTrue(same.all(), f'{int((~same).sum())} samples differ')
+        with self.assertRaises(ValueError): v.decoder_command('input.mp4', 945, 531, 30, pix_fmt='yuv420p')
+
     def test_reusable_rgb_reader_handles_fragmentation_eof_and_truncation(self):
         class Short(io.BytesIO):
             def readinto(self, buf):return super().readinto(buf[:5])
@@ -142,6 +216,10 @@ class Video(unittest.TestCase):
         self.assertEqual(first.tobytes(),bytes(range(12,24)))
         self.assertIsNone(reader.read(stream))
         with self.assertRaisesRegex(ValueError,'truncated'):reader.read(Short(b'abc'))
+        planar=v.RGBFrameReader(2,2,planar=True)
+        frame=planar.read(Short(bytes(range(12))))
+        self.assertEqual(frame.shape,(3,2,2))
+        self.assertEqual(frame[1].tobytes(),bytes(range(4,8)))   # the second plane is B in gbrp order
 
     def test_decoder_builder_keeps_thread_options_on_their_input_and_output(self):
         command=v.decoder_command('input.mp4',945,531,30,start=2.25,chroma='left',decoder_threads=4)
@@ -304,13 +382,14 @@ class Video(unittest.TestCase):
     def test_player_pixel_size_preserves_every_sample_and_odd_edges(self):
         with tempfile.TemporaryDirectory() as temp:
             source=Path(temp)/'pixels.ppm';stats=Path(temp)/'stats.json'
-            for w,h in [(945,531),(1,1)]:
-                with self.subTest(size=(w,h)):
+            for (w,h),layout in [((945,531),'auto'),((945,531),'rgb24'),((1,1),'auto'),((3,5),'gbrp'),((3,5),'rgb24')]:
+                with self.subTest(size=(w,h),layout=layout):
                     # Independent RGB samples expose averaging, enlargement,
                     # colour reordering and loss of the partial edge cells.
                     pixels=np.random.default_rng(91).integers(0,256,(h,w,3),dtype=np.uint8)
                     source.write_bytes(f'P6\n{w} {h}\n255\n'.encode()+pixels.tobytes())
-                    code,out,err=self.player('--pixel-size',f'{w}x{h}','--frames','1','--stats',str(stats),source=str(source),grid=False)
+                    code,out,err=self.player('--pixel-size',f'{w}x{h}','--frames','1','--stats',str(stats),
+                                             '--decoded-format',layout,source=str(source),grid=False)
                     self.assertEqual(code,0,err)
                     frames=self.pixel_frames(out);self.assertEqual(len(frames),1)
                     header,actual=frames[0]
@@ -319,6 +398,25 @@ class Video(unittest.TestCase):
                     self.assertEqual(actual,pixels.tobytes())
                     summary=json.loads(stats.read_text())
                     self.assertEqual(summary['decoded_size'],[w,h]);self.assertEqual(summary['image_size'],[w,h])
+                    # The default takes planes, packed by the native compositor.
+                    self.assertEqual(summary['decoded_format'],'gbrp' if layout=='auto' else layout)
+
+    def test_player_planar_and_packed_decoding_present_identical_scaled_video(self):
+        with tempfile.TemporaryDirectory() as temp:
+            stats=Path(temp)/'stats.json';pictures=[]
+            source='testsrc2=size=640x360:rate=30'
+            for layout in ('gbrp','rgb24'):
+                code,out,err=self.player('--lavfi','--pixel-size','161x91','--frames','4','--untimed','--decoded-format',layout,
+                                         '--stats',str(stats),source=source,grid=False)
+                self.assertEqual(code,0,err)
+                self.assertEqual(json.loads(stats.read_text())['decoded_format'],layout)
+                pictures.append([pixels for _,pixels in self.pixel_frames(out)])
+            self.assertEqual(len(pictures[0]),4)
+            self.assertEqual(pictures[0],pictures[1])
+            reference=subprocess.check_output(v.decoder_command(source,161,91,30,lavfi=True)[:-1]+['-frames:v','4','-'])
+            self.assertEqual(b''.join(pictures[0]),reference)
+            code,out,err=self.player('--decoded-format','gbrp')
+            self.assertEqual(code,2);self.assertIn(b'--decoded-format requires --pixel-size',err)
 
     def test_player_pixel_size_rejects_ambiguous_geometry(self):
         for size,extra in [('0x531',[]),('945x-1',[]),('945',[]),('945x531',['--cols','4']),

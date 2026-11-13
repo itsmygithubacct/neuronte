@@ -159,6 +159,14 @@ The library is C11 with libm and nothing else. On x86-64 it builds its
 inner loops twice, plain and AVX2, and picks one by CPU when it loads.
 `CFLAGS=-DNEURONTE_NO_CLONES` builds the plain path only.
 
+Desktop clients can read `font/ui-tops.json` for the first cell row of each
+native UI bitmap (upright and italic use the same row). Its
+`neuronte.ui-tops/v1` schema contains a `tops` object mapping decimal em sizes
+to integer rows. The baseline within the bitmap remains in each drawing's
+header. This generated table needs no Python training code at runtime.
+After changing `UI_TOP` in `train/glyphs.py`, run `make ui-metadata` and commit
+the table with the change; `make test-ui-metadata` and `make test` check drift.
+
 `neuronte_coverage_styled()` and `neuronte_draw_scalar_styled()` apply
 explicit synthetic terminal bold and italic to a monochrome net. They
 share style flags and geometry, keep the original cell boundary, and

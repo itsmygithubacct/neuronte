@@ -38,6 +38,9 @@ import time
 import tty
 import zlib
 import numpy as np
+# Installed payloads are verified source trees. Keep runtime imports from
+# adding __pycache__ files that would make the next upgrade see local changes.
+sys.dont_write_bytecode = True
 from neuronte_video import TwoInk, MultiInk, ROOT
 
 try: LIBC = ctypes.CDLL(None)        # loaded now, so a child has nothing to load between fork and exec

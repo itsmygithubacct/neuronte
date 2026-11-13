@@ -239,7 +239,15 @@ test-rc9: test-rc9-italics test-rc9-emoji all $(TESTS)
 test-rc9-quality: all
 	$(PYTHON) tools/mono-compare.py --library build/libneuronte.so --baseline weights/neuronte-full-v2.json --candidate $(RC9_FULL).json --set full --include-new --sizes 16,48 --samples 0 --minimum-iou .98 --out build/full-v3-quality.json
 
-test: all $(TESTS) test-rc9 test-rc9-quality
+ui-metadata:
+	$(PYTHON) tools/ui-metadata.py
+
+test-ui-metadata:
+	$(PYTHON) tools/ui-metadata.py --check
+
+.PHONY: ui-metadata test-ui-metadata
+
+test: all $(TESTS) test-rc9 test-rc9-quality test-ui-metadata
 	cd weights && sha256sum -c --quiet SHA256SUMS
 	# The pointer net keeps its own list, with paths from the top of the tree.
 	sha256sum -c --quiet weights/neuronte-pointer-v0.sha256

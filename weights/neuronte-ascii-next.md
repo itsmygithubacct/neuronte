@@ -42,6 +42,57 @@ The video tool accepts both packages in full mode through `--weights`.
 Existing learned video helpers remain bound to the original split-v5 weights;
 they cannot be combined with these new packages without retraining.
 
+## Performance
+
+The declared selection rule chooses **character 4×64**. It ranks eligible recipes
+by geometric mean uncached speedup over split-v5 across both seeds, three CPUs
+and three cell sizes, choosing lower mean coverage error within 5% of the fastest.
+Both packages remain available for the accuracy/storage tradeoff above.
+
+Median uncached coverage at 16×32, **milliseconds per glyph**, for packaged seed 0:
+
+| Full bundle | Core i7-6820HQ | Core i7-10700F | Cortex-A72 / RK3399 |
+|---|---:|---:|---:|
+| Original split-v5 | 2.711 | 2.016 | 22.781 |
+| Character 4×64 | 1.214 | 0.893 | 8.538 |
+| Spatial 2×64 | 1.175 | 0.870 | 8.579 |
+
+Geometric mean speedups over all 18 seed × CPU × size comparisons:
+
+| Recipe | Speedup | Lowest individual speedup | Mean coverage MAE |
+|---|---:|---:|---:|
+| Character 4×64 | 2.286× | 1.925× | 0.003202 |
+| Spatial 2×64 | 2.277× | 1.790× | 0.003493 |
+| Character 2×96 (not packaged) | 1.280× | 1.156× | 0.003160 |
+
+Opening and cached drawing have separate costs. Each entry below is
+**opening ms / warm drawing µs per 16×32 glyph**, for seed 0:
+
+| Full bundle | Core i7-6820HQ | Core i7-10700F | Cortex-A72 / RK3399 |
+|---|---:|---:|---:|
+| Original split-v5 | 2.641 / 3.278 | 1.823 / 2.079 | 8.887 / 8.173 |
+| Character 4×64 | 2.898 / 3.293 | 1.963 / 2.080 | 9.952 / 8.074 |
+| Spatial 2×64 | 2.743 / 3.276 | 1.862 / 2.070 | 9.260 / 8.168 |
+
+Each scenario uses one warmup and ten measured repetitions. Reported values
+are medians of complete 95-character batch means, including spaces; coverage
+and warm drawing use four corpus passes. Each job has a fresh process and
+model handles. Cases are shuffled each round and all raw trials are retained.
+The tested sizes are 8×16, 16×32 and 48×96; automatic sampling uses two samples
+per axis for the first two and one for the last. CPU pins are 3, 3 and 5.
+The laptop uses AC power. Existing background workloads and governors remain
+in place, so these are measurements of those host conditions.
+
+Loading, uncached coverage, cold drawing, primed drawing and table routing
+are separate scenarios. OS page cache is retained. Desktop startup, RC9
+preload threads and persisted atlases are outside this native measurement.
+An uncached inference improvement does not imply the same warm-cache benefit.
+
+The measured runtime is `074cf185f9b805d52abb51d44d7a03b4c5674123` and the
+kilix-bench harness is `8f192286dcda1474b94ff0539492e863228ce3cb`.
+The packaged model bytes match the frozen benchmark inputs. Manifest SHA256:
+`ce566ae36cd02a1441a2bf2a95a2c59b1c2af45d048a0d893cd06cd33deb01a8`.
+
 ## Quality
 
 The limits compare each candidate with the original at the same size:
@@ -60,7 +111,7 @@ The fixed total-width sweep, 4×32, 8×16, 16×8 and 64×2, failed these
 quality limits with both spatial and character partitions. A longer
 character 2×64 recipe passed the initial sizes but failed the percent
 sign's per-glyph allowance at 3×6 in seed 1; it was excluded. Character
-2×96 passed quality and remains in the performance comparison.
+2×96 passed quality but was slower overall than both packaged options.
 
 | Model | 16×32 mean error | 48×96 mean error |
 |---|---:|---:|
@@ -111,3 +162,15 @@ pixels, and verifies unrelated/unknown routes and representative pixels.
 Qualification records cover both seeds; the supplied runtime assets and
 native release check use seed 0. Other-seed exports and checkpoints are
 retained with the experiment.
+
+To prepare the packaged seed-0 benchmark with kilix-bench, use its checked
+release preparer (commit `4311900` or later):
+
+```sh
+python3 -m kilix_bench.ascii_prepare /tmp/ascii-release-bench --neuronte-home .
+OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python3 -m kilix_bench --suite neuronte --neuronte-home . --ascii-experiment /tmp/ascii-release-bench/manifest.json --cells 8x16,16x32,48x96 --warmup 1 --repeats 10 --expert-passes 4 --cpu 3
+```
+
+Choose an allowed CPU and a new directory on active storage. This six-case
+reproduction compares the original and both replacements in direct and full
+form; it does not replace the original two-seed selection campaign.

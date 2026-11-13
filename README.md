@@ -26,7 +26,9 @@ letter. Desktop adapters fall back for unsupported strings and styles.
 | `neuronte-split-v4` | the default before Greek and Russian, kept; most measurements below were made on it | 1,061, over six nets and a router | 48, 128 and 192 | 329,356 | 1,319,616 bytes |
 | `neuronte-full-v3` | explicit RC9 monolithic font; [quality and baseline comparison](weights/neuronte-full-v3.md) | 878, including the Greek and Russian additions | 384 | 331,009 | 1,324,240 bytes |
 | `neuronte-full-v2` | the baseline `split` is measured against | 763 of them in one net, all but the sextants and octants | 320 | 234,881 | 939,728 bytes |
-| `neuronte-ascii-v0` | the smallest file | the 95 printable ASCII characters | 128 | 44,801 | 179,408 bytes |
+| `neuronte-ascii-v0` | the original ASCII expert | the 95 printable ASCII characters | 128 | 44,801 | 179,408 bytes |
+| `neuronte-ascii-groups-v1` | ASCII character groups; [recipe and validation](weights/neuronte-ascii-next.md) | the 95 printable ASCII characters | 4×64 | 56,836 | 228,252 bytes |
+| `neuronte-ascii-spatial-v1` | compact ASCII spatial halves; [recipe and validation](weights/neuronte-ascii-next.md) | the 95 printable ASCII characters | 2×64 | 28,418 | 114,172 bytes |
 | `neuronte-ui1-v0`, `neuronte-ui2-v0`, `neuronte-ui3-v0`, `neuronte-ui4-v0`, `neuronte-ui5-v0`, `neuronte-ui6-v0`, `neuronte-ui7-v0` | the desktop face at an em of 1, 2, 3, 4, 5, 6 and 7 pixels | printable ASCII and the ellipsis, 96, with their advances | 96 | 27,457 | 110,864 bytes each |
 | `neuronte-ui8-v0`, `neuronte-ui9-v0`, `neuronte-ui10-v0`, `neuronte-ui11-v0` | the desktop face: proportional binary text at an em of 8, 9, 10 and 11 pixels | printable ASCII and the ellipsis, 96, with their advances | 96 | 27,457 | 110,864 bytes each |
 | `neuronte-ui12-v0`, `neuronte-ui14-v0` | the desktop face at an em of 12 pixels and of 14 | printable ASCII and the ellipsis, 96, with their advances | 128 | 44,801 | 180,240 bytes each |

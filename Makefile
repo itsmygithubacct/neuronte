@@ -274,6 +274,13 @@ test-known-bundle: build/libneuronte.so
 
 .PHONY: test-known-bundle
 
+test-ascii-next: build/libneuronte.so build/test_api
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_ascii_next.py build/libneuronte.so
+	./build/test_api weights/neuronte-split-ascii-groups-v1.nrt --full --accent --pixel
+	./build/test_api weights/neuronte-split-ascii-spatial-v1.nrt --full --accent --pixel
+
+.PHONY: test-ascii-next
+
 .PHONY: test-widths
 
 test: all $(TESTS) test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors

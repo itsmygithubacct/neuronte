@@ -1,8 +1,8 @@
 """Append known-only experts while preserving a bundle's original unknown routing.
 
 The original members remain byte-identical. Only table entries belonging to
-the selected expert are reassigned. New gate outputs are constant and lower
-than a conservative bound on every original output, for every scalar code.
+the selected expert are reassigned. New gate outputs are constant and below
+a conservative lower bound on the winning original output, for every code.
 """
 import argparse
 import hashlib

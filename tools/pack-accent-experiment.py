@@ -26,6 +26,7 @@ def build(directory, output, mode, parts, seed, budget=None):
     source_paths = [directory / (s['name'] + f'-s{seed}.json') for s in specs]
     docs = [json.loads(p.read_text()) for p in source_paths]
     identities = []
+    recipes = []
     for doc, spec in zip(docs, specs):
         experiment = doc['training']['experiment']
         if any(experiment[k] != v for k, v in spec.items()) or experiment['seed'] != seed:
@@ -35,8 +36,14 @@ def build(directory, output, mode, parts, seed, budget=None):
         if doc['shape']['tau'] != .15 / (spec['region'][1] - spec['region'][0]):
             raise ValueError('tile coverage scaling differs')
         identities.append(experiment['identity']['teacher'])
+        identity = experiment['identity']
+        if any(doc['training'][key] != identity[key] for key in ('steps', 'unlabelled_weight')):
+            raise ValueError('member training recipe differs from its identity')
+        recipes.append((doc['training']['steps'], doc['training']['unlabelled_weight'], identity['trainer_sha256']))
     if any(x != identities[0] for x in identities):
         raise ValueError('candidate members have different teachers')
+    if any(x != recipes[0] for x in recipes):
+        raise ValueError('candidate members have different training recipes')
     corpus = identities[0]['identity']['scalars']
     original_paths = [ROOT / 'weights' / ('neuronte-' + name + '.json') for name in ORIGINALS]
     paths, images = [], []
@@ -100,6 +107,7 @@ def build(directory, output, mode, parts, seed, budget=None):
               'corpus': corpus, 'routes': routes, 'ranges': ranges,
               'mode': mode, 'parts': parts, 'seed': seed, 'width_sum': sum(s['width'] for s in specs),
               'widths': [s['width'] for s in specs],
+              'steps': recipes[0][0], 'unlabelled_weight': recipes[0][1], 'trainer_sha256': recipes[0][2],
               'source_models': [{'file': p.name, 'sha256': decompose.digest(p)} for p in source_paths],
               'preserved_member_sha256': [hashlib.sha256(image).hexdigest() for image in images[:6]],
               'original_gate_logit_magnitude_bound': logit_bound, 'disabled_gate_bias': disabled,

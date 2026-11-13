@@ -54,7 +54,10 @@ class PackageTests(unittest.TestCase):
                     for s in members:
                         doc = fixture(s['width'], s['index'], labelled=' '.join(f'U+{c:04X}' for c in s['scalars']))
                         doc['shape']['tau'] = .15 / (s['region'][1] - s['region'][0])
-                        doc['training']['experiment'] = {**s, 'seed': 0, 'identity': {'teacher': {'identity': {'scalars': sorted(accent)}}}}
+                        doc['training'].update(steps=1, unlabelled_weight=1.)
+                        doc['training']['experiment'] = {**s, 'seed': 0, 'identity': {
+                            'teacher': {'identity': {'scalars': sorted(accent)}},
+                            'steps': 1, 'unlabelled_weight': 1., 'trainer_sha256': 'test-fixture'}}
                         (root / (s['name'] + '-s0.json')).write_text(json.dumps(doc))
                     report = p.build(root, destination, mode, parts, 0, 16)
                     handle = ct.c_void_p()
@@ -72,6 +75,16 @@ class PackageTests(unittest.TestCase):
                             np.testing.assert_array_equal(old, new)
                     finally:
                         lib.neuronte_close(handle)
+                    source = root / (members[-1]['name'] + '-s0.json')
+                    changed = json.loads(source.read_text())
+                    changed['training']['unlabelled_weight'] = 0.
+                    source.write_text(json.dumps(changed))
+                    with self.assertRaisesRegex(ValueError, 'differs from its identity'):
+                        p.build(root, destination, mode, parts, 0, 16)
+                    changed['training']['experiment']['identity']['unlabelled_weight'] = 0.
+                    source.write_text(json.dumps(changed))
+                    with self.assertRaisesRegex(ValueError, 'different training recipes'):
+                        p.build(root, destination, mode, parts, 0, 16)
         finally:
             lib.neuronte_close(baseline)
 

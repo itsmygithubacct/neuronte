@@ -38,6 +38,9 @@ The character-group files use existing version 2 routing. The spatial
 files require the version 6 tiled runtime. Direct and complete-package
 coverage agree bit for bit for every ASCII glyph at all 19 checked sizes.
 Both complete packages pass the full, accent and pixel consumer API checks.
+The video tool accepts both packages in full mode through `--weights`.
+Existing learned video helpers remain bound to the original split-v5 weights;
+they cannot be combined with these new packages without retraining.
 
 ## Quality
 

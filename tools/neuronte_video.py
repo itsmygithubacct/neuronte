@@ -441,7 +441,9 @@ def candidates(mode, width, height, weights=None, library=None):
         lengths = struct.unpack_from(f'<{nets}I', data, 28)
         member = len(data) - sum(lengths)
         for length in lengths:
-            if struct.unpack_from('<I', data, member + 8)[0] != 1:
+            # Distance nets and tiled collections of distance nets are
+            # monochrome and support arbitrary foreground/background fits.
+            if struct.unpack_from('<I', data, member + 8)[0] not in (1, 6):
                 raise ValueError('full two-ink mode requires monochrome nets; fixed-colour bundles cannot use arbitrary foreground/background fits')
             member += length
         offset = 28 + 4 * nets

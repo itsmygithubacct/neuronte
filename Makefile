@@ -247,7 +247,7 @@ test-ui-metadata:
 
 .PHONY: ui-metadata test-ui-metadata
 
-test: all $(TESTS) test-rc9 test-rc9-quality test-ui-metadata
+test: all $(TESTS) test-rc9 test-rc9-quality test-ui-metadata test-bench-errors
 	cd weights && sha256sum -c --quiet SHA256SUMS
 	# The pointer net keeps its own list, with paths from the top of the tree.
 	sha256sum -c --quiet weights/neuronte-pointer-v0.sha256
@@ -339,6 +339,10 @@ clean:
 # Video is an optional Python/numpy/scipy tool; its tests are separate from
 # the dependency-light C/font acceptance suite.
 .PHONY: test-video
+.PHONY: test-bench-errors
+test-bench-errors:
+	CC="$(CC)" $(PYTHON) tests/check_bench_errors.py
+
 test-video: build/libneuronte.so build/video-decoder-bench
 	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_video.py
 	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_video_decoder.py

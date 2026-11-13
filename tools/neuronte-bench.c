@@ -39,12 +39,13 @@ static int one(const char *path)
     neuronte *n;
     float *cov;
     size_t k;
+    int status = 1;
 
     if (open_or_say(path, &n) != NEURONTE_OK)
         return 1;
     cov = malloc(48 * 96 * sizeof *cov);
     if (!cov)
-        return 1;
+        goto done;
     printf("%-10s %-8s %12s %14s %16s\n", "cell", "samples", "ms per cell", "us per sample", "95 cells, ms");
     for (k = 0; k < sizeof sizes / sizeof sizes[0]; k++) {
         int w = sizes[k][0], h = 2 * w, ss = sizes[k][1] ? sizes[k][1] : (w < 24 ? 2 : 1);
@@ -53,16 +54,20 @@ static int one(const char *path)
         char cell[16];
         t0 = now();
         for (c = 32; c < 127; c++)
-            if (neuronte_coverage(n, c, w, h, ss, cov) != NEURONTE_OK)
-                return 1;
+            if (neuronte_coverage(n, c, w, h, ss, cov) != NEURONTE_OK) {
+                fprintf(stderr, "coverage failed; no timing for this row\n");
+                goto done;
+            }
         t = now() - t0;
         snprintf(cell, sizeof cell, "%dx%d", w, h);
         printf("%-10s %dx%-6d %12.3f %14.3f %16.1f\n", cell, ss, ss, t * 1e3 / 95,
                t * 1e6 / (95.0 * w * h * ss * ss), t * 1e3);
     }
+    status = 0;
+done:
     free(cov);
     neuronte_close(n);
-    return 0;
+    return status;
 }
 
 /* The classes, as the training sets define them. */
@@ -96,7 +101,8 @@ static double per_cell(neuronte *n, const struct cls *c, int w, int ss, int cell
     for (p = 0; p < passes; p++) {
         double t0 = now(), t;
         for (i = 0; i < cells; i++)
-            neuronte_coverage(n, c->s[i * c->count / cells], w, 2 * w, ss, cov);
+            if (neuronte_coverage(n, c->s[i * c->count / cells], w, 2 * w, ss, cov) != NEURONTE_OK)
+                return -1.0;
         t = (now() - t0) / cells;
         best = t < best ? t : best;
     }
@@ -121,17 +127,18 @@ static int compare(const char *full_path, const char *bundle_path)
     static const int sizes[][3] = {{8, 2, 3}, {16, 2, 2}, {48, 1, 1}}; /* width, samples, passes */
     static struct cls classes[6];
     uint32_t outside[256];
-    neuronte *full, *b;
-    float *cov;
+    neuronte *full = NULL, *b = NULL;
+    float *cov = NULL;
     int k, z, i;
+    int status = 1;
 
     if (open_or_say(full_path, &full) != NEURONTE_OK)
-        return 1;
+        goto done;
     if (open_or_say(bundle_path, &b) != NEURONTE_OK)
-        return 1;
+        goto done;
     cov = malloc(48 * 96 * sizeof *cov);
     if (!cov)
-        return 1;
+        goto done;
     classes[0].name = "ascii";
     add_range(&classes[0], 0x20, 0x7E, 1);
     classes[1].name = "draw";
@@ -177,6 +184,10 @@ static int compare(const char *full_path, const char *bundle_path)
             double tf = per_cell(full, c, w, ss, cells, sizes[z][2], cov);
             double tb = per_cell(b, c, w, ss, cells, sizes[z][2], cov);
             char cell[24], count[12];
+            if (tf < 0.0 || tb < 0.0) {
+                fprintf(stderr, "coverage failed; no timing for %s at %dx%d\n", c->name, w, 2 * w);
+                goto done;
+            }
             snprintf(cell, sizeof cell, "%dx%d %dx%d", w, 2 * w, ss, ss);
             snprintf(count, sizeof count, "%d", c->count);
             printf("%-7s %5s %4s  %-10s %13.2f %15.2f %7.2fx\n", z == 0 ? c->name : "", z == 0 ? count : "",
@@ -192,10 +203,12 @@ static int compare(const char *full_path, const char *bundle_path)
     for (k = 0; k < 6; k++)
         printf("  %s %.1f", classes[k].name, route_ns(b, classes[k].s, classes[k].count));
     printf("  outside the table %.1f\n", route_ns(b, outside, 256));
+    status = 0;
+done:
     free(cov);
     neuronte_close(full);
     neuronte_close(b);
-    return 0;
+    return status;
 }
 
 int main(int argc, char **argv)

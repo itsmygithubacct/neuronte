@@ -136,3 +136,95 @@ fails if this file is out of date.
 |---|---|---:|
 | `neuronte-full-v3.validation.json` | `d05f14f6c0d0e6ed2077d6007b4a5f588e4ca802` | 1 |
 | `neuronte-split-v5.validation.json` | `d05f14f6c0d0e6ed2077d6007b4a5f588e4ca802` | 0 |
+
+## Accent decomposition experiments
+
+`train/decompose.py --expert accent` uses the original 318-label teacher:
+203 Latin and spacing marks, 49 Greek letters, and 66 Russian letters.
+Sparse scalars are mapped explicitly into teacher rows. The original accent
+model has H256 and 155,137 parameters.
+
+| Design | Hidden widths | New parameters | Label partition |
+|---|---|---:|---|
+| Four repertoire groups | 4 x 64 | 56,836 | Latin 101, Latin 102, Greek 49, Russian 66 |
+| Four spatial tiles | 4 x 64 | 56,836 | All 318 in each tile of a 2x2 grid |
+| Eight repertoire groups | 8 x 32 | 40,456 | Four Latin groups, two Greek, two Russian |
+| Eight spatial tiles | 8 x 32 | 40,456 | All 318 in each tile of a 2x4 grid |
+| Three scripts | 128,64,64 | 73,219 | Latin 203, Greek 49, Russian 66 |
+
+These are experimental recipes, not replacements for `neuronte-split-v5.nrt`.
+The packager retains the original six experts and original gate rows, clears
+only the original accent table labels, and appends the new accent members.
+New constant gate logits cannot win against the original gate, so unknown
+scalars retain their original routing and coverage. Consequently the new
+parameters are **added** to the full bundle. Smaller per-glyph inference does
+not imply a smaller bundle. Spatial members use the shared version 6 format.
+
+Prepare and train the uniform-width comparisons with seeds 0 and 1, the original
+40,000-step Adam/cosine schedule, and unknown regularization 1:
+
+```sh
+python3 train/decompose.py prepare experiment --expert accent
+python3 train/decompose.py train experiment --expert accent \
+    --mode repertoire --parts 4 --seeds 0,1 --steps 40000 \
+    --batch-models 8 --compile --checkpoint-every 1000
+```
+
+Use `--mode spatial` for spatial tiles. For eight parts use
+`--parts 8 --batch-models 16`. Compiled CUDA training needs a C compiler.
+Checkpoints bind teacher and trainer hashes, full training schedule, model
+inventory, optimizer and RNG state; `--resume` refuses different identities.
+The two-seed uniform comparisons were trained from source `70b8d87`.
+
+The three-script follow-up uses source `90ebb36`. Train it in separate
+experiment directories for `--unlabelled 1` and `--unlabelled 0`, reusing the
+identical teacher. Each directory needs four homogeneous-width batches:
+
+```sh
+python3 train/decompose.py train experiment --expert accent \
+    --mode repertoire --parts 3 --seeds 0,1 --steps 40000 \
+    --start 0 --batch-models 1 --unlabelled 0 --compile
+```
+
+Repeat with `(start,batch-models)` of `(1,2)`, `(3,1)`, and `(4,2)`.
+Members are ordered by seed, then Latin/Greek/Russian. Mixed-width batches
+are rejected. The regularization 0 follow-up is valid only with preserved
+original fallback; it does not train replacement unknown-glyph behavior.
+
+Package each seed under a distinct directory and score through the native API:
+
+```sh
+python3 tools/pack-accent-experiment.py experiment package \
+    --mode repertoire --parts 3 --seed 0
+python3 tools/accent-quality.py --library build/libneuronte.so \
+    --model weights/neuronte-split-v5.nrt --teacher experiment --out baseline
+python3 tools/accent-quality.py --library build/libneuronte.so \
+    --model package/neuronte-accent-next-repertoire3-s0.nrt \
+    --teacher experiment --baseline baseline/quality.json --out candidate
+```
+
+Run native quality and performance under a host-wide benchmark lock. The
+quality output records model/library/teacher/reference hashes, raw coverage,
+per-glyph metrics and per-script gates. Its `complete` field must be true.
+A failed quality gate remains a valid experimental result and does not cause
+a nonzero process exit; inspect `passed`. Incomplete evaluations must not be
+used as final evidence. The following gates were fixed before candidate scoring:
+
+- Each script: MAE no more than baseline+.0015, pixel-error p99 no more than
+  baseline+.02, firm-error fraction no more than baseline+.0005, and mean
+  binary IoU no less than baseline-.005.
+- Each glyph: MAE no more than baseline+.01, IoU no less than baseline-.05,
+  no newly lost glyph and no loss of a baseline-compatible nearest identity.
+- Exactly tied teacher identities count as compatible; ambiguity is reported.
+  Binary exactness is descriptive because the antialiased baseline is not
+  binary-perfect.
+
+Production qualification requires **both seeds**, all three standard sizes
+8x16/16x32/48x96, and small/odd/boundary cells:
+1x1,1x2,2x3,3x5,5x9,7x13,9x17,17x35,23x46,23x47,24x48,25x49,25x50,
+16x16,12x40,33x61. Automatic sampling changes from 2 to 1 at width 24.
+The video consumer uses 1 sample per axis; compare `--samples 1` against a
+separately calibrated S1 baseline. The evaluator rejects mismatched sampling.
+The tiny-cell baseline itself loses identities, so gates are relative to its
+measured limits. Whole-glyph cache, unaffected expert/unknown fallback and
+consumer API checks are additional requirements.

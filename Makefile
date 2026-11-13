@@ -11,22 +11,28 @@ FULL = weights/neuronte-full-v2
 # asks about characters none of them was trained on.
 DRAW = weights/neuronte-draw-v2
 SYMBOL = weights/neuronte-symbol-v0
-ACCENT = weights/neuronte-accent-v1
+ACCENT = weights/neuronte-accent-v2
 PIXEL = weights/neuronte-pixel-v1
 BRAILLE = weights/neuronte-braille-v0
-GATE = weights/neuronte-gate-v3.json
-SPLIT = weights/neuronte-split-v4.nrt
+GATE = weights/neuronte-gate-v4.json
+SPLIT = weights/neuronte-split-v5.nrt
 NETS = $(ASCII).json $(DRAW).json $(SYMBOL).json $(ACCENT).json $(PIXEL).json $(BRAILLE).json
-# RC9 assets are explicit; the retained default and baselines above stay named.
-RC9_ACCENT = weights/neuronte-accent-v2
-RC9_GATE = weights/neuronte-gate-v4.json
-RC9_SPLIT = weights/neuronte-split-v5.nrt
+# The bundle before Greek and Russian, kept and still checked: split-v4,
+# with the accent net and gate it was packed from.
+PRIOR_ACCENT = weights/neuronte-accent-v1
+PRIOR_GATE = weights/neuronte-gate-v3.json
+PRIOR_SPLIT = weights/neuronte-split-v4.nrt
+PRIOR_NETS = $(ASCII).json $(DRAW).json $(SYMBOL).json $(PRIOR_ACCENT).json $(PIXEL).json $(BRAILLE).json
+# The RC9 names are the default bundle's own parts now.
+RC9_ACCENT = $(ACCENT)
+RC9_GATE = $(GATE)
+RC9_SPLIT = $(SPLIT)
 RC9_FULL = weights/neuronte-full-v3
 RC9_ITALIC_SIZES = 3 4 5 6 7 8 9 13 15 17 19 21 23 25 27 29 31
 RC9_ITALIC_JSON = $(foreach em,$(RC9_ITALIC_SIZES),weights/neuronte-ui$(em)-italic-v0.json)
 RC9_EMOJI = weights/neuronte-emoji-v0.nrt
 RC9_EMOJI_NETS = weights/neuronte-emoji-e0-v0.json weights/neuronte-emoji-e1-v0.json weights/neuronte-emoji-e2-v0.json
-RC9_NETS = $(ASCII).json $(DRAW).json $(SYMBOL).json $(RC9_ACCENT).json $(PIXEL).json $(BRAILLE).json
+RC9_NETS = $(NETS)
 # The desktop face: one drawing file for each em, a net and the advances
 # of that em's pixel face.
 UI1 = weights/neuronte-ui1-v0
@@ -87,7 +93,7 @@ UILARGE = weights/neuronte-ui-large-v0
 # The Kilix flame: one colour net, version 3, drawn at U+100000.
 FLAME = weights/neuronte-flame-v0
 # The icon net: a colour net, form A, a version 3 file by itself. It is not
-# in the bundle; neuronte-split-v4 stays the default font.
+# in the bundle; neuronte-split-v5 is the default font.
 ICON = weights/neuronte-icon-v1
 OBJS = build/neuronte.o build/utf8.o
 TOOLS = build/neuronte-render build/neuronte-bench
@@ -148,10 +154,11 @@ pack-rc9-italics: $(RC9_ITALIC_JSON)
 pack-rc9-emoji: $(RC9_EMOJI_NETS)
 	$(PYTHON) tools/pack-bundle-members.py $(RC9_EMOJI) $(RC9_EMOJI_NETS)
 
-pack: $(ASCII).json $(FULL).json $(NETS) $(GATE) $(UI1).json $(UI2).json $(UI3).json $(UI4).json $(UI5).json $(UI6).json $(UI7).json $(UI8).json $(UI9).json $(UI10).json $(UI10I).json $(UI11).json $(UI11I).json $(UI12).json $(UI12I).json $(UI13).json $(UI14).json $(UI14I).json $(UI15).json $(UI16).json $(UI16I).json $(UI17).json $(UI18).json $(UI18I).json $(UI19).json $(UI20).json $(UI20I).json $(UI21).json $(UI22).json $(UI22I).json $(UI23).json $(UI24).json $(UI24I).json $(UI25).json $(UI26).json $(UI26I).json $(UI27).json $(UI28).json $(UI29).json $(UI30).json $(UI30I).json $(UI31).json $(UI32).json $(UI33).json $(UI34).json $(UI35).json $(UI36).json $(UI37).json $(UI38).json $(UI39).json $(UI43).json $(UILARGE).json $(FLAME).json $(ICON).json $(UI28I).json $(UI32I).json
+pack: $(ASCII).json $(FULL).json $(NETS) $(GATE) $(PRIOR_NETS) $(PRIOR_GATE) $(UI1).json $(UI2).json $(UI3).json $(UI4).json $(UI5).json $(UI6).json $(UI7).json $(UI8).json $(UI9).json $(UI10).json $(UI10I).json $(UI11).json $(UI11I).json $(UI12).json $(UI12I).json $(UI13).json $(UI14).json $(UI14I).json $(UI15).json $(UI16).json $(UI16I).json $(UI17).json $(UI18).json $(UI18I).json $(UI19).json $(UI20).json $(UI20I).json $(UI21).json $(UI22).json $(UI22I).json $(UI23).json $(UI24).json $(UI24I).json $(UI25).json $(UI26).json $(UI26I).json $(UI27).json $(UI28).json $(UI29).json $(UI30).json $(UI30I).json $(UI31).json $(UI32).json $(UI33).json $(UI34).json $(UI35).json $(UI36).json $(UI37).json $(UI38).json $(UI39).json $(UI43).json $(UILARGE).json $(FLAME).json $(ICON).json $(UI28I).json $(UI32I).json
 	$(PYTHON) train/pack.py $(ASCII).json $(ASCII).nrt
 	$(PYTHON) train/pack.py $(FULL).json $(FULL).nrt
 	$(PYTHON) train/pack.py --bundle $(SPLIT) $(NETS) --gate $(GATE)
+	$(PYTHON) train/pack.py --bundle $(PRIOR_SPLIT) $(PRIOR_NETS) --gate $(PRIOR_GATE)
 	$(PYTHON) train/pack.py --drawing $(UI1).nrt $(UI1).json font/ui-1.txt
 	$(PYTHON) train/pack.py --drawing $(UI2).nrt $(UI2).json font/ui-2.txt
 	$(PYTHON) train/pack.py --drawing $(UI3).nrt $(UI3).json font/ui-3.txt
@@ -240,12 +247,12 @@ test: all $(TESTS) test-rc9 test-rc9-quality
 	./build/test_utf8
 	./build/test_api $(ASCII).nrt
 	./build/test_api $(FULL).nrt --full --accent
-	./build/test_api $(SPLIT) --full --accent --pixel
+	./build/test_api $(PRIOR_SPLIT) --full --accent --pixel
 	$(PYTHON) tests/check_styles.py build/libneuronte.so
 	$(PYTHON) tests/check_halves.py build/libneuronte.so
 	$(PYTHON) tests/check_reference.py build/libneuronte.so $(ASCII).json $(ASCII).nrt
 	$(PYTHON) tests/check_reference.py build/libneuronte.so $(FULL).json $(FULL).nrt
-	$(PYTHON) tests/check_reference.py build/libneuronte.so --bundle $(SPLIT) $(NETS) --gate $(GATE)
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --bundle $(PRIOR_SPLIT) $(PRIOR_NETS) --gate $(PRIOR_GATE)
 	$(PYTHON) tests/colour_fixture.py build/colour-fixture.nrt
 	$(PYTHON) tests/check_colour_sources.py
 	$(PYTHON) tests/check_icon_gate.py

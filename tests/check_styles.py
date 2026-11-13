@@ -62,7 +62,7 @@ def styled(mask, flags):
     return canvas[:, w:2*w]
 
 
-ptr = open_net('neuronte-split-v4.nrt')
+ptr = open_net('neuronte-split-v5.nrt')
 try:
     for w, h, samples in ((12,24,2),(32,64,1),(48,64,1),(7,19,0)):
         for cp in (ord('H'), ord('g'), 0xE9):

@@ -75,12 +75,12 @@ static void add_utf8(struct cls *c, const char *t)
         off += neuronte_utf8_decode(t + off, len - off, &c->s[c->count++]);
 }
 
-/* The classes of neuronte-split-v4, as the training sets define them. */
+/* The classes of neuronte-split-v5, as the training sets define them. */
 static int classes(struct cls *c)
 {
     static const uint32_t subs[] = {0x1FB82, 0x1FB85, 0x1FBE6, 0x1FBE7, 0x1CEA0, 0x1CEA3, 0x1CEA8, 0x1CEAB};
     size_t i;
-    memset(c, 0, 9 * sizeof *c);
+    memset(c, 0, 10 * sizeof *c);
     c[0].name = "ASCII";
     add_range(&c[0], 0x20, 0x7E);
     c[1].name = "accented";
@@ -102,7 +102,14 @@ static int classes(struct cls *c)
     c[8].name = "substitutes";
     for (i = 0; i < sizeof subs / sizeof subs[0]; i++)
         c[8].s[c[8].count++] = subs[i];
-    return 9;
+    c[9].name = "Greek, Russian";
+    add_range(&c[9], 0x391, 0x3A1);
+    add_range(&c[9], 0x3A3, 0x3A9);
+    add_range(&c[9], 0x3B1, 0x3C9);
+    add_range(&c[9], 0x401, 0x401);
+    add_range(&c[9], 0x410, 0x44F);
+    add_range(&c[9], 0x451, 0x451);
+    return 10;
 }
 
 /* Draw scalars in cells cw x 2cw from (x, y), wrapping at right. Returns
@@ -126,7 +133,7 @@ static int scalars(neuronte *n, const struct screen *s, int x, int y, int right,
 
 static void draw_font_page(neuronte *n, const struct screen *s, int (*show)(const struct screen *))
 {
-    static struct cls c[9];
+    static struct cls c[10];
     int m = s->w >= 1000 ? 24 : 12, y = m, k, nc = classes(c), label_w, cw = 10, right = s->w - m;
     char buf[256], num[32];
 
@@ -692,7 +699,7 @@ static int open_weights(const char *path, neuronte **n)
 {
     int rc;
     if (!path)
-        path = "weights/neuronte-split-v4.nrt";
+        path = "weights/neuronte-split-v5.nrt";
     rc = neuronte_open_file(path, n);
     if (rc != NEURONTE_OK)
         fprintf(stderr, "%s: cannot load weights (%d)\n", path, rc);

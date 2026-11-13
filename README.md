@@ -16,7 +16,8 @@ letter. Desktop adapters fall back for unsupported strings and styles.
 
 | Weights | Use | Characters | Hidden width | Parameters | File |
 |---|---|---|---:|---:|---:|
-| `neuronte-split-v4` | the font to use | 1,061, over six nets and a router | 48, 128 and 192 | 329,356 | 1,319,616 bytes |
+| `neuronte-split-v5` | the font to use | 1,176, over six nets and a router; [recipe and validation](weights/neuronte-split-v5.md) | 48, 128, 192 and 256 | 392,716 | 1,573,128 bytes |
+| `neuronte-split-v4` | the default before Greek and Russian, kept; most measurements below were made on it | 1,061, over six nets and a router | 48, 128 and 192 | 329,356 | 1,319,616 bytes |
 | `neuronte-full-v3` | explicit RC9 monolithic font; [quality and baseline comparison](weights/neuronte-full-v3.md) | 878, including the Greek and Russian additions | 384 | 331,009 | 1,324,240 bytes |
 | `neuronte-full-v2` | the baseline `split` is measured against | 763 of them in one net, all but the sextants and octants | 320 | 234,881 | 939,728 bytes |
 | `neuronte-ascii-v0` | the smallest file | the 95 printable ASCII characters | 128 | 44,801 | 179,408 bytes |
@@ -42,12 +43,16 @@ letter. Desktop adapters fall back for unsupported strings and styles.
 | `neuronte-ui28-italic-v0` | the italic at 28 pixels, trained for 40,000 steps: at the default 20,000 no width from 384 to 768 had both seeds exact | printable ASCII and the ellipsis, 96, with their advances | 384 | 331,009 | 1,325,072 bytes |
 | `neuronte-ui32-italic-v0` | the italic at 32 pixels, trained for 40,000 steps; both seeds exact at width 512 | printable ASCII and the ellipsis, 96, with their advances | 512 | 572,417 | 2,290,704 bytes |
 
-RC9 adds the explicitly selected `neuronte-split-v5.nrt`: 1,176 labelled
-scalars, including 49 Greek and 66 Russian letters, in a 1,573,128-byte bundle.
-Its accent-v2 expert passes both-seed script gates and root visual review.
-Latin mean IoU at 16 px changes from .984936529 to .984822170; per-glyph
-regressions are retained. The existing split-v4 default and full-v2 baseline
-are preserved. See [the recipe and validation](weights/neuronte-split-v5.md).
+`neuronte-split-v5.nrt` is the default: 1,176 labelled scalars, including
+49 Greek and 66 Russian letters, in a 1,573,128-byte bundle. It differs from
+split-v4 only in its accent net and gate; every character the other five nets
+draw comes out pixel for pixel the same. Its accent-v2 expert passes
+both-seed script gates and root visual review. Latin mean IoU at 16 px
+changes from .984936529 to .984822170, and individual letters regress at
+every size; the per-glyph changes are retained. An accented, Greek or
+Russian cell costs about 1.6 times what it did, because that net is 256 wide.
+split-v4 and the full-v2 baseline are kept and still checked by `make test`.
+See [the recipe and validation](weights/neuronte-split-v5.md).
 
 RC9 also ships the separate `neuronte-emoji-v0.nrt` colour bundle: 300 original
 single-scalar emoji, 600 left/right half labels, three experts, and up to six
@@ -147,7 +152,7 @@ a letter and a mark, such as ß æ œ ð þ ø ł đ ħ ŋ ĳ, are drawn in
 make          # build/libneuronte.a, build/libneuronte.so and the tools
 make test     # needs python3 with numpy
 make bench
-./build/neuronte-render weights/neuronte-split-v4.nrt 16 out.ppm 'Hello, café.' '╭──╮ ⣿⣶⣤⣀ ░▒▓ ✔'
+./build/neuronte-render weights/neuronte-split-v5.nrt 16 out.ppm 'Hello, café. Привет, αβγ.' '╭──╮ ⣿⣶⣤⣀ ░▒▓ ✔'
 ```
 
 The library is C11 with libm and nothing else. On x86-64 it builds its
@@ -270,7 +275,7 @@ as it is done. After that a frame takes about a millisecond.
 
 ```sh
 ./build/neuronte-compare                      # neuronte-ascii left, neuronte-full right
-./build/neuronte-compare weights/neuronte-full-v2.nrt weights/neuronte-split-v4.nrt
+./build/neuronte-compare weights/neuronte-full-v2.nrt weights/neuronte-split-v5.nrt
 ./build/neuronte-compare LEFT.nrt RIGHT.nrt   # any two weight files
 ./build/neuronte-compare --snapshot out.ppm 1280 800
 ```
@@ -316,7 +321,7 @@ it took to draw one cell, the whole half, and the last keypress.
 #include "neuronte.h"
 
 neuronte *font;
-if (neuronte_open_file("neuronte-split-v4.nrt", &font) != NEURONTE_OK)
+if (neuronte_open_file("neuronte-split-v5.nrt", &font) != NEURONTE_OK)
     return 1;
 /* pixels: row-major 0xAARRGGBB, stride in pixels. */
 neuronte_draw_utf8(font, pixels, stride, width, height,
@@ -405,8 +410,14 @@ pixels, against 0.948, 0.990 and 0.992 for the shipped file.
 
 ## Split nets and the router
 
-`neuronte-split-v4` is a bundle of nets that each know one part of the
-set, with a router in front:
+A split bundle is a set of nets that each know one part of the
+characters, with a router in front. This section describes
+`neuronte-split-v4`, which its measurements were made on. The default,
+`neuronte-split-v5`, is the same bundle with two parts replaced:
+`neuronte-accent-v2` (318 characters: the 203 below and 115 Greek and
+Russian letters; 256 wide, 155,137 parameters) and `neuronte-gate-v4`
+(68 ranges). Its figures are in [its own page](weights/neuronte-split-v5.md).
+split-v4:
 
 | Net | Characters | Hidden width | Parameters |
 |---|---|---:|---:|
@@ -477,6 +488,10 @@ made in the same sitting as the table under [Speed](#speed):
 | Braille, 256 | `braille`, 48 | 8 × 16, 2 × 2 | 3.34 | 0.19 | 18.0× |
 | | | 16 × 32, 2 × 2 | 13.24 | 0.72 | 18.5× |
 | | | 48 × 96, 1 | 29.12 | 1.49 | 19.6× |
+
+`make bench` now times the default, split-v5. The table is of split-v4;
+in the same sitting split-v5 differed only on the accented row, where its
+256-wide net took 2.33, 9.42 and 21.2 ms.
 
 ASCII and the mosaics are drawn by nets of the same width, and the
 difference between them is mostly noise; an earlier run under heavier

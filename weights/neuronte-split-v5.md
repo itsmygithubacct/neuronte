@@ -3,8 +3,8 @@
 `neuronte-split-v5.nrt` is an explicitly selected new bundle. It adds 49 Greek
 letters (including final sigma) and 66 Russian letters (including Ё/ё) to the
 1,061 labels in split-v4. Greek accents, other Cyrillic alphabets and shaping
-are outside these new labels. The existing split-v4 default and full-v2 are
-preserved. The release owner decides default integration separately.
+are outside these new labels. It is the default bundle since 2026-11-12, by
+the release owner's decision; split-v4 and full-v2 are kept and still checked.
 
 The new accent-v2 expert has 318 labels: the previous 203 Latin letters and
 spacing marks plus these 115 letters. It uses width 256, 155,137 parameters,

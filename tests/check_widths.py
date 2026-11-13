@@ -36,7 +36,7 @@ lib.neuronte_open_file.argtypes = [C.c_char_p, C.POINTER(C.c_void_p)]
 lib.neuronte_close.argtypes = [C.c_void_p]
 with tempfile.TemporaryDirectory(prefix="neuronte-widths-") as temporary:
     directory = Path(temporary)
-    for width in (8, 12, 20, 48):
+    for width in (1, 2, 3, 4, 6, 8, 12, 15, 17, 20, 48):
         source, packed = directory / f"h{width}.json", directory / f"h{width}.nrt"
         source.write_text(json.dumps(fixture(width)))
         raw = pack.pack(str(source))
@@ -46,7 +46,7 @@ with tempfile.TemporaryDirectory(prefix="neuronte-widths-") as temporary:
         assert pack.member(str(packed)) == (1, raw)
         subprocess.run([sys.executable, str(ROOT / "tests/check_reference.py"),
                         str(library), str(source), str(packed)], check=True)
-        if width == 12:
+        if width in (1, 2, 6, 12):
             bundle, _ = pack.bundle([str(source)])
             drawing, _ = pack.drawing([str(packed)])
             for name, image in (("bundle", bundle), ("drawing", drawing)):
@@ -55,7 +55,7 @@ with tempfile.TemporaryDirectory(prefix="neuronte-widths-") as temporary:
                 handle = C.c_void_p()
                 assert lib.neuronte_open_file(os.fsencode(wrapped), C.byref(handle)) == 0
                 lib.neuronte_close(handle)
-    for width in (4, 10, 1028):
+    for width in (0, -1, 1.5, True, 1025, 1028):
         invalid = fixture(8)
         invalid["shape"]["hidden_width"] = width
         source.write_text(json.dumps(invalid))

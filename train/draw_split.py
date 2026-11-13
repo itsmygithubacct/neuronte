@@ -135,6 +135,15 @@ def teacher_coverage(torch, target, w, h, px, py, samples=8):
     return inside.float().reshape(m, g, p, samples*samples).mean(-1)
 
 
+def firm_hinge(torch, rendered, wanted, margin=.05):
+    """Penalty for threshold crossings that draw-quality counts as firm errors: where
+    the teacher is at least 0.1 from 1/2, the rendered coverage must be on the teacher's
+    side of 1/2 by margin. Zero elsewhere. Same shapes as the coverages."""
+    on = torch.relu(.5+margin-rendered)*(wanted >= .6)
+    off = torch.relu(rendered-(.5-margin))*(wanted <= .4)
+    return on+off
+
+
 def prepare(directory):
     import glyphs
     directory.mkdir(parents=True, exist_ok=True)
@@ -231,6 +240,8 @@ def train(args):
         coverage = {'weight': args.coverage_weight, 'pixels': args.coverage_pixels, 'candidates': 4*args.coverage_pixels,
                     'sizes_sha256': digest(args.coverage_sizes), 'teacher_samples': 8,
                     'rule': 'half uniform, half nearest-edge candidates; each pixel its own size; native sampling'}
+        if args.coverage_firm_weight:
+            coverage.update(firm_weight=args.coverage_firm_weight, firm_margin=args.coverage_firm_margin)
         identity['coverage'] = coverage
     stem = f'{args.tag if custom else args.design}-w{width}-s{"_".join(map(str, seeds))}'
     checkpoint = args.directory/(stem+'.pt')
@@ -265,7 +276,11 @@ def train(args):
         w, h, px, py = (torch.gather(t, 2, pick) for t in (w, h, px, py))
         with torch.no_grad():
             wanted = teacher_coverage(torch, target, w, h, px, py)
-        error = (render_coverage(torch, weights, biases, cf, w, h, px, py)-wanted).abs().mean(-1)
+        rendered = render_coverage(torch, weights, biases, cf, w, h, px, py)
+        error = (rendered-wanted).abs()
+        if 'firm_weight' in coverage:
+            error = error+coverage['firm_weight']*firm_hinge(torch, rendered, wanted, coverage['firm_margin'])
+        error = error.mean(-1)
         return (error*valid).sum(1)/valid.sum(1)
     span = torch.tensor([1., 2.])
     started = time.monotonic()
@@ -363,10 +378,16 @@ def main():
                         help='weight of the rendered-coverage term (0, the original recipe, leaves it out)')
     parser.add_argument('--coverage-pixels', type=int, default=64, help='coverage-term pixels per glyph and step')
     parser.add_argument('--coverage-sizes', help='JSON of training cell sizes [[w, h, probability], ...]')
+    parser.add_argument('--coverage-firm-weight', type=float, default=0.,
+                        help='weight of a hinge on firm threshold crossings in the coverage term (0 leaves it out)')
+    parser.add_argument('--coverage-firm-margin', type=float, default=.05)
     args = parser.parse_args()
     if args.coverage_weight and (not math.isfinite(args.coverage_weight) or args.coverage_weight < 0 or
                                  not args.coverage_sizes or args.coverage_pixels < 2 or args.coverage_pixels % 2):
         parser.error('the coverage term needs a finite positive weight, --coverage-sizes and an even pixel count')
+    if args.coverage_firm_weight and (not args.coverage_weight or not math.isfinite(args.coverage_firm_weight) or
+                                      args.coverage_firm_weight < 0 or not 0 <= args.coverage_firm_margin < .1):
+        parser.error('the firm hinge needs the coverage term, a finite positive weight and a margin in [0, 0.1)')
     if min(args.steps, args.log_every, args.checkpoint_every) < 1 or not math.isfinite(args.unlabelled) or args.unlabelled < 0:
         parser.error('invalid training counts or loss weight')
     if args.width is not None and not 1 <= args.width <= 1024:

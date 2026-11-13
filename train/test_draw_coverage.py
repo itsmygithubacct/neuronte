@@ -98,6 +98,14 @@ class CoverageTermTests(unittest.TestCase):
                                                        [(6.5)/20, 1.5/40*2], [(7.5)/20, 1.5/40*2]], rtol=1e-6)
         np.testing.assert_allclose(points[1].numpy(), [[29.5/30, 60.5/61*2]]*4, rtol=1e-6)
 
+    def test_firm_hinge_matches_the_firm_error_definition(self):
+        wanted = torch.tensor([.6, .6, .6, .4, .4, .45, .55, 1., 0.])
+        rendered = torch.tensor([.49, .56, .52, .51, .40, .9, .1, .2, .8])
+        hinge = ds.firm_hinge(torch, rendered, wanted, .05)
+        np.testing.assert_allclose(hinge.numpy(), [.06, 0, .03, .06, 0, 0, 0, .35, .35], atol=1e-6)
+        firm_wrong = ((wanted > .5) != (rendered > .5)) & ((wanted-.5).abs() >= .1)
+        self.assertTrue(bool((hinge[firm_wrong] > 0).all()))
+
 
 if __name__ == '__main__':
     unittest.main()

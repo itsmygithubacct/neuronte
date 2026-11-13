@@ -1,10 +1,44 @@
 # Third-party notices
 
-Neuronte's library has no third-party code in it. It needs a C11 compiler
-and the C maths library. This file lists the third-party data and tools
+Neuronte's core library has no third-party code in it. It needs a C11 compiler
+and the C maths library. The separate, optional media library includes
+adaptations from FFmpeg, as described below. This file lists the third-party data and tools
 the project uses and whether each one is redistributed here.
 
 ## Redistributed in this repository
+
+### FFmpeg 7.1 command-line video handling
+
+`src/media.c` adapts the timestamp, seeking, filtering and constant-frame-rate
+handling in FFmpeg 7.1's `fftools/ffmpeg_demux.c`, `ffmpeg_dec.c`,
+`ffmpeg_filter.c`, `ffmpeg_mux_init.c` and `ffmpeg_opt.c`. Each adapted step
+names its upstream function. Neuronte exposes these steps through a decoding
+API with one video stream and a bounded frame queue, and declines unsupported
+input behaviours. This file is under LGPL-2.1-or-later, separately from the
+MIT core renderer and weights.
+
+Upstream source: <https://ffmpeg.org/releases/ffmpeg-7.1.tar.xz>.
+The upstream files carry this notice:
+
+> FFmpeg is free software; you can redistribute it and/or
+> modify it under the terms of the GNU Lesser General Public
+> License as published by the Free Software Foundation; either
+> version 2.1 of the License, or (at your option) any later version.
+>
+> FFmpeg is distributed in the hope that it will be useful,
+> but WITHOUT ANY WARRANTY; without even the implied warranty of
+> MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+> Lesser General Public License for more details.
+>
+> You should have received a copy of the GNU Lesser General Public
+> License along with FFmpeg; if not, write to the Free Software
+> Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+
+The full licence is in [LICENSES/FFmpeg-LGPL-2.1-or-later.txt](LICENSES/FFmpeg-LGPL-2.1-or-later.txt).
+`libneuronte-media.so` dynamically links the separately installed FFmpeg
+libraries. Those libraries and the `ffmpeg` command are not vendored here;
+their applicable licence depends on the installed FFmpeg build and its
+enabled components. The core `libneuronte.so` does not link them.
 
 ### Unicode Character Database 16.0.0 (derived data)
 

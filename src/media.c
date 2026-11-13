@@ -1,4 +1,11 @@
-/* In-process video decoding with the frames of the FFmpeg 7.1 command line.
+/* SPDX-License-Identifier: LGPL-2.1-or-later
+ *
+ * Adapted from FFmpeg 7.1's fftools. See THIRD_PARTY_NOTICES.md and
+ * LICENSES/FFmpeg-LGPL-2.1-or-later.txt for the upstream notice and licence.
+ * Modified for Neuronte: one video stream, a reusable decoding API and a
+ * bounded frame queue; unsupported command behaviours are declined.
+ *
+ * In-process video decoding with the frames of the FFmpeg 7.1 command line.
  *
  * Each step below names the fftools function it reproduces (ffmpeg_demux.c,
  * ffmpeg_dec.c, ffmpeg_filter.c, ffmpeg_mux_init.c of FFmpeg 7.1) for the

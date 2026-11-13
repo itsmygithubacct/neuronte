@@ -38,7 +38,14 @@ class DecompositionTests(unittest.TestCase):
         # distance loss, so neither batching nor cdist defines its answer.
         torch.manual_seed(8)
         torch.set_num_threads(1)
-        torch.set_default_device(os.environ.get('DECOMPOSE_TEST_DEVICE', 'cpu'))
+        device = os.environ.get('DECOMPOSE_TEST_DEVICE', 'cpu')
+        torch.set_default_device(device)
+        torch.backends.cuda.matmul.allow_tf32 = False
+        torch.backends.cudnn.allow_tf32 = False
+        # CUDA bmm and independent Linear use different reduction orders.
+        # Adam amplifies cancellation near zero; keep strict gradient checks
+        # above and allow one micro-unit in the updated CUDA parameters.
+        parameter_atol = 1e-6 if device.startswith('cuda') else 2e-7
         nets=[torch.nn.Sequential(torch.nn.Linear(90,8),torch.nn.ReLU(),torch.nn.Linear(8,8),
               torch.nn.ReLU(),torch.nn.Linear(8,8),torch.nn.ReLU(),torch.nn.Linear(8,1)) for _ in range(2)]
         layers=[[m for m in net if isinstance(m,torch.nn.Linear)] for net in nets]
@@ -79,8 +86,8 @@ class DecompositionTests(unittest.TestCase):
             optim.step()
             for k in range(2):
                 for i,layer in enumerate(layers[k]):
-                    torch.testing.assert_close(ws[i][k],layer.weight,rtol=1e-5,atol=2e-7)
-                    torch.testing.assert_close(bs[i][k],layer.bias,rtol=1e-5,atol=2e-7)
+                    torch.testing.assert_close(ws[i][k],layer.weight,rtol=1e-5,atol=parameter_atol)
+                    torch.testing.assert_close(bs[i][k],layer.bias,rtol=1e-5,atol=parameter_atol)
 
     def test_checkpoint_resume_and_identity(self):
         with tempfile.TemporaryDirectory() as temp:

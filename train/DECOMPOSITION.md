@@ -71,3 +71,23 @@ occupancy bit alone is insufficient to share its distance network. The
 pixel tests retain this counterexample and check every sextant and octant
 pattern at tile centres. Spatial experiments retain the complete scalar
 input and original distance units.
+
+## Preserve unknown-scalar behavior when packaging
+
+A selected narrower model need not replace the old expert's behavior on
+unlabelled scalars. Append its labelled override to a new bundle:
+
+```sh
+python3 tools/override-bundle.py weights/neuronte-split-v5.nrt \
+  /tmp/pixel-candidate.nrt /tmp/pixel-experiment/pixel-repertoire-k2-w64-p0-s0.json \
+  /tmp/pixel-experiment/pixel-repertoire-k2-w64-p1-s0.json
+python3 tests/check_bundle_override.py
+```
+
+Each new expert's labels must be disjoint and already covered by the base.
+The original members, fallback and gate weights remain intact. Appended gate
+outputs are constants strictly below the bound on every original logit, so
+they cannot win a table miss. This retains the original model's size in
+addition to the candidate weights; report that load/storage cost explicitly.
+The output uses the existing version-2 bundle format and the public API.
+Never overwrite a shipped model whose hash is bound by consumers.

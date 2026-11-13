@@ -58,6 +58,27 @@ cost.
   shares exactly.
 - `test_api` with `--full --accent --pixel`.
 
+## Speed
+
+One x86-64 host, kilix-bench `8f19228` expert experiment on the 49-symbol
+corpus: one core, 1 warmup + median of 10, coverage and primed draw over
+4 corpus passes, first draw over 1. Runtime built from this commit's parent
+tree at -O3. ms per glyph unless noted.
+
+| Bundle | Uncached coverage 8×16 | 16×32 | 48×96 | First draw 48×96 | Primed draw 8×16 (µs) | Open (ms) |
+|---|---:|---:|---:|---:|---:|---:|
+| `neuronte-split-v5` | 0.616 | 2.191 | 5.175 | 5.146 | 0.59 | 1.74 |
+| `neuronte-split-v7` | 0.623 | 2.246 | 4.843 | 4.874 | 0.59 | 1.92 |
+| `neuronte-split-v7-symbol-v1` | 0.117 | 0.396 | 0.823 | 0.847 | 0.59 | 1.96 |
+| `neuronte-split-v5-symbol-v1` | 0.117 | 0.399 | 0.834 | 0.895 | 0.59 | 1.80 |
+
+Against split-v7, uncached symbol coverage is 5.3×, 5.7× and 5.9× faster
+at the three cells and matches split-v5-symbol-v1 within 1.3%. Primed
+(cached) draws are unchanged. Opening is 2% slower than split-v7 (four more
+members); routing stays about 7 ns per selection. Only symbols were timed:
+Braille and ASCII routes and pixels are split-v7's, so their costs are not
+re-measured here.
+
 ## Status
 
 Not a default; no release pins it. The video player still draws full mode

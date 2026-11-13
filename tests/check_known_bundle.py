@@ -57,6 +57,16 @@ with tempfile.TemporaryDirectory(prefix='known-bundle-') as tmp:
    if not 32<=c<=126:assert coverage(new,c)==coverage(original,c)
  finally:
   for h in [original,new,*members]:lib.neuronte_close(h)
+ # A subsequent expert replacement must preserve already suppressed outputs.
+ composed,info=known_bundle.replace_known(combined,[paths[0]],6)
+ first,second=opened(combined),opened(composed)
+ try:
+  for c in range(32,127):
+   assert coverage(first,c)==coverage(second,c)
+   assert lib.neuronte_route(second,c)==(8 if c<=78 else 7)
+  for c in codes:
+   if not 32<=c<=126:assert lib.neuronte_route(first,c)==lib.neuronte_route(second,c)
+ finally:lib.neuronte_close(first);lib.neuronte_close(second)
  for changes in ([paths[0]],paths+[paths[0]]):
   try:known_bundle.replace_known(base,changes,0)
   except ValueError:pass

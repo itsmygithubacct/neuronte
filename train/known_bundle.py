@@ -34,7 +34,7 @@ def replace_known(base, replacements, expert, allow_partial=False):
            for i,(a,b,n) in enumerate(ranges)):
         raise ValueError('invalid original range table')
     off+=12*nranges
-    gate_bytes=b'';bound=None
+    gate_bytes=b'';bound=None;winning_floor=None
     if g:
         count=43+g*64+g+nets*g+nets
         raw=base[off:off+4*count]
@@ -50,7 +50,11 @@ def replace_known(base, replacements, expert, allow_partial=False):
             raise ValueError('cannot establish a safe hidden activation bound')
         magnitude=np.abs(bias)+np.abs(out)@hidden_bound*2
         bound=float(magnitude.max())
-        if not np.isfinite(bound) or bound>=1e20:
+        winning_floor=-float(magnitude.min())
+        # All original outputs stay finite, and at least one original row
+        # exceeds the newly suppressed outputs. Existing suppressed rows
+        # therefore remain valid when several expert replacements are composed.
+        if not np.isfinite(magnitude).all() or bound>=1e35 or winning_floor<=-1e20:
             raise ValueError('cannot establish a safe original gate-output bound')
         first=172+4*g*65;last=first+4*nets*g
         gate_bytes=(raw[:last]+bytes(4*len(replacements)*g)+raw[last:]+
@@ -104,6 +108,7 @@ def replace_known(base, replacements, expert, allow_partial=False):
         'sha256':digest(result),'bytes':len(result),'original_members':nets,'members':total,
         'expert':expert,'partial':allow_partial,'replaced_scalars':len(owner),
         'sources':sources,'ranges':rewritten,'gate_original_magnitude_bound':bound,
+        'gate_original_winning_floor':winning_floor,
         'original_member_sha256':[digest(m) for m in members[:nets]],
         'unknown_policy':'original gate outputs and original member bytes retained; appended outputs suppressed'}
 

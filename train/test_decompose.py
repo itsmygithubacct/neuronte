@@ -32,6 +32,13 @@ class DecompositionTests(unittest.TestCase):
                     self.assertTrue(all(g['scalars'] == scalars for g in groups))
         with self.assertRaises(ValueError):
             d.specs('spatial', 4, 'accent', 255)
+        mixed = d.specs('repertoire', 3, 'accent')
+        self.assertEqual([g['width'] for g in mixed], [128, 64, 64])
+        self.assertEqual([len(g['scalars']) for g in mixed], [203, 49, 66])
+        self.assertEqual([c for g in mixed for c in g['scalars']], scalars)
+        for expert, mode in (('ascii', 'repertoire'), ('accent', 'spatial')):
+            with self.assertRaises(ValueError):
+                d.specs(mode, 3, expert)
 
     def test_geometry_and_repertoire(self):
         n = 16
@@ -111,8 +118,9 @@ class DecompositionTests(unittest.TestCase):
         for expert in ('ascii', 'accent'):
             with self.subTest(expert=expert):
                 self.check_restart(expert)
+        self.check_restart('accent', parts=3, start=1)
 
-    def check_restart(self, expert):
+    def check_restart(self, expert, parts=64, start=63):
         import glyphs
         scalars = [ord(c) for c, _, _ in glyphs.charset(expert)]
         with tempfile.TemporaryDirectory() as temp:
@@ -125,8 +133,14 @@ class DecompositionTests(unittest.TestCase):
                 np.save(directory/'teacher.npy',fields)
                 (directory/'teacher.json').write_text(json.dumps({'sha256':d.digest(directory/'teacher.npy'),
                     'identity':{'grid':8,'sources':{},'pen':.075,'scalars':scalars}}))
-            a=argparse.Namespace(directory=dirs[0],expert=expert,mode='repertoire',parts=64,seeds='0,1',start=63,batch_models=2,
+            a=argparse.Namespace(directory=dirs[0],expert=expert,mode='repertoire',parts=parts,seeds='0,1',start=start,batch_models=2,
                 steps=4,device='cpu',unlabelled=1.,compile=False,resume=False,log_every=1,checkpoint_every=2,stop_after=None)
+            if parts == 3:
+                a.width_budget = 16
+                invalid = copy.copy(a)
+                invalid.start = 0
+                with self.assertRaisesRegex(ValueError, 'mixes widths'):
+                    d.train(invalid)
             with contextlib.redirect_stdout(io.StringIO()):
                 d.train(a)
                 b=copy.copy(a);b.directory=dirs[1];b.stop_after=2;d.train(b)

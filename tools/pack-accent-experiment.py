@@ -99,6 +99,7 @@ def build(directory, output, mode, parts, seed, budget=None):
     report = {'file': out.name, 'sha256': decompose.digest(out), 'bytes': len(data),
               'corpus': corpus, 'routes': routes, 'ranges': ranges,
               'mode': mode, 'parts': parts, 'seed': seed, 'width_sum': sum(s['width'] for s in specs),
+              'widths': [s['width'] for s in specs],
               'source_models': [{'file': p.name, 'sha256': decompose.digest(p)} for p in source_paths],
               'preserved_member_sha256': [hashlib.sha256(image).hexdigest() for image in images[:6]],
               'original_gate_logit_magnitude_bound': logit_bound, 'disabled_gate_bias': disabled,
@@ -113,7 +114,7 @@ if __name__ == '__main__':
     p.add_argument('directory', type=Path)
     p.add_argument('output', type=Path)
     p.add_argument('--mode', choices=('spatial', 'repertoire'), required=True)
-    p.add_argument('--parts', type=int, choices=decompose.COUNTS, required=True)
+    p.add_argument('--parts', type=int, choices=(3,) + decompose.COUNTS, required=True)
     p.add_argument('--seed', type=int, required=True)
     p.add_argument('--width-budget', type=int)
     a = p.parse_args()

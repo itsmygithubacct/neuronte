@@ -59,3 +59,13 @@ for follow-up recipes; use a separate directory for each budget to preserve
 checkpoints and exports. Accent's original baseline used 40,000 steps; pass
 `--steps 40000` to match that schedule. No teacher equivalence or quality
 improvement is implied by trainer support.
+
+`--expert accent --mode repertoire --parts 3` assigns the complete Latin,
+Greek and Russian inventories to widths 128, 64 and 64, respectively. This
+also sums to 256 but spends more of the width on the larger Latin repertoire.
+For seeds `0,1`, train homogeneous slices `(start,batch-models)` of `(0,1)`,
+`(1,2)`, `(3,1)` and `(4,2)`. Mixed-width batches fail explicitly. A separate
+`--unlabelled 0` experiment can focus capacity on known glyphs; it must keep
+the original expert for unknown-scalar rendering. The accent packager does
+so for both spatial and repertoire designs, retaining all original gate rows
+and routing only labelled accent scalars to appended members.

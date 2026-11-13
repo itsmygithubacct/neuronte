@@ -48,16 +48,17 @@ class PackageTests(unittest.TestCase):
         try:
             with tempfile.TemporaryDirectory() as temp:
                 root = Path(temp)
-                for mode in ('spatial', 'repertoire'):
-                    members = d.specs(mode, 4, 'accent', 16)
+                for mode, parts in (('spatial', 4), ('repertoire', 4), ('repertoire', 3)):
+                    destination = root / f'{mode}{parts}'
+                    members = d.specs(mode, parts, 'accent', 16)
                     for s in members:
                         doc = fixture(s['width'], s['index'], labelled=' '.join(f'U+{c:04X}' for c in s['scalars']))
                         doc['shape']['tau'] = .15 / (s['region'][1] - s['region'][0])
                         doc['training']['experiment'] = {**s, 'seed': 0, 'identity': {'teacher': {'identity': {'scalars': sorted(accent)}}}}
                         (root / (s['name'] + '-s0.json')).write_text(json.dumps(doc))
-                    report = p.build(root, root / mode, mode, 4, 0, 16)
+                    report = p.build(root, destination, mode, parts, 0, 16)
                     handle = ct.c_void_p()
-                    self.assertEqual(lib.neuronte_open_file(str(root / mode / report['file']).encode(), ct.byref(handle)), 0)
+                    self.assertEqual(lib.neuronte_open_file(str(destination / report['file']).encode(), ct.byref(handle)), 0)
                     try:
                         for scalar, expected in zip(report['corpus'], report['routes']):
                             self.assertEqual(lib.neuronte_route(handle, scalar), expected)

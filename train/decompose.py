@@ -24,7 +24,8 @@ def digest(path):
 
 
 def specs(mode, count, expert='ascii', width_budget=None):
-    if mode not in ('spatial', 'repertoire') or count not in COUNTS:
+    mixed_scripts = expert == 'accent' and mode == 'repertoire' and count == 3
+    if mode not in ('spatial', 'repertoire') or (count not in COUNTS and not mixed_scripts):
         raise ValueError('unsupported decomposition')
     if expert not in ('ascii', 'accent'):
         raise ValueError('unsupported expert')
@@ -36,24 +37,26 @@ def specs(mode, count, expert='ascii', width_budget=None):
         scripts = [[c for c in scalars if c < 0x370],
                    [c for c in scalars if 0x370 <= c < 0x400],
                    [c for c in scalars if 0x400 <= c < 0x500]]
-        allocations = [count//2, count//4, count//4]
+        allocations = [1, 1, 1] if mixed_scripts else [count//2, count//4, count//4]
         groups = [script[len(script)*i//parts:len(script)*(i+1)//parts]
                   for script, parts in zip(scripts, allocations) for i in range(parts)]
     else:
         scalars = SCALARS
         groups = [scalars[len(scalars)*i//count:len(scalars)*(i+1)//count] for i in range(count)]
     budget = width_budget if width_budget is not None else (256 if expert == 'accent' else 128)
-    if budget < count or budget % count or budget//count > 1024:
+    divisor = 4 if mixed_scripts else count
+    widths = [budget//2, budget//4, budget//4] if mixed_scripts else [budget//count] * count
+    if budget < divisor or budget % divisor or max(widths) > 1024:
         raise ValueError('width budget must divide exactly into supported widths')
     if any(not g for g in groups) or sorted(c for g in groups for c in g) != sorted(scalars):
         raise ValueError('groups must partition the entire repertoire')
-    cols, rows = GRIDS[count]
+    cols, rows = GRIDS.get(count, (1, 1))
     out = []
     for i in range(count):
         region = [i % cols / cols, (i % cols + 1) / cols,
                   2 * (i // cols) / rows, 2 * (i // cols + 1) / rows]
         out.append({'name': f'{expert}-{mode}-k{count}-p{i}', 'index': i,
-                    'width': budget // count, 'region': region if mode == 'spatial' else [0., 1., 0., 2.],
+                    'width': widths[i], 'region': region if mode == 'spatial' else [0., 1., 0., 2.],
                     'scalars': scalars if mode == 'spatial' else groups[i]})
     return out
 
@@ -181,11 +184,13 @@ def train(args):
         raise ValueError('teacher SHA256 differs')
     full = np.load(args.directory/'teacher.npy', allow_pickle=False)
     inventory = metadata['identity'].get('scalars', SCALARS)
-    if inventory != sorted({c for s in specs('spatial', args.parts, expert) for c in s['scalars']}):
+    if inventory != sorted({c for s in specs(args.mode, args.parts, expert) for c in s['scalars']}):
         raise ValueError('teacher scalar inventory differs from experiment')
     scalar_index = {c: i for i, c in enumerate(inventory)}
     model_count, glyph_count = len(members), max(len(x['scalars']) for x in members)
     width, n = members[0]['width'], metadata['identity']['grid']
+    if any(m['width'] != width for m in members):
+        raise ValueError('training batch mixes widths; select a homogeneous slice with --start/--batch-models')
     fields, labels, valid = [], [], []
     for member in members:
         indices = [scalar_index[c] for c in member['scalars']]
@@ -307,7 +312,7 @@ def main():
     parser.add_argument('--expert', choices=('ascii','accent'), default='ascii')
     parser.add_argument('--width-budget', type=int, help='sum of hidden widths; default 128 for ASCII, 256 for accent')
     parser.add_argument('--mode',choices=('spatial','repertoire'),default='spatial')
-    parser.add_argument('--parts',type=int,choices=COUNTS,default=4)
+    parser.add_argument('--parts',type=int,choices=(3,)+COUNTS,default=4)
     parser.add_argument('--seeds',default='0,1')
     parser.add_argument('--steps',type=int,default=20000)
     parser.add_argument('--start',type=int,default=0)

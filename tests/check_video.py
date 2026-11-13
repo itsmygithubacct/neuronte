@@ -200,7 +200,7 @@ class Video(unittest.TestCase):
             path=Path(temp)/'helper.json';path.write_text(json.dumps(doc))
             with self.assertRaisesRegex(ValueError,'invalid video helper layer'):Helper(path,'speed')
 
-    def player(self,*args,keys=(),source=None,grid=True):
+    def player(self,*args,keys=(),source=None,grid=True,timeout=60):
         """Run the player off a terminal; keys are (seconds to wait, bytes) written to its key pipe."""
         import shutil,time
         if not shutil.which('ffmpeg') or not shutil.which('ffprobe'):self.skipTest('ffmpeg is not installed')
@@ -214,12 +214,110 @@ class Video(unittest.TestCase):
                 for wait,key in keys:
                     time.sleep(wait)
                     if child.poll() is None:os.write(w,key)
-                _,err=child.communicate(timeout=60)
+                _,err=child.communicate(timeout=timeout)
             finally:
                 os.close(w)
-                if child.poll() is None:child.kill()
+                if child.poll() is None:child.kill();child.wait()
             picture.seek(0);out=picture.read()
         return child.returncode,out,err
+
+    def test_player_drains_noisy_decoder_and_reports_its_last_error(self):
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory() as temp:
+            fake=Path(temp)/'ffmpeg'
+            # More than a pipe can hold, both before a picture and after stdout
+            # closes. Diagnostics must not prevent either playback or EOF.
+            fake.write_text('#!/usr/bin/env python3\nimport os,sys\n'
+                'for _ in range(256): os.write(2,b"decoder diagnostic\\n"*256)\n'
+                'os.write(1,bytes(12*12*3))\nos.close(1)\n'
+                'for _ in range(256): os.write(2,b"late diagnostic\\n"*256)\n'
+                'os.write(2,b"last decoder error\\n")\nsys.exit(int(os.environ["DECODER_STATUS"]))\n')
+            fake.chmod(0o755)
+            for status in (0,7):
+                with self.subTest(status=status),patch.dict(os.environ,PATH=temp+os.pathsep+os.environ['PATH'],DECODER_STATUS=str(status)):
+                    code,out,err=self.player('--no-audio',timeout=5)
+                    self.assertEqual(code,1 if status else 0,err)
+                    self.assertEqual(len(self.pixel_frames(out)),1)
+                    self.assertLess(len(err),70000)  # only a bounded diagnostic tail
+                    if status:self.assertIn(b'last decoder error',err)
+
+    def test_player_can_quit_while_a_decoder_holds_a_partial_frame(self):
+        from unittest.mock import patch
+        import time
+        with tempfile.TemporaryDirectory() as temp:
+            fake=Path(temp)/'ffmpeg'
+            fake.write_text('#!/usr/bin/env python3\nimport os,time\nos.write(1,bytes(100))\ntime.sleep(30)\n')
+            fake.chmod(0o755)
+            with patch.dict(os.environ,PATH=temp+os.pathsep+os.environ['PATH']):
+                began=time.monotonic()
+                code,out,err=self.player('--no-audio',keys=[(.8,b'q')],timeout=2)
+            self.assertEqual(code,0,err)
+            self.assertLess(time.monotonic()-began,2.5)
+            self.assertEqual(self.pixel_frames(out),[])
+
+    def test_bad_player_log_keeps_terminal_attributes(self):
+        import fcntl,termios
+        with tempfile.TemporaryDirectory() as temp:
+            master,slave=os.openpty();before=termios.tcgetattr(slave)
+            def terminal_owner():
+                os.setsid();fcntl.ioctl(0,termios.TIOCSCTTY,0)
+            cmd=[sys.executable,str(ROOT/'tools/neuronte-play.py'),'color=size=32x32:rate=30',
+                 '--lavfi','--no-audio','--log',str(Path(temp)/'missing'/'frames.jsonl')]
+            child=None
+            try:
+                child=subprocess.Popen(cmd,stdin=slave,stdout=subprocess.PIPE,stderr=subprocess.PIPE,preexec_fn=terminal_owner)
+                out,err=child.communicate(timeout=10)
+                self.assertEqual(child.returncode,2,err)
+                self.assertIn(b'No such file or directory',err)
+                self.assertEqual(out,b'')
+                self.assertEqual(termios.tcgetattr(slave),before)
+            finally:
+                if child and child.poll() is None:child.kill();child.wait()
+                termios.tcsetattr(slave,termios.TCSANOW,before)
+                os.close(master);os.close(slave)
+
+    def test_player_waits_for_slow_frames_including_a_pause(self):
+        with tempfile.TemporaryDirectory() as temp:
+            log=Path(temp)/'frames.jsonl'
+            code,out,err=self.player('--fps','.5','--frames','3','--log',str(log),
+                                     keys=[(.8,b' '),(.6,b' ')],timeout=10)
+            self.assertEqual(code,0,err)
+            rows=[json.loads(line) for line in log.read_text().splitlines()]
+            self.assertEqual([r['pts'] for r in rows],[0,2,4])
+            self.assertEqual(len(self.pixel_frames(out)),3)
+            self.assertGreater(rows[1]['shown']-rows[0]['shown'],2.4)
+            self.assertGreater(rows[2]['shown']-rows[1]['shown'],1.8)
+            self.assertGreater(min(r['late_ms'] for r in rows),-10)
+
+    def test_player_busy_terminal_still_waits_for_slow_frames(self):
+        with tempfile.TemporaryDirectory() as temp:
+            stats=Path(temp)/'stats.json'
+            code,out,err=self.player('--fps','.5','--frames','5','--transport','shm','--stats',str(stats),timeout=12)
+            self.assertEqual(code,0,err)
+            summary=json.loads(stats.read_text())
+            self.assertEqual(summary['shown'],3)
+            self.assertEqual(summary['skipped_terminal_busy'],2)
+            self.assertGreaterEqual(summary['seconds'],7.9)
+
+    def test_cancelled_picture_keeps_the_last_displayed_image(self):
+        import base64,re
+        spec=importlib.util.spec_from_file_location('neuronte_play',ROOT/'tools/neuronte-play.py')
+        play=importlib.util.module_from_spec(spec);spec.loader.exec_module(play)
+        presenter=play.Presenter(io.BytesIO(),'shm')
+        picture=np.zeros((4,2,3),np.uint8)
+        def image_name(payload):
+            return '/dev/shm/'+base64.b64decode(re.search(rb',t=s;([^\x1b]+)',payload)[1]).decode()
+        try:
+            first=presenter.frame(picture,1,1,1,1);presenter.sent()
+            shown=presenter.current;os.unlink(image_name(first))  # terminal consumed it
+            cancelled=presenter.frame(picture,1,1,1,1)
+            presenter.discard()
+            self.assertFalse(os.path.exists(image_name(cancelled)))
+            self.assertEqual(presenter.current,shown)
+            next_frame=presenter.frame(picture,1,1,1,1)
+            self.assertIn(f'a=d,d=I,i={shown},'.encode(),next_frame)
+            presenter.sent();os.unlink(image_name(next_frame))
+        finally:presenter.close(drain=0)
 
     def pixel_frames(self,out):
         import re,base64,zlib

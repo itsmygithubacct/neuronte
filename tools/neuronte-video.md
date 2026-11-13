@@ -70,6 +70,12 @@ restarts the decoder at the same position; a pause holds both. One row of
 text under the picture shows the position (`--no-status` removes it). A
 resized terminal is refitted.
 
+Controls remain responsive while waiting for decoded frames and during long
+frame intervals. Rates below one frame per second keep their full timing,
+including pauses. Decoder diagnostics are drained throughout playback with
+only their last 64 KiB retained for an error report. An invalid `--log` path
+fails before the player changes the terminal's input mode.
+
 The default, `--mode pixels`, gives every cell eight colours in a 2 × 4
 arrangement of blocks, mixed by the three video masks drawn at 8 × 16 pixels
 a cell, and sends the result with the kitty graphics protocol. The file is

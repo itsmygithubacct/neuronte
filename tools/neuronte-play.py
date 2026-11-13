@@ -137,7 +137,7 @@ class Presenter:
         base = 0x4e520000 | secrets.randbelow(0x7fff) << 1
         self.ids = (base, base + 1); self.current = None
         self.names = [f'neuronte-play-{os.getpid()}-{secrets.token_hex(6)}-{i}' for i in range(3)]
-        self.slot = 0; self.skipped = 0
+        self.slot = 0; self.skipped = 0; self.pending = None
 
     def frame(self, frame, cols, rows, left, top, natural=False):
         """The bytes that replace the picture, or None when the terminal has
@@ -147,8 +147,8 @@ class Presenter:
         span = '' if natural else f'c={cols},r={rows},'
         head = f'a=T,f=24,s={w},v={h},i={new},p=1,{span}z=-1,C=1,q=2'
         out = [b'\x1b[?2026h', f'\x1b[{top};{left}H'.encode()]
+        name = None
         if self.transport == 'shm':
-            name = None
             for tries in range(3):              # the terminal unlinks a name once it has read it
                 candidate = self.names[(self.slot + tries) % 3]
                 try:
@@ -169,10 +169,23 @@ class Presenter:
                 more = int(start + 4096 < len(data))
                 out.append(b'\x1b_G' + (head + ',o=z,' if not start else '').encode() + f'm={more};'.encode() + data[start:start+4096] + b'\x1b\\')
         if self.current is not None: out.append(f'\x1b_Ga=d,d=I,i={self.current},q=2;\x1b\\'.encode())
-        out.append(b'\x1b[?2026l'); self.current = new
+        out.append(b'\x1b[?2026l'); self.pending = (self.current, name); self.current = new
         return b''.join(out)
 
+    def sent(self):
+        self.pending = None
+
+    def discard(self):
+        """A seek/resize can cancel a packed picture before it reaches the terminal."""
+        if self.pending is not None:
+            self.current, name = self.pending
+            if name is not None:
+                try: os.unlink('/dev/shm/' + name)
+                except FileNotFoundError: pass
+            self.pending = None
+
     def close(self, drain=.2):
+        self.discard()
         # A flushed graphics command can still be waiting in the terminal's
         # input queue. Give it a bounded chance to read/unlink the last image
         # before removing unread objects, including after --frames completes.
@@ -199,13 +212,43 @@ def text(renderer, cells, previous, left, top):
     return (''.join(out) + '\x1b[0m\x1b[?2026l').encode()
 
 
-def read_exact(stream, size):
-    parts = []; remaining = size
-    while remaining:
-        part = stream.read(remaining)
-        if not part: return None
-        parts.append(part); remaining -= len(part)
-    return b''.join(parts)
+class Decoder:
+    """Read one frame incrementally while draining a bounded diagnostic tail.
+
+    A quiet or damaged source must not prevent the player from handling keys.
+    read() returns b'' while waiting, a complete frame, or None after exit.
+    """
+    def __init__(self, command):
+        self.child = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                      bufsize=0, preexec_fn=with_us)
+        self.readers = [self.child.stdout, self.child.stderr]
+        self.partial = bytearray(); self.errors = bytearray()
+        for stream in self.readers: os.set_blocking(stream.fileno(), False)
+
+    def read(self, size, wait=.05):
+        ready = select.select(self.readers, [], [], wait)[0]
+        for stream in ready:
+            chunk = os.read(stream.fileno(), size - len(self.partial) if stream is self.child.stdout else 65536)
+            if not chunk:
+                self.readers.remove(stream)
+                stream.close()
+            elif stream is self.child.stdout:
+                self.partial.extend(chunk)
+            else:
+                self.errors.extend(chunk)
+                del self.errors[:-65536]
+        if len(self.partial) == size:
+            frame = bytes(self.partial); self.partial.clear()
+            return frame
+        if not self.readers and self.child.poll() is not None:
+            return None
+        return b''
+
+    def close(self):
+        if self.child.poll() is None: self.child.kill()
+        self.child.wait()
+        for stream in self.readers: stream.close()
+        self.readers.clear()
 
 
 class Keys:
@@ -454,7 +497,7 @@ def main():
         if chroma: scale += f':in_chroma_loc={chroma}'
         cmd = ['ffmpeg', '-v', 'error', '-nostdin', '-filter_threads', str(a.filter_threads)] + (['-f', 'lavfi'] if a.lavfi else ['-ss', f'{position:.3f}']) \
             + ['-i', a.video, '-an', '-sn', '-vf', f'fps={fps},{scale}', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-']
-        return subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, preexec_fn=with_us)
+        return Decoder(cmd)
 
     def draw_pixels(colours):
         picture = renderer.decode(colours)
@@ -464,31 +507,46 @@ def main():
         return presenter.frame(picture, geometry['c'], geometry['r'], geometry['left'], geometry['top'],
                                natural=bool(a.pixel_size))
 
-    keys = Keys(a.input_fd); presenter = Presenter(out, transport)
+    presenter = Presenter(out, transport)
+    keys = None
     source = clock = None; shown = dropped = count = skipped = seeks = 0; failure = ''; resized = []
+    # Opening a bad log path must fail before changing the terminal's input mode.
     log = open(a.log, 'w', buffering=1) if a.log else None; late = []; cost = dict(read=0., fit=0., draw=0., pack=0., write=0.); wire = 0
     for number in (signal.SIGTERM, signal.SIGHUP):          # leave through finally, so the terminal and the sound are put back
         signal.signal(number, lambda *_: sys.exit(0))
     signal.signal(signal.SIGWINCH, lambda *_: resized.append(1))
     began = time.perf_counter()
     try:
+        keys = Keys(a.input_fd)
         out.write(b'\x1b[?1049h\x1b[?25l\x1b[2J'); out.flush()
         if not a.no_audio and not a.untimed and not a.lavfi and has_sound and player:
             try: clock = Sound(player, a.video, a.start, a.loop, a.audio_output, a.audio_delay, held=True)
             except OSError as exc: notes.append(f'no sound: {exc}')
         if clock is None: clock = WallClock(a.start); clock.pause(True)
         origin = a.start; index = 0; previous = None; paused = False; drawn = -1.
+        pending = None; preview = False; read_time = 0.
         source = decoder(origin); waiting = True    # the clock is held until the first picture is in hand
 
         def restart(position):
-            nonlocal source, origin, index, previous, waiting
-            source.kill(); source.wait()
+            nonlocal source, origin, index, previous, waiting, pending, preview, read_time, dropped
+            source.close()
+            if pending is not None:
+                dropped += 1
+                pending['record'].update(dropped=True, interrupted=True)
+                if log: log.write(json.dumps(pending['record']) + '\n')
+            presenter.discard(); pending = None; read_time = 0.; preview = paused
             if not waiting and not paused: clock.pause(True)
             waiting = True
             origin = position; index = 0; previous = None; source = decoder(origin)
 
-        while a.frames is None or count < a.frames:
-            for key in keys.read(.05 if paused else 0):
+        while pending is not None or a.frames is None or count < a.frames:
+            # Revisit controls throughout long frame intervals and decoder stalls.
+            # Packed pictures stay pending until their full deadline, including
+            # pauses and rates below one frame per second.
+            wait = .05 if paused and not preview else 0.
+            if pending is not None and not paused and not a.untimed:
+                wait = max(0., min(.05, pending['pts'] - clock.time()))
+            for key in keys.read(wait):
                 if key == 'quit': raise KeyboardInterrupt
                 if key == 'pause':
                     paused = not paused; drawn = -1.
@@ -499,64 +557,73 @@ def main():
                     target = 0. if key == 'home' else clock.time() + SEEK[key]
                     target = max(0., min(target, max(0., duration - 1)) if duration else target)
                     restart(target); clock.seek(target); seeks += 1; drawn = -1.
-                    if paused:                              # show where we landed, then hold
-                        raw = read_exact(source.stdout, geometry['w'] * geometry['h'] * 3); waiting = False
-                        if raw is not None:
-                            frame = np.frombuffer(raw, np.uint8).reshape(geometry['h'], geometry['w'], 3); index = 1
-                            payload = present_pixels(draw_pixels(fitter.encode(pad_cells(frame, fitter)))) \
-                                if a.mode == 'pixels' else text(renderer, renderer.fit(frame), None, geometry['left'], geometry['top'])
-                            if payload: out.write(payload); out.flush()
             if resized:
                 del resized[:]; layout(); out.write(b'\x1b[2J'); restart(clock.time()); drawn = -1.
             now = clock.time()
             if geometry['status'] and int(now) != int(drawn):
                 out.write(status(now, duration, paused, clock.volume, geometry['cols'], geometry['status'])); out.flush(); drawn = now
-            if paused: continue
-            t0 = time.perf_counter()
-            raw = read_exact(source.stdout, geometry['w'] * geometry['h'] * 3)
-            t1 = time.perf_counter()
-            if waiting:
-                waiting = False
-                if not paused: clock.pause(False)
-            if raw is None:                                 # the end, or ffmpeg gave up: say which
-                if source.wait(): failure = source.stderr.read().decode(errors='replace').strip(); break
-                if not a.loop: break
-                restart(0.); clock.seek(0.); continue
-            pts = origin + index / fps; index += 1; count += 1
-            now = clock.time(); record = dict(n=count, t=round(time.monotonic(), 6), pts=round(pts, 4), clock=round(now, 4), read_ms=round((t1 - t0) * 1e3, 3))
-            if not a.untimed and now > pts + 1 / fps and shown:  # late: skip the work, keep the clock
-                dropped += 1; record['dropped'] = True
-                if log: log.write(json.dumps(record) + '\n')
-                continue
-            frame = np.frombuffer(raw, np.uint8).reshape(geometry['h'], geometry['w'], 3)
-            if a.mode == 'pixels':
-                colours = fitter.encode(pad_cells(frame, fitter)); t2 = time.perf_counter()
-                picture = draw_pixels(colours); t3 = time.perf_counter()
-                payload = present_pixels(picture)
-            else:
-                if helper is not None:
-                    k = helper.doc['inference']['candidates']
-                    scores = helper(features(frame))
-                    cells = renderer.fit(frame, np.argpartition(scores, -k, axis=1)[:, -k:].reshape(geometry['r'], geometry['c'], k))
+            if paused and not preview: continue
+            if pending is None:
+                t0 = time.perf_counter()
+                raw = source.read(geometry['w'] * geometry['h'] * 3)
+                t1 = time.perf_counter(); read_time += t1 - t0
+                if raw == b'': continue
+                if waiting:
+                    waiting = False
+                    if not paused: clock.pause(False)
+                if raw is None:                             # both pipes are drained and the child has exited
+                    if source.child.returncode:
+                        failure = source.errors.decode(errors='replace').strip() or f'exit status {source.child.returncode}'
+                        break
+                    if not a.loop or paused: break
+                    restart(0.); clock.seek(0.); continue
+                frame = np.frombuffer(raw, np.uint8).reshape(geometry['h'], geometry['w'], 3)
+                if preview and paused:                      # a paused seek/resize gets one picture, then holds
+                    payload = present_pixels(draw_pixels(fitter.encode(pad_cells(frame, fitter)))) \
+                        if a.mode == 'pixels' else text(renderer, renderer.fit(frame), None, geometry['left'], geometry['top'])
+                    if payload: out.write(payload); out.flush(); presenter.sent()
+                    index = 1; preview = False; read_time = 0.
+                    continue
+                preview = False
+                pts = origin + index / fps; index += 1; count += 1
+                now = clock.time(); record = dict(n=count, t=round(time.monotonic(), 6), pts=round(pts, 4), clock=round(now, 4), read_ms=round(read_time * 1e3, 3))
+                if not a.untimed and now > pts + 1 / fps and shown:
+                    dropped += 1; record['dropped'] = True; read_time = 0.
+                    if log: log.write(json.dumps(record) + '\n')
+                    continue
+                if a.mode == 'pixels':
+                    colours = fitter.encode(pad_cells(frame, fitter)); t2 = time.perf_counter()
+                    picture = draw_pixels(colours); t3 = time.perf_counter()
+                    payload = present_pixels(picture)
                 else:
-                    cells = renderer.fit(frame)
-                t2 = t3 = time.perf_counter()
-                payload = text(renderer, cells, previous, geometry['left'], geometry['top']); previous = cells
-            t4 = time.perf_counter()
+                    if helper is not None:
+                        k = helper.doc['inference']['candidates']
+                        scores = helper(features(frame))
+                        cells = renderer.fit(frame, np.argpartition(scores, -k, axis=1)[:, -k:].reshape(geometry['r'], geometry['c'], k))
+                    else:
+                        cells = renderer.fit(frame)
+                    t2 = t3 = time.perf_counter()
+                    payload = text(renderer, cells, previous, geometry['left'], geometry['top']); previous = cells
+                t4 = time.perf_counter()
+                pending = dict(payload=payload, pts=pts, record=record,
+                               costs=(read_time, t2 - t1, t3 - t2, t4 - t3))
+                read_time = 0.
+            if not a.untimed and clock.time() < pending['pts']: continue
+            payload, pts, record = pending['payload'], pending['pts'], pending['record']
             if payload is None:                             # the terminal is behind: skip, do not queue
-                skipped += 1; record['skipped'] = True
+                skipped += 1; record['skipped'] = True; pending = None
                 if log: log.write(json.dumps(record) + '\n')
-                wait = 0. if a.untimed else pts - clock.time()
-                if wait > 0: time.sleep(min(wait, 1.))
                 continue
-            wait = 0. if a.untimed else pts - clock.time()
-            if wait > 0: time.sleep(min(wait, 1.))
             lateness = (clock.time() - pts) * 1e3
-            out.write(payload); out.flush(); t5 = time.perf_counter(); shown += 1; wire += len(payload); late.append(lateness)
-            for name, value in zip(('read', 'fit', 'draw', 'pack'), (t1 - t0, t2 - t1, t3 - t2, t4 - t3)): cost[name] += value
-            cost['write'] += t5 - t4 - max(0., min(wait, 1.))
-            record.update(fit_ms=round((t2 - t1) * 1e3, 3), draw_ms=round((t3 - t2) * 1e3, 3), pack_ms=round((t4 - t3) * 1e3, 3),
-                          write_ms=round((t5 - t4 - max(0., min(wait, 1.))) * 1e3, 3), late_ms=round(lateness, 3), bytes=len(payload), wall=round(t5 - began, 4), shown=round(time.monotonic(), 6))
+            wrote = time.perf_counter()
+            out.write(payload); out.flush(); presenter.sent(); t5 = time.perf_counter(); shown += 1; wire += len(payload); late.append(lateness)
+            for name, value in zip(('read', 'fit', 'draw', 'pack'), pending['costs']):
+                cost[name] += value
+                record[name + '_ms'] = round(value * 1e3, 3)
+            cost['write'] += t5 - wrote
+            record.update(write_ms=round((t5 - wrote) * 1e3, 3), late_ms=round(lateness, 3),
+                          bytes=len(payload), wall=round(t5 - began, 4), shown=round(time.monotonic(), 6))
+            pending = None
             if log: log.write(json.dumps(record) + '\n')
     except (KeyboardInterrupt, BrokenPipeError):
         pass
@@ -564,11 +631,9 @@ def main():
         for number in (signal.SIGTERM, signal.SIGHUP, signal.SIGINT): signal.signal(number, signal.SIG_IGN)   # a second signal must not cut this short
         elapsed = time.perf_counter() - began
         tail = presenter.close()                            # first: the pictures in /dev/shm are the one thing nobody else removes
-        if source:
-            if source.poll() is None: source.kill()
-            source.wait()
+        if source: source.close()
         if clock: clock.close()
-        keys.close()
+        if keys: keys.close()
         if log: log.close()
         try:
             out.write(tail + b'\x1b[?2026l\x1b[0m\x1b[?25h\x1b[?1049l'); out.flush()

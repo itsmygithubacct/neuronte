@@ -199,6 +199,27 @@ class Video(unittest.TestCase):
             path=Path(temp)/'helper.json';path.write_text(json.dumps(doc))
             with self.assertRaisesRegex(ValueError,'invalid video helper layer'):Helper(path,'speed')
 
+    def test_player_pixels_and_cells(self):
+        import shutil,re,base64,zlib
+        if not shutil.which('ffmpeg') or not shutil.which('ffprobe'):self.skipTest('ffmpeg is not installed')
+        cmd=[sys.executable,str(ROOT/'tools/neuronte-play.py'),'color=c=red:size=32x48:rate=10[a];color=c=blue:size=32x48:rate=10[b];[a][b]hstack','--lavfi','--cols','6','--rows','3','--frames','2']
+        result=subprocess.run(cmd,capture_output=True)
+        self.assertEqual(result.returncode,0,result.stderr)
+        self.assertIn(b'2 frames shown',result.stderr)
+        frames=re.findall(rb'\x1b_Ga=T,f=24,o=z,s=48,v=48,i=\d+,p=1,c=6,r=3,C=1,q=2,m=0;([^\x1b]*)\x1b\\',result.stdout)
+        self.assertEqual(len(frames),2)
+        # Red on the left and blue on the right must come back that way round.
+        image=np.frombuffer(zlib.decompress(base64.standard_b64decode(frames[0])),np.uint8).reshape(48,48,3).astype(int)
+        self.assertLessEqual(int(np.abs(image[:,:24]-[255,0,0]).max()),8)
+        self.assertLessEqual(int(np.abs(image[:,24:]-[0,0,255]).max()),8)
+        self.assertTrue(result.stdout.startswith(b'\x1b[?1049h'));self.assertTrue(result.stdout.endswith(b'\x1b[?25h\x1b[?1049l'))
+        result=subprocess.run(cmd+['--mode','cells'],capture_output=True)
+        self.assertEqual(result.returncode,0,result.stderr)
+        self.assertNotIn(b'\x1b_G'+b'a=T',result.stdout)
+        self.assertEqual(result.stdout.count(b'\x1b[48;2;'),18);self.assertIn(b'\x1b[1;1H',result.stdout)   # 6 x 3 cells, sent once; the second frame is unchanged
+        bad=subprocess.run(cmd[:2]+['nosuchsource=1']+cmd[3:],capture_output=True)
+        self.assertEqual(bad.returncode,2);self.assertNotIn(b'Traceback',bad.stderr)
+
     def test_exact_video_asset(self):
         result=v.exactness()
         self.assertEqual(result['points'],2048)

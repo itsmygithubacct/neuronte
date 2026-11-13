@@ -51,6 +51,31 @@ not this repository. No source frames are retained in model assets. Video
 nets are retained only when held-out acceptance beats the exact-search
 baseline under the research plan's quality, stability and speed criteria.
 
+## Playing a file
+
+`python3 tools/neuronte-play.py FILE` plays a video in the terminal. ffmpeg
+decodes and scales it to the terminal's grid, keeping the picture's shape,
+and the player shows it at the file's own frame rate. Frames that cannot be
+shown in time are dropped, so playback keeps to the clock and never runs
+slow. `q` or Ctrl-C quits and space pauses; `--audio` also plays the sound
+through ffplay, started together and not resynchronised afterwards.
+
+The default, `--mode pixels`, gives every cell eight colours in a 2 × 4
+arrangement of blocks, mixed by the three video masks drawn at 8 × 16 pixels
+a cell, and sends the result with the kitty graphics protocol. The file is
+scaled to one pixel a block, so the fit is exact. It needs a terminal with
+that protocol. On one laptop core a 200 × 56 grid played at 30 frames a
+second with 2 of 120 frames dropped; that is one measurement, on a
+synthetic clip.
+
+`--mode cells` writes one character and two colours a cell as ordinary
+truecolour text, which any truecolour terminal shows in its own font; in a
+Neuronte terminal the nets draw it. It is the exhaustive two-ink fit and
+is far from real time: an 80 × 24 grid showed 2 frames a second with
+the 328 block characters. `--characters full` searches the whole bundle and
+`--helper` adds the speed helper; both are slower still than the picture
+needs.
+
 ## Optional learned helpers
 
 `--level two --mode full --cell 8x16 --helper speed` proposes a compact

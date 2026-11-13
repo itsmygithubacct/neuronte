@@ -78,3 +78,19 @@ gate rows and appends suppressed outputs after establishing conservative
 activation/output bounds. `--allow-partial` explicitly permits mixed-width
 fallback. The provenance sidecar binds the original bytes, replacements,
 new ranges and output hash. Validate resulting quality before deployment.
+
+## Explicit script capacities
+
+For the three-member accent repertoire, `--script-widths 192,128,128` selects
+independent Latin/diacritic, Greek and Russian widths in that order. It is mutually
+exclusive with `--width-budget`. The same option must be supplied to
+`tools/pack-accent-experiment.py`; packing verifies each trained member's width
+and complete scalar partition. Widths remain part of checkpoint identity.
+
+Use a new experiment directory for each recipe. Train equal-width slices with
+`--start` and `--batch-models`; for seeds `0,1`, starts `0` and `3` select the two
+Latin models individually, while starts `1` and `4` with batch size `2` select
+each seed's Greek/Russian pair. The existing default H128/H64/H64 recipe and all
+prior checkpoints retain their interpretation. Explicit widths are a training
+configuration, not a quality or performance claim.
+

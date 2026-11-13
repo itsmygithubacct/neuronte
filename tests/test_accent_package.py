@@ -48,9 +48,11 @@ class PackageTests(unittest.TestCase):
         try:
             with tempfile.TemporaryDirectory() as temp:
                 root = Path(temp)
-                for mode, parts in (('spatial', 4), ('repertoire', 4), ('repertoire', 3)):
+                for mode, parts, widths in (('spatial', 4, None), ('repertoire', 4, None),
+                                            ('repertoire', 3, None), ('repertoire', 3, (6, 4, 4))):
                     destination = root / f'{mode}{parts}'
-                    members = d.specs(mode, parts, 'accent', 16)
+                    budget = 16 if widths is None else None
+                    members = d.specs(mode, parts, 'accent', budget, widths)
                     for s in members:
                         doc = fixture(s['width'], s['index'], labelled=' '.join(f'U+{c:04X}' for c in s['scalars']))
                         doc['shape']['tau'] = .15 / (s['region'][1] - s['region'][0])
@@ -59,7 +61,7 @@ class PackageTests(unittest.TestCase):
                             'teacher': {'identity': {'scalars': sorted(accent)}},
                             'steps': 1, 'unlabelled_weight': 1., 'trainer_sha256': 'test-fixture'}}
                         (root / (s['name'] + '-s0.json')).write_text(json.dumps(doc))
-                    report = p.build(root, destination, mode, parts, 0, 16)
+                    report = p.build(root, destination, mode, parts, 0, budget, widths)
                     handle = ct.c_void_p()
                     self.assertEqual(lib.neuronte_open_file(str(destination / report['file']).encode(), ct.byref(handle)), 0)
                     try:
@@ -80,11 +82,11 @@ class PackageTests(unittest.TestCase):
                     changed['training']['unlabelled_weight'] = 0.
                     source.write_text(json.dumps(changed))
                     with self.assertRaisesRegex(ValueError, 'differs from its identity'):
-                        p.build(root, destination, mode, parts, 0, 16)
+                        p.build(root, destination, mode, parts, 0, budget, widths)
                     changed['training']['experiment']['identity']['unlabelled_weight'] = 0.
                     source.write_text(json.dumps(changed))
                     with self.assertRaisesRegex(ValueError, 'different training recipes'):
-                        p.build(root, destination, mode, parts, 0, 16)
+                        p.build(root, destination, mode, parts, 0, budget, widths)
         finally:
             lib.neuronte_close(baseline)
 

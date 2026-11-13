@@ -23,7 +23,17 @@ def digest(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
-def specs(mode, count, expert='ascii', width_budget=None):
+def parse_script_widths(value):
+    try:
+        widths = tuple(int(part) for part in value.split(','))
+        if len(widths) != 3 or any(not 1 <= width <= 1024 for width in widths):
+            raise ValueError
+        return widths
+    except ValueError:
+        raise argparse.ArgumentTypeError('script widths must be Latin,Greek,Russian integers in 1..1024') from None
+
+
+def specs(mode, count, expert='ascii', width_budget=None, script_widths=None):
     mixed_scripts = expert == 'accent' and mode == 'repertoire' and count == 3
     if mode not in ('spatial', 'repertoire') or (count not in COUNTS and not mixed_scripts):
         raise ValueError('unsupported decomposition')
@@ -43,11 +53,19 @@ def specs(mode, count, expert='ascii', width_budget=None):
     else:
         scalars = SCALARS
         groups = [scalars[len(scalars)*i//count:len(scalars)*(i+1)//count] for i in range(count)]
-    budget = width_budget if width_budget is not None else (256 if expert == 'accent' else 128)
-    divisor = 4 if mixed_scripts else count
-    widths = [budget//2, budget//4, budget//4] if mixed_scripts else [budget//count] * count
-    if budget < divisor or budget % divisor or max(widths) > 1024:
-        raise ValueError('width budget must divide exactly into supported widths')
+    if script_widths is not None:
+        if not mixed_scripts or width_budget is not None:
+            raise ValueError('explicit script widths require three accent repertoire members and no width budget')
+        if (not isinstance(script_widths, (tuple, list)) or len(script_widths) != 3 or
+                any(type(width) is not int or not 1 <= width <= 1024 for width in script_widths)):
+            raise ValueError('expected three script widths in 1..1024')
+        widths = list(script_widths)
+    else:
+        budget = width_budget if width_budget is not None else (256 if expert == 'accent' else 128)
+        divisor = 4 if mixed_scripts else count
+        widths = [budget//2, budget//4, budget//4] if mixed_scripts else [budget//count] * count
+        if budget < divisor or budget % divisor or max(widths) > 1024:
+            raise ValueError('width budget must divide exactly into supported widths')
     if any(not g for g in groups) or sorted(c for g in groups for c in g) != sorted(scalars):
         raise ValueError('groups must partition the entire repertoire')
     cols, rows = GRIDS.get(count, (1, 1))
@@ -175,7 +193,8 @@ def train(args):
         raise ValueError('seeds must be distinct')
     expert = getattr(args, 'expert', 'ascii')
     members = [{**spec, 'seed': seed} for seed in seeds
-               for spec in specs(args.mode, args.parts, expert, getattr(args, 'width_budget', None))]
+               for spec in specs(args.mode, args.parts, expert, getattr(args, 'width_budget', None),
+                                 getattr(args, 'script_widths', None))]
     members = members[args.start:args.start+args.batch_models]
     if not members:
         raise ValueError('empty training batch')
@@ -310,7 +329,10 @@ def main():
     parser.add_argument('operation',choices=('prepare','train'))
     parser.add_argument('directory',type=Path)
     parser.add_argument('--expert', choices=('ascii','accent'), default='ascii')
-    parser.add_argument('--width-budget', type=int, help='sum of hidden widths; default 128 for ASCII, 256 for accent')
+    widths = parser.add_mutually_exclusive_group()
+    widths.add_argument('--width-budget', type=int, help='sum of hidden widths; default 128 for ASCII, 256 for accent')
+    widths.add_argument('--script-widths', type=parse_script_widths,
+                        help='explicit Latin,Greek,Russian widths for --expert accent --mode repertoire --parts 3')
     parser.add_argument('--mode',choices=('spatial','repertoire'),default='spatial')
     parser.add_argument('--parts',type=int,choices=(3,)+COUNTS,default=4)
     parser.add_argument('--seeds',default='0,1')

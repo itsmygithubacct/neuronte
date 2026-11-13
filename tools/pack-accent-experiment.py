@@ -20,9 +20,9 @@ import pack
 ORIGINALS = ['ascii-v0', 'draw-v2', 'symbol-v0', 'accent-v2', 'pixel-v1', 'braille-v0']
 
 
-def build(directory, output, mode, parts, seed, budget=None):
+def build(directory, output, mode, parts, seed, budget=None, script_widths=None):
     output.mkdir(parents=True, exist_ok=True)
-    specs = decompose.specs(mode, parts, 'accent', budget)
+    specs = decompose.specs(mode, parts, 'accent', budget, script_widths)
     source_paths = [directory / (s['name'] + f'-s{seed}.json') for s in specs]
     docs = [json.loads(p.read_text()) for p in source_paths]
     identities = []
@@ -124,6 +124,8 @@ if __name__ == '__main__':
     p.add_argument('--mode', choices=('spatial', 'repertoire'), required=True)
     p.add_argument('--parts', type=int, choices=(3,) + decompose.COUNTS, required=True)
     p.add_argument('--seed', type=int, required=True)
-    p.add_argument('--width-budget', type=int)
+    widths = p.add_mutually_exclusive_group()
+    widths.add_argument('--width-budget', type=int)
+    widths.add_argument('--script-widths', type=decompose.parse_script_widths)
     a = p.parse_args()
-    build(a.directory, a.output, a.mode, a.parts, a.seed, a.width_budget)
+    build(a.directory, a.output, a.mode, a.parts, a.seed, a.width_budget, a.script_widths)

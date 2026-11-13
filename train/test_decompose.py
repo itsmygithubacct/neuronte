@@ -36,6 +36,16 @@ class DecompositionTests(unittest.TestCase):
         self.assertEqual([g['width'] for g in mixed], [128, 64, 64])
         self.assertEqual([len(g['scalars']) for g in mixed], [203, 49, 66])
         self.assertEqual([c for g in mixed for c in g['scalars']], scalars)
+        explicit = d.specs('repertoire', 3, 'accent', script_widths=(192, 128, 128))
+        self.assertEqual([g['width'] for g in explicit], [192, 128, 128])
+        self.assertEqual([g['scalars'] for g in explicit], [g['scalars'] for g in mixed])
+        for widths in ((192, 128), (192, 0, 128), (192, True, 128), (192, 128, 1025)):
+            with self.assertRaises(ValueError):
+                d.specs('repertoire', 3, 'accent', script_widths=widths)
+        with self.assertRaises(ValueError):
+            d.specs('repertoire', 3, 'accent', 256, (192, 128, 128))
+        with self.assertRaises(ValueError):
+            d.specs('repertoire', 4, 'accent', script_widths=(192, 128, 128))
         for expert, mode in (('ascii', 'repertoire'), ('accent', 'spatial')):
             with self.assertRaises(ValueError):
                 d.specs(mode, 3, expert)
@@ -119,8 +129,9 @@ class DecompositionTests(unittest.TestCase):
             with self.subTest(expert=expert):
                 self.check_restart(expert)
         self.check_restart('accent', parts=3, start=1)
+        self.check_restart('accent', parts=3, start=1, script_widths=(6, 4, 4))
 
-    def check_restart(self, expert, parts=64, start=63):
+    def check_restart(self, expert, parts=64, start=63, script_widths=None):
         import glyphs
         scalars = [ord(c) for c, _, _ in glyphs.charset(expert)]
         with tempfile.TemporaryDirectory() as temp:
@@ -136,7 +147,10 @@ class DecompositionTests(unittest.TestCase):
             a=argparse.Namespace(directory=dirs[0],expert=expert,mode='repertoire',parts=parts,seeds='0,1',start=start,batch_models=2,
                 steps=4,device='cpu',unlabelled=1.,compile=False,resume=False,log_every=1,checkpoint_every=2,stop_after=None)
             if parts == 3:
-                a.width_budget = 16
+                if script_widths is None:
+                    a.width_budget = 16
+                else:
+                    a.script_widths = script_widths
                 invalid = copy.copy(a)
                 invalid.start = 0
                 with self.assertRaisesRegex(ValueError, 'mixes widths'):
@@ -150,6 +164,11 @@ class DecompositionTests(unittest.TestCase):
                 for path in first:self.assertEqual(path.read_bytes(),(dirs[1]/path.name).read_bytes())
                 before=[p.read_bytes() for p in first];a.resume=True;d.train(a)
                 self.assertEqual(before,[p.read_bytes() for p in first])
+                if script_widths is not None:
+                    changed = copy.copy(b)
+                    changed.script_widths = (6, 5, 5)
+                    with self.assertRaisesRegex(ValueError,'identity differs'):
+                        d.train(changed)
                 b.unlabelled=.5
                 with self.assertRaisesRegex(ValueError,'identity differs'):d.train(b)
 

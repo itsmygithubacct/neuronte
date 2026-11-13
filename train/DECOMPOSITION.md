@@ -47,3 +47,15 @@ groups and exact interrupted/resumed CPU training. Set
 `DECOMPOSE_TEST_DEVICE=cuda` to run the independent-gradient comparison
 on CUDA. Timing, quality and production selection belong to the
 experiment's external research record, not the trainer's output loss.
+
+The accent expert is available with `--expert accent` on both preparation
+and training. Its default hidden-width sum is 256. Repertoire splits assign
+half the models to Latin letters/spacing marks, one quarter to Greek, and
+one quarter to Russian, partitioning each script in scalar order. All 318
+labels are retained. Spatial models see all labels. The teacher inventory
+maps sparse Unicode values to field rows explicitly; it is verified before
+training. `--width-budget` permits an explicitly different divisible budget
+for follow-up recipes; use a separate directory for each budget to preserve
+checkpoints and exports. Accent's original baseline used 40,000 steps; pass
+`--steps 40000` to match that schedule. No teacher equivalence or quality
+improvement is implied by trainer support.

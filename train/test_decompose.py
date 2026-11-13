@@ -16,6 +16,23 @@ import decompose as d
 
 
 class DecompositionTests(unittest.TestCase):
+    def test_accent_script_partition(self):
+        import glyphs
+        scalars = [ord(c) for c, _, _ in glyphs.charset('accent')]
+        self.assertEqual(len(scalars), 318)
+        for count in d.COUNTS:
+            for mode in ('spatial', 'repertoire'):
+                groups = d.specs(mode, count, 'accent')
+                self.assertEqual(sum(g['width'] for g in groups), 256)
+                if mode == 'repertoire':
+                    self.assertEqual(sorted(c for g in groups for c in g['scalars']), scalars)
+                    for g in groups:
+                        self.assertEqual(len({0 if c < 0x370 else 1 if c < 0x400 else 2 for c in g['scalars']}), 1)
+                else:
+                    self.assertTrue(all(g['scalars'] == scalars for g in groups))
+        with self.assertRaises(ValueError):
+            d.specs('spatial', 4, 'accent', 255)
+
     def test_geometry_and_repertoire(self):
         n = 16
         yy, xx = np.mgrid[0:2*n+1, 0:n+1]/n
@@ -83,24 +100,31 @@ class DecompositionTests(unittest.TestCase):
                     torch.testing.assert_close(bs[i][k],layer.bias,rtol=1e-5,atol=2e-7)
 
     def test_checkpoint_resume_and_identity(self):
+        for expert in ('ascii', 'accent'):
+            with self.subTest(expert=expert):
+                self.check_restart(expert)
+
+    def check_restart(self, expert):
+        import glyphs
+        scalars = [ord(c) for c, _, _ in glyphs.charset(expert)]
         with tempfile.TemporaryDirectory() as temp:
             dirs=[Path(temp)/name for name in ('full','interrupted')]
             for directory in dirs:
                 directory.mkdir()
                 # A small analytic teacher keeps this test independent of fonts.
                 yy,xx=np.mgrid[0:17,0:9]/8
-                fields=np.repeat((.4-((xx-.5)**2+(yy-1)**2))[None],95,axis=0).astype(np.float16)
+                fields=np.repeat((.4-((xx-.5)**2+(yy-1)**2))[None],len(scalars),axis=0).astype(np.float16)
                 np.save(directory/'teacher.npy',fields)
                 (directory/'teacher.json').write_text(json.dumps({'sha256':d.digest(directory/'teacher.npy'),
-                    'identity':{'grid':8,'sources':{},'pen':.075}}))
-            a=argparse.Namespace(directory=dirs[0],mode='repertoire',parts=64,seeds='0,1',start=63,batch_models=2,
+                    'identity':{'grid':8,'sources':{},'pen':.075,'scalars':scalars}}))
+            a=argparse.Namespace(directory=dirs[0],expert=expert,mode='repertoire',parts=64,seeds='0,1',start=63,batch_models=2,
                 steps=4,device='cpu',unlabelled=1.,compile=False,resume=False,log_every=1,checkpoint_every=2,stop_after=None)
             with contextlib.redirect_stdout(io.StringIO()):
                 d.train(a)
                 b=copy.copy(a);b.directory=dirs[1];b.stop_after=2;d.train(b)
-                self.assertFalse(list(dirs[1].glob('ascii-*.json')))
+                self.assertFalse(list(dirs[1].glob(expert+'-*.json')))
                 b.stop_after=None;b.resume=True;d.train(b)
-                first=sorted(dirs[0].glob('ascii-*.json'));self.assertEqual(len(first),2)
+                first=sorted(dirs[0].glob(expert+'-*.json'));self.assertEqual(len(first),2)
                 for path in first:self.assertEqual(path.read_bytes(),(dirs[1]/path.name).read_bytes())
                 before=[p.read_bytes() for p in first];a.resume=True;d.train(a)
                 self.assertEqual(before,[p.read_bytes() for p in first])

@@ -23,17 +23,38 @@ def digest(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
-def specs(mode, count):
+def specs(mode, count, expert='ascii', width_budget=None):
     if mode not in ('spatial', 'repertoire') or count not in COUNTS:
-        raise ValueError('unsupported ASCII decomposition')
+        raise ValueError('unsupported decomposition')
+    if expert not in ('ascii', 'accent'):
+        raise ValueError('unsupported expert')
+    if expert == 'accent':
+        import glyphs
+        scalars = [ord(c) for c, _, _ in glyphs.charset(expert)]
+        # Keep the two smaller scripts independent; divide Latin twice as
+        # finely. No group crosses a script boundary, even with sparse labels.
+        scripts = [[c for c in scalars if c < 0x370],
+                   [c for c in scalars if 0x370 <= c < 0x400],
+                   [c for c in scalars if 0x400 <= c < 0x500]]
+        allocations = [count//2, count//4, count//4]
+        groups = [script[len(script)*i//parts:len(script)*(i+1)//parts]
+                  for script, parts in zip(scripts, allocations) for i in range(parts)]
+    else:
+        scalars = SCALARS
+        groups = [scalars[len(scalars)*i//count:len(scalars)*(i+1)//count] for i in range(count)]
+    budget = width_budget if width_budget is not None else (256 if expert == 'accent' else 128)
+    if budget < count or budget % count or budget//count > 1024:
+        raise ValueError('width budget must divide exactly into supported widths')
+    if any(not g for g in groups) or sorted(c for g in groups for c in g) != sorted(scalars):
+        raise ValueError('groups must partition the entire repertoire')
     cols, rows = GRIDS[count]
     out = []
     for i in range(count):
         region = [i % cols / cols, (i % cols + 1) / cols,
                   2 * (i // cols) / rows, 2 * (i // cols + 1) / rows]
-        out.append({'name': f'ascii-{mode}-k{count}-p{i}', 'index': i,
-                    'width': 128 // count, 'region': region if mode == 'spatial' else [0., 1., 0., 2.],
-                    'scalars': SCALARS if mode == 'spatial' else SCALARS[95*i//count:95*(i+1)//count]})
+        out.append({'name': f'{expert}-{mode}-k{count}-p{i}', 'index': i,
+                    'width': budget // count, 'region': region if mode == 'spatial' else [0., 1., 0., 2.],
+                    'scalars': scalars if mode == 'spatial' else groups[i]})
     return out
 
 
@@ -66,13 +87,16 @@ def teacher_masks(fields, w, h, samples=8):
     return np.asarray(out, dtype=np.float32)
 
 
-def prepare(directory):
+def prepare(directory, expert='ascii'):
     import glyphs
     directory.mkdir(parents=True, exist_ok=True)
     path = directory/'teacher.npy'
-    sources = {name: digest(ROOT/name) for name in glyphs.sources('ascii') + ['font/code-masks.txt']}
-    spec = {'schema': 'neuronte.ascii-teacher/v1', 'scalars': SCALARS, 'grid': 256,
-            'tau': .15, 'pen': glyphs.PEN, 'sources': sources}
+    rows = glyphs.charset(expert)
+    scalars = [ord(c) for c, _, _ in rows]
+    pen = glyphs.PENS.get(expert, glyphs.PEN)
+    sources = {name: digest(ROOT/name) for name in glyphs.sources(expert) + ['font/code-masks.txt']}
+    spec = {'schema': f'neuronte.{expert}-teacher/v1', 'scalars': scalars, 'grid': 256,
+            'tau': .15, 'pen': pen, 'sources': sources}
     meta = directory/'teacher.json'
     if meta.exists():
         old = json.loads(meta.read_text())
@@ -82,9 +106,7 @@ def prepare(directory):
             raise ValueError('teacher coverage target changed')
         print('existing verified teacher', path)
         return
-    rows = glyphs.charset('ascii')
-    assert [ord(c) for c, _, _ in rows] == SCALARS
-    fields = np.stack([glyphs.field(shapes, 256, glyphs.PEN, .15) for _, _, shapes in rows]).astype(np.float16)
+    fields = np.stack([glyphs.field(shapes, 256, pen, .15) for _, _, shapes in rows]).astype(np.float16)
     np.save(path, fields, allow_pickle=False)
     targets = {}
     for w, h in ((8, 16), (16, 32), (48, 96)):
@@ -148,7 +170,9 @@ def train(args):
     seeds = [int(x) for x in args.seeds.split(',')]
     if not seeds or len(set(seeds)) != len(seeds):
         raise ValueError('seeds must be distinct')
-    members = [{**spec, 'seed': seed} for seed in seeds for spec in specs(args.mode, args.parts)]
+    expert = getattr(args, 'expert', 'ascii')
+    members = [{**spec, 'seed': seed} for seed in seeds
+               for spec in specs(args.mode, args.parts, expert, getattr(args, 'width_budget', None))]
     members = members[args.start:args.start+args.batch_models]
     if not members:
         raise ValueError('empty training batch')
@@ -156,11 +180,15 @@ def train(args):
     if digest(args.directory/'teacher.npy') != metadata['sha256']:
         raise ValueError('teacher SHA256 differs')
     full = np.load(args.directory/'teacher.npy', allow_pickle=False)
+    inventory = metadata['identity'].get('scalars', SCALARS)
+    if inventory != sorted({c for s in specs('spatial', args.parts, expert) for c in s['scalars']}):
+        raise ValueError('teacher scalar inventory differs from experiment')
+    scalar_index = {c: i for i, c in enumerate(inventory)}
     model_count, glyph_count = len(members), max(len(x['scalars']) for x in members)
     width, n = members[0]['width'], metadata['identity']['grid']
     fields, labels, valid = [], [], []
     for member in members:
-        indices = [c-32 for c in member['scalars']]
+        indices = [scalar_index[c] for c in member['scalars']]
         field = full[indices].astype(np.float32)
         if args.mode == 'spatial':
             field = crop(field, member['region'])
@@ -260,7 +288,7 @@ def train(args):
         doc={'format':'neuronte-weights','version':1,
              'shape':{'position_octaves':6,'code_bits':64,'hidden_width':width,'hidden_layers':3,
                       'tau':.15/(x1-x0),'parity_masks':[f'0x{x:06X}' for x in masks]},
-             'training':{'set':'ascii-'+args.mode,'labelled':' '.join(f'U+{x:04X}' for x in member['scalars']),
+             'training':{'set':expert+'-'+args.mode,'labelled':' '.join(f'U+{x:04X}' for x in member['scalars']),
                          'sources_sha256':metadata['identity']['sources'],'pen_radius':metadata['identity']['pen'],
                          'grid':n,'steps':args.steps,'seed':member['seed'],'unlabelled_weight':args.unlabelled,
                          'experiment':{'identity':identity,**member,'final_loss':last[k]}},
@@ -276,6 +304,8 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('operation',choices=('prepare','train'))
     parser.add_argument('directory',type=Path)
+    parser.add_argument('--expert', choices=('ascii','accent'), default='ascii')
+    parser.add_argument('--width-budget', type=int, help='sum of hidden widths; default 128 for ASCII, 256 for accent')
     parser.add_argument('--mode',choices=('spatial','repertoire'),default='spatial')
     parser.add_argument('--parts',type=int,choices=COUNTS,default=4)
     parser.add_argument('--seeds',default='0,1')
@@ -292,7 +322,7 @@ def main():
     args=parser.parse_args()
     if min(args.steps,args.batch_models,args.log_every,args.checkpoint_every)<1 or args.start<0 or not math.isfinite(args.unlabelled) or args.unlabelled<0 or (args.stop_after is not None and args.stop_after<1):
         parser.error('invalid training counts or loss weight')
-    if args.operation=='prepare':prepare(args.directory)
+    if args.operation=='prepare':prepare(args.directory, args.expert)
     else:train(args)
 
 

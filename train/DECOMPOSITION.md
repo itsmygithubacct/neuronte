@@ -62,3 +62,8 @@ recipe, the teacher, both requested seeds and the complete 20,000-step schedule.
 The output records the development cohort and changed loss; it never changes
 the fixed matrix. Known-only models require the original unknown fallback
 when incorporated into a production bundle.
+
+Development recipes may explicitly set `--hidden-width` per member and a
+new `--steps` schedule. Record both total width and packed bytes when relaxing
+the original total-width budget. Pass the same width and step count to the
+packer. Fixed-matrix packing refuses these overrides without `--recipe`.

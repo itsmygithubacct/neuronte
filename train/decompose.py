@@ -24,16 +24,19 @@ def digest(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
-def specs(mode, count):
+def specs(mode, count, hidden_width=None):
     if mode not in ('spatial', 'repertoire') or count not in DEVELOPMENT_COUNTS:
         raise ValueError('unsupported ASCII decomposition')
+    width = 128 // count if hidden_width is None else hidden_width
+    if type(width) is not int or not 1 <= width <= 1024:
+        raise ValueError('hidden width must be 1..1024')
     cols, rows = GRIDS[count]
     out = []
     for i in range(count):
         region = [i % cols / cols, (i % cols + 1) / cols,
                   2 * (i // cols) / rows, 2 * (i // cols + 1) / rows]
         out.append({'name': f'ascii-{mode}-k{count}-p{i}', 'index': i,
-                    'width': 128 // count, 'region': region if mode == 'spatial' else [0., 1., 0., 2.],
+                    'width': width, 'region': region if mode == 'spatial' else [0., 1., 0., 2.],
                     'scalars': SCALARS if mode == 'spatial' else SCALARS[95*i//count:95*(i+1)//count]})
     return out
 
@@ -149,7 +152,8 @@ def train(args):
     seeds = [int(x) for x in args.seeds.split(',')]
     if not seeds or len(set(seeds)) != len(seeds):
         raise ValueError('seeds must be distinct')
-    members = [{**spec, 'seed': seed} for seed in seeds for spec in specs(args.mode, args.parts)]
+    members = [{**spec, 'seed': seed} for seed in seeds
+               for spec in specs(args.mode, args.parts, getattr(args, 'hidden_width', None))]
     members = members[args.start:args.start+args.batch_models]
     if not members:
         raise ValueError('empty training batch')
@@ -279,6 +283,7 @@ def main():
     parser.add_argument('directory',type=Path)
     parser.add_argument('--mode',choices=('spatial','repertoire'),default='spatial')
     parser.add_argument('--parts',type=int,choices=DEVELOPMENT_COUNTS,default=4)
+    parser.add_argument('--hidden-width',type=int,help='explicit per-member development width; default 128 / parts')
     parser.add_argument('--seeds',default='0,1')
     parser.add_argument('--steps',type=int,default=20000)
     parser.add_argument('--start',type=int,default=0)

@@ -17,6 +17,9 @@ import decompose as d
 
 class DecompositionTests(unittest.TestCase):
     def test_geometry_and_repertoire(self):
+        self.assertEqual([s['width'] for s in d.specs('repertoire',4,64)],[64]*4)
+        for bad in (0,1025,1.5):
+            with self.assertRaises(ValueError):d.specs('repertoire',2,bad)
         n = 16
         yy, xx = np.mgrid[0:2*n+1, 0:n+1]/n
         full = np.stack((xx+3*yy, 2*xx-yy))

@@ -132,6 +132,8 @@ The scaler defaults to one worker to reduce CPU overhead at terminal sizes.
 can help throughput at larger resolutions. This changes scheduling, not the
 scaling filter or neural reconstruction. Shared-memory shutdown waits up to
 200 ms for the terminal to take pending frames before reclaiming unread ones.
+Known source chroma locations are passed explicitly to ffmpeg's scale filter,
+so subsampled color samples retain the alignment declared by the source.
 
 ## Optional learned helpers
 

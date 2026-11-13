@@ -263,6 +263,20 @@ class Video(unittest.TestCase):
                 self.assertEqual(code,2);self.assertIn(b'--pixel-size',err);self.assertNotIn(b'Traceback',err)
                 self.assertEqual(out,b'')
 
+    def test_player_preserves_the_sources_chroma_location(self):
+        with tempfile.TemporaryDirectory() as temp:
+            source=Path(temp)/'left.mkv'
+            subprocess.run(['ffmpeg','-v','error','-f','lavfi','-i','testsrc2=size=96x64:rate=1',
+                            '-frames:v','1','-c:v','libx264','-qp','0','-preset','ultrafast','-colorspace','bt709',
+                            '-x264-params','chromaloc=0',str(source)],check=True)
+            reference=subprocess.check_output(['ffmpeg','-v','error','-i',str(source),
+                '-vf','scale=17:13:flags=lanczos+accurate_rnd+full_chroma_int+full_chroma_inp:in_chroma_loc=left',
+                '-frames:v','1','-f','rawvideo','-pix_fmt','rgb24','-'])
+            code,out,err=self.player('--pixel-size','17x13','--fps','1','--frames','1',source=str(source),grid=False)
+            self.assertEqual(code,0,err)
+            frames=self.pixel_frames(out);self.assertEqual(len(frames),1)
+            self.assertEqual(frames[0][1],reference)
+
     def test_player_pixel_size_survives_a_paused_seek(self):
         with tempfile.TemporaryDirectory() as temp:
             clip=self.sound_clip(temp);stats=Path(temp)/'stats.json'

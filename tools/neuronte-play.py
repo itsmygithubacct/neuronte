@@ -67,7 +67,7 @@ def with_us():
 
 
 def probe(path, lavfi):
-    cmd = ['ffprobe', '-v', 'error', '-show_entries', 'stream=codec_type,width,height,r_frame_rate:format=duration', '-of', 'json']
+    cmd = ['ffprobe', '-v', 'error', '-show_entries', 'stream=codec_type,width,height,r_frame_rate,chroma_location:format=duration', '-of', 'json']
     out = subprocess.run(cmd + (['-f', 'lavfi'] if lavfi else []) + [path], capture_output=True, text=True)
     try:
         doc = json.loads(out.stdout)
@@ -75,7 +75,9 @@ def probe(path, lavfi):
         num, den = map(int, stream['r_frame_rate'].split('/'))
         duration = float(doc.get('format', {}).get('duration') or 0)
         sound = any(s.get('codec_type') == 'audio' for s in doc['streams'])
-        return int(stream['width']), int(stream['height']), num / den, duration, sound
+        chroma = stream.get('chroma_location')
+        if chroma not in ('left', 'center', 'topleft', 'top', 'bottomleft', 'bottom'): chroma = None
+        return int(stream['width']), int(stream['height']), num / den, duration, sound, chroma
     except (KeyError, IndexError, ValueError, ZeroDivisionError, StopIteration):
         raise ValueError(f'ffprobe found no video stream in {path}: {out.stderr.strip()}')
 
@@ -399,7 +401,7 @@ def main():
     if a.helper and (a.mode != 'cells' or a.characters != 'full'): p.error('--helper requires --mode cells --characters full')
     library = a.library or ROOT / 'build/libneuronte.so'
     if not os.path.exists(library): p.error(f'{library} is missing; run make first, or pass --library')
-    width, height, rate, duration, has_sound = probe(a.video, a.lavfi)
+    width, height, rate, duration, has_sound, chroma = probe(a.video, a.lavfi)
     fps = a.fps or rate
     if not 0 < fps <= 240: p.error('frame rate must be above 0 and at most 240')
     if a.start < 0 or (duration and a.start >= duration): p.error('--start is outside the file')
@@ -448,8 +450,10 @@ def main():
     def decoder(position):
         g = geometry
         flags = 'lanczos+accurate_rnd+full_chroma_int+full_chroma_inp' if a.pixel_size else 'area'
+        scale = f'scale={g["w"]}:{g["h"]}:flags={flags}'
+        if chroma: scale += f':in_chroma_loc={chroma}'
         cmd = ['ffmpeg', '-v', 'error', '-nostdin', '-filter_threads', str(a.filter_threads)] + (['-f', 'lavfi'] if a.lavfi else ['-ss', f'{position:.3f}']) \
-            + ['-i', a.video, '-an', '-sn', '-vf', f'fps={fps},scale={g["w"]}:{g["h"]}:flags={flags}', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-']
+            + ['-i', a.video, '-an', '-sn', '-vf', f'fps={fps},{scale}', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-']
         return subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, preexec_fn=with_us)
 
     def draw_pixels(colours):

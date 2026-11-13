@@ -47,3 +47,27 @@ groups and exact interrupted/resumed CPU training. Set
 `DECOMPOSE_TEST_DEVICE=cuda` to run the independent-gradient comparison
 on CUDA. Timing, quality and production selection belong to the
 experiment's external research record, not the trainer's output loss.
+
+## Other monochrome experts
+
+`--set pixel` uses the complete, sorted 327-scalar block, sextant and
+octant repertoire from the unchanged teacher. Other supported sets are
+`symbol`, `boxshade` and `accent`. Preparation and training must specify
+the same set; the teacher identity binds both set and scalar inventory.
+Counts 1 and 2 are also supported; count 2 splits left/right spatially.
+`--width-budget` specifies the sum of hidden widths, default 128, and must
+divide the count exactly. It is not a parameter-count budget.
+
+```sh
+python3 train/decompose.py prepare /tmp/pixel-experiment --set pixel
+python3 train/decompose.py train /tmp/pixel-experiment --set pixel \
+  --mode repertoire --parts 4 --seeds 0,1 --batch-models 8
+python3 train/test_pixel_decompose.py
+```
+
+Mosaic bits are row-major and are not Braille dot bits. Adjacent filled
+regions change the teacher distance inside an occupied tile; a tile's
+occupancy bit alone is insufficient to share its distance network. The
+pixel tests retain this counterexample and check every sextant and octant
+pattern at tile centres. Spatial experiments retain the complete scalar
+input and original distance units.

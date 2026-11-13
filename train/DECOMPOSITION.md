@@ -122,3 +122,41 @@ the two width-64 models. Smaller repertoires are padded and excluded from
 loss exactly as in contiguous partitioning. The pixel tests check complete
 29/60/238 semantic inventories, refusal of overlaps and mixed-width batches,
 and exact restart with the padded noncontiguous selection.
+
+### Pixel refinement recipes
+
+`pixel-semantic-spec.json` is the explicit 29-block, 60-sextant,
+238-octant partition with widths 32, 32, 64. It has the same summed hidden
+width as the original H128 expert, but 24,323 parameters rather than
+44,801. The two homogeneous allocations have 28,418 parameters (2x64)
+and 20,228 parameters (4x32). These counts exclude retained fallback
+weights and routing metadata.
+
+The following commands reproduce the semantic training configuration in a
+fresh directory. Both batches use the same prepared teacher. Specify the
+same pinned NumPy, PyTorch, CUDA, and device versions when comparing training
+trajectories; checkpoint identities refuse changes to these inputs.
+
+```sh
+python3 train/decompose.py prepare /tmp/pixel-semantic --set pixel
+python3 train/decompose.py train /tmp/pixel-semantic --set pixel \
+  --mode repertoire --parts 3 --width-budget 128 \
+  --specification train/pixel-semantic-spec.json --seeds 0,1 \
+  --model-indices 0,1,3,4 --batch-models 4 --steps 60000 --unlabelled 0
+python3 train/decompose.py train /tmp/pixel-semantic --set pixel \
+  --mode repertoire --parts 3 --width-budget 128 \
+  --specification train/pixel-semantic-spec.json --seeds 0,1 \
+  --model-indices 2,5 --batch-models 2 --steps 60000 --unlabelled 0
+```
+
+For longer contiguous 2x64 controls, prepare separate fresh directories,
+then use `--mode repertoire --parts 2 --seeds 0,1 --batch-models 4
+--steps 60000`, with `--unlabelled 1` for the original regularizer or
+`--unlabelled 0` for known-only training. Do not resume a completed
+20,000-step cosine schedule as a 60,000-step experiment.
+
+Training completion is not a quality or production approval. Check every
+label, both seeds, odd cell geometries, and each consumer sampling mode.
+Report per-glyph failures even when corpus averages pass. A partial override
+retains the original H128 inference for omitted labels and the full original
+bundle in storage; it is not a uniformly narrower replacement.

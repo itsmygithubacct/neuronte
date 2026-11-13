@@ -79,8 +79,10 @@ learned helpers are bound to split-v5, which stays. See
 `neuronte-split-v7.nrt` is split-v6 with the four ASCII character-group
 nets of `neuronte-ascii-groups-v1` added by `train/known_bundle.py`. split-v6's
 members, unknown-character routing and non-ASCII pixels are unchanged, and
-its ASCII pixels are the qualified group nets'. It is not a default yet. See
-[its recipe and checks](weights/neuronte-split-v7.md).
+its ASCII pixels are the qualified group nets'. Measured as a whole bundle on
+two x86 CPUs, it draws uncached ASCII about 2.2 times as fast as split-v6 and
+Braille as fast, and takes 0.1 to 0.3 ms longer to open. It is not a default
+yet. See [its recipe, checks and speed](weights/neuronte-split-v7.md).
 
 RC9 also ships the separate `neuronte-emoji-v0.nrt` colour bundle: 300 original
 single-scalar emoji, 600 left/right half labels, three experts, and up to six

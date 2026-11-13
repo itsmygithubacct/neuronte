@@ -60,10 +60,45 @@ current 128.
 
 ## Speed
 
-Not yet measured as a whole bundle. The ASCII and Braille figures in their
-own model cards were measured in other bundles (split-v5 packages and
-split-v6), and split-v7's opening, routing and drawing costs are not
-inferred from them.
+Measured as a whole bundle with kilix-bench `e21e5cd`, against split-v5,
+split-v6 and the ASCII package (`neuronte-split-ascii-groups-v1`) in the same
+runs. Two x86 hosts, an Intel i7-10700F and an i7-6820HQ, each on one pinned
+core with the benchmark lock held for the whole run. One warmup and ten
+measured rounds, a fresh process per job, rounds shuffled. ARM was not
+measured for this bundle, and no figure here is carried over from the ASCII or
+Braille campaigns.
+
+Uncached `neuronte_coverage()`, geometric mean over cells of (other bundle /
+split-v7); above 1 means split-v7 is faster. Figures are i7-10700F /
+i7-6820HQ.
+
+| Corpus | Cells | split-v5 | split-v6 | ASCII package |
+|---|---|---:|---:|---:|
+| Printable ASCII (95) | 8x16, 16x32, 48x96 | 2.25 / 2.22 | 2.26 / 2.23 | 1.00 / 1.00 |
+| Braille (256) | 8x16, 16x32, 25x49, 48x96 | 11.47 / 11.49 | 1.00 / 1.00 | 11.61 / 11.60 |
+
+Median µs per glyph at 16x32, uncached coverage:
+
+| CPU | ASCII, split-v6 | ASCII, split-v7 | Braille, split-v6 | Braille, split-v7 |
+|---|---:|---:|---:|---:|
+| i7-10700F | 2,040.5 | 899.8 | 32.5 | 32.8 |
+| i7-6820HQ | 2,740.8 | 1,222.8 | 44.1 | 44.1 |
+
+Pixels are identical on both hosts. ASCII draws exactly as the ASCII package,
+and Braille exactly as split-v6, so combining the experts costs neither any
+drawing speed. A primed (cached) draw costs the same for all four bundles.
+
+Opening (one model open, including the first 8x16 buffer) and table routing
+are the only added costs:
+
+| CPU | Open ms, split-v6 | Open ms, split-v7 | Route ns, split-v6 | Route ns, split-v7 |
+|---|---:|---:|---:|---:|
+| i7-10700F | 1.69–1.71 | 1.78–1.89 | 6.59–6.73 | 7.01–7.14 |
+| i7-6820HQ | 2.57–2.58 | 2.84–2.86 | 11.39–12.04 | 11.90–12.59 |
+
+Each range spans the two corpus runs. The extra opening time, paid once per
+process, matches the ASCII package; the four appended members are the likely
+cause.
 
 ## Status
 

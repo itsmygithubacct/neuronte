@@ -79,9 +79,12 @@ static void check_width(int H)
             f32(image + l1_bias + 4 * i, i < 2 ? 1e30f : 0.f);
         f32(image + l2_weights + 4 * ((H-1)*H), 1e30f);
         f32(image + l2_weights + 4 * ((H-1)*H + 1), -1e30f);
+        /* Read a finite neighbor too: an uncleared NaN would poison it via
+         * zero weights in the next layer and erase this contribution. */
+        f32(image + l3_weights + 4 * (H*H + H), 1e-31f);
         assert(neuronte_open(image, BYTES, &net) == 0 && net);
         assert(neuronte_coverage(net, 0x28ff, 8, 16, 1, coverage) == 0);
-        for (int i = 0; i < 128; i++) assert(coverage[i] == .5f);
+        for (int i = 0; i < 128; i++) assert(fabsf(coverage[i] - .62f) < 1e-6f);
         neuronte_close(net);
     }
     for (int h = 0; h <= 1028; h++) {

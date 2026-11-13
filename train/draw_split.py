@@ -10,7 +10,10 @@ whole by one net). C1 retrains the original shape with this batched
 trainer as a recipe control.
 
 Loss, sampling, Adam/cosine schedule and initialization are the original
-trainer's; the batched evaluation and objective are imported from
+trainer's, unless --coverage-weight adds a term that renders pixels of
+cells of declared sizes exactly as neuronte_coverage() does (S samples per
+axis, the clamped one-sample ramp) and fits them to the box-filtered
+teacher; the batched evaluation and objective are imported from
 decompose.py, whose equivalence tests cover them. See DECOMPOSITION.md.
 MIT licence; see LICENSE.
 """
@@ -82,6 +85,56 @@ def specs(design, scalars, width=None, custom=None):
     return out
 
 
+def bilinear(flat, offsets, n, xy):
+    """Teacher field at design points xy (x in 0..1, y in 0..2): bilinear on the
+    (2n+1) x (n+1) grid of each glyph, stored flat from offsets."""
+    u, v = xy[..., 0]*n, xy[..., 1]*n
+    i, j = u.floor().clamp(0, n-1), v.floor().clamp(0, 2*n-1)
+    fu, fv = u-i, v-j
+    at = offsets+j.long()*(n+1)+i.long()
+    a, b, c, d = (flat[at+delta].float() for delta in (0, 1, n+1, n+2))
+    return (a*(1-fu)+b*fu)*(1-fv)+(c*(1-fu)+d*fu)*fv
+
+
+def pixel_samples(torch, w, h, px, py):
+    """Sample points and samples per axis of pixels, as the native coverage_code().
+
+    w, h, px, py are integer tensors of one shape. S is 2 below 24 pixels wide,
+    else 1. Every pixel gets four points; with S = 1 they are the same point, so
+    their mean is the one-sample value. Returns points (..., 4, 2) and S.
+    """
+    s = torch.where(w < 24, 2, 1)
+    i = torch.tensor([0, 1, 0, 1], device=w.device)
+    j = torch.tensor([0, 0, 1, 1], device=w.device)
+    si, sj = torch.minimum(i, s[..., None]-1), torch.minimum(j, s[..., None]-1)
+    sw, sh = (w*s)[..., None].float(), (h*s)[..., None].float()
+    x = ((px*s)[..., None]+si).float().add(.5)/sw
+    y = ((py*s)[..., None]+sj).float().add(.5)/sh*2
+    return torch.stack((x, y), -1), s
+
+
+def render_coverage(torch, weights, biases, character, w, h, px, py, tau=.15):
+    """Coverage of pixels (px, py) of w x h cells, as neuronte_coverage() computes it:
+    the mean over S x S samples of clamp(1/2 + tau w S f, 0, 1). Shapes (M, G, P)."""
+    points, s = pixel_samples(torch, w, h, px, py)
+    m, g, p = w.shape
+    f = decompose.evaluate(torch, weights, biases, character, points.reshape(m, g, p*4, 2)).reshape(m, g, p, 4)
+    slope = (torch.tensor(tau, dtype=torch.float32)*w.float()*s.float())[..., None]
+    return (.5+slope*f).clamp(0, 1).mean(-1)
+
+
+def teacher_coverage(torch, target, w, h, px, py, samples=8):
+    """The box-filtered teacher coverage of the same pixels: decompose.teacher_masks's
+    samples x samples inside-fraction, at each pixel's own cell size. Shapes (M, G, P)."""
+    a = torch.arange(samples, device=w.device).float().add(.5)
+    x = ((px*samples)[..., None].float()+a)/(w*samples)[..., None].float()
+    y = ((py*samples)[..., None].float()+a)/(h*samples)[..., None].float()*2
+    xy = torch.stack(torch.broadcast_tensors(x[..., None, :], y[..., :, None]), -1)
+    m, g, p = w.shape
+    inside = target(xy.reshape(m, g, p*samples*samples, 2)) > 0
+    return inside.float().reshape(m, g, p, samples*samples).mean(-1)
+
+
 def prepare(directory):
     import glyphs
     directory.mkdir(parents=True, exist_ok=True)
@@ -142,12 +195,7 @@ def train(args):
     offsets = torch.arange(model_count*glyph_count).reshape(model_count, glyph_count, 1)*(n+1)*(2*n+1)
 
     def target(xy):
-        u, v = xy[..., 0]*n, xy[..., 1]*n
-        i, j = u.floor().clamp(0, n-1), v.floor().clamp(0, 2*n-1)
-        fu, fv = u-i, v-j
-        at = offsets+j.long()*(n+1)+i.long()
-        a, b, c, d = (target_field[at+delta].float() for delta in (0, 1, n+1, n+2))
-        return (a*(1-fu)+b*fu)*(1-fv)+(c*(1-fu)+d*fu)*fv
+        return bilinear(target_field, offsets, n, xy)
 
     masks = strokes.masks()
     mask_bits = torch.tensor([[(mask >> bit) & 1 for bit in range(21)] for mask in masks], dtype=torch.float32)
@@ -175,6 +223,15 @@ def train(args):
                 'labelled_samples': 256, 'candidate_samples': 1024, 'unlabelled_samples': 256, 'unlabelled_scalars': 64,
                 'optimizer': 'Adam 0.002, cosine', 'gradient_reduction': 'sum of independent per-model losses',
                 'rng_policy': 'original initialization per seed, shared draws within a seed and padded glyph-count group'}
+    coverage = None
+    if args.coverage_weight:
+        sizes_doc = json.loads(Path(args.coverage_sizes).read_text())
+        table = torch.tensor([s[:2] for s in sizes_doc['sizes']])
+        probs = torch.tensor([s[2] for s in sizes_doc['sizes']], dtype=torch.float64)
+        coverage = {'weight': args.coverage_weight, 'pixels': args.coverage_pixels, 'candidates': 4*args.coverage_pixels,
+                    'sizes_sha256': digest(args.coverage_sizes), 'teacher_samples': 8,
+                    'rule': 'half uniform, half nearest-edge candidates; each pixel its own size; native sampling'}
+        identity['coverage'] = coverage
     stem = f'{args.tag if custom else args.design}-w{width}-s{"_".join(map(str, seeds))}'
     checkpoint = args.directory/(stem+'.pt')
     first, last = 0, []
@@ -197,14 +254,32 @@ def train(args):
         return decompose.objective(torch, weights, biases, cf, xy, wanted, valid, unlabelled, pu, truth, args.unlabelled)
     if args.compile:
         loss_fn = torch.compile(loss_fn, fullgraph=True)
+    def coverage_term(weights, biases, pixel_draws):
+        size, fx, fy = pixel_draws
+        w, h = table[size, 0], table[size, 1]
+        px, py = (fx*w).long().clamp(max=w-1), (fy*h).long().clamp(max=h-1)
+        centre = torch.stack(((px.float()+.5)/w.float(), (py.float()+.5)/h.float()*2), -1)
+        half = args.coverage_pixels//2
+        near = target(centre).abs().topk(half, dim=2, largest=False).indices
+        pick = torch.cat((torch.arange(half).expand(model_count, glyph_count, -1), near), dim=2)
+        w, h, px, py = (torch.gather(t, 2, pick) for t in (w, h, px, py))
+        with torch.no_grad():
+            wanted = teacher_coverage(torch, target, w, h, px, py)
+        error = (render_coverage(torch, weights, biases, cf, w, h, px, py)-wanted).abs().mean(-1)
+        return (error*valid).sum(1)/valid.sum(1)
     span = torch.tensor([1., 2.])
     started = time.monotonic()
     for step in range(first, args.steps):
-        draws = {}
+        draws, pixel_draws = {}, {}
         for seed, gen in generators.items():
             draws[seed] = (torch.rand(glyph_count, 1024, 2, generator=gen)*span,
                            torch.randint(0, 0x110000, (64,), generator=gen),
                            torch.rand(1, 256, 2, generator=gen)*span)
+            if coverage:
+                n_c = glyph_count*coverage['candidates']
+                pixel_draws[seed] = (torch.multinomial(probs, n_c, replacement=True, generator=gen).reshape(glyph_count, -1),
+                                     torch.rand(glyph_count, coverage['candidates'], generator=gen),
+                                     torch.rand(glyph_count, coverage['candidates'], generator=gen))
         cand = torch.stack([draws[m['seed']][0] for m in members])
         v = torch.stack([draws[m['seed']][1] for m in members])
         pu = torch.stack([draws[m['seed']][2] for m in members])
@@ -216,6 +291,10 @@ def train(args):
         truth = (target(pu.expand(-1, glyph_count, -1, -1)) > 0).float()
         optimizer.zero_grad()
         losses = loss_fn(weights, biases, xy, wanted, decompose.code(torch, v, mask_bits), pu.expand(-1, 64, -1, -1), truth)
+        if coverage:
+            cov = coverage_term(weights, biases, tuple(torch.stack([pixel_draws[m['seed']][k] for m in members])
+                                                       for k in range(3)))
+            losses = losses+coverage['weight']*cov
         losses.sum().backward()
         optimizer.step()
         schedule.step()
@@ -223,7 +302,10 @@ def train(args):
             last = losses.detach().cpu().tolist()
             if not all(math.isfinite(x) for x in last):
                 raise ValueError('nonfinite training loss')
-            print(json.dumps({'step': step+1, 'seconds': round(time.monotonic()-started, 2), 'losses': last}), flush=True)
+            row = {'step': step+1, 'seconds': round(time.monotonic()-started, 2), 'losses': last}
+            if coverage:
+                row['coverage_losses'] = cov.detach().cpu().tolist()
+            print(json.dumps(row), flush=True)
         if (step+1) % args.checkpoint_every == 0 or step+1 == args.steps:
             last = losses.detach().cpu().tolist()
             tmp = checkpoint.with_suffix('.tmp')
@@ -251,6 +333,7 @@ def export(directory, members, weights, biases, metadata, identity, last, args, 
                                            'objective_sha256': identity['objective_sha256'],
                                            'teacher_sha256': metadata['sha256'], 'torch': identity['torch'],
                                            'device': identity['device'], 'compiled': identity['compiled'],
+                                           **({'coverage': identity['coverage']} if 'coverage' in identity else {}),
                                            **member, 'final_loss': last[k]}},
                'layers': {name: {'rows': w.shape[1], 'cols': w.shape[2], 'weight': w[k].detach().cpu().flatten().tolist(),
                                  'bias': b[k].detach().cpu().tolist()}
@@ -276,7 +359,14 @@ def main():
     parser.add_argument('--resume', action='store_true')
     parser.add_argument('--log-every', type=int, default=1000)
     parser.add_argument('--checkpoint-every', type=int, default=2000)
+    parser.add_argument('--coverage-weight', type=float, default=0.,
+                        help='weight of the rendered-coverage term (0, the original recipe, leaves it out)')
+    parser.add_argument('--coverage-pixels', type=int, default=64, help='coverage-term pixels per glyph and step')
+    parser.add_argument('--coverage-sizes', help='JSON of training cell sizes [[w, h, probability], ...]')
     args = parser.parse_args()
+    if args.coverage_weight and (not math.isfinite(args.coverage_weight) or args.coverage_weight < 0 or
+                                 not args.coverage_sizes or args.coverage_pixels < 2 or args.coverage_pixels % 2):
+        parser.error('the coverage term needs a finite positive weight, --coverage-sizes and an even pixel count')
     if min(args.steps, args.log_every, args.checkpoint_every) < 1 or not math.isfinite(args.unlabelled) or args.unlabelled < 0:
         parser.error('invalid training counts or loss weight')
     if args.width is not None and not 1 <= args.width <= 1024:

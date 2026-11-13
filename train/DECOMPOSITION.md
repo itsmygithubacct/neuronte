@@ -91,3 +91,18 @@ they cannot win a table miss. This retains the original model's size in
 addition to the candidate weights; report that load/storage cost explicitly.
 The output uses the existing version-2 bundle format and the public API.
 Never overwrite a shipped model whose hash is bound by consumers.
+
+Spatial exports can be assembled as a single version-6 member:
+
+```sh
+python3 tools/decomposition-tiled.py /tmp/pixel-spatial.json \
+  /tmp/pixel-experiment/pixel-spatial-k2-w64-p0-s0.json \
+  /tmp/pixel-experiment/pixel-spatial-k2-w64-p1-s0.json
+python3 tests/check_decomposition_tiled.py
+```
+
+The assembler verifies row-major full-cell coverage, matching training
+identities and distance scales. Tiles use the original scalar unchanged.
+The native sampler dispatches each subpixel at its full-cell position,
+including odd sizes and widths 23, 24 and 25. The analytic test checks
+both axes, scalar identity and coverage scaling across these boundaries.

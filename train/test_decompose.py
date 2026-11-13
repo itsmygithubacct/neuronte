@@ -79,8 +79,11 @@ class DecompositionTests(unittest.TestCase):
             optim.step()
             for k in range(2):
                 for i,layer in enumerate(layers[k]):
-                    torch.testing.assert_close(ws[i][k],layer.weight,rtol=1e-5,atol=2e-7)
-                    torch.testing.assert_close(bs[i][k],layer.bias,rtol=1e-5,atol=2e-7)
+                    # Independent CUDA GEMMs and batched GEMMs reduce in a
+                    # different order. Adam can amplify sub-ULP near-zero
+                    # gradient differences; require <1e-6 absolute drift.
+                    torch.testing.assert_close(ws[i][k],layer.weight,rtol=1e-5,atol=1e-6)
+                    torch.testing.assert_close(bs[i][k],layer.bias,rtol=1e-5,atol=1e-6)
 
     def test_checkpoint_resume_and_identity(self):
         with tempfile.TemporaryDirectory() as temp:

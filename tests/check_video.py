@@ -6,6 +6,7 @@ import unittest
 import io
 import subprocess
 import json
+import os
 import tempfile
 import struct
 import numpy as np
@@ -203,7 +204,8 @@ class Video(unittest.TestCase):
         import shutil,re,base64,zlib
         if not shutil.which('ffmpeg') or not shutil.which('ffprobe'):self.skipTest('ffmpeg is not installed')
         cmd=[sys.executable,str(ROOT/'tools/neuronte-play.py'),'color=c=red:size=32x48:rate=10[a];color=c=blue:size=32x48:rate=10[b];[a][b]hstack','--lavfi','--cols','6','--rows','3','--frames','2']
-        result=subprocess.run(cmd,capture_output=True)
+        env=dict(os.environ,COLUMNS='80',LINES='24')
+        result=subprocess.run(cmd,capture_output=True,env=env)
         self.assertEqual(result.returncode,0,result.stderr)
         self.assertIn(b'2 frames shown',result.stderr)
         frames=re.findall(rb'\x1b_Ga=T,f=24,o=z,s=48,v=48,i=\d+,p=1,c=6,r=3,C=1,q=2,m=0;([^\x1b]*)\x1b\\',result.stdout)
@@ -213,10 +215,10 @@ class Video(unittest.TestCase):
         self.assertLessEqual(int(np.abs(image[:,:24]-[255,0,0]).max()),8)
         self.assertLessEqual(int(np.abs(image[:,24:]-[0,0,255]).max()),8)
         self.assertTrue(result.stdout.startswith(b'\x1b[?1049h'));self.assertTrue(result.stdout.endswith(b'\x1b[?25h\x1b[?1049l'))
-        result=subprocess.run(cmd+['--mode','cells'],capture_output=True)
+        result=subprocess.run(cmd+['--mode','cells'],capture_output=True,env=env)
         self.assertEqual(result.returncode,0,result.stderr)
         self.assertNotIn(b'\x1b_G'+b'a=T',result.stdout)
-        self.assertEqual(result.stdout.count(b'\x1b[48;2;'),18);self.assertIn(b'\x1b[1;1H',result.stdout)   # 6 x 3 cells, sent once; the second frame is unchanged
+        self.assertEqual(result.stdout.count(b'\x1b[48;2;'),18);self.assertIn(b'\x1b[11;38H',result.stdout)   # centred in 80 x 24   # 6 x 3 cells, sent once; the second frame is unchanged
         bad=subprocess.run(cmd[:2]+['nosuchsource=1']+cmd[3:],capture_output=True)
         self.assertEqual(bad.returncode,2);self.assertNotIn(b'Traceback',bad.stderr)
 

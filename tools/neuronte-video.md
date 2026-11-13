@@ -38,7 +38,7 @@ not an exhaustive search over all RGB8 pairs. Deterministic ties prefer the
 first character in the manifest. `--stats PATH` records frame count, time,
 cell dimensions and reconstructed PSNR, including RGB8 quantisation.
 
-No new library format or public C API is required. In-process multi-ink
+No new library format is required. In-process multi-ink
 records have shape (rows, columns, 8, 3), uint8. Plane scalars are fixed by
 this version and not repeated in each cell: payload is 24 bytes/cell. A
 future persistent format would additionally require dimensions, version,
@@ -101,6 +101,27 @@ terminal does not change this resolution. `--pixel-size` cannot be combined
 with `--cols`, `--rows` or `--mode cells`. Summary JSON records both
 `decoded_size` and `image_size` so comparisons can check the actual samples
 and transmitted dimensions.
+
+The natural-size player fuses palette packing, binary neural ink selection
+and edge handling in `neuronte_video_rgb24` (declared in `include/neuronte.h`).
+It receives the actual learned 4 × 2 ink map and writes into a caller-owned
+RGB24 buffer; it validates dimensions, strides, buffer lengths and overlap
+before writing. Rows whose learned selections preserve column order use a
+row copy. Other binary selections use the same map pixel by pixel. Fractional
+models and older libraries keep the continuous Python blend. The reusable
+`MultiInk.render_rgb24` interface and the player's nonblocking decoder reuse
+input and output storage for each natural-size frame. Batch consumers can
+use `RGBFrameReader` with blocking streams. Returned frames remain valid
+until the next read; a successful stream ending in a partial frame is an error.
+The player continues draining bounded diagnostics and handling controls while
+waiting for decoder output or a presentation deadline.
+
+Playback and benchmarks share `decoder_command`. FFmpeg uses one scaling
+worker and one rawvideo output worker. Codec threading remains automatic;
+`--decoder-threads N` lets a caller trade codec parallelism for lower memory
+use, while `--filter-threads N` controls scaling. Zero lets FFmpeg choose.
+Natural-size frame logs put the fused composition time in `draw`; `fit` is
+zero because no separate palette is materialized.
 
 Measured once, on one laptop, in a background Kilix tab of 196 × 55 cells
 with a synthetic 640 × 360 clip at 30 frames a second: shared memory showed

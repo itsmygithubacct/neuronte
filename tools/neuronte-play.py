@@ -42,7 +42,7 @@ import numpy as np
 # Installed payloads are verified source trees. Keep runtime imports from
 # adding __pycache__ files that would make the next upgrade see local changes.
 sys.dont_write_bytecode = True
-from neuronte_video import TwoInk, MultiInk, ROOT
+from neuronte_video import TwoInk, MultiInk, decoder_command, ROOT
 
 try: LIBC = ctypes.CDLL(None)        # loaded now, so a child has nothing to load between fork and exec
 except OSError: LIBC = None
@@ -217,30 +217,39 @@ class Decoder:
 
     A quiet or damaged source must not prevent the player from handling keys.
     read() returns b'' while waiting, a complete frame, or None after exit.
+    Complete frames share one buffer and remain valid until the next read().
     """
     def __init__(self, command):
         self.child = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                       bufsize=0, preexec_fn=with_us)
         self.readers = [self.child.stdout, self.child.stderr]
-        self.partial = bytearray(); self.errors = bytearray()
+        self.buffer = None; self.filled = 0; self.errors = bytearray()
         for stream in self.readers: os.set_blocking(stream.fileno(), False)
 
     def read(self, size, wait=.05):
+        if size <= 0: raise ValueError('frame size must be positive')
+        if self.buffer is None or len(self.buffer) != size:
+            if self.filled: raise ValueError('cannot resize a partial frame')
+            self.buffer = memoryview(bytearray(size))
         ready = select.select(self.readers, [], [], wait)[0]
         for stream in ready:
-            chunk = os.read(stream.fileno(), size - len(self.partial) if stream is self.child.stdout else 65536)
-            if not chunk:
-                self.readers.remove(stream)
-                stream.close()
-            elif stream is self.child.stdout:
-                self.partial.extend(chunk)
+            if stream is self.child.stdout:
+                amount = os.readv(stream.fileno(), [self.buffer[self.filled:]])
+                self.filled += amount
             else:
+                chunk = os.read(stream.fileno(), 65536)
+                amount = len(chunk)
                 self.errors.extend(chunk)
                 del self.errors[:-65536]
-        if len(self.partial) == size:
-            frame = bytes(self.partial); self.partial.clear()
-            return frame
+            if not amount:
+                self.readers.remove(stream)
+                stream.close()
+        if self.filled == size:
+            self.filled = 0
+            return self.buffer
         if not self.readers and self.child.poll() is not None:
+            if self.filled and not self.child.returncode:
+                raise ValueError('truncated RGB frame')
             return None
         return b''
 
@@ -417,6 +426,7 @@ def main():
                    help='pixels mode: retain this many RGB samples and display at natural pixel size')
     p.add_argument('--fps', type=float, help='default: the file\'s own rate')
     p.add_argument('--filter-threads', type=int, default=1, help='scaling workers (default: 1; 0 lets ffmpeg choose)')
+    p.add_argument('--decoder-threads', type=int, default=0, help='codec workers (default: 0 lets ffmpeg choose; fewer use less memory)')
     p.add_argument('--start', type=float, default=0, help='begin at this many seconds')
     p.add_argument('--frames', type=int, help='stop after this many source frames')
     p.add_argument('--untimed', action='store_true', help='benchmark: process every frame as fast as possible, without sound')
@@ -439,6 +449,7 @@ def main():
     if a.pixel_size and (a.mode != 'pixels' or a.cols is not None or a.rows is not None):
         p.error('--pixel-size requires pixels mode and cannot be combined with --cols or --rows')
     if a.filter_threads < 0: p.error('--filter-threads must be nonnegative')
+    if a.decoder_threads < 0: p.error('--decoder-threads must be nonnegative')
     for tool in ['ffmpeg', 'ffprobe']:
         if not shutil.which(tool): p.error(f'{tool} is required and was not found')
     if a.helper and (a.mode != 'cells' or a.characters != 'full'): p.error('--helper requires --mode cells --characters full')
@@ -492,11 +503,9 @@ def main():
 
     def decoder(position):
         g = geometry
-        flags = 'lanczos+accurate_rnd+full_chroma_int+full_chroma_inp' if a.pixel_size else 'area'
-        scale = f'scale={g["w"]}:{g["h"]}:flags={flags}'
-        if chroma: scale += f':in_chroma_loc={chroma}'
-        cmd = ['ffmpeg', '-v', 'error', '-nostdin', '-filter_threads', str(a.filter_threads)] + (['-f', 'lavfi'] if a.lavfi else ['-ss', f'{position:.3f}']) \
-            + ['-i', a.video, '-an', '-sn', '-vf', f'fps={fps},{scale}', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-']
+        cmd = decoder_command(a.video, g['w'], g['h'], fps, start=position, chroma=chroma,
+                              lavfi=a.lavfi, exact_pixels=bool(a.pixel_size), filter_threads=a.filter_threads,
+                              decoder_threads=a.decoder_threads)
         return Decoder(cmd)
 
     def draw_pixels(colours):
@@ -506,6 +515,14 @@ def main():
     def present_pixels(picture):
         return presenter.frame(picture, geometry['c'], geometry['r'], geometry['left'], geometry['top'],
                                natural=bool(a.pixel_size))
+
+    output_frame = None
+
+    def render_natural(frame):
+        nonlocal output_frame
+        if output_frame is None or output_frame.shape != frame.shape:
+            output_frame = np.empty_like(frame)
+        return renderer.render_rgb24(frame, out=output_frame)
 
     presenter = Presenter(out, transport)
     keys = None
@@ -579,8 +596,11 @@ def main():
                     restart(0.); clock.seek(0.); continue
                 frame = np.frombuffer(raw, np.uint8).reshape(geometry['h'], geometry['w'], 3)
                 if preview and paused:                      # a paused seek/resize gets one picture, then holds
-                    payload = present_pixels(draw_pixels(fitter.encode(pad_cells(frame, fitter)))) \
-                        if a.mode == 'pixels' else text(renderer, renderer.fit(frame), None, geometry['left'], geometry['top'])
+                    if a.mode == 'pixels':
+                        picture = render_natural(frame) if a.pixel_size else draw_pixels(fitter.encode(pad_cells(frame, fitter)))
+                        payload = present_pixels(picture)
+                    else:
+                        payload = text(renderer, renderer.fit(frame), None, geometry['left'], geometry['top'])
                     if payload: out.write(payload); out.flush(); presenter.sent()
                     index = 1; preview = False; read_time = 0.
                     continue
@@ -592,8 +612,13 @@ def main():
                     if log: log.write(json.dumps(record) + '\n')
                     continue
                 if a.mode == 'pixels':
-                    colours = fitter.encode(pad_cells(frame, fitter)); t2 = time.perf_counter()
-                    picture = draw_pixels(colours); t3 = time.perf_counter()
+                    if a.pixel_size:
+                        t2 = t1
+                        picture = render_natural(frame)
+                    else:
+                        colours = fitter.encode(pad_cells(frame, fitter)); t2 = time.perf_counter()
+                        picture = draw_pixels(colours)
+                    t3 = time.perf_counter()
                     payload = present_pixels(picture)
                 else:
                     if helper is not None:
@@ -627,6 +652,8 @@ def main():
             if log: log.write(json.dumps(record) + '\n')
     except (KeyboardInterrupt, BrokenPipeError):
         pass
+    except ValueError as exc:
+        failure = str(exc)
     finally:
         for number in (signal.SIGTERM, signal.SIGHUP, signal.SIGINT): signal.signal(number, signal.SIG_IGN)   # a second signal must not cut this short
         elapsed = time.perf_counter() - began

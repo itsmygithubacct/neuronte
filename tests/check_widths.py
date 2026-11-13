@@ -36,7 +36,7 @@ lib.neuronte_open_file.argtypes = [C.c_char_p, C.POINTER(C.c_void_p)]
 lib.neuronte_close.argtypes = [C.c_void_p]
 with tempfile.TemporaryDirectory(prefix="neuronte-widths-") as temporary:
     directory = Path(temporary)
-    for width in (1, 2, 3, 4, 6, 8, 12, 15, 17, 20, 48, 63, 64, 65, 128, 192, 255, 256, 257):
+    for width in (1, 2, 3, 4, 6, 8, 12, 15, 17, 20, 48, 63, 64, 65, 100, 128, 192, 255, 256, 257):
         source, packed = directory / f"h{width}.json", directory / f"h{width}.nrt"
         source.write_text(json.dumps(fixture(width)))
         raw = pack.pack(str(source))

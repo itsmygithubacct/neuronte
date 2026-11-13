@@ -395,26 +395,192 @@ class Video(unittest.TestCase):
             path=Path(temp)/'helper.json';path.write_text(json.dumps(doc))
             with self.assertRaisesRegex(ValueError,'invalid video helper layer'):Helper(path,'speed')
 
-    def player(self,*args,keys=(),source=None,grid=True,timeout=60):
-        """Run the player off a terminal; keys are (seconds to wait, bytes) written to its key pipe."""
-        import shutil,time
+    def shared_paths(self,pid):
+        """Shared-memory objects belonging to one player process, never every session."""
+        return sorted(Path('/dev/shm').glob(f'neuronte-play-{int(pid)}-*'))
+
+    def drop_shared(self,pid):
+        for path in self.shared_paths(pid):path.unlink(missing_ok=True)
+
+    def playback_ready(self,kind,output,args):
+        """True once `kind` is visible: screen, frame, backpressure (three shared pictures), or log."""
+        if kind=='screen':return b'\x1b[?1049h' in output
+        if kind=='frame':return b'\x1b[?2026h' in output or b'\x1b_G' in output
+        if kind=='backpressure':return output.count(b',t=s;')>=3
+        if kind=='log':
+            path=next((args[i+1] for i,item in enumerate(args) if item=='--log' and i+1<len(args)),None)
+            try:return path is not None and os.path.getsize(path)>0 and b'\n' in Path(path).read_bytes()
+            except OSError:return False
+        raise ValueError(f'unknown playback milestone {kind}')
+
+    def player(self,*args,keys=(),source=None,grid=True,timeout=60,ready=None,ready_timeout=20,extra_env=None):
+        """Run the player off a terminal.
+
+        keys are (seconds to wait, bytes) written to its key pipe. `timeout` is
+        one monotonic deadline from the observed milestone, or from spawn when
+        ready is None. It covers the key schedule and the wait for exit. Startup
+        has its own ready_timeout and is not part of that deadline. A requested
+        milestone that never arrives, including because the player already
+        exited, fails with the exit code and stderr. Output is drained while the
+        player runs. A reader that raises or is still running after its join is
+        not a sample.
+        """
+        import shutil,threading,time
         if not shutil.which('ffmpeg') or not shutil.which('ffprobe'):self.skipTest('ffmpeg is not installed')
         cmd=[sys.executable,str(ROOT/'tools/neuronte-play.py'),source or 'color=c=red:size=32x48:rate=10[a];color=c=blue:size=32x48:rate=10[b];[a][b]hstack']
         cmd+=([] if source else ['--lavfi'])+(['--cols','6','--rows','3'] if grid else [])+['--no-status',*args]
         env=dict(os.environ,COLUMNS='80',LINES='24');env.pop('KITTY_WINDOW_ID',None)
+        if extra_env:env.update(extra_env)
         r,w=os.pipe()
-        with tempfile.TemporaryFile() as picture:   # a file, so the player never waits on us while we wait to press keys
-            child=subprocess.Popen(cmd+['--input-fd',str(r)],stdout=picture,stderr=subprocess.PIPE,env=env,pass_fds=[r]);os.close(r)
+        try:
+            child=subprocess.Popen(cmd+['--input-fd',str(r)],stdout=subprocess.PIPE,stderr=subprocess.PIPE,env=env,pass_fds=[r])
+        except BaseException:
+            os.close(r);os.close(w);raise
+        os.close(r)
+        box={'out':bytearray(),'err':bytearray(),'faults':[]};lock=threading.Lock()
+        def pump(stream,key,name):
+            # os.read returns the bytes already written. BufferedReader.read
+            # waits until its whole request is full, so a short milestone
+            # (the alternate screen, one shared-memory name) stays invisible
+            # until the player exits. A failed read is recorded and is not a sample.
+            fd=stream.fileno()
             try:
-                for wait,key in keys:
-                    time.sleep(wait)
-                    if child.poll() is None:os.write(w,key)
-                _,err=child.communicate(timeout=timeout)
+                while True:
+                    chunk=os.read(fd,65536)
+                    if not chunk:break
+                    with lock:box[key]+=chunk
+            except Exception as exc:
+                with lock:box['faults'].append(f'{name}: {type(exc).__name__}: {exc}')
             finally:
-                os.close(w)
-                if child.poll() is None:child.kill();child.wait()
-            picture.seek(0);out=picture.read()
-        return child.returncode,out,err
+                try:stream.close()
+                except Exception as exc:
+                    with lock:box['faults'].append(f'{name} close: {type(exc).__name__}: {exc}')
+        def faults():
+            with lock:return list(box['faults'])
+        def descendants(pid):
+            try:text=Path(f'/proc/{pid}/task/{pid}/children').read_text()
+            except OSError:return []
+            found=[]
+            for token in text.split():
+                try:kid=int(token)
+                except ValueError:continue
+                found.extend(descendants(kid));found.append(kid)
+            return found
+        threads=[];problems=[];missed=None;stop=False
+        self.player_pid=child.pid
+        start=time.monotonic();self.player_mark={'start':start,'ready':start,'done':start}
+        try:
+            for stream,key,name in ((child.stdout,'out','player-out'),(child.stderr,'err','player-err')):
+                thread=threading.Thread(target=pump,args=(stream,key,name),name=name,daemon=True)
+                thread.start();threads.append(thread)
+            if ready:
+                limit=start+ready_timeout
+                while not stop:
+                    with lock:output=bytes(box['out'])
+                    if self.playback_ready(ready,output,args):
+                        self.player_mark['ready']=time.monotonic();break
+                    if child.poll() is not None:
+                        missed=ready;stop=True;break
+                    if faults():
+                        stop=True;break
+                    if time.monotonic()>=limit:
+                        problems.append(f'player was not {ready} within {ready_timeout}s ({len(output)} bytes seen)')
+                        stop=True;break
+                    time.sleep(.02)
+                origin=self.player_mark['ready']
+            else:origin=start
+            if not stop:
+                # One deadline from the milestone (or spawn). Key delays are
+                # sliced so a long sleep cannot outlive it, and so a player
+                # that exits during a key is returned instead of burned into
+                # a false deadline.
+                deadline=origin+timeout
+                where='readiness' if ready else 'spawn'
+                exceeded=f'playback deadline exceeded ({timeout}s from {where})'
+                for wait,key in keys:
+                    if faults() or child.poll() is not None:
+                        stop=True;break
+                    if time.monotonic()>=deadline:
+                        problems.append(exceeded);stop=True;break
+                    remaining=wait
+                    while remaining>0:
+                        if faults():
+                            stop=True;break
+                        if child.poll() is not None:break
+                        left=deadline-time.monotonic()
+                        if left<=0:
+                            problems.append(exceeded);stop=True;break
+                        step=min(.05,remaining,left)
+                        time.sleep(step);remaining-=step
+                    if stop or child.poll() is not None:break
+                    try:os.write(w,key)
+                    except BrokenPipeError:pass
+                while not stop and child.poll() is None:
+                    if faults():
+                        stop=True;break
+                    left=deadline-time.monotonic()
+                    if left<=0:
+                        problems.append(exceeded);stop=True;break
+                    time.sleep(min(.05,left))
+        finally:
+            kill_note=None
+            try:os.close(w)
+            except OSError:pass
+            if child.poll() is None:
+                for pid in descendants(child.pid)+[child.pid]:
+                    try:os.kill(pid,9)
+                    except OSError:pass
+                try:child.wait(timeout=3)
+                except subprocess.TimeoutExpired:kill_note='player did not exit after kill'
+            for thread in threads:thread.join(timeout=2)
+            stuck=[thread.name for thread in threads if thread.is_alive()]
+            with lock:
+                seen=list(box['faults']);err=bytes(box['err']);out=bytes(box['out'])
+            # Exit can be observed before the reader drains the final bytes.
+            # Decide whether readiness was missing only after that drain.
+            if missed is not None and not stuck and self.playback_ready(missed,out,args):
+                self.player_mark['ready']=time.monotonic();missed=None
+            if missed is not None:
+                snippet=' '.join(err.decode('utf-8','replace').split())
+                if len(snippet)>400:snippet=snippet[-400:]
+                text=f'player exited before {missed} (exit {child.returncode})'
+                if snippet:text+=': '+snippet
+                problems.insert(0,text)
+            reader=[]
+            if seen:reader.append('output reader failed: '+'; '.join(seen))
+            if stuck:reader.append('output reader did not finish: '+', '.join(stuck))
+            if reader:problems.append('; '.join(reader))
+            if kill_note:problems.append(kill_note)
+            self.player_mark['done']=time.monotonic()
+        if problems:raise AssertionError('; '.join(problems))
+        return child.returncode,bytes(box['out']),bytes(box['err'])
+
+    def test_player_readiness_survives_output_drained_after_exit(self):
+        from unittest.mock import patch
+        import threading
+        real_popen,real_read=subprocess.Popen,os.read
+        polled=threading.Event()
+        frame=b'\x1b[?2026hframe\x1b[?2026l'
+        def spawn(_command,**kwargs):
+            child=real_popen([sys.executable,'-c',f'import os;os.write(1,{frame!r})'],**kwargs)
+            child.wait(timeout=5)
+            original_poll=child.poll
+            def poll():
+                result=original_poll()
+                if result is not None:polled.set()
+                return result
+            child.poll=poll
+            return child
+        def delayed_read(fd,size):
+            if threading.current_thread().name=='player-out':
+                if not polled.wait(timeout=5):raise TimeoutError('player was never polled')
+            return real_read(fd,size)
+        # The process has exited, but its frame is still waiting in the pipe.
+        # Observe that exit before allowing the reader to drain the bytes.
+        with patch('subprocess.Popen',side_effect=spawn),patch('os.read',side_effect=delayed_read):
+            code,out,err=self.player('--no-audio',ready='frame',ready_timeout=1,timeout=1)
+        self.assertEqual(code,0,err)
+        self.assertEqual(out,frame)
 
     def test_player_drains_noisy_decoder_and_reports_its_last_error(self):
         from unittest.mock import patch
@@ -438,16 +604,16 @@ class Video(unittest.TestCase):
 
     def test_player_can_quit_while_a_decoder_holds_a_partial_frame(self):
         from unittest.mock import patch
-        import time
         with tempfile.TemporaryDirectory() as temp:
             fake=Path(temp)/'ffmpeg'
             fake.write_text('#!/usr/bin/env python3\nimport os,time\nos.write(1,bytes(100))\ntime.sleep(30)\n')
             fake.chmod(0o755)
             with patch.dict(os.environ,PATH=temp+os.pathsep+os.environ['PATH']):
-                began=time.monotonic()
-                code,out,err=self.player('--no-audio',keys=[(.8,b'q')],timeout=2)
+                # The alternate screen is up before the stalled read. Quit is
+                # timed from that point, so a slow import is not a missed quit.
+                code,out,err=self.player('--no-audio',keys=[(.8,b'q')],timeout=2,ready='screen')
             self.assertEqual(code,0,err)
-            self.assertLess(time.monotonic()-began,2.5)
+            self.assertLess(self.player_mark['done']-self.player_mark['ready'],2.5)
             self.assertEqual(self.pixel_frames(out),[])
 
     def test_bad_player_log_keeps_terminal_attributes(self):
@@ -474,25 +640,33 @@ class Video(unittest.TestCase):
     def test_player_waits_for_slow_frames_including_a_pause(self):
         with tempfile.TemporaryDirectory() as temp:
             log=Path(temp)/'frames.jsonl'
+            # Pause only after the first frame is logged. A fixed sleep from
+            # process start runs during decoder startup and the two spaces cancel.
             code,out,err=self.player('--fps','.5','--frames','3','--log',str(log),
-                                     keys=[(.8,b' '),(.6,b' ')],timeout=10)
+                                     keys=[(.8,b' '),(.6,b' ')],timeout=8,ready='log')
             self.assertEqual(code,0,err)
             rows=[json.loads(line) for line in log.read_text().splitlines()]
             self.assertEqual([r['pts'] for r in rows],[0,2,4])
             self.assertEqual(len(self.pixel_frames(out)),3)
-            self.assertGreater(rows[1]['shown']-rows[0]['shown'],2.4)
+            self.assertGreater(rows[1]['shown']-rows[0]['shown'],2.4)   # 2 s period plus the 0.6 s pause
+            self.assertLess(rows[1]['shown']-rows[0]['shown'],4.0)      # the pause, not an unbounded stall
             self.assertGreater(rows[2]['shown']-rows[1]['shown'],1.8)
+            self.assertLess(rows[2]['shown']-rows[1]['shown'],3.2)
             self.assertGreater(min(r['late_ms'] for r in rows),-10)
 
     def test_player_busy_terminal_still_waits_for_slow_frames(self):
         with tempfile.TemporaryDirectory() as temp:
             stats=Path(temp)/'stats.json'
-            code,out,err=self.player('--fps','.5','--frames','5','--transport','shm','--stats',str(stats),timeout=12)
+            # Four two-second intervals remain after the first picture. The
+            # deadline starts then, so startup cannot eat it or satisfy it.
+            code,out,err=self.player('--fps','.5','--frames','5','--transport','shm','--stats',str(stats),
+                                     ready='frame',timeout=12)
             self.assertEqual(code,0,err)
             summary=json.loads(stats.read_text())
             self.assertEqual(summary['shown'],3)
             self.assertEqual(summary['skipped_terminal_busy'],2)
             self.assertGreaterEqual(summary['seconds'],7.9)
+            self.assertLess(self.player_mark['done']-self.player_mark['ready'],12)
 
     def test_cancelled_picture_keeps_the_last_displayed_image(self):
         import base64,re
@@ -594,7 +768,7 @@ class Video(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             clip=self.sound_clip(temp);stats=Path(temp)/'stats.json'
             code,out,err=self.player('--pixel-size','17x13','--no-audio','--stats',str(stats),source=clip,grid=False,
-                                     keys=[(1.5,b' '),(.2,b'\x1b[C'),(.4,b'q')])
+                                     keys=[(1.5,b' '),(.2,b'\x1b[C'),(.4,b'q')],ready='frame',timeout=10)
             self.assertEqual(code,0,err)
             frames=self.pixel_frames(out);self.assertGreater(len(frames),2)
             # Paused seeking presents one additional picture outside the main
@@ -647,13 +821,172 @@ class Video(unittest.TestCase):
         self.assertEqual(code,2);self.assertNotIn(b'Traceback',err)
 
     def test_player_shared_memory_backpressure(self):
-        import glob
-        before=set(glob.glob('/dev/shm/neuronte-play-*'))
         code,out,err=self.player('--frames','8','--transport','shm')
         self.assertEqual(code,0,err)
-        # Nothing reads the objects here, so three are written, the rest are skipped, and all are removed at exit.
+        # Nothing reads the objects here, so three are written, the rest are skipped, and this player's are removed at exit.
         self.assertEqual(out.count(b',t=s;'),3);self.assertIn(b'5 skipped for a busy terminal',err)
-        self.assertEqual(set(glob.glob('/dev/shm/neuronte-play-*')),before)
+        self.assertEqual(self.shared_paths(self.player_pid),[])
+
+    def test_readiness_deadline_stops_a_player_that_never_shows_a_frame(self):
+        from unittest.mock import patch
+        import time
+        with tempfile.TemporaryDirectory() as temp:
+            fake=Path(temp)/'ffmpeg'
+            fake.write_text('#!/usr/bin/env python3\nimport time\ntime.sleep(30)\n')
+            fake.chmod(0o755)
+            with patch.dict(os.environ,PATH=temp+os.pathsep+os.environ['PATH']):
+                with self.assertRaises(AssertionError) as caught:
+                    self.player('--no-audio',ready='frame',ready_timeout=.6,timeout=1)
+            self.assertIn('not frame',str(caught.exception))
+            self.assertLess(self.player_mark['done']-self.player_mark['start'],2.5)
+            self.assertFalse(Path(f'/proc/{self.player_pid}').exists())
+            time.sleep(.05)
+            self.assertEqual(self.shared_paths(self.player_pid),[])
+
+    def test_playback_deadline_includes_the_wait_for_a_scheduled_key(self):
+        """A key delay past the deadline fails before that delay elapses.
+
+        Sleeping the whole key first, then applying the timeout only to the
+        exit wait, lets this player take the quit and return success.
+        """
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory() as temp:
+            fake=Path(temp)/'ffmpeg'
+            fake.write_text('#!/usr/bin/env python3\nimport time\ntime.sleep(30)\n')
+            fake.chmod(0o755)
+            with patch.dict(os.environ,PATH=temp+os.pathsep+os.environ['PATH']):
+                with self.assertRaises(AssertionError) as caught:
+                    self.player('--no-audio',keys=[(3,b'q')],timeout=.4,ready='screen',ready_timeout=15)
+            self.assertIn('playback deadline exceeded',str(caught.exception))
+            self.assertLess(self.player_mark['done']-self.player_mark['ready'],1.2)
+            self.assertFalse(Path(f'/proc/{self.player_pid}').exists())
+
+    def test_player_exit_before_the_frame_is_a_failure(self):
+        with self.assertRaises(AssertionError) as caught:
+            self.player(source='nosuchsource=1',ready='frame',ready_timeout=15,timeout=5)
+        message=str(caught.exception)
+        self.assertIn('exited before frame',message)
+        self.assertIn('exit 2',message)
+        self.assertIn('no video stream',message)
+        self.assertFalse(Path(f'/proc/{self.player_pid}').exists())
+
+    def test_output_reader_exception_is_not_a_sample(self):
+        from unittest.mock import patch
+        import time
+        real=os.read
+        def hooked(fd,size):
+            if size==65536:raise OSError(5,'Input/output error')
+            return real(fd,size)
+        with patch('os.read',side_effect=hooked):
+            started=time.monotonic()
+            with self.assertRaises(AssertionError) as caught:
+                self.player('--frames','1',timeout=2)
+            elapsed=time.monotonic()-started
+        self.assertIn('Input/output error',str(caught.exception))
+        self.assertIn('reader',str(caught.exception))
+        self.assertLess(elapsed,1.5)
+        self.assertFalse(Path(f'/proc/{self.player_pid}').exists())
+
+    def test_output_reader_that_does_not_finish_is_not_a_sample(self):
+        from unittest.mock import patch
+        import threading,time
+        real=os.read;gate=threading.Event()
+        def hooked(fd,size):
+            if size==65536:
+                gate.wait(30);return b''
+            return real(fd,size)
+        started=time.monotonic()
+        try:
+            with patch('os.read',side_effect=hooked):
+                with self.assertRaises(AssertionError) as caught:
+                    self.player('--no-audio',ready='frame',ready_timeout=.3,timeout=1)
+            elapsed=time.monotonic()-started
+        finally:gate.set()
+        message=str(caught.exception)
+        self.assertIn('did not finish',message)
+        self.assertIn('not frame',message)
+        self.assertLess(elapsed,8)
+        self.assertFalse(Path(f'/proc/{self.player_pid}').exists())
+
+    def test_slow_decoder_start_does_not_consume_pause_or_seek(self):
+        """The first decoder is late. Pause and seek still land on playback time."""
+        import shutil
+        real=shutil.which('ffmpeg')
+        if not real:self.skipTest('ffmpeg is not installed')
+        with tempfile.TemporaryDirectory() as temp:
+            clip=Path(temp)/'clip.mkv'
+            made=subprocess.run([real,'-v','error','-y','-f','lavfi','-i','testsrc2=size=64x48:rate=10',
+                                 '-t','12','-c:v','mpeg4','-g','10',str(clip)],capture_output=True)
+            if made.returncode:self.skipTest('ffmpeg cannot make the clip')
+            stamp=Path(temp)/'decoder-started'
+            wrapper=Path(temp)/'bin';wrapper.mkdir()
+            ffmpeg=wrapper/'ffmpeg'
+            ffmpeg.write_text('#!/usr/bin/env python3\nimport os,sys,time\n'
+                f'stamp={str(stamp)!r}\n'
+                'if not os.path.exists(stamp):\n'
+                '    open(stamp,"w").write(str(time.monotonic()))\n'
+                '    time.sleep(1.2)\n'
+                f'os.execv({real!r},["ffmpeg",*sys.argv[1:]])\n')
+            ffmpeg.chmod(0o755)
+            log=Path(temp)/'frames.jsonl'
+            code,out,err=self.player('--no-audio','--decoder','ffmpeg','--fps','10','--log',str(log),source=str(clip),
+                                     ready='log',ready_timeout=20,timeout=8,
+                                     keys=[(.3,b'\x1b[C'),(.8,b' '),(.6,b' '),(.4,b'q')],
+                                     extra_env={'PATH':str(wrapper)+os.pathsep+os.environ['PATH']})
+            self.assertEqual(code,0,err)
+            rows=[json.loads(line) for line in log.read_text().splitlines()]
+            shown=[r for r in rows if 'shown' in r]
+            self.assertGreater(len(shown),4)
+            started=float(stamp.read_text())
+            self.assertGreater(shown[0]['shown']-started,1.1)             # the delay happened before the first picture
+            gaps=[b['shown']-a['shown'] for a,b in zip(shown,shown[1:])]
+            self.assertLess(gaps[0],.8)                                   # and is not inside the first frame interval
+            jumps=[round(b['pts']-a['pts']) for a,b in zip(rows,rows[1:]) if abs(b['pts']-a['pts'])>1]
+            self.assertEqual(jumps[:1],[5])
+            held=[b['shown']-a['shown'] for a,b in zip(shown,shown[1:]) if abs(b['pts']-a['pts'])<.5]
+            self.assertGreater(max(held),.45)                             # the 0.6 s pause held the clock
+            self.assertLess(max(held),1.15)                               # without taking in the 1.2 s startup
+
+    def test_independent_players_keep_separate_shared_memory(self):
+        import time
+        procs=[];pipes=[]
+        try:
+            for _ in range(2):
+                r,w=os.pipe()
+                cmd=[sys.executable,str(ROOT/'tools/neuronte-play.py'),'color=c=red:size=32x48:rate=10',
+                     '--lavfi','--cols','6','--rows','3','--no-status','--untimed','--frames','8',
+                     '--transport','shm','--input-fd',str(r)]
+                env=dict(os.environ,COLUMNS='80',LINES='24');env.pop('KITTY_WINDOW_ID',None)
+                child=subprocess.Popen(cmd,stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.PIPE,env=env,pass_fds=[r])
+                os.close(r);procs.append(child);pipes.append(w)
+            deadline=time.monotonic()+20
+            while time.monotonic()<deadline:
+                groups=[self.shared_paths(child.pid) for child in procs]
+                if all(len(group)>=3 for group in groups):break
+                if any(child.poll() is not None for child in procs):break
+                time.sleep(.02)
+            else:self.fail('players did not reach independent backpressure')
+            groups=[self.shared_paths(child.pid) for child in procs]
+            self.assertEqual([len(group) for group in groups],[3,3], [child.stderr.read() if child.poll() is not None else b'' for child in procs])
+            self.assertFalse(set(groups[0])&set(groups[1]))
+            for child,group in zip(procs,groups):
+                self.assertTrue(all(path.name.startswith(f'neuronte-play-{child.pid}-') for path in group))
+            held=list(groups[1])
+            os.write(pipes[0],b'q');procs[0].wait(timeout=5)
+            self.assertEqual(self.shared_paths(procs[0].pid),[])
+            self.assertEqual(self.shared_paths(procs[1].pid),held)       # quitting one session leaves the other alone
+            self.drop_shared(procs[0].pid)
+            self.assertEqual(self.shared_paths(procs[1].pid),held)
+            os.write(pipes[1],b'q');procs[1].wait(timeout=5)
+            self.assertEqual(self.shared_paths(procs[1].pid),[])
+        finally:
+            for write in pipes:
+                try:os.close(write)
+                except OSError:pass
+            for child in procs:
+                if child.poll() is None:child.kill();child.wait()
+                self.drop_shared(child.pid)
+                if child.stderr:child.stderr.close()
 
     def test_untimed_player_keeps_every_frame_when_the_consumer_stalls(self):
         import base64,re,select,time
@@ -692,17 +1025,18 @@ class Video(unittest.TestCase):
                                      (8,8,0))
                 finally:
                     if child.poll() is None:child.kill();child.wait()
-                    for path in Path('/dev/shm').glob(f'neuronte-play-{child.pid}-*'):path.unlink(missing_ok=True)
+                    self.drop_shared(child.pid)
 
     def test_untimed_player_can_quit_while_the_consumer_is_blocked(self):
-        import time
-        began=time.monotonic()
-        code,out,err=self.player('--untimed','--frames','8','--transport','shm',
-                                 '--no-audio',keys=[(1.,b'q')],timeout=3)
+        # Quit only after three pictures are waiting. A sleep from process start
+        # can arrive before they exist and quit the player too early.
+        code,out,err=self.player('--untimed','--frames','8','--transport','shm','--no-audio',
+                                 keys=[(.15,b'q')],timeout=2,ready='backpressure')
         self.assertEqual(code,0,err)
-        self.assertLess(time.monotonic()-began,3)
+        self.assertLess(self.player_mark['done']-self.player_mark['ready'],2.5)
         self.assertEqual(out.count(b',t=s;'),3)
         self.assertIn(b'0 skipped for a busy terminal',err)
+        self.assertEqual(self.shared_paths(self.player_pid),[])
 
     def test_player_waits_for_the_terminal_to_take_the_final_shared_frame(self):
         import base64,re,select,time
@@ -736,7 +1070,9 @@ class Video(unittest.TestCase):
             made=subprocess.run(['ffmpeg','-v','error','-y','-f','lavfi','-i','testsrc2=size=64x48:rate=20','-f','lavfi','-i','sine=frequency=440',
                                  '-t','30','-c:v','mpeg4','-g','10','-c:a','pcm_s16le',clip],capture_output=True)
             if made.returncode:self.skipTest('ffmpeg cannot make the clip')
-            code,out,err=self.player('--audio-output','null','--log',str(log),source=clip,
+            # The first logged frame means the picture is running. A seek sent
+            # before that restarts the decoder first, so the log has no jump.
+            code,out,err=self.player('--audio-output','null','--log',str(log),source=clip,ready='log',timeout=15,
                                      keys=[(1.5,b'\x1b[C'),(1.2,b' '),(1.0,b' '),(1.0,b'\x1b[D'),(1.2,b'\x1b[A'),(.8,b'q')])
             self.assertEqual(code,0,err);self.assertIn(b'sound on',err)
             rows=[json.loads(line) for line in log.read_text().splitlines()]
@@ -911,7 +1247,7 @@ subprocess.Popen([sys.executable,'-c','import time;time.sleep(60)'],preexec_fn=w
                 except OSError:pass
 
     def test_player_leaves_no_shared_memory_when_the_window_goes(self):
-        import signal,time,glob
+        import signal,time
         with tempfile.TemporaryDirectory() as temp:
             clip=self.sound_clip(temp)
             cmd=[sys.executable,str(ROOT/'tools/neuronte-play.py'),clip,'--cols','6','--rows','3','--no-status','--audio-output','null','--transport','shm','--loop']
@@ -919,18 +1255,18 @@ subprocess.Popen([sys.executable,'-c','import time;time.sleep(60)'],preexec_fn=w
             with tempfile.TemporaryFile() as picture:
                 child=subprocess.Popen(cmd+['--input-fd',str(r)],stdout=picture,stderr=subprocess.PIPE,env=dict(os.environ,COLUMNS='80',LINES='24'),pass_fds=[r]);os.close(r)
                 try:
-                    mine=f'/dev/shm/neuronte-play-{child.pid}-*'
                     end=time.time()+20
-                    while time.time()<end and len(glob.glob(mine))<3:time.sleep(.05)
-                    self.assertEqual(len(glob.glob(mine)),3)      # nobody reads them here, so three wait
+                    while time.time()<end and len(self.shared_paths(child.pid))<3:time.sleep(.05)
+                    self.assertEqual(len(self.shared_paths(child.pid)),3)      # nobody reads them here, so three wait
                     child.send_signal(signal.SIGHUP);time.sleep(.05);child.send_signal(signal.SIGTERM)   # a closing terminal sends more than one
                     child.wait(timeout=20)
+                    self.assertEqual(self.shared_paths(child.pid),[])          # the player removed its own objects
+                    picture.seek(0);self.assertTrue(picture.read().endswith(b'\x1b[?1049l'))   # and the terminal is put back
                 finally:
                     os.close(w)
-                    if child.poll() is None:child.kill()
+                    if child.poll() is None:child.kill();child.wait()
+                    self.drop_shared(child.pid)
                     child.stderr.close()
-                self.assertEqual(glob.glob(mine),[])
-                picture.seek(0);self.assertTrue(picture.read().endswith(b'\x1b[?1049l'))   # and the terminal is put back
 
     def test_exact_video_asset(self):
         result=v.exactness()

@@ -100,7 +100,7 @@ static void check_width(int H)
 
 int main(void)
 {
-    const int widths[] = {1, 2, 3, 4, 6, 8, 12, 15, 17, 20, 48, 63, 64, 65, 128, 192, 255, 256, 257, 1024};
+    const int widths[] = {1, 2, 3, 4, 6, 8, 12, 15, 17, 20, 48, 63, 64, 65, 100, 128, 192, 255, 256, 257, 1024};
     for (size_t i = 0; i < sizeof widths / sizeof *widths; i++) check_width(widths[i]);
     puts("test_widths: scalar/vector/tail widths, final-neuron inference, cold/warm drawing and malformed shapes passed");
     return 0;

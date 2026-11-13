@@ -153,13 +153,16 @@ class Presenter:
                     fd = os.open('/dev/shm/' + candidate, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
                 except FileExistsError:
                     continue
-                with os.fdopen(fd, 'wb') as f: f.write(frame.tobytes())
+                # Cropping an odd-width picture leaves strided rows. NumPy's
+                # strided tobytes walks individual elements; a contiguous
+                # buffer uses row copies and can be written without another copy.
+                with os.fdopen(fd, 'wb') as f: f.write(memoryview(np.ascontiguousarray(frame)))
                 name = candidate; self.slot = (self.slot + tries + 1) % 3; break
             if name is None:
                 self.skipped += 1; return None
             out.append(f'\x1b_G{head},t=s;'.encode() + base64.standard_b64encode(name.encode()) + b'\x1b\\')
         else:
-            data = base64.standard_b64encode(zlib.compress(frame.tobytes(), 1))
+            data = base64.standard_b64encode(zlib.compress(memoryview(np.ascontiguousarray(frame)), 1))
             for start in range(0, len(data), 4096):
                 more = int(start + 4096 < len(data))
                 out.append(b'\x1b_G' + (head + ',o=z,' if not start else '').encode() + f'm={more};'.encode() + data[start:start+4096] + b'\x1b\\')
@@ -368,6 +371,7 @@ def main():
     p.add_argument('--pixel-size', type=pixel_size, metavar='WIDTHxHEIGHT',
                    help='pixels mode: retain this many RGB samples and display at natural pixel size')
     p.add_argument('--fps', type=float, help='default: the file\'s own rate')
+    p.add_argument('--filter-threads', type=int, default=1, help='scaling workers (default: 1; 0 lets ffmpeg choose)')
     p.add_argument('--start', type=float, default=0, help='begin at this many seconds')
     p.add_argument('--frames', type=int, help='stop after this many source frames')
     p.add_argument('--untimed', action='store_true', help='benchmark: process every frame as fast as possible, without sound')
@@ -389,6 +393,7 @@ def main():
     a = p.parse_args()
     if a.pixel_size and (a.mode != 'pixels' or a.cols is not None or a.rows is not None):
         p.error('--pixel-size requires pixels mode and cannot be combined with --cols or --rows')
+    if a.filter_threads < 0: p.error('--filter-threads must be nonnegative')
     for tool in ['ffmpeg', 'ffprobe']:
         if not shutil.which(tool): p.error(f'{tool} is required and was not found')
     if a.helper and (a.mode != 'cells' or a.characters != 'full'): p.error('--helper requires --mode cells --characters full')
@@ -443,7 +448,7 @@ def main():
     def decoder(position):
         g = geometry
         flags = 'lanczos+accurate_rnd+full_chroma_int+full_chroma_inp' if a.pixel_size else 'area'
-        cmd = ['ffmpeg', '-v', 'error', '-nostdin'] + (['-f', 'lavfi'] if a.lavfi else ['-ss', f'{position:.3f}']) \
+        cmd = ['ffmpeg', '-v', 'error', '-nostdin', '-filter_threads', str(a.filter_threads)] + (['-f', 'lavfi'] if a.lavfi else ['-ss', f'{position:.3f}']) \
             + ['-i', a.video, '-an', '-sn', '-vf', f'fps={fps},scale={g["w"]}:{g["h"]}:flags={flags}', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-']
         return subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, preexec_fn=with_us)
 

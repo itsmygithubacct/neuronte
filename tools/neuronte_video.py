@@ -126,6 +126,15 @@ class MultiInk:
         if colours.dtype != np.uint8 or colours.ndim != 4 or colours.shape[2:] != (8, 3):
             raise ValueError('colours must be rows x columns x 8 x 3 uint8')
         if self.ink_indices is not None:
+            if (self.width, self.height) == (2, 4):
+                # Write each actual neural ink selection into image order.
+                # Avoid the full patch-order take followed by an unpatch copy.
+                rows, cols = colours.shape[:2]
+                image = np.empty((rows * 4, cols * 2, 3), np.uint8)
+                for y in range(4):
+                    for x in range(2):
+                        image[y::4, x::2] = colours[:, :, self.ink_indices[y, x]]
+                return image
             return unpatch(np.take(colours, self.ink_indices, axis=2))
         p = np.einsum('rckd,khw->rchwd', colours.astype(np.float32), self.mix, optimize=True)
         return np.clip(np.rint(unpatch(p)), 0, 255).astype(np.uint8)

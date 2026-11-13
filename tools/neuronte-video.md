@@ -127,6 +127,11 @@ writes the totals. `--input-fd N` takes keys from a descriptor, for scripts.
 `--untimed` disables sound, clock waits and late-frame dropping for throughput
 measurements; `--frames N` bounds the work. Shared-memory backpressure still
 applies, so a benchmark consumer must read and unlink each published frame.
+The scaler defaults to one worker to reduce CPU overhead at terminal sizes.
+`--filter-threads 0` restores ffmpeg's automatic worker count; higher counts
+can help throughput at larger resolutions. This changes scheduling, not the
+scaling filter or neural reconstruction. Shared-memory shutdown waits up to
+200 ms for the terminal to take pending frames before reclaiming unread ones.
 
 ## Optional learned helpers
 

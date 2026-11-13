@@ -53,3 +53,12 @@ groups and exact interrupted/resumed CPU training. Set
 `DECOMPOSE_TEST_DEVICE=cuda` to run the independent-gradient comparison
 on CUDA. Timing, quality and production selection belong to the
 experiment's external research record, not the trainer's output loss.
+
+`decompose_pack.py DIRECTORY` verifies and packs the fixed matrix.
+`--completed-only` writes an explicitly partial manifest for progress checks.
+For an independently trained development directory, use e.g.
+`--recipe repertoire --parts 2 --unlabelled 0`. Each source must match that
+recipe, the teacher, both requested seeds and the complete 20,000-step schedule.
+The output records the development cohort and changed loss; it never changes
+the fixed matrix. Known-only models require the original unknown fallback
+when incorporated into a production bundle.

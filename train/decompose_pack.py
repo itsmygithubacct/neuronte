@@ -9,7 +9,15 @@ import decompose as d
 import pack
 
 
-def build(directory, seeds=(0,1), completed_only=False):
+def build(directory, seeds=(0,1), completed_only=False, *, recipe=None, parts=None, unlabelled=1.):
+    if recipe is None:
+        if parts is not None or unlabelled != 1:
+            raise ValueError('changed parts/loss require an explicit development recipe')
+        modes, counts, cohort = ('spatial','repertoire'), d.COUNTS, 'fixed-matrix'
+    else:
+        if recipe not in ('spatial','repertoire') or parts not in d.DEVELOPMENT_COUNTS or unlabelled not in (0,1):
+            raise ValueError('invalid development recipe')
+        modes, counts, cohort = (recipe,), (parts,), 'development'
     metadata=json.loads((directory/'teacher.json').read_text())
     if d.digest(directory/'teacher.npy') != metadata['sha256']:
         raise ValueError('teacher changed')
@@ -23,8 +31,8 @@ def build(directory, seeds=(0,1), completed_only=False):
         dest=directory/filename;shutil.copyfile(d.ROOT/'weights'/filename,dest)
         asset(name,dest)
         cases.append({'name':name,'kind':'bundle','members':[name],'routes':[0]*95,'design':'baseline'})
-    for mode in ('spatial','repertoire'):
-        for count in d.COUNTS:
+    for mode in modes:
+        for count in counts:
             specs=d.specs(mode,count)
             for seed in seeds:
                 name=f'{mode}-k{count}-s{seed}'
@@ -41,7 +49,7 @@ def build(directory, seeds=(0,1), completed_only=False):
                             doc['shape']['tau']!=.15/(spec['region'][1]-spec['region'][0]) or
                             any(experiment[k]!=v for k,v in spec.items()) or
                             identity['teacher']!=metadata or identity['steps']!=20000 or
-                            identity['unlabelled_weight']!=1 or identity['tf32'] is not False):
+                            identity['unlabelled_weight']!=unlabelled or identity['tf32'] is not False):
                         raise ValueError('candidate training identity differs: '+name)
                     if pack.scalars(str(sources[spec['index']]))[1]!=set(spec['scalars']):
                         raise ValueError('candidate repertoire differs: '+name)
@@ -71,12 +79,14 @@ def build(directory, seeds=(0,1), completed_only=False):
                 asset(name,path,parameters=parameters,source_sha256={p.name:d.digest(p) for p in sources})
                 cases.append({'name':name,'kind':'bundle','members':[name],'routes':routes,
                               'design':mode,'parts':count,'width':128//count,'seed':seed,
+                              'cohort':cohort,'unlabelled_weight':unlabelled,
                               'parameters':parameters,'canonical_patterns_per_handle':[95],
                               'regions':[s['region'] for s in specs],
                               'repertoires':[s['scalars'] for s in specs]})
     revision=subprocess.check_output(['git','rev-parse','HEAD'],cwd=d.ROOT,text=True).strip()
     manifest={'schema':'kilix-bench.ascii-experiment/v1','corpus':d.SCALARS,'teacher':metadata,
               'targets':metadata['targets'],'models':models,'cases':cases,'runtime_revision':revision,
+              'cohort':cohort,'recipe':{'modes':modes,'parts':counts,'unlabelled_weight':unlabelled},
               'campaign_complete':not missing,'missing_cases':missing,
               'packer_sources_sha256':{p.name:d.digest(p) for p in (Path(__file__),Path(pack.__file__))}}
     path=directory/('partial-manifest.json' if completed_only else 'manifest.json')
@@ -90,5 +100,9 @@ if __name__=='__main__':
     parser.add_argument('directory',type=Path)
     parser.add_argument('--seeds',default='0,1')
     parser.add_argument('--completed-only',action='store_true',help='explicitly marked partial manifest for progress quality checks')
+    parser.add_argument('--recipe',choices=('spatial','repertoire'),help='explicit separate development recipe')
+    parser.add_argument('--parts',type=int,choices=d.DEVELOPMENT_COUNTS)
+    parser.add_argument('--unlabelled',type=float,default=1.,choices=(0.,1.))
     args=parser.parse_args()
-    build(args.directory,tuple(int(s) for s in args.seeds.split(',')),args.completed_only)
+    build(args.directory,tuple(int(s) for s in args.seeds.split(',')),args.completed_only,
+          recipe=args.recipe,parts=args.parts,unlabelled=args.unlabelled)

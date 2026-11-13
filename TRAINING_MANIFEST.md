@@ -17,7 +17,7 @@ fails if this file is out of date.
   of its input and of the tool that made it.
 - **JSON, packed**: the first 16 hex digits of the SHA-256 of the weight
   file and of its packed `.nrt`, if one is shipped. The full hashes of
-  the 297 files it lists are in `weights/SHA256SUMS`. The pointer net's
+  the 327 files it lists are in `weights/SHA256SUMS`. The pointer net's
   files are not in that list; theirs are in
   `weights/neuronte-pointer-v0.sha256`.
 
@@ -32,14 +32,20 @@ fails if this file is out of date.
 - No training run has been repeated by a third party. Two seeds were
   trained by the project for the models whose `seed1` files are here.
 
-## Weight files (93)
+## Weight files (107)
 
 | Weight file | Set or drawing | Steps | Seed | Unlabelled weight | Pen radius | Sources hashed | After training | JSON | Packed |
 |---|---|---:|---:|---:|---:|---|---|---|---|
 | `neuronte-accent-v1.json` | accent | 20000 | 0 | 1.0 | 0.075 | `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `train/glyphs.py`, `train/strokes.py` | - | `5b19063025433ece` | - |
 | `neuronte-accent-v2.json` | accent | 40000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `train/glyphs.py`, `train/strokes.py`, `train/train.py` | - | `b1e194cd27d436ae` | `d4e29e75333c39c8` |
+| `neuronte-ascii-groups-v1-p0.json` | ascii-repertoire | 40000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `train/glyphs.py`, `train/strokes.py` | - | `efd3a69eccb1d2ef` | - |
+| `neuronte-ascii-groups-v1-p1.json` | ascii-repertoire | 40000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `train/glyphs.py`, `train/strokes.py` | - | `7c5bf3f2f1978a86` | - |
+| `neuronte-ascii-groups-v1-p2.json` | ascii-repertoire | 40000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `train/glyphs.py`, `train/strokes.py` | - | `ed4f1e97e9fdfffc` | - |
+| `neuronte-ascii-groups-v1-p3.json` | ascii-repertoire | 40000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `train/glyphs.py`, `train/strokes.py` | - | `cc2d9ea3e408379b` | - |
+| `neuronte-ascii-spatial-v1.json` | ascii-spatial-k2-s0 | 100000 | 0 | - | - | `ascii-spatial-k2-p0-s0.json`, `ascii-spatial-k2-p1-s0.json` | - | `d12bb1d00b7e4466` | `31b817fe78106606` |
 | `neuronte-ascii-v0.json` | - | 20000 | 0 | 1.0 | 0.075 | `font/strokes.txt` | - | `900ebaafc6a5ba2c` | `e1d3b97811dba461` |
 | `neuronte-braille-v0.json` | braille | 20000 | 0 | 1.0 | 0.075 | `train/glyphs.py`, `train/strokes.py` | - | `733bdf975abff08d` | - |
+| `neuronte-braille-v1.json` | braille | - | - | - | - | - | - | `e86a3e00f261d2f3` | `96ca3cf81e0df88a` |
 | `neuronte-draw-v2.json` | boxshade | 20000 | 1 | 1.0 | 0.075 | `train/glyphs.py`, `train/strokes.py` | - | `9d463ec642826349` | - |
 | `neuronte-emoji-e0-v0.json` | emoji-0of3 | 60000 | 0 | - | 0.075 | `font/code-masks.txt`, `font/emoji-manifest.json`, `font/emoji-palette.txt`, `font/emoji.txt`, `font/icons.txt`, `train/checkpoint.py`, `train/colour.py`, `train/colour_sources.py`, `train/emoji.py`, `train/glyphs.py`, `train/strokes.py` | output_bias_calibration | `93725d293e2d8437` | `b61c16931bf31376` |
 | `neuronte-emoji-e1-v0.json` | emoji-1of3 | 60000 | 0 | - | 0.075 | `font/code-masks.txt`, `font/emoji-manifest.json`, `font/emoji-palette.txt`, `font/emoji.txt`, `font/icons.txt`, `train/checkpoint.py`, `train/colour.py`, `train/colour_sources.py`, `train/emoji.py`, `train/glyphs.py`, `train/strokes.py` | output_bias_calibration | `99c45378334dcbbc` | `fc9d0124285dd0de` |
@@ -56,6 +62,14 @@ fails if this file is out of date.
 | `neuronte-pointer-v0.seed1.json` | pointer | 20000 | 1 | - | 0.075 | `font/code-masks.txt`, `font/pointer-palette.txt`, `font/pointer.txt`, `train/checkpoint.py`, `train/colour.py`, `train/colour_sources.py`, `train/glyphs.py`, `train/strokes.py` | coverage_calibration | `4bbddebee4793d88` | `744cceced55c62db` |
 | `neuronte-pointer-v0.seed1.raw.json` | pointer | 20000 | 1 | - | 0.075 | `font/code-masks.txt`, `font/pointer-palette.txt`, `font/pointer.txt`, `train/checkpoint.py`, `train/colour.py`, `train/colour_sources.py`, `train/glyphs.py`, `train/strokes.py` | - | `97727aa8480904a0` | `51c9d08a96ab09cf` |
 | `neuronte-symbol-v0.json` | symbol | 20000 | 0 | 1.0 | 0.075 | `font/symbols.txt`, `train/glyphs.py`, `train/strokes.py` | - | `981629fc7e61c49c` | - |
+| `neuronte-symbol-v1-g0.json` | symbol-repertoire | 80000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/symbols.txt`, `train/glyphs.py`, `train/strokes.py` | - | `c4d1d5d23d5adf1c` | - |
+| `neuronte-symbol-v1-g0.seed1.json` | symbol-repertoire | 80000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/symbols.txt`, `train/glyphs.py`, `train/strokes.py` | - | `522029f52830492c` | - |
+| `neuronte-symbol-v1-g1.json` | symbol-repertoire | 80000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/symbols.txt`, `train/glyphs.py`, `train/strokes.py` | - | `b1e41f192067ba0d` | - |
+| `neuronte-symbol-v1-g1.seed1.json` | symbol-repertoire | 80000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/symbols.txt`, `train/glyphs.py`, `train/strokes.py` | - | `f1bc475623cd2afb` | - |
+| `neuronte-symbol-v1-g2.json` | symbol-repertoire | 80000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/symbols.txt`, `train/glyphs.py`, `train/strokes.py` | - | `422ee8cbba1ff3be` | - |
+| `neuronte-symbol-v1-g2.seed1.json` | symbol-repertoire | 80000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/symbols.txt`, `train/glyphs.py`, `train/strokes.py` | - | `300fa393d4b15b65` | - |
+| `neuronte-symbol-v1-g3.json` | symbol-repertoire | 80000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/symbols.txt`, `train/glyphs.py`, `train/strokes.py` | - | `c314b7cfa0d1315b` | - |
+| `neuronte-symbol-v1-g3.seed1.json` | symbol-repertoire | 80000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/symbols.txt`, `train/glyphs.py`, `train/strokes.py` | - | `26460df1f75f2fa3` | - |
 | `neuronte-ui-large-v0.json` | uilarge | 20000 | 0 | 0.0 | 0.046875 | `font/ui-large.txt`, `train/glyphs.py`, `train/strokes.py` | - | `2b914704f7c4b81f` | `00736e339edc6eda` |
 | `neuronte-ui1-v0.json` | ui1 | 20000 | 0 | 0.0 | 0.55 | `font/ui-1.txt`, `train/glyphs.py`, `train/strokes.py` | - | `589a33bbdac6d0b6` | `74792e9cf615c7d1` |
 | `neuronte-ui10-italic-v0.json` | ui10i | 20000 | 0 | 0.0 | 0.05500000000000001 | `font/ui-10-italic.txt`, `train/glyphs.py`, `train/strokes.py` | - | `df1ae419c09ceb7c` | `f734c7bc51cd18fe` |
@@ -136,3 +150,4 @@ fails if this file is out of date.
 |---|---|---:|
 | `neuronte-full-v3.validation.json` | `d05f14f6c0d0e6ed2077d6007b4a5f588e4ca802` | 1 |
 | `neuronte-split-v5.validation.json` | `d05f14f6c0d0e6ed2077d6007b4a5f588e4ca802` | 0 |
+| `neuronte-symbol-v1.validation.json` | `be17cff1b03315ba6c2c2bde8b39f3b11618f34f` | 0 |

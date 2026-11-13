@@ -69,3 +69,12 @@ For seeds `0,1`, train homogeneous slices `(start,batch-models)` of `(0,1)`,
 the original expert for unknown-scalar rendering. The accent packager does
 so for both spatial and repertoire designs, retaining all original gate rows
 and routing only labelled accent scalars to appended members.
+
+`known_bundle.py BASE.nrt OUT.nrt REPLACEMENT.json... --expert INDEX`
+appends complete known-character replacements to an existing version2 bundle.
+Original members remain byte-identical for unknown and unrelated glyphs.
+Only the selected expert's table entries move. The packer preserves original
+gate rows and appends suppressed outputs after establishing conservative
+activation/output bounds. `--allow-partial` explicitly permits mixed-width
+fallback. The provenance sidecar binds the original bytes, replacements,
+new ranges and output hash. Validate resulting quality before deployment.

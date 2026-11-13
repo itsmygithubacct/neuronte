@@ -96,6 +96,71 @@ class Video(unittest.TestCase):
         fractional=v.MultiInk(ROOT/'weights/neuronte-split-v4.nrt')
         self.assertIsNone(fractional.ink_indices)
 
+    def test_native_rgb_composition_matches_independent_blend_and_odd_edges(self):
+        rng = np.random.default_rng(71)
+        for width, height in ((1,1), (1,9), (7,1), (17,13), (945,531)):
+            image = rng.integers(0,256,(height,width,3),dtype=np.uint8)
+            model = v.MultiInk()
+            self.assertIsNotNone(model.native_rgb24)
+            output = np.empty_like(image)
+            self.assertIs(model.render_rgb24(image, output), output)
+            model.ink_indices = None  # evaluate the learned continuous blend independently
+            padded = np.pad(image,((0,-height%4),(0,-width%2),(0,0)),mode='edge')
+            np.testing.assert_array_equal(output, model.decode(model.encode(padded))[:height,:width])
+        # A different learned binary selection must change the pixels. Keep
+        # mix and indices consistent while exchanging the first two inks.
+        for exchange in (1, 2, 4):
+            model = v.MultiInk()
+            model.ink_indices = model.ink_indices ^ exchange
+            model.mix = model.mix[np.arange(8) ^ exchange]
+            rendered = model.render_rgb24(image)
+            self.assertFalse(np.array_equal(rendered, image))
+            model.ink_indices = None
+            np.testing.assert_array_equal(rendered, model.decode(model.encode(padded))[:height,:width])
+
+    def test_rgb_fallback_fractional_models_and_output_ownership(self):
+        image = np.arange(17*13*3,dtype=np.uint8).reshape(13,17,3)
+        for model in (v.MultiInk(), v.MultiInk(ROOT/'weights/neuronte-split-v4.nrt')):
+            native = model.render_rgb24(image)
+            model.native_rgb24 = None
+            np.testing.assert_array_equal(native, model.render_rgb24(image))
+            with self.assertRaisesRegex(ValueError,'overlap'):model.render_rgb24(image,image)
+            with self.assertRaises(ValueError):model.render_rgb24(image,np.empty((1,1,3),np.uint8))
+            output=np.empty_like(image);output.flags.writeable=False
+            with self.assertRaises(ValueError):model.render_rgb24(image,output)
+        model=v.MultiInk()
+        np.testing.assert_array_equal(model.render_rgb24(image[:,::-1]), image[:,::-1])
+
+    def test_reusable_rgb_reader_handles_fragmentation_eof_and_truncation(self):
+        class Short(io.BytesIO):
+            def readinto(self, buf):return super().readinto(buf[:5])
+        reader=v.RGBFrameReader(2,2)
+        stream=Short(bytes(range(24)))
+        first=reader.read(stream)
+        self.assertEqual(first.tobytes(),bytes(range(12)))
+        self.assertIs(first,reader.read(stream))
+        self.assertEqual(first.tobytes(),bytes(range(12,24)))
+        self.assertIsNone(reader.read(stream))
+        with self.assertRaisesRegex(ValueError,'truncated'):reader.read(Short(b'abc'))
+
+    def test_decoder_builder_keeps_thread_options_on_their_input_and_output(self):
+        command=v.decoder_command('input.mp4',945,531,30,start=2.25,chroma='left',decoder_threads=4)
+        pos=command.index('-i')
+        self.assertIn('-threads:v',command[:pos])
+        self.assertEqual(command[command.index('-threads:v')+1],'4')
+        self.assertEqual(command[command.index('-threads:v',pos)+1],'1')
+        self.assertIn('in_chroma_loc=left',command[command.index('-vf')+1])
+        for options in ({'start':float('nan')},{'chroma':'unknown'},{'decoder_threads':-1}):
+            with self.assertRaises(ValueError):v.decoder_command('input.mp4',945,531,30,**options)
+        outputs=[]
+        for decoder,encoder in ((0,0),(0,1),(2,1)):
+            command=v.decoder_command('testsrc2=size=64x36:rate=24:duration=0.2',17,13,24,
+                                      lavfi=True,decoder_threads=decoder,output_threads=encoder)
+            outputs.append(subprocess.check_output(command))
+        self.assertEqual(len(outputs[0]),5*17*13*3)
+        self.assertEqual(outputs[0],outputs[1])
+        self.assertEqual(outputs[0],outputs[2])
+
     def test_helper_numpy_reference(self):
         from neuronte_video_helpers import Helper
         for version,kind,n in [(ver,kind,n) for ver in ('v0','v1') for kind,n in [('speed',24),('quality',51)]]:

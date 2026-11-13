@@ -9,6 +9,7 @@ import ctypes as C
 import json
 import sys
 import struct
+import math
 import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -98,12 +99,19 @@ class MultiInk:
         weights = weights or ROOT / 'weights/neuronte-video-masks-v0.nrt'
         with NeuralMasks(weights, library) as net:
             masks = np.stack([net.mask(cp, cell_w, cell_h) for cp in self.planes])
+            self.library = net.lib
+        self.native_rgb24 = getattr(self.library, 'neuronte_video_rgb24', None)
+        if self.native_rgb24 is not None:
+            self.native_rgb24.argtypes = [C.c_void_p, C.c_size_t, C.c_size_t,
+                                         C.c_void_p, C.c_size_t, C.c_size_t,
+                                         C.c_int, C.c_int, C.c_void_p]
+            self.native_rgb24.restype = C.c_int
         # Integer selection is valid only AFTER the actual neural masks are
         # exactly binary. No coverage is rounded and no geometric mask is
         # substituted. Fractional models retain the continuous blend below.
         self.ink_indices = None
         if np.all((masks == 0) | (masks == 1)):
-            self.ink_indices = (masks[0] + 2*masks[1] + 4*masks[2]).astype(np.intp)
+            self.ink_indices = (masks[0] + 2*masks[1] + 4*masks[2]).astype(np.uint8)
         self.mix = np.stack([np.prod(np.stack([masks[b] if k >> b & 1 else 1 - masks[b] for b in range(3)]), axis=0) for k in range(8)])
 
     def encode(self, rgb):
@@ -119,6 +127,40 @@ class MultiInk:
             means = p.reshape(rows, cols, 4, self.height // 4, 2, self.width // 2, 3).mean(axis=(3, 5))
             for y, label in enumerate(self.row_labels):
                 out[:, :, label * 2:label * 2 + 2] = np.rint(means[:, :, y]).astype(np.uint8)
+        return out
+
+    def render_rgb24(self, rgb, out=None):
+        """Render 2x4 cells at source size, reusing an optional RGB buffer.
+
+        The C path uses the actual binary neural ink map. Older libraries
+        and fractional models retain the independent palette/blend path.
+        Odd edges replicate exactly as pad -> encode -> decode -> crop.
+        """
+        rgb = np.asarray(rgb)
+        if ((self.width, self.height) != (2, 4) or rgb.dtype != np.uint8 or
+                rgb.ndim != 3 or rgb.shape[2] != 3 or min(rgb.shape[:2]) < 1):
+            raise ValueError('natural RGB rendering requires 2x4 cells and nonempty HxWx3 uint8')
+        if out is None:
+            out = np.empty(rgb.shape, np.uint8)
+        if (not isinstance(out, np.ndarray) or out.shape != rgb.shape or
+                out.dtype != np.uint8 or not out.flags.c_contiguous or not out.flags.writeable):
+            raise ValueError('output must be a writable contiguous RGB array of the same shape')
+        if np.shares_memory(rgb, out):
+            raise ValueError('source and output must not overlap')
+        rgb = np.ascontiguousarray(rgb)
+        height, width = rgb.shape[:2]
+        if self.native_rgb24 is not None and self.ink_indices is not None:
+            indices = np.ascontiguousarray(self.ink_indices, dtype=np.uint8)
+            if indices.shape != (4, 2):
+                raise ValueError('binary ink map must be 4x2')
+            result = self.native_rgb24(rgb.ctypes.data, rgb.nbytes, rgb.strides[0],
+                                       out.ctypes.data, out.nbytes, out.strides[0],
+                                       width, height, indices.ctypes.data)
+            if result:
+                raise ValueError(f'native RGB composition failed: {result}')
+        else:
+            padded = np.pad(rgb, ((0, -height % 4), (0, -width % 2), (0, 0)), mode='edge')
+            np.copyto(out, self.decode(self.encode(padded))[:height, :width])
         return out
 
     def decode(self, colours):
@@ -138,6 +180,55 @@ class MultiInk:
             return unpatch(np.take(colours, self.ink_indices, axis=2))
         p = np.einsum('rckd,khw->rchwd', colours.astype(np.float32), self.mix, optimize=True)
         return np.clip(np.rint(unpatch(p)), 0, 255).astype(np.uint8)
+
+
+class RGBFrameReader:
+    """Read complete RGB frames into one reusable array.
+
+    A returned frame is valid until the next read. EOF before a frame returns
+    None; EOF within a frame is an error rather than an apparently clean end.
+    """
+    def __init__(self, width, height):
+        if width < 1 or height < 1:
+            raise ValueError('frame size must be positive')
+        self.frame = np.empty((height, width, 3), np.uint8)
+        self.buffer = memoryview(self.frame).cast('B')
+
+    def read(self, stream):
+        offset = 0
+        while offset < len(self.buffer):
+            size = stream.readinto(self.buffer[offset:])
+            if not size:
+                if offset:
+                    raise ValueError('truncated RGB frame')
+                return None
+            offset += size
+        return self.frame
+
+
+def decoder_command(video, width, height, fps, *, start=0., chroma=None,
+                    lavfi=False, exact_pixels=True, filter_threads=1,
+                    decoder_threads=0, output_threads=1):
+    """Build the shared RGB decoder command used by playback and benchmarks.
+
+    Decoder threads precede the input; rawvideo encoder threads follow it.
+    Keeping these separate makes startup buffering and CPU costs measurable.
+    """
+    if (width < 1 or height < 1 or not math.isfinite(fps) or fps <= 0 or
+            not math.isfinite(start) or start < 0 or
+            min(filter_threads, decoder_threads, output_threads) < 0):
+        raise ValueError('invalid video geometry, timing or thread count')
+    flags = 'lanczos+accurate_rnd+full_chroma_int+full_chroma_inp' if exact_pixels else 'area'
+    scale = f'scale={width}:{height}:flags={flags}'
+    if chroma is not None:
+        if chroma not in ('left', 'center', 'topleft', 'top', 'bottomleft', 'bottom'):
+            raise ValueError('unknown source chroma location')
+        scale += ':in_chroma_loc=' + chroma
+    return ['ffmpeg', '-v', 'error', '-nostdin', '-filter_threads', str(filter_threads),
+            '-threads:v', str(decoder_threads),
+            *(['-f', 'lavfi'] if lavfi else ['-ss', f'{start:.3f}']),
+            '-i', str(video), '-an', '-sn', '-vf', f'fps={fps},{scale}',
+            '-threads:v', str(output_threads), '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-']
 
 
 def candidates(mode, width, height, weights=None, library=None):

@@ -95,7 +95,7 @@ FLAME = weights/neuronte-flame-v0
 # The icon net: a colour net, form A, a version 3 file by itself. It is not
 # in the bundle; neuronte-split-v5 is the default font.
 ICON = weights/neuronte-icon-v1
-OBJS = build/neuronte.o build/utf8.o
+OBJS = build/neuronte.o build/utf8.o build/video.o
 TOOLS = build/neuronte-render build/neuronte-bench
 TESTS = build/test_utf8 build/test_api
 
@@ -339,7 +339,8 @@ clean:
 # Video is an optional Python/numpy/scipy tool; its tests are separate from
 # the dependency-light C/font acceptance suite.
 .PHONY: test-video
-test-video: build/libneuronte.so build/video-decoder-bench
+test-video: build/libneuronte.so build/video-decoder-bench build/test_video
+	./build/test_video
 	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_video.py
 	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_video_decoder.py
 	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_reference.py build/libneuronte.so --bundle weights/neuronte-video-masks-v0.nrt weights/neuronte-video-pixel-v1.json weights/neuronte-video-ascii-v0.json --fallback 1

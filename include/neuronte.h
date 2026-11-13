@@ -59,6 +59,19 @@ int neuronte_open(const void *data, size_t len, neuronte **out);
 int neuronte_open_file(const char *path, neuronte **out);
 void neuronte_close(neuronte *n);
 
+/* Compose natural-size RGB24 using eight cached neural ink selections for
+ * one 2x4 cell. ink_indices is row-major, each value 0..7, and must be
+ * derived only from exactly binary coverage masks. Fractional models need
+ * their continuous blend. This fuses Gray-labelled palette packing and
+ * selection without allocating an intermediate palette or padded image.
+ * Partial cells replicate source edges. Strides are bytes between rows;
+ * src_bytes/dst_bytes cover all rows, including inter-row padding. Source
+ * and output must not overlap. On invalid arguments no output is written.
+ * The caller owns all buffers. Returns NEURONTE_OK or NEURONTE_ERR_ARG. */
+int neuronte_video_rgb24(const uint8_t *src, size_t src_bytes, size_t src_stride,
+                        uint8_t *dst, size_t dst_bytes, size_t dst_stride,
+                        int width, int height, const uint8_t ink_indices[8]);
+
 /* The number of weights and biases, over all nets and the router's gate,
  * or 0 for NULL. A colour net counts its trunk and its palette head. */
 size_t neuronte_parameters(const neuronte *n);

@@ -42,7 +42,7 @@ import numpy as np
 # Installed payloads are verified source trees. Keep runtime imports from
 # adding __pycache__ files that would make the next upgrade see local changes.
 sys.dont_write_bytecode = True
-from neuronte_video import TwoInk, MultiInk, ROOT
+from neuronte_video import TwoInk, MultiInk, RGBFrameReader, decoder_command, ROOT
 
 try: LIBC = ctypes.CDLL(None)        # loaded now, so a child has nothing to load between fork and exec
 except OSError: LIBC = None
@@ -197,15 +197,6 @@ def text(renderer, cells, previous, left, top):
         bg, fg = c
         out.append(f'\x1b[{y+top};{x+left}H\x1b[38;2;{fg[0]};{fg[1]};{fg[2]}m\x1b[48;2;{bg[0]};{bg[1]};{bg[2]}m' + chr(int(renderer.scalars[i])))
     return (''.join(out) + '\x1b[0m\x1b[?2026l').encode()
-
-
-def read_exact(stream, size):
-    parts = []; remaining = size
-    while remaining:
-        part = stream.read(remaining)
-        if not part: return None
-        parts.append(part); remaining -= len(part)
-    return b''.join(parts)
 
 
 class Keys:
@@ -374,6 +365,7 @@ def main():
                    help='pixels mode: retain this many RGB samples and display at natural pixel size')
     p.add_argument('--fps', type=float, help='default: the file\'s own rate')
     p.add_argument('--filter-threads', type=int, default=1, help='scaling workers (default: 1; 0 lets ffmpeg choose)')
+    p.add_argument('--decoder-threads', type=int, default=0, help='codec workers (default: 0 lets ffmpeg choose; fewer use less memory)')
     p.add_argument('--start', type=float, default=0, help='begin at this many seconds')
     p.add_argument('--frames', type=int, help='stop after this many source frames')
     p.add_argument('--untimed', action='store_true', help='benchmark: process every frame as fast as possible, without sound')
@@ -396,6 +388,7 @@ def main():
     if a.pixel_size and (a.mode != 'pixels' or a.cols is not None or a.rows is not None):
         p.error('--pixel-size requires pixels mode and cannot be combined with --cols or --rows')
     if a.filter_threads < 0: p.error('--filter-threads must be nonnegative')
+    if a.decoder_threads < 0: p.error('--decoder-threads must be nonnegative')
     for tool in ['ffmpeg', 'ffprobe']:
         if not shutil.which(tool): p.error(f'{tool} is required and was not found')
     if a.helper and (a.mode != 'cells' or a.characters != 'full'): p.error('--helper requires --mode cells --characters full')
@@ -449,11 +442,9 @@ def main():
 
     def decoder(position):
         g = geometry
-        flags = 'lanczos+accurate_rnd+full_chroma_int+full_chroma_inp' if a.pixel_size else 'area'
-        scale = f'scale={g["w"]}:{g["h"]}:flags={flags}'
-        if chroma: scale += f':in_chroma_loc={chroma}'
-        cmd = ['ffmpeg', '-v', 'error', '-nostdin', '-filter_threads', str(a.filter_threads)] + (['-f', 'lavfi'] if a.lavfi else ['-ss', f'{position:.3f}']) \
-            + ['-i', a.video, '-an', '-sn', '-vf', f'fps={fps},{scale}', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-']
+        cmd = decoder_command(a.video, g['w'], g['h'], fps, start=position, chroma=chroma,
+                              lavfi=a.lavfi, exact_pixels=bool(a.pixel_size), filter_threads=a.filter_threads,
+                              decoder_threads=a.decoder_threads)
         return subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, preexec_fn=with_us)
 
     def draw_pixels(colours):
@@ -463,6 +454,19 @@ def main():
     def present_pixels(picture):
         return presenter.frame(picture, geometry['c'], geometry['r'], geometry['left'], geometry['top'],
                                natural=bool(a.pixel_size))
+
+    reader = output_frame = None
+
+    def read_pixels():
+        nonlocal reader, output_frame
+        shape = (geometry['h'], geometry['w'], 3)
+        if reader is None or reader.frame.shape != shape:
+            reader = RGBFrameReader(geometry['w'], geometry['h'])
+            output_frame = np.empty(shape, np.uint8) if a.pixel_size else None
+        return reader.read(source.stdout)
+
+    def render_natural(frame):
+        return renderer.render_rgb24(frame, out=output_frame)
 
     keys = Keys(a.input_fd); presenter = Presenter(out, transport)
     source = clock = None; shown = dropped = count = skipped = seeks = 0; failure = ''; resized = []
@@ -500,11 +504,14 @@ def main():
                     target = max(0., min(target, max(0., duration - 1)) if duration else target)
                     restart(target); clock.seek(target); seeks += 1; drawn = -1.
                     if paused:                              # show where we landed, then hold
-                        raw = read_exact(source.stdout, geometry['w'] * geometry['h'] * 3); waiting = False
-                        if raw is not None:
-                            frame = np.frombuffer(raw, np.uint8).reshape(geometry['h'], geometry['w'], 3); index = 1
-                            payload = present_pixels(draw_pixels(fitter.encode(pad_cells(frame, fitter)))) \
-                                if a.mode == 'pixels' else text(renderer, renderer.fit(frame), None, geometry['left'], geometry['top'])
+                        frame = read_pixels(); waiting = False
+                        if frame is not None:
+                            index = 1
+                            if a.mode == 'pixels':
+                                picture = render_natural(frame) if a.pixel_size else draw_pixels(fitter.encode(pad_cells(frame, fitter)))
+                                payload = present_pixels(picture)
+                            else:
+                                payload = text(renderer, renderer.fit(frame), None, geometry['left'], geometry['top'])
                             if payload: out.write(payload); out.flush()
             if resized:
                 del resized[:]; layout(); out.write(b'\x1b[2J'); restart(clock.time()); drawn = -1.
@@ -513,12 +520,12 @@ def main():
                 out.write(status(now, duration, paused, clock.volume, geometry['cols'], geometry['status'])); out.flush(); drawn = now
             if paused: continue
             t0 = time.perf_counter()
-            raw = read_exact(source.stdout, geometry['w'] * geometry['h'] * 3)
+            frame = read_pixels()
             t1 = time.perf_counter()
             if waiting:
                 waiting = False
                 if not paused: clock.pause(False)
-            if raw is None:                                 # the end, or ffmpeg gave up: say which
+            if frame is None:                               # the end, or ffmpeg gave up: say which
                 if source.wait(): failure = source.stderr.read().decode(errors='replace').strip(); break
                 if not a.loop: break
                 restart(0.); clock.seek(0.); continue
@@ -528,10 +535,14 @@ def main():
                 dropped += 1; record['dropped'] = True
                 if log: log.write(json.dumps(record) + '\n')
                 continue
-            frame = np.frombuffer(raw, np.uint8).reshape(geometry['h'], geometry['w'], 3)
             if a.mode == 'pixels':
-                colours = fitter.encode(pad_cells(frame, fitter)); t2 = time.perf_counter()
-                picture = draw_pixels(colours); t3 = time.perf_counter()
+                if a.pixel_size:
+                    t2 = t1  # fitting and drawing are fused in the natural-size path
+                    picture = render_natural(frame)
+                else:
+                    colours = fitter.encode(pad_cells(frame, fitter)); t2 = time.perf_counter()
+                    picture = draw_pixels(colours)
+                t3 = time.perf_counter()
                 payload = present_pixels(picture)
             else:
                 if helper is not None:
@@ -560,6 +571,8 @@ def main():
             if log: log.write(json.dumps(record) + '\n')
     except (KeyboardInterrupt, BrokenPipeError):
         pass
+    except ValueError as exc:
+        failure = str(exc)
     finally:
         for number in (signal.SIGTERM, signal.SIGHUP, signal.SIGINT): signal.signal(number, signal.SIG_IGN)   # a second signal must not cut this short
         elapsed = time.perf_counter() - began

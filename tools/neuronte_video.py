@@ -7,6 +7,7 @@ No coverage thresholding is performed. See tools/neuronte-video.md.
 from pathlib import Path
 import ctypes as C
 import json
+import os
 import sys
 import struct
 import math
@@ -213,6 +214,25 @@ class MultiInk:
             raise ValueError(f'native planar composition failed: {result}')
         return out
 
+    def render_planes(self, red, green, blue, stride, width, height, out):
+        """render_gbrp for three plane addresses that share one row stride,
+        such as a MediaStream frame; no plane is copied first. Requires the
+        native compositor and a binary learned ink map."""
+        if self.native_planes is None or self.ink_indices is None or (self.width, self.height) != (2, 4):
+            raise ValueError('planes by address need the native compositor and a binary 2x4 ink map')
+        if width < 1 or height < 1 or stride < width:
+            raise ValueError('invalid plane geometry')
+        if (not isinstance(out, np.ndarray) or out.shape != (height, width, 3) or
+                out.dtype != np.uint8 or not out.flags.c_contiguous or not out.flags.writeable):
+            raise ValueError('output must be a writable contiguous RGB array of the planes\' size')
+        indices = np.ascontiguousarray(self.ink_indices, dtype=np.uint8)
+        result = self.native_planes(red, green, blue, (height - 1) * stride + width, stride,
+                                    out.ctypes.data, out.nbytes, out.strides[0],
+                                    width, height, indices.ctypes.data)
+        if result:
+            raise ValueError(f'native planar composition failed: {result}')
+        return out
+
     def decode(self, colours):
         colours = np.asarray(colours)
         if colours.dtype != np.uint8 or colours.ndim != 4 or colours.shape[2:] != (8, 3):
@@ -286,6 +306,119 @@ def decoder_command(video, width, height, fps, *, start=0., chroma=None,
             *(['-f', 'lavfi'] if lavfi else ['-ss', f'{start:.3f}']),
             '-i', str(video), '-an', '-sn', '-vf', f'fps={fps},{scale}',
             '-threads:v', str(output_threads), '-f', 'rawvideo', '-pix_fmt', pix_fmt, '-']
+
+
+class MediaFrame(C.Structure):
+    """struct neuronte_media_frame (include/neuronte_media.h)."""
+    _fields_ = [('data', C.c_void_p * 4), ('linesize', C.c_int * 4), ('width', C.c_int),
+                ('height', C.c_int), ('planes', C.c_int), ('number', C.c_int64)]
+
+
+class MediaDecoder:
+    """decoder_command's frames decoded inside this process.
+
+    build/libneuronte-media.so repeats what FFmpeg 7.1's command does with
+    the same arguments (include/neuronte_media.h), without a process start,
+    a second probe or a pipe for each start and seek. open() takes what
+    decoder_command takes and passes the library the command's own -ss,
+    -vf, -pix_fmt and thread arguments. It returns None where the command
+    must run instead: an lavfi source, other FFmpeg libraries, an input the
+    library declines, or one it cannot open (the command then reports the
+    error as before).
+    """
+    OK, END, AGAIN, ERROR, UNSUPPORTED, ARG = 0, 1, 2, -1, -2, -3
+
+    def __init__(self, library=None):
+        self.lib = C.CDLL(str(library or ROOT / 'build/libneuronte-media.so'))
+        self.lib.neuronte_media_open.argtypes = [C.POINTER(C.c_void_p), C.c_char_p, C.c_char_p, C.c_char_p,
+                                                 C.c_char_p, C.c_int, C.c_int, C.c_char_p, C.c_int]
+        self.lib.neuronte_media_open.restype = C.c_int
+        self.lib.neuronte_media_next.argtypes = [C.c_void_p, C.POINTER(MediaFrame), C.c_int]
+        self.lib.neuronte_media_next.restype = C.c_int
+        self.lib.neuronte_media_message.argtypes = [C.c_void_p]
+        self.lib.neuronte_media_message.restype = C.c_char_p
+        self.lib.neuronte_media_close.argtypes = [C.c_void_p]
+        self.lib.neuronte_media_close.restype = None
+
+    def open(self, video, width, height, fps, **options):
+        command = decoder_command(video, width, height, fps, **options)
+        if '-ss' not in command:
+            return None
+
+        def value(flag):
+            return command[command.index(flag) + 1]
+        handle, message = C.c_void_p(), C.create_string_buffer(1024)
+        status = self.lib.neuronte_media_open(C.byref(handle), os.fsencode(video), value('-ss').encode(),
+                                              value('-vf').encode(), value('-pix_fmt').encode(),
+                                              int(value('-threads:v')), int(value('-filter_threads')),
+                                              message, len(message))
+        if status == self.ARG:
+            raise ValueError('invalid in-process decoder arguments')
+        if status != self.OK:
+            return None
+        return MediaStream(self.lib, handle, width, height, value('-pix_fmt') == 'gbrp')
+
+
+class MediaStream:
+    """One run of MediaDecoder: the frames one ffmpeg process would write."""
+
+    def __init__(self, lib, handle, width, height, planar):
+        self.lib, self.handle = lib, handle
+        self.width, self.height, self.planar = width, height, planar
+        self.frame = MediaFrame()
+        self.failure = ''
+
+    def read(self, wait_ms=None):
+        """The next frame, valid until the next read or close; None at the
+        end. failure then says why, if decoding failed. A finite wait_ms
+        returns b'' when no frame is ready, so callers can handle controls."""
+        if not self.handle:
+            raise ValueError('the decoder is closed')
+        if wait_ms is not None and (not isinstance(wait_ms, int) or wait_ms < 0):
+            raise ValueError('wait_ms must be a nonnegative integer or None')
+        while True:
+            # A bounded wait lets Python handle signals between calls.
+            status = self.lib.neuronte_media_next(self.handle, C.byref(self.frame),
+                                                 100 if wait_ms is None else wait_ms)
+            if status == MediaDecoder.AGAIN and wait_ms is not None:
+                return b''
+            if status != MediaDecoder.AGAIN:
+                break
+        if status == MediaDecoder.OK:
+            frame = self.frame
+            if (frame.width, frame.height) != (self.width, self.height) or frame.planes < (3 if self.planar else 1):
+                raise ValueError('a decoded frame does not have the requested size and layout')
+            return frame
+        if status == MediaDecoder.ERROR:
+            self.failure = (self.lib.neuronte_media_message(self.handle) or b'').decode(errors='replace').strip() \
+                or 'decoding failed'
+        return None
+
+    def planes(self, frame):
+        """(red, green, blue, stride) addresses of a gbrp frame whose planes
+        share one stride, or None."""
+        if not self.planar or len(set(frame.linesize[:3])) != 1:
+            return None
+        return frame.data[2], frame.data[0], frame.data[1], frame.linesize[0]
+
+    def copy(self, frame, out):
+        """Copy a frame into an array of RGBFrameReader's layout."""
+        row = self.width * (1 if self.planar else 3)
+        for index, target in enumerate(out if self.planar else [out.reshape(self.height, row)]):
+            stride = frame.linesize[index]
+            span = (self.height - 1) * stride + row
+            flat = np.ctypeslib.as_array((C.c_uint8 * span).from_address(frame.data[index]))
+            np.copyto(target.reshape(self.height, row),
+                      np.lib.stride_tricks.as_strided(flat, (self.height, row), (stride, 1)))
+        return out
+
+    def close(self):
+        if self.handle:
+            self.lib.neuronte_media_close(self.handle)
+            self.handle = None
+
+    def __del__(self):
+        self.close()
 
 
 def candidates(mode, width, height, weights=None, library=None):

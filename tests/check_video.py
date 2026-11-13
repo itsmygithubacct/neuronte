@@ -271,6 +271,26 @@ class Video(unittest.TestCase):
         finally:
             decoder.close()
 
+    def test_in_process_decoder_yields_to_playback_controls(self):
+        class Library:
+            def __init__(self): self.waits=[]
+            def neuronte_media_next(self,handle,frame,wait):
+                self.waits.append(wait)
+                return v.MediaDecoder.AGAIN if len(self.waits)==1 else v.MediaDecoder.END
+            def neuronte_media_close(self,handle): pass
+        library=Library()
+        stream=v.MediaStream(library,1,2,2,False)
+        spec=importlib.util.spec_from_file_location('neuronte_play',ROOT/'tools/neuronte-play.py')
+        play=importlib.util.module_from_spec(spec);spec.loader.exec_module(play)
+        source=play.LibraryFrames(stream)
+        try:
+            self.assertEqual(source.read(12,.025),b'')
+            self.assertEqual(library.waits,[25])
+            self.assertIsNone(source.read(12,0))
+            self.assertEqual(library.waits,[25,0])
+            self.assertEqual(source.failure(),'')
+        finally: source.close()
+
     def test_helper_numpy_reference(self):
         from neuronte_video_helpers import Helper
         for version,kind,n in [(ver,kind,n) for ver in ('v0','v1') for kind,n in [('speed',24),('quality',51)]]:
@@ -769,21 +789,27 @@ while True:
             self.assertLess(abs(sound.time()-held-.2),.05)
 
     def test_a_killed_player_takes_its_sound_and_decoder_with_it(self):
+        # The ffmpeg command is a second child; the in-process decoder dies with the player.
+        for decoder,children in [('ffmpeg',2)]+([('libav',1)] if (ROOT/'build/libneuronte-media.so').exists() else []):
+            with self.subTest(decoder=decoder):self.killed_player(decoder,children)
+
+    def killed_player(self,decoder,children):
         import signal,time
         with tempfile.TemporaryDirectory() as temp:
             clip=self.sound_clip(temp)
-            cmd=[sys.executable,str(ROOT/'tools/neuronte-play.py'),clip,'--cols','6','--rows','3','--no-status','--audio-output','null','--loop']
+            cmd=[sys.executable,str(ROOT/'tools/neuronte-play.py'),clip,'--cols','6','--rows','3','--no-status','--audio-output','null','--loop','--decoder',decoder]
             r,w=os.pipe()
             with tempfile.TemporaryFile() as picture:
-                child=subprocess.Popen(cmd+['--input-fd',str(r)],stdout=picture,stderr=subprocess.DEVNULL,env=dict(os.environ,COLUMNS='80',LINES='24'),pass_fds=[r]);os.close(r)
+                env=dict(os.environ,COLUMNS='80',LINES='24');env.pop('KITTY_WINDOW_ID',None)   # inline pictures, so the file grows while it plays
+                child=subprocess.Popen(cmd+['--input-fd',str(r)],stdout=picture,stderr=subprocess.DEVNULL,env=env,pass_fds=[r]);os.close(r)
                 started=[]
                 try:
                     end=time.time()+20
-                    while time.time()<end and len(started)<2:       # the sound and the decoder
+                    while time.time()<end and (len(started)<children or os.fstat(picture.fileno()).st_size<4096):   # playing
                         time.sleep(.05)
                         try:started=[int(x) for x in Path(f'/proc/{child.pid}/task/{child.pid}/children').read_text().split()]
                         except OSError:started=[]
-                    self.assertEqual(len(started),2)
+                    self.assertEqual(len(started),children)
                     child.send_signal(signal.SIGKILL);child.wait(timeout=5)   # no chance to tidy up
                     end=time.time()+5
                     def alive(pid):

@@ -356,6 +356,44 @@ test-video: build/libneuronte.so build/video-decoder-bench build/test_video buil
 	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_video_decoder.py
 	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_reference.py build/libneuronte.so --bundle weights/neuronte-video-masks-v0.nrt weights/neuronte-video-pixel-v1.json weights/neuronte-video-ascii-v0.json --fallback 1
 
+# In-process decoding (src/media.c) links FFmpeg 7.1's libraries, which
+# libneuronte itself never does. It is optional: without it the player runs
+# the ffmpeg command. Building it needs the libav*-dev packages.
+PKG_CONFIG ?= pkg-config
+MEDIA_PACKAGES = libavformat libavcodec libavfilter libavutil
+MEDIA_CFLAGS ?= $(shell $(PKG_CONFIG) --cflags $(MEDIA_PACKAGES))
+MEDIA_LIBS ?= $(shell $(PKG_CONFIG) --libs $(MEDIA_PACKAGES))
+MEDIA_SANITIZE = -O1 -g -fno-omit-frame-pointer -fsanitize=address,undefined -fno-sanitize-recover=undefined
+
+.PHONY: media test-media
+media: build/libneuronte-media.so build/neuronte-media-decode
+
+build/libneuronte-media.so: src/media.c include/neuronte_media.h | build
+	$(CC) $(NRT_CFLAGS) $(MEDIA_CFLAGS) $(LDFLAGS) -shared -o $@ $< $(MEDIA_LIBS) -pthread -lm
+
+build/neuronte-media-decode: tools/neuronte-media-decode.c include/neuronte_media.h build/libneuronte-media.so
+	$(CC) $(NRT_CFLAGS) $(LDFLAGS) -o $@ $< -Lbuild -lneuronte-media -Wl,-rpath,'$$ORIGIN'
+
+# The same decoder and harness with AddressSanitizer and UBSan, for the
+# media checks to run against.
+build/sanitize/neuronte-media-decode: tools/neuronte-media-decode.c src/media.c include/neuronte_media.h | build
+	mkdir -p build/sanitize
+	$(CC) -std=c11 -Wall -Wextra -Wpedantic -Iinclude $(MEDIA_CFLAGS) $(MEDIA_SANITIZE) -o $@ tools/neuronte-media-decode.c src/media.c $(MEDIA_LIBS) -pthread -lm
+
+build/sanitize/test_media: tests/test_media.c src/media.c include/neuronte_media.h | build
+	mkdir -p build/sanitize
+	$(CC) -std=c11 -Wall -Wextra -Wpedantic -Iinclude $(MEDIA_CFLAGS) $(MEDIA_SANITIZE) -o $@ tests/test_media.c src/media.c $(MEDIA_LIBS) -pthread -lm
+
+# ThreadSanitizer for the decoder thread and its reader. FFmpeg's own
+# threads are kept out of that run (TEST_MEDIA_THREADS=1): the sanitizer
+# cannot see the atomics its uninstrumented libraries synchronize with.
+build/tsan/test_media: tests/test_media.c src/media.c include/neuronte_media.h | build
+	mkdir -p build/tsan
+	$(CC) -std=c11 -Wall -Wextra -Wpedantic -Iinclude $(MEDIA_CFLAGS) -O1 -g -fsanitize=thread -o $@ tests/test_media.c src/media.c $(MEDIA_LIBS) -pthread -lm
+
+test-media: media build/libneuronte.so build/sanitize/neuronte-media-decode build/sanitize/test_media build/tsan/test_media
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_media.py
+
 build/video-decoder-bench: tools/neuronte-video-decoder-bench.c | build
 	$(CC) $(NRT_CFLAGS) -o $@ $< $(LDLIBS)
 

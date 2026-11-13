@@ -125,6 +125,56 @@ use, while `--filter-threads N` controls scaling. Zero lets FFmpeg choose.
 Natural-size frame logs put the fused composition time in `draw`; `fit` is
 zero because no separate palette is materialized.
 
+### Decoding inside the player
+
+`make media` builds `build/libneuronte-media.so` from `src/media.c`
+(declared in `include/neuronte_media.h`). It needs the development files of
+FFmpeg 7.1's libavformat, libavcodec, libavfilter and libavutil
+(`libavformat-dev libavcodec-dev libavfilter-dev libavutil-dev` on Debian
+13); libneuronte itself never links them. When the library is built, the
+player decodes local files with it in its own process instead of starting
+the `decoder_command` process. It repeats that command's steps with the same
+libraries: the open and probe, the seek and timestamp offset of `-ss`, the
+choice of stream, the decoder and its options, packet and frame timestamps,
+the filter graph and its rebuilds when the size, format, colours or display
+matrix change, and rawvideo's constant-rate output with its duplicated and
+dropped frames. Its frames are the bytes the command writes. Every start
+and seek opens and probes the file again, as a new process would, so no
+frame depends on what was read before; what is saved is the process start,
+its library loading and the pipe.
+
+The library declines what it does not reproduce, and the player then runs
+the command as before: formats with discontinuous or no timestamps
+(MPEG-TS, raw elementary streams), files whose only picture is a cover,
+codecs without a decoder, and FFmpeg libraries whose major or minor version
+differs from the one it was built with. Network URLs and `--lavfi` sources
+always use the command. The summary JSON records `decoder` (`libav` or
+`ffmpeg`), with a note when a file was declined. `--decoder ffmpeg` keeps
+the command; `--decoder libav` fails rather than fall back. The command is
+the `ffmpeg` on `PATH`, and the library reproduces FFmpeg 7.1's command on
+the same libraries, which is what Debian 13's `ffmpeg` is.
+
+A decoder thread reads up to three frames ahead. The player waits for each
+with a timeout, so it still handles signals, and passes the frame's planes
+to `neuronte_video_planes_rgb24` without copying them. FFmpeg's messages
+are kept instead of printed, errors only as with `-v error`, so they cannot
+disturb the terminal; a failure is reported with them.
+
+`make test-media` compares the library with the command byte for byte, to
+the end of each file. Its generated inputs cover H.264 with B-frames in one-
+and two-stream files (constant-rate output with and without the initial
+duplicates), odd sizes, a late start time, irregular timestamps and a change
+of rate, 10-bit HEVC, a rotation matrix, VP9 that changes size mid-stream,
+ASF, FLV and AVI; starts at zero, inside a group of pictures, on keyframes
+and past the end; both layouts, Lanczos and area scaling, chroma location
+and thread counts. It checks that declined inputs are declined and played
+by the command, compares the player's pictures with both decoders, including
+after a paused seek, and runs `tests/test_media.c` (arguments, errors,
+timeouts, closing while the thread decodes or waits, two decoders at once)
+under AddressSanitizer, UBSan, LeakSanitizer and ThreadSanitizer. FFmpeg's
+own threads are left out of the ThreadSanitizer run, because the sanitizer
+cannot see the atomics its uninstrumented libraries synchronize with.
+
 Measured once, on one laptop, in a background Kilix tab of 196 × 55 cells
 with a synthetic 640 × 360 clip at 30 frames a second: shared memory showed
 237 of 240 frames, median 5 ms after their time; inline showed 204, median

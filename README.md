@@ -194,7 +194,9 @@ or layout requests require an explicit fallback in a consumer.
 `make test` includes the selected RC9 scripts, full-v3, italic and emoji
 inventories. Use `make test-rc9-italics` or `make test-rc9-emoji` for the focused
 asset checks; `make pack-rc9-italics` and `make pack-rc9-emoji` reproduce their
-packed files. Video has its separate `make test-video` target.
+packed files. Video has its separate `make test-video` target, and the
+optional in-process video decoder, which links FFmpeg's libraries, has
+`make media` and `make test-media` (see `tools/neuronte-video.md`).
 
 `make test` checks, for every weight file, that:
 

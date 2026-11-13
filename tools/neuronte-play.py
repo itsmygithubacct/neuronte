@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Play a video in the terminal, drawn by Neuronte. See neuronte-video.md.
 
-ffmpeg decodes and scales the file; each frame is fitted to terminal cells
-with the nets' own coverage masks. Sound is played by mpv (kilix-mpv when it
+ffmpeg decodes and scales the file, inside the player through
+libneuronte-media when it is built, else as a separate ffmpeg process; each
+frame is fitted to terminal cells with the nets' own coverage masks. Sound is played by mpv (kilix-mpv when it
 is installed), and its playback position is the clock the picture follows,
 so seeking and pausing move both together. Frames that cannot be shown in
 time are dropped instead of slowing playback down.
@@ -42,7 +43,7 @@ import numpy as np
 # Installed payloads are verified source trees. Keep runtime imports from
 # adding __pycache__ files that would make the next upgrade see local changes.
 sys.dont_write_bytecode = True
-from neuronte_video import TwoInk, MultiInk, RGBFrameReader, decoder_command, ROOT
+from neuronte_video import TwoInk, MultiInk, MediaDecoder, RGBFrameReader, decoder_command, ROOT
 
 try: LIBC = ctypes.CDLL(None)        # loaded now, so a child has nothing to load between fork and exec
 except OSError: LIBC = None
@@ -64,6 +65,45 @@ def with_us():
     # The signal is not retroactive: the player may have died after fork,
     # before the child registered it. Do not launch an orphan in that case.
     if os.getppid() != PLAYER_PID: os._exit(0)
+
+
+class CommandFrames:
+    """Frames from the ffmpeg command, read through its pipe."""
+    kind = 'ffmpeg'
+
+    def __init__(self, command):
+        self.process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, preexec_fn=with_us)
+
+    def read(self, reader, direct=False):
+        return reader.read(self.process.stdout)
+
+    def failure(self):
+        """At the end: why ffmpeg failed, or '' when it finished cleanly."""
+        code = self.process.wait()
+        return (self.process.stderr.read().decode(errors='replace').strip() or f'exit status {code}') if code else ''
+
+    def close(self):
+        if self.process.poll() is None: self.process.kill()
+        self.process.wait()
+
+
+class LibraryFrames:
+    """The same frames decoded inside the player by libneuronte-media."""
+    kind = 'libav'
+
+    def __init__(self, stream): self.stream = stream
+
+    def read(self, reader, direct=False):
+        """direct: return (red, green, blue, stride) addresses of planar
+        frames for MultiInk.render_planes instead of copying them."""
+        frame = self.stream.read()
+        if frame is None: return None
+        planes = self.stream.planes(frame) if direct else None
+        return planes if planes is not None else self.stream.copy(frame, reader.frame)
+
+    def failure(self): return self.stream.failure
+
+    def close(self): self.stream.close()
 
 
 def probe(path, lavfi):
@@ -368,6 +408,9 @@ def main():
     p.add_argument('--decoder-threads', type=int, default=0, help='codec workers (default: 0 lets ffmpeg choose; fewer use less memory)')
     p.add_argument('--decoded-format', choices=['auto', 'rgb24', 'gbrp'], default='auto',
                    help='--pixel-size: the RGB layout ffmpeg writes; auto takes planar gbrp when the native compositor packs it')
+    p.add_argument('--decoder', choices=['auto', 'libav', 'ffmpeg'], default='auto',
+                   help='libav decodes local files inside the player with the same frames as the ffmpeg command; '
+                        'auto uses it when build/libneuronte-media.so loads and accepts the file')
     p.add_argument('--start', type=float, default=0, help='begin at this many seconds')
     p.add_argument('--frames', type=int, help='stop after this many source frames')
     p.add_argument('--untimed', action='store_true', help='benchmark: process every frame as fast as possible, without sound')
@@ -395,6 +438,7 @@ def main():
     for tool in ['ffmpeg', 'ffprobe']:
         if not shutil.which(tool): p.error(f'{tool} is required and was not found')
     if a.helper and (a.mode != 'cells' or a.characters != 'full'): p.error('--helper requires --mode cells --characters full')
+    if a.decoder == 'libav' and (a.lavfi or not os.path.isfile(a.video)): p.error('--decoder libav requires a local file')
     library = a.library or ROOT / 'build/libneuronte.so'
     if not os.path.exists(library): p.error(f'{library} is missing; run make first, or pass --library')
     width, height, rate, duration, has_sound, chroma = probe(a.video, a.lavfi)
@@ -405,6 +449,13 @@ def main():
     player = next((x for x in ('kilix-mpv', 'mpv') if shutil.which(x)), None)
     notes = []
     if not a.no_audio and not a.lavfi and has_sound and player is None: notes.append('no sound: neither kilix-mpv nor mpv is installed')
+    media = None
+    if a.decoder != 'ffmpeg' and not a.lavfi and os.path.isfile(a.video):
+        # Local files only: a network stream could block the player itself.
+        try: media = MediaDecoder()
+        except OSError as exc:
+            if a.decoder == 'libav': p.error(f'the in-process decoder is not available: {exc}')
+            notes.append('decoder: ffmpeg command (build/libneuronte-media.so is not built)')
 
     helper = None
     if a.mode == 'pixels':
@@ -451,12 +502,19 @@ def main():
     layout()
     if geometry['c'] < 1 or geometry['r'] < 1: p.error('--cols and --rows must be positive')
 
+    used = set()
+
     def decoder(position):
         g = geometry
-        cmd = decoder_command(a.video, g['w'], g['h'], fps, start=position, chroma=chroma,
-                              lavfi=a.lavfi, exact_pixels=bool(a.pixel_size), filter_threads=a.filter_threads,
-                              decoder_threads=a.decoder_threads, pix_fmt=decoded)
-        return subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, preexec_fn=with_us)
+        options = dict(start=position, chroma=chroma, lavfi=a.lavfi, exact_pixels=bool(a.pixel_size),
+                       filter_threads=a.filter_threads, decoder_threads=a.decoder_threads, pix_fmt=decoded)
+        stream = media.open(a.video, g['w'], g['h'], fps, **options) if media else None
+        if stream is None and a.decoder == 'libav': raise ValueError('the in-process decoder declined this file')
+        if stream is None and media and 'libav-declined' not in used:
+            used.add('libav-declined'); notes.append('decoder: ffmpeg command (the in-process decoder declined this file)')
+        source = LibraryFrames(stream) if stream else CommandFrames(decoder_command(a.video, g['w'], g['h'], fps, **options))
+        used.add(source.kind)
+        return source
 
     def draw_pixels(colours):
         picture = renderer.decode(colours)
@@ -474,9 +532,11 @@ def main():
         if reader is None or reader.frame.shape != ((3, *shape[:2]) if planar else shape):
             reader = RGBFrameReader(geometry['w'], geometry['h'], planar=planar)
             output_frame = np.empty(shape, np.uint8) if a.pixel_size else None
-        return reader.read(source.stdout)
+        return source.read(reader, direct=planar and bool(a.pixel_size))
 
     def render_natural(frame):
+        if isinstance(frame, tuple):                        # planes decoded in this process
+            return renderer.render_planes(*frame, geometry['w'], geometry['h'], output_frame)
         if planar: return renderer.render_gbrp(frame, out=output_frame)
         return renderer.render_rgb24(frame, out=output_frame)
 
@@ -498,7 +558,7 @@ def main():
 
         def restart(position):
             nonlocal source, origin, index, previous, waiting
-            source.kill(); source.wait()
+            source.close()
             if not waiting and not paused: clock.pause(True)
             waiting = True
             origin = position; index = 0; previous = None; source = decoder(origin)
@@ -538,7 +598,8 @@ def main():
                 waiting = False
                 if not paused: clock.pause(False)
             if frame is None:                               # the end, or ffmpeg gave up: say which
-                if source.wait(): failure = source.stderr.read().decode(errors='replace').strip(); break
+                failure = source.failure()
+                if failure: break
                 if not a.loop: break
                 restart(0.); clock.seek(0.); continue
             pts = origin + index / fps; index += 1; count += 1
@@ -589,9 +650,7 @@ def main():
         for number in (signal.SIGTERM, signal.SIGHUP, signal.SIGINT): signal.signal(number, signal.SIG_IGN)   # a second signal must not cut this short
         elapsed = time.perf_counter() - began
         tail = presenter.close()                            # first: the pictures in /dev/shm are the one thing nobody else removes
-        if source:
-            if source.poll() is None: source.kill()
-            source.wait()
+        if source: source.close()
         if clock: clock.close()
         keys.close()
         if log: log.close()
@@ -605,7 +664,7 @@ def main():
                    transport=transport if a.mode == 'pixels' else 'text', sound=type(clock).__name__ == 'Sound' if clock else False,
                    late_ms=dict(median=round(float(np.median(late)), 2), p95=round(float(np.percentile(late, 95)), 2), max=round(float(late.max()), 2)),
                    mean_ms={k: round(v / shown * 1e3, 3) if shown else 0 for k, v in cost.items()}, wire_bytes=wire, notes=notes)
-    summary.update(decoded_size=[geometry['w'], geometry['h']], decoded_format=decoded,
+    summary.update(decoded_size=[geometry['w'], geometry['h']], decoded_format=decoded, decoder='+'.join(sorted(used - {'libav-declined'})),
                    image_size=(list(a.pixel_size) if a.pixel_size else
                                [geometry['c'] * CELL[0], geometry['r'] * CELL[1]]) if a.mode == 'pixels' else None)
     if a.stats:
@@ -614,7 +673,7 @@ def main():
           f'{geometry["c"]} x {geometry["r"]} cells, {a.mode}, {summary["transport"]}, sound {"on" if summary["sound"] else "off"}'
           + ''.join('; ' + n for n in notes), file=sys.stderr)
     if failure:
-        print(f'ffmpeg stopped early: {failure}', file=sys.stderr); return 1
+        print(f'decoding stopped early: {failure}', file=sys.stderr); return 1
     return 0
 
 

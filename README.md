@@ -217,6 +217,15 @@ optional in-process video decoder, which links FFmpeg's libraries, has
   in the bundle that is itself bad;
 - drawing clips at every edge and blends correctly, and the draw cache
   gives the same cell after it has turned over;
+- a tiled (version 6) net draws exactly its definition. Each sample
+  belongs to the tile that holds it, and each tile's net sees its own
+  code (`tests/test_tiled.c`, with hand-built nets, at 14 sizes and
+  every sampling). It agrees with a float64 numpy evaluation to 1e-4
+  from 1×1 to 64×128, and bit for bit with a build that evaluates
+  every sample where it is summed (`tests/check_tiled.py`). A whole-cell
+  tiled wrapper is bit for bit the net it wraps. The loader refuses
+  every truncation and 35 other malformed tiled files, and the packer
+  refuses 21 malformed tiled JSON files;
 - the C library agrees with an independent float64 numpy evaluation of
   the JSON weights to 1e-3 in coverage, and the packed file is exactly
   what `train/pack.py` makes from the JSON. For the bundle, the C router

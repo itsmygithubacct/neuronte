@@ -6,7 +6,8 @@ usage: python3 tests/check_reference.py LIB.so WEIGHTS.json WEIGHTS.nrt
        python3 tests/check_reference.py LIB.so --drawing DRAWING.nrt NET.json FACE.txt
        python3 tests/check_reference.py LIB.so --drawing DRAWING.nrt NET.json ADVANCES.txt
 
-The numpy side reads the JSON weights and works in float64. The C side
+The numpy side reads the JSON weights and works in float64; a tiled
+(version 6) net or member is evaluated by tests/tiled_reference.py. The C side
 loads the packed file and works in float32. They must agree to 1e-3 in
 coverage, and the packed file must be exactly what train/pack.py makes
 from the JSON. For a bundle, the net the C router picks for each case must
@@ -41,6 +42,7 @@ import glyphs  # noqa: E402
 import pack  # noqa: E402
 import snap  # noqa: E402
 import strokes  # noqa: E402
+from tiled_reference import Tiled  # noqa: E402  (tests/, beside this file)
 
 
 def normal(s):
@@ -261,7 +263,13 @@ with open(nrt_path, "rb") as fh:
     if fh.read() != made:
         print("FAIL the packed file is not what pack.py makes from the JSON")
         failed = True
-nets = [Net(p) for p in json_paths]
+def net_of(path):
+    with open(path) as fh:
+        doc = json.load(fh)
+    return Tiled(doc) if doc.get("format") == "neuronte-tiled-weights" else Net(path)
+
+
+nets = [net_of(p) for p in json_paths]
 if len(nets) == 1 and nets[0].colour:
     nets[0].bind(pack.read_colour(made))
 

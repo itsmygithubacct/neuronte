@@ -59,7 +59,7 @@ A bundle, version 2:
 
     0   8 bytes   "NEURONTE"
     8   u32       format version, 2
-    12  u32       nets K, 1 to 16
+    12  u32       nets K, 1 to 128
     16  u32       table ranges R
     20  u32       fallback net, below K
     24  u32       gate hidden width G, 0 for no gate, at most 256
@@ -563,8 +563,8 @@ def _bundle_images(nets, images, gate=None, fallback=0):
     """Assemble already packed members; callers must bind them to their sources."""
     if len(images) != len(nets):
         raise SystemExit("packed member inventory differs from source inventory")
-    if not 1 <= len(nets) <= 16:
-        raise SystemExit("a bundle holds 1 to 16 nets")
+    if not 1 <= len(nets) <= 128:
+        raise SystemExit("a bundle holds 1 to 128 nets")
     if not 0 <= fallback < len(nets):
         raise SystemExit(f"fallback {fallback} is not one of the {len(nets)} nets")
     sigs = [s for s in (colour_signature(im) for im in images) if s is not None]

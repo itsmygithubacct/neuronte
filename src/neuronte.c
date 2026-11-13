@@ -46,7 +46,8 @@
 #define LAYERS 3
 #define HEADER (8 + 5 * 4 + 4 + NMASK * 4)
 #define MAX_H 1024 /* distance widths are any integer from 1 up to this */
-#define MAX_NETS 16
+#define MAX_NETS 128 /* a 64-way expert plus the other bundle members */
+#define MAX_DRAWING_MEMBERS 16
 #define MAX_RANGES 65536
 #define MAX_GATE 256 /* gate hidden width */
 #define BUNDLE_HEAD 28
@@ -728,7 +729,7 @@ static int adv_open(const unsigned char *p, size_t len, neuronte *n)
 static size_t drawing_prefix(const unsigned char *p)
 {
     uint32_t m = rd32(p + 12);
-    return m >= 1 && m <= MAX_NETS ? DRAWING_HEAD + 8 * (size_t)m : 0;
+    return m >= 1 && m <= MAX_DRAWING_MEMBERS ? DRAWING_HEAD + 8 * (size_t)m : 0;
 }
 
 /* The length of a drawing file from its first drawing_prefix() bytes, or 0.

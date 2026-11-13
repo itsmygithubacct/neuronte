@@ -250,6 +250,7 @@ test-ui-metadata:
 test-widths: build/libneuronte.so build/test_widths
 	./build/test_widths
 	$(PYTHON) tests/check_widths.py build/libneuronte.so
+	$(PYTHON) tests/check_bundle_counts.py build/libneuronte.so
 
 .PHONY: test-widths
 

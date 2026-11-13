@@ -1,5 +1,12 @@
 """Pixel inventory and teacher checks for expert decomposition."""
 import unittest
+import argparse
+import contextlib
+import copy
+import io
+import json
+from pathlib import Path
+import tempfile
 import numpy as np
 import decompose
 import glyphs
@@ -20,6 +27,37 @@ class PixelTests(unittest.TestCase):
                     self.assertTrue(all(p['scalars'] == codes for p in parts))
         with self.assertRaises(ValueError):
             decompose.specs('spatial', 4, 'pixel', 127)
+
+    def test_explicit_semantic_groups_and_selected_restart(self):
+        codes = decompose.inventory('pixel')
+        mosaic = glyphs.mosaics()
+        groups = [dict(name='pixel-block', width=2, scalars=sorted(ord(c) for c,t,_ in glyphs.charset('pixel') if t=='block')),
+                  dict(name='pixel-sextant', width=2, scalars=sorted(c for c,(_,n) in mosaic.items() if n==3)),
+                  dict(name='pixel-octant', width=4, scalars=sorted(c for c,(_,n) in mosaic.items() if n==4))]
+        doc=dict(schema='neuronte.decomposition-spec/v1',expert='pixel',groups=groups)
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary); specification=root/'spec.json'; specification.write_text(json.dumps(doc))
+            specs=decompose.explicit_specs(specification,'pixel','repertoire',3,8)
+            self.assertEqual([len(p['scalars']) for p in specs],[29,60,238])
+            with self.assertRaises(ValueError):decompose.explicit_specs(specification,'pixel','spatial',3,8)
+            dirs=[root/'full',root/'resume']
+            for directory in dirs:
+                directory.mkdir(); yy,xx=np.mgrid[0:9,0:5]/4
+                np.save(directory/'teacher.npy',np.repeat((xx-.5)[None],len(codes),axis=0).astype(np.float16))
+                (directory/'teacher.json').write_text(json.dumps(dict(sha256=decompose.digest(directory/'teacher.npy'),identity=dict(expert='pixel',scalars=codes,grid=4,sources={},pen=.075))))
+            args=argparse.Namespace(directory=dirs[0],expert='pixel',width_budget=8,mode='repertoire',parts=3,
+                seeds='0,1',start=0,batch_models=4,steps=4,device='cpu',unlabelled=0.,compile=False,resume=False,
+                log_every=1,checkpoint_every=2,stop_after=None,specification=specification,model_indices='0,1,3,4')
+            with contextlib.redirect_stdout(io.StringIO()):
+                decompose.train(args)
+                resumed=copy.copy(args);resumed.directory=dirs[1];resumed.stop_after=2;decompose.train(resumed)
+                resumed.stop_after=None;resumed.resume=True;decompose.train(resumed)
+            files=list(dirs[0].glob('pixel-*-s*.json'));self.assertEqual(len(files),4)
+            for path in files:self.assertEqual(path.read_bytes(),(dirs[1]/path.name).read_bytes())
+            mixed=copy.copy(args);mixed.model_indices='0,2'
+            with self.assertRaisesRegex(ValueError,'single width'):decompose.train(mixed)
+            groups[1]['scalars'][0]=groups[0]['scalars'][0];specification.write_text(json.dumps(doc))
+            with self.assertRaises(ValueError):decompose.explicit_specs(specification,'pixel','repertoire',3,8)
 
     def test_mosaic_order_and_missing_halves(self):
         self.assertEqual([glyphs.sextant(cp)[0] for cp in range(0x1fb00, 0x1fb3c)],

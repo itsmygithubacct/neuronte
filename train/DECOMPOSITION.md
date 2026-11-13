@@ -106,3 +106,19 @@ identities and distance scales. Tiles use the original scalar unchanged.
 The native sampler dispatches each subpixel at its full-cell position,
 including odd sizes and widths 23, 24 and 25. The analytic test checks
 both axes, scalar identity and coverage scaling across these boundaries.
+
+Explicit repertoire partitions may mix widths while retaining an exact
+summed budget. `--specification spec.json` accepts
+`{"schema":"neuronte.decomposition-spec/v1","expert":"pixel","groups":[...]}`.
+Each group supplies a unique `name`, positive `width`, and sorted distinct
+`scalars`; groups must cover the teacher inventory exactly once. The number
+of groups must match `--parts`, and widths must sum to `--width-budget`.
+The specification's hash and complete selected members are checkpoint-bound.
+
+`--model-indices 0,1,3,4` selects noncontiguous seed-major members for one
+batch. Each batch must have one width. For a three-group 32/32/64 partition
+and seeds 0/1, indices 0,1,3,4 train the four width-32 models, and 2,5 train
+the two width-64 models. Smaller repertoires are padded and excluded from
+loss exactly as in contiguous partitioning. The pixel tests check complete
+29/60/238 semantic inventories, refusal of overlaps and mixed-width batches,
+and exact restart with the padded noncontiguous selection.

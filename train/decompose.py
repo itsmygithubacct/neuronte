@@ -8,6 +8,7 @@ import argparse
 import hashlib
 import json
 import math
+import re
 from pathlib import Path
 import time
 
@@ -47,6 +48,29 @@ def specs(mode, count, expert='ascii', budget=128):
         out.append({'name': name, 'index': i,
                     'width': budget // count, 'region': region if mode == 'spatial' else [0., 1., 0., 2.],
                     'scalars': scalars if mode == 'spatial' else scalars[len(scalars)*i//count:len(scalars)*(i+1)//count]})
+    return out
+
+
+def explicit_specs(path, expert, mode, count, budget):
+    doc = json.loads(Path(path).read_text())
+    if (doc.get('schema') != 'neuronte.decomposition-spec/v1' or
+            doc.get('expert') != expert or mode != 'repertoire'):
+        raise ValueError('explicit specification must match the repertoire expert')
+    groups = doc.get('groups', [])
+    if len(groups) != count:
+        raise ValueError('explicit group count differs')
+    out = []
+    for i, group in enumerate(groups):
+        name, width, scalars = group['name'], group['width'], group['scalars']
+        if (not isinstance(name, str) or not re.fullmatch(r'[a-z0-9-]+', name) or
+                type(width) is not int or not 1 <= width <= 1024 or
+                not isinstance(scalars, list) or not scalars or
+                any(type(c) is not int for c in scalars) or scalars != sorted(set(scalars))):
+            raise ValueError('invalid explicit group')
+        out.append(dict(name=name, index=i, width=width, scalars=scalars, region=[0.,1.,0.,2.]))
+    if (len({p['name'] for p in out}) != count or sum(p['width'] for p in out) != budget or
+            sorted(c for p in out for c in p['scalars']) != inventory(expert)):
+        raise ValueError('explicit groups must cover each scalar once within the width budget')
     return out
 
 
@@ -167,8 +191,20 @@ def train(args):
         raise ValueError('seeds must be distinct')
     expert = getattr(args, 'expert', 'ascii')
     budget = getattr(args, 'width_budget', 128)
-    members = [{**spec, 'seed': seed} for seed in seeds for spec in specs(args.mode, args.parts, expert, budget)]
-    members = members[args.start:args.start+args.batch_models]
+    specification = getattr(args, 'specification', None)
+    planned = (explicit_specs(specification, expert, args.mode, args.parts, budget)
+               if specification else specs(args.mode, args.parts, expert, budget))
+    members = [{**spec, 'seed': seed} for seed in seeds for spec in planned]
+    selected = getattr(args, 'model_indices', None)
+    if selected is not None:
+        indices = [int(v) for v in selected.split(',')]
+        if args.start or not indices or len(indices) > args.batch_models or len(indices) != len(set(indices)) or any(i < 0 or i >= len(members) for i in indices):
+            raise ValueError('invalid explicit model indices')
+        members = [members[i] for i in indices]
+    else:
+        members = members[args.start:args.start+args.batch_models]
+    if len({m['width'] for m in members}) > 1:
+        raise ValueError('batch must contain a single width; select matching model indices')
     if not members:
         raise ValueError('empty training batch')
     metadata = json.loads((args.directory/'teacher.json').read_text())
@@ -222,6 +258,7 @@ def train(args):
     schedule = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer,args.steps)
     identity = {'schema':'neuronte.decomposition-training/v1','members':members,'steps':args.steps,
         'teacher':metadata,'trainer_sha256':digest(__file__),'unlabelled_weight':args.unlabelled,
+        'specification_sha256':digest(specification) if specification else None,
         'torch':str(torch.__version__),'cuda':torch.version.cuda,'compiled':args.compile,'tf32':False,
         'device':torch.cuda.get_device_name(0) if args.device.startswith('cuda') else args.device,
         'labelled_samples':256,'candidate_samples':1024,'unlabelled_samples':256,'unlabelled_scalars':64,
@@ -302,8 +339,10 @@ def main():
     parser.add_argument('--set', dest='expert', default='ascii', choices=('ascii','pixel','symbol','boxshade','accent'))
     parser.add_argument('--width-budget', type=int, default=128)
     parser.add_argument('--mode',choices=('spatial','repertoire'),default='spatial')
-    parser.add_argument('--parts',type=int,choices=COUNTS,default=4)
+    parser.add_argument('--parts',type=int,choices=COUNTS+(3,),default=4)
     parser.add_argument('--seeds',default='0,1')
+    parser.add_argument('--specification',type=Path,help='explicit repertoire groups and widths')
+    parser.add_argument('--model-indices',help='comma-separated seed-major indices of equal-width models')
     parser.add_argument('--steps',type=int,default=20000)
     parser.add_argument('--start',type=int,default=0)
     parser.add_argument('--batch-models',type=int,default=16)

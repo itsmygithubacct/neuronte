@@ -67,3 +67,12 @@ Development recipes may explicitly set `--hidden-width` per member and a
 new `--steps` schedule. Record both total width and packed bytes when relaxing
 the original total-width budget. Pass the same width and step count to the
 packer. Fixed-matrix packing refuses these overrides without `--recipe`.
+
+`known_bundle.py BASE.nrt OUT.nrt REPLACEMENT.json... --expert INDEX`
+appends complete known-character replacements to an existing version2 bundle.
+Original members remain byte-identical for unknown and unrelated glyphs.
+Only the selected expert's table entries move. The packer preserves original
+gate rows and appends suppressed outputs after establishing conservative
+activation/output bounds. `--allow-partial` explicitly permits mixed-width
+fallback. The provenance sidecar binds the original bytes, replacements,
+new ranges and output hash. Validate resulting quality before deployment.

@@ -10,7 +10,8 @@ time are dropped instead of slowing playback down.
   pixels  (default) every cell is split into 2 x 4 blocks with eight
           colours, mixed by three Neuronte masks drawn at 8 x 16 pixels a
           cell; the result is sent with the kitty graphics protocol, so it
-          needs a terminal that has it. Real time at ordinary sizes.
+          needs a terminal that has it. --pixel-size instead draws at 2 x 4
+          pixels a cell, retaining each decoded sample at natural size.
   cells   one character and two colours per cell, written as ordinary
           truecolour text, so the terminal's own font draws it. This is an
           exhaustive search and shows a few frames a second at best.
@@ -99,6 +100,25 @@ def fit(width, height, cols, rows, ratio):
     return c, r
 
 
+def pixel_size(value):
+    try:
+        width, height = map(int, value.lower().split('x'))
+        if width > 0 and height > 0:
+            return width, height
+    except ValueError:
+        pass
+    raise argparse.ArgumentTypeError('pixel size must be positive WIDTHxHEIGHT')
+
+
+def pad_cells(frame, fitter):
+    """Complete edge cells without resizing or discarding source samples."""
+    height, width = frame.shape[:2]
+    bottom, right = -height % fitter.height, -width % fitter.width
+    if bottom or right:
+        return np.pad(frame, ((0, bottom), (0, right), (0, 0)), mode='edge')
+    return frame
+
+
 def shared_memory_reaches_terminal():
     """True when the terminal is a local kitty or Kilix that can read /dev/shm."""
     if os.environ.get('SSH_CONNECTION') or os.environ.get('TMUX'): return False
@@ -117,12 +137,13 @@ class Presenter:
         self.names = [f'neuronte-play-{os.getpid()}-{secrets.token_hex(6)}-{i}' for i in range(3)]
         self.slot = 0; self.skipped = 0
 
-    def frame(self, frame, cols, rows, left, top):
+    def frame(self, frame, cols, rows, left, top, natural=False):
         """The bytes that replace the picture, or None when the terminal has
         not yet taken the earlier frames (shared memory only)."""
         h, w = frame.shape[:2]
         new = self.ids[0] if self.current != self.ids[0] else self.ids[1]
-        head = f'a=T,f=24,s={w},v={h},i={new},p=1,c={cols},r={rows},z=-1,C=1,q=2'
+        span = '' if natural else f'c={cols},r={rows},'
+        head = f'a=T,f=24,s={w},v={h},i={new},p=1,{span}z=-1,C=1,q=2'
         out = [b'\x1b[?2026h', f'\x1b[{top};{left}H'.encode()]
         if self.transport == 'shm':
             name = None
@@ -336,6 +357,8 @@ def main():
     p.add_argument('--mode', choices=['pixels', 'cells'], default='pixels')
     p.add_argument('--cols', type=int, help='grid width in cells; default: fit the terminal')
     p.add_argument('--rows', type=int)
+    p.add_argument('--pixel-size', type=pixel_size, metavar='WIDTHxHEIGHT',
+                   help='pixels mode: retain this many RGB samples and display at natural pixel size')
     p.add_argument('--fps', type=float, help='default: the file\'s own rate')
     p.add_argument('--start', type=float, default=0, help='begin at this many seconds')
     p.add_argument('--frames', type=int, help='stop after this many source frames')
@@ -355,6 +378,8 @@ def main():
     p.add_argument('--stats', help='write a JSON summary at the end')
     p.add_argument('--weights'); p.add_argument('--library')
     a = p.parse_args()
+    if a.pixel_size and (a.mode != 'pixels' or a.cols is not None or a.rows is not None):
+        p.error('--pixel-size requires pixels mode and cannot be combined with --cols or --rows')
     for tool in ['ffmpeg', 'ffprobe']:
         if not shutil.which(tool): p.error(f'{tool} is required and was not found')
     if a.helper and (a.mode != 'cells' or a.characters != 'full'): p.error('--helper requires --mode cells --characters full')
@@ -371,9 +396,10 @@ def main():
 
     helper = None
     if a.mode == 'pixels':
-        # The file is scaled to one pixel a block, so fitting is exact; the
-        # nets' masks then draw each block at the cell's real size.
-        fitter = MultiInk(a.weights, library, *BLOCKS); renderer = MultiInk(a.weights, library, *CELL)
+        # Each block receives one decoded sample. Explicit pixel sizing uses
+        # the same 2 x 4 neural masks for drawing, with no block enlargement.
+        fitter = MultiInk(a.weights, library, *BLOCKS)
+        renderer = fitter if a.pixel_size else MultiInk(a.weights, library, *CELL)
     else:
         renderer = TwoInk(a.characters, *CELL, a.weights, library)
         if a.helper:
@@ -390,6 +416,11 @@ def main():
     def layout():
         cols, rows, ratio = terminal()
         room = rows - (0 if a.no_status or rows < 4 else 1)
+        if a.pixel_size:
+            w, h = a.pixel_size
+            geometry.update(cols=cols, rows=rows, c=(w+1)//2, r=(h+3)//4, w=w, h=h,
+                            left=1, top=1, status=None if a.no_status or rows < 4 else rows)
+            return
         grid_c, grid_r = fit(width, height, a.cols or cols, a.rows or room, ratio)
         if a.cols: grid_c = a.cols
         if a.rows: grid_r = a.rows
@@ -402,9 +433,18 @@ def main():
 
     def decoder(position):
         g = geometry
+        flags = 'lanczos+accurate_rnd+full_chroma_int+full_chroma_inp' if a.pixel_size else 'area'
         cmd = ['ffmpeg', '-v', 'error', '-nostdin'] + (['-f', 'lavfi'] if a.lavfi else ['-ss', f'{position:.3f}']) \
-            + ['-i', a.video, '-an', '-sn', '-vf', f'fps={fps},scale={g["w"]}:{g["h"]}:flags=area', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-']
+            + ['-i', a.video, '-an', '-sn', '-vf', f'fps={fps},scale={g["w"]}:{g["h"]}:flags={flags}', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-']
         return subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, preexec_fn=with_us)
+
+    def draw_pixels(colours):
+        picture = renderer.decode(colours)
+        return picture[:geometry['h'], :geometry['w']] if a.pixel_size else picture
+
+    def present_pixels(picture):
+        return presenter.frame(picture, geometry['c'], geometry['r'], geometry['left'], geometry['top'],
+                               natural=bool(a.pixel_size))
 
     keys = Keys(a.input_fd); presenter = Presenter(out, transport)
     source = clock = None; shown = dropped = count = skipped = seeks = 0; failure = ''; resized = []
@@ -445,7 +485,7 @@ def main():
                         raw = read_exact(source.stdout, geometry['w'] * geometry['h'] * 3); waiting = False
                         if raw is not None:
                             frame = np.frombuffer(raw, np.uint8).reshape(geometry['h'], geometry['w'], 3); index = 1
-                            payload = presenter.frame(renderer.decode(fitter.encode(frame)), geometry['c'], geometry['r'], geometry['left'], geometry['top']) \
+                            payload = present_pixels(draw_pixels(fitter.encode(pad_cells(frame, fitter)))) \
                                 if a.mode == 'pixels' else text(renderer, renderer.fit(frame), None, geometry['left'], geometry['top'])
                             if payload: out.write(payload)
             if resized:
@@ -472,9 +512,9 @@ def main():
                 continue
             frame = np.frombuffer(raw, np.uint8).reshape(geometry['h'], geometry['w'], 3)
             if a.mode == 'pixels':
-                colours = fitter.encode(frame); t2 = time.perf_counter()
-                picture = renderer.decode(colours); t3 = time.perf_counter()
-                payload = presenter.frame(picture, geometry['c'], geometry['r'], geometry['left'], geometry['top'])
+                colours = fitter.encode(pad_cells(frame, fitter)); t2 = time.perf_counter()
+                picture = draw_pixels(colours); t3 = time.perf_counter()
+                payload = present_pixels(picture)
             else:
                 if helper is not None:
                     k = helper.doc['inference']['candidates']
@@ -520,6 +560,9 @@ def main():
                    transport=transport if a.mode == 'pixels' else 'text', sound=type(clock).__name__ == 'Sound' if clock else False,
                    late_ms=dict(median=round(float(np.median(late)), 2), p95=round(float(np.percentile(late, 95)), 2), max=round(float(late.max()), 2)),
                    mean_ms={k: round(v / shown * 1e3, 3) if shown else 0 for k, v in cost.items()}, wire_bytes=wire, notes=notes)
+    summary.update(decoded_size=[geometry['w'], geometry['h']],
+                   image_size=(list(a.pixel_size) if a.pixel_size else
+                               [geometry['c'] * CELL[0], geometry['r'] * CELL[1]]) if a.mode == 'pixels' else None)
     if a.stats:
         with open(a.stats, 'w') as f: f.write(json.dumps(summary, indent=1) + '\n')
     print(f'{shown} frames shown, {dropped} dropped, {skipped} skipped for a busy terminal, {summary["shown_per_second"]:.1f} per second; '

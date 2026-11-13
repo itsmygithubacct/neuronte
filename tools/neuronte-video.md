@@ -81,13 +81,29 @@ objects that the terminal unlinks as it reads them; if all three are still
 unread the frame is skipped, not queued. Elsewhere, and with `--transport
 inline`, they are compressed and sent through the terminal's own stream.
 
+For a comparison at a fixed pixel resolution, use
+`python3 tools/neuronte-play.py FILE --pixel-size 945x531 --no-status`.
+ffmpeg scales directly to 945 × 531 RGB samples with Lanczos. Each 2 × 4
+neural cell retains eight samples and draws them at 2 × 4 pixels, using the
+same actual coverage masks and eight-colour reconstruction as above. With
+the default calibrated video weights this preserves every decoded RGB
+sample; other weights can still be lossy. Partial cells on the right and
+bottom are edge-padded internally and cropped back to the requested size.
+The picture is displayed at its natural pixel size at the top left, without
+terminal cell scaling. The terminal must have room for it; resizing the
+terminal does not change this resolution. `--pixel-size` cannot be combined
+with `--cols`, `--rows` or `--mode cells`. Summary JSON records both
+`decoded_size` and `image_size` so comparisons can check the actual samples
+and transmitted dimensions.
+
 Measured once, on one laptop, in a background Kilix tab of 196 × 55 cells
 with a synthetic 640 × 360 clip at 30 frames a second: shared memory showed
 237 of 240 frames, median 5 ms after their time; inline showed 204, median
 33 ms after, because compressing and encoding 3.8 MB a frame took 19 ms.
 
 Measured again with the side-by-side run in kilix-benchmark (a 1920 × 1080
-H.264 file at 30 frames a second, a pane of 105 × 56 cells, three runs of
+H.264 file at 30 frames a second, a pane of 105 × 56 cells, decoding
+210 × 120 samples and drawing an 840 × 480 image, three runs of
 20 s with two seeks each, sound sent to a null output): the terminal took
 29.5 pictures a second, 95% of
 them within 38 ms of the one before; none was dropped for lateness; the

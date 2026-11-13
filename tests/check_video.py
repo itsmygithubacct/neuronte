@@ -200,12 +200,12 @@ class Video(unittest.TestCase):
             path=Path(temp)/'helper.json';path.write_text(json.dumps(doc))
             with self.assertRaisesRegex(ValueError,'invalid video helper layer'):Helper(path,'speed')
 
-    def player(self,*args,keys=(),source=None):
+    def player(self,*args,keys=(),source=None,grid=True):
         """Run the player off a terminal; keys are (seconds to wait, bytes) written to its key pipe."""
         import shutil,time
         if not shutil.which('ffmpeg') or not shutil.which('ffprobe'):self.skipTest('ffmpeg is not installed')
         cmd=[sys.executable,str(ROOT/'tools/neuronte-play.py'),source or 'color=c=red:size=32x48:rate=10[a];color=c=blue:size=32x48:rate=10[b];[a][b]hstack']
-        cmd+=([] if source else ['--lavfi'])+['--cols','6','--rows','3','--no-status',*args]
+        cmd+=([] if source else ['--lavfi'])+(['--cols','6','--rows','3'] if grid else [])+['--no-status',*args]
         env=dict(os.environ,COLUMNS='80',LINES='24');env.pop('KITTY_WINDOW_ID',None)
         r,w=os.pipe()
         with tempfile.TemporaryFile() as picture:   # a file, so the player never waits on us while we wait to press keys
@@ -220,6 +220,64 @@ class Video(unittest.TestCase):
                 if child.poll() is None:child.kill()
             picture.seek(0);out=picture.read()
         return child.returncode,out,err
+
+    def pixel_frames(self,out):
+        import re,base64,zlib
+        frames=[];parts=[];header=None
+        for packet in re.findall(rb'\x1b_G(.*?)\x1b\\',out,re.S):
+            control,data=packet.split(b';',1)
+            fields=dict(item.split(b'=',1) for item in control.split(b','))
+            if fields.get(b'a')==b'T':header=fields;parts=[]
+            elif b'a' in fields:continue
+            if header is None:continue
+            parts.append(data)
+            if fields.get(b'm',b'0')==b'0':
+                pixels=zlib.decompress(base64.standard_b64decode(b''.join(parts)))
+                frames.append((header,pixels));header=None
+        return frames
+
+    def test_player_pixel_size_preserves_every_sample_and_odd_edges(self):
+        with tempfile.TemporaryDirectory() as temp:
+            source=Path(temp)/'pixels.ppm';stats=Path(temp)/'stats.json'
+            for w,h in [(945,531),(1,1)]:
+                with self.subTest(size=(w,h)):
+                    # Independent RGB samples expose averaging, enlargement,
+                    # colour reordering and loss of the partial edge cells.
+                    pixels=np.random.default_rng(91).integers(0,256,(h,w,3),dtype=np.uint8)
+                    source.write_bytes(f'P6\n{w} {h}\n255\n'.encode()+pixels.tobytes())
+                    code,out,err=self.player('--pixel-size',f'{w}x{h}','--frames','1','--stats',str(stats),source=str(source),grid=False)
+                    self.assertEqual(code,0,err)
+                    frames=self.pixel_frames(out);self.assertEqual(len(frames),1)
+                    header,actual=frames[0]
+                    self.assertEqual((header[b's'],header[b'v']),(str(w).encode(),str(h).encode()))
+                    self.assertNotIn(b'c',header);self.assertNotIn(b'r',header)
+                    self.assertEqual(actual,pixels.tobytes())
+                    summary=json.loads(stats.read_text())
+                    self.assertEqual(summary['decoded_size'],[w,h]);self.assertEqual(summary['image_size'],[w,h])
+
+    def test_player_pixel_size_rejects_ambiguous_geometry(self):
+        for size,extra in [('0x531',[]),('945x-1',[]),('945',[]),('945x531',['--cols','4']),
+                           ('945x531',['--rows','4']),('945x531',['--mode','cells'])]:
+            with self.subTest(size=size,extra=extra):
+                code,out,err=self.player('--pixel-size',size,*extra,grid=False)
+                self.assertEqual(code,2);self.assertIn(b'--pixel-size',err);self.assertNotIn(b'Traceback',err)
+                self.assertEqual(out,b'')
+
+    def test_player_pixel_size_survives_a_paused_seek(self):
+        with tempfile.TemporaryDirectory() as temp:
+            clip=self.sound_clip(temp);stats=Path(temp)/'stats.json'
+            code,out,err=self.player('--pixel-size','17x13','--no-audio','--stats',str(stats),source=clip,grid=False,
+                                     keys=[(1.5,b' '),(.2,b'\x1b[C'),(.4,b'q')])
+            self.assertEqual(code,0,err)
+            frames=self.pixel_frames(out);self.assertGreater(len(frames),2)
+            # Paused seeking presents one additional picture outside the main
+            # loop. It must take the same pad/draw/crop path as normal playback.
+            summary=json.loads(stats.read_text());self.assertEqual(summary['seeks'],1)
+            self.assertEqual(len(frames),summary['shown']+1)
+            for header,pixels in frames:
+                self.assertEqual((header[b's'],header[b'v']),(b'17',b'13'))
+                self.assertNotIn(b'c',header);self.assertNotIn(b'r',header)
+                self.assertEqual(len(pixels),17*13*3)
 
     def test_player_pixels_and_cells(self):
         import re,base64,zlib

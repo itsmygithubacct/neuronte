@@ -1,4 +1,4 @@
-/* Exercise the final four neurons of a width-12 distance model. */
+/* Exercise the last neuron at scalar, vector and tail widths. */
 #include "neuronte.h"
 #include <assert.h>
 #include <math.h>
@@ -19,10 +19,11 @@ static void f32(unsigned char *p, float value)
     u32(p, bits);
 }
 
-int main(void)
+static void check_width(int H)
 {
-    enum { H = 12, PARAMS = 2 * H * H + 94 * H + 1, BYTES = 204 + 4 * PARAMS };
-    unsigned char image[BYTES] = {0};
+    size_t BYTES = 204 + 4 * (2 * H * H + 94 * H + 1);
+    unsigned char *image = calloc(BYTES, 1);
+    assert(image);
     neuronte *net = NULL;
     float coverage[128];
     uint32_t canvas[130];
@@ -38,7 +39,7 @@ int main(void)
     f32(image + offset + 4 * (H*H-1), 1.f); /* l3 last diagonal */
     offset += 4 * (H*H + H);
     f32(image + offset + 4 * (H-1), .125f); /* output last neuron */
-    assert(neuronte_open(image, sizeof image, &net) == 0 && net);
+    assert(neuronte_open(image, BYTES, &net) == 0 && net);
     for (int samples = 1; samples <= 2; samples++) {
         assert(neuronte_coverage(net, 0x28ff, 8, 16, samples, coverage) == 0);
         float expected = .5f + .15f * 8 * samples * .125f;
@@ -53,14 +54,21 @@ int main(void)
         assert(canvas[0] == 0x12345678 && canvas[129] == 0x12345678);
     }
     neuronte_close(net);
-    for (int h = 4; h <= 1028; h += 2) {
-        if (h >= 8 && h <= 1024 && h % 4 == 0) continue;
+    for (int h = 0; h <= 1028; h++) {
+        if (h >= 1 && h <= 1024) continue;
         u32(image + 20, (uint32_t)h);
         net = (neuronte *)1;
-        assert(neuronte_open(image, sizeof image, &net) < 0 && net == NULL);
+        assert(neuronte_open(image, BYTES, &net) < 0 && net == NULL);
     }
     u32(image + 20, H);
-    assert(neuronte_open(image, sizeof image - 1, &net) < 0 && net == NULL);
-    puts("test_widths: width 12, final-neuron inference, cold/warm drawing and malformed shapes passed");
+    assert(neuronte_open(image, BYTES - 1, &net) < 0 && net == NULL);
+    free(image);
+}
+
+int main(void)
+{
+    const int widths[] = {1, 2, 3, 4, 6, 8, 12, 15, 17, 20, 48, 1024};
+    for (size_t i = 0; i < sizeof widths / sizeof *widths; i++) check_width(widths[i]);
+    puts("test_widths: scalar/vector/tail widths, final-neuron inference, cold/warm drawing and malformed shapes passed");
     return 0;
 }

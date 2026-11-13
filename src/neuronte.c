@@ -45,7 +45,7 @@
 #define IN (POS + CODE)
 #define LAYERS 3
 #define HEADER (8 + 5 * 4 + 4 + NMASK * 4)
-#define MAX_H 1024 /* distance widths are multiples of 4 up to this */
+#define MAX_H 1024 /* distance widths are any integer from 1 up to this */
 #define MAX_NETS 16
 #define MAX_RANGES 65536
 #define MAX_GATE 256 /* gate hidden width */
@@ -181,7 +181,7 @@ static size_t head_floats(size_t r, size_t k)
 /* The length of a one-net file of hidden width h, or 0 if no such width. */
 static size_t file_len(uint32_t h)
 {
-    return h >= 8 && h <= MAX_H && h % 4 == 0 ? HEADER + 4 * params(h) : 0;
+    return h >= 1 && h <= MAX_H ? HEADER + 4 * params(h) : 0;
 }
 
 static size_t gate_params(size_t g, size_t k)

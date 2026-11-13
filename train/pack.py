@@ -44,7 +44,7 @@ One distance net, version 1, all little-endian:
     8   u32       format version, 1
     12  u32       position octaves, 6
     16  u32       code bits, 64
-    20  u32       hidden width H, a multiple of 8 from 8 to 1024
+    20  u32       hidden width H, a multiple of 4 from 8 to 1024
     24  u32       hidden layers, 3
     28  f32       tau
     32  43 x u32  parity masks
@@ -190,8 +190,8 @@ def load(path):
         if shape.get(k) != v:
             raise SystemExit(f"{path}: {k} is {shape.get(k)}, this packer is for {v}")
     h = shape.get("hidden_width")
-    if not (isinstance(h, int) and 8 <= h <= 1024 and h % 8 == 0):
-        raise SystemExit(f"{path}: hidden width {h} is not a multiple of 8 from 8 to 1024")
+    if not (isinstance(h, int) and 8 <= h <= 1024 and h % 4 == 0):
+        raise SystemExit(f"{path}: hidden width {h} is not a multiple of 4 from 8 to 1024")
     masks = [int(m, 16) for m in shape["parity_masks"]]
     if len(masks) != 43 or any(not 0 < m < 1 << 21 for m in masks):
         raise SystemExit(f"{path}: parity masks must be 43 values over 21 bits")
@@ -727,7 +727,7 @@ def member(path, fallback=0x3F, bold_add=None):
         version = struct.unpack_from("<I", raw, 8)[0]
         if version == 1:
             h = struct.unpack_from("<I", raw, 20)[0] if len(raw) >= 24 else 0
-            if not (8 <= h <= 1024 and h % 8 == 0) or len(raw) != length(h):
+            if not (8 <= h <= 1024 and h % 4 == 0) or len(raw) != length(h):
                 raise SystemExit(f"{path}: not a whole version 1 net")
         elif version == 4:
             n = struct.unpack_from("<I", raw, 24)[0] if len(raw) >= 32 else 0

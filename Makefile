@@ -247,7 +247,13 @@ test-ui-metadata:
 
 .PHONY: ui-metadata test-ui-metadata
 
-test: all $(TESTS) test-rc9 test-rc9-quality test-ui-metadata test-bench-errors
+test-widths: build/libneuronte.so build/test_widths
+	./build/test_widths
+	$(PYTHON) tests/check_widths.py build/libneuronte.so
+
+.PHONY: test-widths
+
+test: all $(TESTS) test-widths test-rc9 test-rc9-quality test-ui-metadata test-bench-errors
 	cd weights && sha256sum -c --quiet SHA256SUMS
 	# The pointer net keeps its own list, with paths from the top of the tree.
 	sha256sum -c --quiet weights/neuronte-pointer-v0.sha256

@@ -14,6 +14,7 @@ import numpy as np
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'tools'))
 from neuronte_video import TwoInk
 from neuronte_video_helpers import Helper,features,quality_cells,ssim
+import video
 from video import scenes
 
 
@@ -38,15 +39,24 @@ def evaluate(model,speed,quality,seeds,k):
 
 
 def main():
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument('parents',type=Path);p.add_argument('output',type=Path);a=p.parse_args();a.output.mkdir(parents=True,exist_ok=True)
-    protocol=dict(version=2,selection='validation PSNR loss <=.02dB and speedup>=3; minimum K',validation=[101,102],heldout=[1901,1902,1903],quality='neural switch + localSSIM .0001 veto + frameSSIM .001 veto',parents={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in a.parents.glob('*seed*.json')},script_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest())
-    (a.output/'protocol.json').write_text(json.dumps(protocol,indent=2)+'\n');model=TwoInk('full');results=[]
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('parents',type=Path);p.add_argument('output',type=Path)
+    p.add_argument('--weights',type=Path,default=ROOT/'weights/neuronte-split-v5.nrt',help='the bundle the parents were trained against')
+    p.add_argument('--heldout',type=int,nargs='+',default=[1901,1902,1903],help='held-out clip seeds; use ones no earlier helper was assessed on')
+    p.add_argument('--grid-seed',type=int,help='also assess one 640x384 (80x24 cell) clip with this seed')
+    a=p.parse_args();a.output.mkdir(parents=True,exist_ok=True)
+    protocol=dict(version=2,selection='validation PSNR loss <=.02dB and speedup>=3; minimum K',validation=[101,102],heldout=a.heldout,grid_seed=a.grid_seed,weights=a.weights.name,weights_sha256=hashlib.sha256(a.weights.read_bytes()).hexdigest(),quality='neural switch + localSSIM .0001 veto + frameSSIM .001 veto',parents={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in a.parents.glob('*seed*.json')},script_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest())
+    (a.output/'protocol.json').write_text(json.dumps(protocol,indent=2)+'\n');model=TwoInk('full',weights=a.weights);results=[]
     for seed in [0,1]:
         speed=Helper(a.parents/f'speed-seed{seed}.json','speed');quality=Helper(a.parents/f'quality-seed{seed}.json','quality')
         validation=[evaluate(model,speed,quality,[101,102],k) for k in [64,80,96]]
         passed=[r for r in validation if r['psnr_loss_db']<=.02 and r['speedup']>=3]
         k=min(passed,key=lambda r:r['k'])['k'] if passed else 96
-        result=dict(seed=seed,validation=validation,heldout=evaluate(model,speed,quality,[1901,1902,1903],k),selection_pass=bool(passed));results.append(result)
+        result=dict(seed=seed,validation=validation,heldout=evaluate(model,speed,quality,a.heldout,k),selection_pass=bool(passed))
+        if a.grid_seed is not None:
+            global scenes;small=scenes;scenes=lambda s:video.scenes(s,width=640,height=384)
+            try:result['grid_80x24']=evaluate(model,speed,quality,[a.grid_seed],k)
+            finally:scenes=small
+        results.append(result)
         (a.output/'results.json').write_text(json.dumps(results,indent=2)+'\n');print(json.dumps(result),flush=True)
 
 if __name__=='__main__':main()

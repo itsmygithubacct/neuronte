@@ -97,8 +97,8 @@ class Video(unittest.TestCase):
 
     def test_helper_numpy_reference(self):
         from neuronte_video_helpers import Helper
-        for kind,n in [('speed',24),('quality',51)]:
-            path=ROOT/f'weights/neuronte-video-{kind}-v0.json'
+        for version,kind,n in [(ver,kind,n) for ver in ('v0','v1') for kind,n in [('speed',24),('quality',51)]]:
+            path=ROOT/f'weights/neuronte-video-{kind}-{version}.json'
             model=Helper(path,kind);doc=json.loads(path.read_text())
             x=np.random.default_rng(15).random((7,n)).astype(np.float32)
             reference=x.astype(float)
@@ -159,7 +159,7 @@ class Video(unittest.TestCase):
         self.assertIn(b'exactness failed',result.stderr)
 
     def test_runtime_helper_policy_required_before_frames(self):
-        doc=json.loads((ROOT/'weights/neuronte-video-speed-v0.json').read_text())
+        doc=json.loads((ROOT/'weights/neuronte-video-speed-v1.json').read_text())
         with tempfile.TemporaryDirectory() as temp:
             path=Path(temp)/'helper.json'
             for policy in ['missing',None,[],3]:
@@ -172,6 +172,32 @@ class Video(unittest.TestCase):
                 self.assertEqual(result.returncode,2,result.stderr)
                 self.assertIn(b'inference policy',result.stderr)
                 self.assertNotIn(b'Traceback',result.stderr)
+
+    def test_helpers_are_bound_to_their_bundle(self):
+        from neuronte_video_helpers import Helper
+        sums=dict(reversed(line.split('  ')) for line in (ROOT/'weights/SHA256SUMS').read_text().splitlines())
+        for version,bundle,scalars in [('v0','split-v4',1061),('v1','split-v5',1176)]:
+            for kind in ['speed','quality']:
+                doc=Helper(ROOT/f'weights/neuronte-video-{kind}-{version}.json',kind,runtime=True).doc
+                self.assertEqual(doc['scalar_manifest'],bundle)
+                self.assertEqual(doc['scalar_bundle_sha256'],sums[f'neuronte-{bundle}.nrt'])
+            self.assertEqual(len(json.loads((ROOT/f'weights/neuronte-video-speed-{version}.json').read_text())['layers'][1]['bias']),scalars)
+        cmd=[sys.executable,str(ROOT/'tools/neuronte-video.py'),'--width','8','--height','16','--mode','full','--helper','speed']
+        old=['--helper-model',str(ROOT/'weights/neuronte-video-speed-v0.json')]
+        frame=bytes(384)
+        # Defaults: split-v5 with the v1 helper.
+        self.assertEqual(subprocess.run(cmd,input=frame,capture_output=True).returncode,0)
+        # The v0 helper is refused with split-v5 and still runs with split-v4.
+        result=subprocess.run(cmd+old,input=frame,capture_output=True)
+        self.assertEqual(result.returncode,2);self.assertIn(b'differ from the selected bundle',result.stderr)
+        self.assertEqual(subprocess.run(cmd+old+['--weights',str(ROOT/'weights/neuronte-split-v4.nrt')],input=frame,capture_output=True).returncode,0)
+        result=subprocess.run(cmd+['--weights',str(ROOT/'weights/neuronte-split-v4.nrt')],input=frame,capture_output=True)
+        self.assertEqual(result.returncode,2);self.assertIn(b'differ from the selected bundle',result.stderr)
+        # A helper whose output layer does not match its bundle is refused.
+        with tempfile.TemporaryDirectory() as temp:
+            doc=json.loads((ROOT/'weights/neuronte-video-speed-v0.json').read_text());doc['scalar_manifest']='split-v5'
+            path=Path(temp)/'helper.json';path.write_text(json.dumps(doc))
+            with self.assertRaisesRegex(ValueError,'invalid video helper layer'):Helper(path,'speed')
 
     def test_exact_video_asset(self):
         result=v.exactness()

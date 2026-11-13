@@ -23,7 +23,7 @@ class NeuralMasks:
         self.lib.neuronte_close.argtypes = [C.c_void_p]
         self.lib.neuronte_coverage.argtypes = [C.c_void_p, C.c_uint32, C.c_int, C.c_int, C.c_int, C.POINTER(C.c_float)]
         self.handle = C.c_void_p()
-        path = Path(weights or ROOT / 'weights/neuronte-split-v4.nrt')
+        path = Path(weights or ROOT / 'weights/neuronte-split-v5.nrt')
         if self.lib.neuronte_open_file(str(path).encode(), C.byref(self.handle)):
             raise ValueError(f'cannot load {path}')
 
@@ -142,7 +142,7 @@ def candidates(mode, width, height, weights=None, library=None):
     if mode != 'full': raise ValueError('mode must be portable or full')
     # Use the loaded bundle's explicit routing ranges, so newly trained
     # bundles cannot silently be searched with an obsolete scalar manifest.
-    path = Path(weights or ROOT / 'weights/neuronte-split-v4.nrt')
+    path = Path(weights or ROOT / 'weights/neuronte-split-v5.nrt')
     with NeuralMasks(path, library) as net:
         data = path.read_bytes()
         if len(data) < 28 or struct.unpack_from('<I', data, 8)[0] != 2:

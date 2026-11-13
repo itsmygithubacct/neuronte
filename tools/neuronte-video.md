@@ -9,7 +9,7 @@ size exactly. No implicit resizing or cropping is performed.
 terminal cells. `--output rgb` writes reconstructed RGB24 frames. Full mode
 uses the loaded bundle’s explicit scalar ranges and its actual C coverage masks;
 portable mode uses the 328 ideal geometric masks. Full mode must be displayed
-with that same Neuronte bundle to reproduce the fitted image. Full mode requires a monochrome bundle with explicit scalar ranges; split-v4 is the
+with that same Neuronte bundle to reproduce the fitted image. Full mode requires a monochrome bundle with explicit scalar ranges; split-v5 is the
 default. A standalone net without a manifest is rejected. Fixed-colour members are
 also rejected, including single-layer colour nets: their palette cannot be
 reproduced by an arbitrary foreground/background fit.
@@ -62,13 +62,19 @@ not a model-only fidelity guarantee. Its goal is fewer character changes;
 it still performs exhaustive search. The two helpers are alternatives, not a
 combined mode that has never been measured.
 
-Both require the precise split-v4 weights they were trained against, zero
-`--margin`, and 8×16 cells. A mismatched bundle is rejected. The optional
+Both require the precise bundle they were trained against, zero `--margin`,
+and 8×16 cells. A mismatched bundle is rejected. The default helpers,
+`neuronte-video-speed-v1` and `neuronte-video-quality-v1`, were retrained
+against split-v5, whose 1,176 scalars include the Greek and Russian letters.
+The v0 helpers were trained against split-v4's 1,061 and are kept: select them
+with `--weights weights/neuronte-split-v4.nrt --helper-model
+weights/neuronte-video-speed-v0.json` (or `-quality-v0`). The optional
 `--helper-model` explicitly selects another compatible, versioned model.
 The helper JSON records the bundle SHA256, model seed, training-frame digest,
 training source hash, inference policy and acceptance evidence. Playback uses
 NumPy/SciPy, not torch. Training and reproducible gates are in `train/video.py`
-and `train/evaluate_video_helpers.py`.
+and `train/evaluate_video_helpers.py`; `train/adopt_video_helpers.py` writes the
+shipped files and refuses unless both seeds pass.
 
 The initial helpers failed on held-out data and were not adopted. The revised
 inference policy was chosen on validation clips and checked on fresh held-out

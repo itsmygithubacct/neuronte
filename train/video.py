@@ -94,10 +94,14 @@ def logits(net,x):
     with torch.no_grad():return net(torch.from_numpy(x)).numpy()
 
 
-def save(net,path,kind,seed,datahash):
+def manifest_name(weights):
+    return Path(weights).stem.removeprefix('neuronte-')
+
+
+def save(net,path,kind,seed,datahash,weights):
     doc=dict(format='neuronte-video-helper',version=1,kind=kind,seed=seed,source_frames_sha256=datahash,
         source_script_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),cell=[8,16],
-        scalar_manifest='split-v4',layers=[dict(weight=m.weight.detach().numpy().tolist(),bias=m.bias.detach().numpy().tolist()) for m in net if isinstance(m,nn.Linear)])
+        scalar_manifest=manifest_name(weights),scalar_bundle_sha256=hashlib.sha256(Path(weights).read_bytes()).hexdigest(),layers=[dict(weight=m.weight.detach().numpy().tolist(),bias=m.bias.detach().numpy().tolist()) for m in net if isinstance(m,nn.Linear)])
     path.write_text(json.dumps(doc,separators=(',',':'))+'\n')
 
 
@@ -127,13 +131,13 @@ def evaluate(model,speed,quality,seeds,k):
 
 
 def main():
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--output',required=True,type=Path);p.add_argument('--epochs',type=int,default=100);a=p.parse_args();a.output.mkdir(parents=True,exist_ok=True)
-    torch.set_num_threads(2);model=TwoInk('full');(x,y,qx,qy),digest=make_data(model,range(10,18))
-    (a.output/'protocol.json').write_text(json.dumps(dict(train_seeds=list(range(10,18)),validation_seeds=[101,102],heldout_seeds=[901,902,903],epochs=a.epochs,speed_gate='>=3x and <=.1dB loss',quality_gate='SSIM loss <=.001 and fewer character changes',training_rgb_sha256=digest),indent=2))
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--output',required=True,type=Path);p.add_argument('--epochs',type=int,default=100);p.add_argument('--weights',type=Path,default=ROOT/'weights/neuronte-split-v5.nrt',help='bundle the helpers are trained against and bound to');a=p.parse_args();a.output.mkdir(parents=True,exist_ok=True)
+    torch.set_num_threads(2);model=TwoInk('full',weights=a.weights);(x,y,qx,qy),digest=make_data(model,range(10,18))
+    (a.output/'protocol.json').write_text(json.dumps(dict(train_seeds=list(range(10,18)),validation_seeds=[101,102],heldout_seeds=[901,902,903],epochs=a.epochs,speed_gate='>=3x and <=.1dB loss',quality_gate='SSIM loss <=.001 and fewer character changes',training_rgb_sha256=digest,weights=a.weights.name,weights_sha256=hashlib.sha256(a.weights.read_bytes()).hexdigest()),indent=2))
     all_results=[]
     for seed in [0,1]:
         speed=fit_net(x,y,len(model.scalars),seed,a.epochs);quality=fit_net(qx,qy,2,seed,a.epochs)
-        save(speed,a.output/f'speed-seed{seed}.json','speed',seed,digest);save(quality,a.output/f'quality-seed{seed}.json','quality',seed,digest)
+        save(speed,a.output/f'speed-seed{seed}.json','speed',seed,digest,a.weights);save(quality,a.output/f'quality-seed{seed}.json','quality',seed,digest,a.weights)
         validation=[evaluate(model,speed,quality,[101,102],k) for k in [16,32,64,96,128]]
         passing=[r for r in validation if r['speed_pass']]
         chosen=min(passing,key=lambda r:r['k'])['k'] if passing else 128

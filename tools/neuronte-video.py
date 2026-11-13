@@ -55,9 +55,9 @@ def main():
         if a.level!='two' or a.mode!='full' or (w,h)!=(8,16) or a.margin:
             p.error('helpers require --level two --mode full --cell 8x16 and zero margin')
         from neuronte_video_helpers import Helper,features,quality_cells
-        helper=Helper(a.helper_model or ROOT/f'weights/neuronte-video-{a.helper}-v0.json',a.helper,runtime=True)
+        helper=Helper(a.helper_model or ROOT/f'weights/neuronte-video-{a.helper}-v1.json',a.helper,runtime=True)
         expected=helper.doc.get('scalar_bundle_sha256')
-        actual=hashlib.sha256(Path(a.weights or ROOT/'weights/neuronte-split-v4.nrt').read_bytes()).hexdigest()
+        actual=hashlib.sha256(Path(a.weights or ROOT/'weights/neuronte-split-v5.nrt').read_bytes()).hexdigest()
         if not expected or expected!=actual:p.error('helper scalar manifest/weights differ from the selected bundle')
     elif a.helper_model:p.error('--helper-model requires a helper')
     count=0; error=0.; previous=None; previous_frame=None; started=time.perf_counter()

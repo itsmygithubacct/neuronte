@@ -70,7 +70,7 @@ starts from random initialisation and sees only the targets above.
 
 ## What has been checked
 
-- `weights/SHA256SUMS` matches every file it lists (294 files) at the
+- `weights/SHA256SUMS` matches every file it lists (297 files) at the
   commit that added this document.
 - No font file (`.ttf`, `.otf`, `.woff`, `.woff2`, `.pcf`, `.bdf`, `.psf`,
   `.ttc`, `.fon`) has ever been added in this repository's history, on

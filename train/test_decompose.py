@@ -55,7 +55,12 @@ class DecompositionTests(unittest.TestCase):
         # distance loss, so neither batching nor cdist defines its answer.
         torch.manual_seed(8)
         torch.set_num_threads(1)
-        torch.set_default_device(os.environ.get('DECOMPOSE_TEST_DEVICE', 'cpu'))
+        device = os.environ.get('DECOMPOSE_TEST_DEVICE', 'cpu')
+        torch.set_default_device(device)
+        torch.backends.cuda.matmul.allow_tf32 = False
+        # Independent CUDA GEMMs and batched GEMMs use different float32
+        # reduction orders; Adam amplifies differences near zero gradients.
+        update_rtol, update_atol = (5e-5, 5e-7) if device.startswith('cuda') else (1e-5, 2e-7)
         nets=[torch.nn.Sequential(torch.nn.Linear(90,8),torch.nn.ReLU(),torch.nn.Linear(8,8),
               torch.nn.ReLU(),torch.nn.Linear(8,8),torch.nn.ReLU(),torch.nn.Linear(8,1)) for _ in range(2)]
         layers=[[m for m in net if isinstance(m,torch.nn.Linear)] for net in nets]
@@ -64,11 +69,14 @@ class DecompositionTests(unittest.TestCase):
         optim=torch.optim.Adam(ws+bs,lr=.002)
         refs=[torch.optim.Adam(net.parameters(),lr=.002) for net in nets]
         valid=torch.tensor([[1,1,1,0,0],[1,1,1,1,1.]])
+        objective = lambda *args: d.objective(torch, *args)
+        if os.environ.get('DECOMPOSE_TEST_COMPILE') == '1':
+            objective = torch.compile(objective, fullgraph=True)
         for _ in range(3):
             xy=torch.rand(2,5,17,2)*torch.tensor([1.,2.]);cf=torch.randn(2,5,64)
             pu=torch.rand(2,7,13,2)*torch.tensor([1.,2.]);cu=torch.randn(2,7,64)
             wanted=torch.rand(2,5,17)*2-1;truth=(torch.rand(2,5,13)>.7).float()
-            got=d.objective(torch,ws,bs,cf,xy,wanted,valid,cu,pu,truth,1.)
+            got=objective(ws,bs,cf,xy,wanted,valid,cu,pu,truth,1.)
             expected=[]
             for k,g in enumerate((3,5)):
                 def field(c,p):
@@ -96,8 +104,8 @@ class DecompositionTests(unittest.TestCase):
             optim.step()
             for k in range(2):
                 for i,layer in enumerate(layers[k]):
-                    torch.testing.assert_close(ws[i][k],layer.weight,rtol=1e-5,atol=2e-7)
-                    torch.testing.assert_close(bs[i][k],layer.bias,rtol=1e-5,atol=2e-7)
+                    torch.testing.assert_close(ws[i][k],layer.weight,rtol=update_rtol,atol=update_atol)
+                    torch.testing.assert_close(bs[i][k],layer.bias,rtol=update_rtol,atol=update_atol)
 
     def test_checkpoint_resume_and_identity(self):
         for expert in ('ascii', 'accent'):

@@ -24,6 +24,7 @@ letter. Desktop adapters fall back for unsupported strings and styles.
 |---|---|---|---:|---:|---:|
 | `neuronte-split-v5` | the font to use | 1,176, over six nets and a router; [recipe and validation](weights/neuronte-split-v5.md) | 48, 128, 192 and 256 | 392,716 | 1,573,128 bytes |
 | `neuronte-split-v6` | RC9 Braille: split-v5 with its Braille net replaced by the tiled `neuronte-braille-v1`; the video player's full-mode bundle; [recipe and validation](weights/neuronte-braille-v1.md) | 1,176, over six nets and a router | 6, 128, 192 and 256 | 384,232 | 1,539,388 bytes |
+| `neuronte-split-v7` | split-v6 with the ASCII character groups added: tiled Braille and `neuronte-ascii-groups-v1`; not a default; [recipe and checks](weights/neuronte-split-v7.md) | 1,176, over ten nets and a router | 6, 64, 128, 192 and 256 | 441,068 | 1,768,128 bytes |
 | `neuronte-split-v4` | the default before Greek and Russian, kept; most measurements below were made on it | 1,061, over six nets and a router | 48, 128 and 192 | 329,356 | 1,319,616 bytes |
 | `neuronte-full-v3` | explicit RC9 monolithic font; [quality and baseline comparison](weights/neuronte-full-v3.md) | 878, including the Greek and Russian additions | 384 | 331,009 | 1,324,240 bytes |
 | `neuronte-full-v2` | the baseline `split` is measured against | 763 of them in one net, all but the sextants and octants | 320 | 234,881 | 939,728 bytes |
@@ -74,6 +75,12 @@ split-v5's on two x86 hosts and 11 to 40 times on an ARM board, least at
 higher at 48 x 96. The video player's full mode draws with split-v6; its
 learned helpers are bound to split-v5, which stays. See
 [the recipe and validation](weights/neuronte-braille-v1.md).
+
+`neuronte-split-v7.nrt` is split-v6 with the four ASCII character-group
+nets of `neuronte-ascii-groups-v1` added by `train/known_bundle.py`. split-v6's
+members, unknown-character routing and non-ASCII pixels are unchanged, and
+its ASCII pixels are the qualified group nets'. It is not a default yet. See
+[its recipe and checks](weights/neuronte-split-v7.md).
 
 RC9 also ships the separate `neuronte-emoji-v0.nrt` colour bundle: 300 original
 single-scalar emoji, 600 left/right half labels, three experts, and up to six

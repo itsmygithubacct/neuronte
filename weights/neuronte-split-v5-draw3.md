@@ -1,6 +1,12 @@
-# Split-v5 with the draw-v3 box-drawing experts
+# Split-v5 with the draw-v3 box-drawing experts (experimental)
 
-`neuronte-split-v5-draw3.nrt` is a new, explicitly selected bundle. It is
+**Experimental; not for production or default use.** The draw-v3 recipe failed its
+pre-declared quality gates: one of its two trained seeds (seed 0) exceeds the firm-pixel
+limit at a 24x47 cell (59 against 46). Every trained seed of a recipe had to pass. The
+package is kept so the study can be reproduced and measured. Nothing selects it by
+default.
+
+`neuronte-split-v5-draw3.nrt` is a new bundle that must be named explicitly. It is
 split-v5 with its one box-drawing expert (draw-v2, width 192, 91,777
 parameters) replaced by six narrower experts, draw-v3, each width 64
 (14,209 parameters, 85,254 in all). Split-v5 itself is unchanged; consumers
@@ -26,12 +32,15 @@ code points route to the same expert family as in split-v5.
 
 Training: `train/draw_split.py --design custom` with the six groups above,
 width 64, 40,000 Adam/cosine steps, the original losses, teacher and
-sampling, seeds 0 and 1, eager CUDA float32 with TF32 off. Seed 1 ships;
-seed 0 also passes the gates below. The teacher is the boxshade target of
+sampling, seeds 0 and 1, eager CUDA float32 with TF32 off. The package
+holds seed 1. Both seeds pass the gates at 8x16, 16x32 and 48x96. Seed 0 fails
+the geometry gate at 24x47; seed 1 passes it. A gate recalibrated on
+retrains of draw-v2's own architecture, written after these results, passes
+both seeds. It is post hoc and does not make the recipe eligible. The teacher is the boxshade target of
 `train/glyphs.py`, identical to the one draw-v2 was trained on.
 
-Grouping by glyph structure is what makes the narrow nets work. With the
-same per-net widths, contiguous scalar groups (2 x 96, 4 x 48, 8 x 24,
+Grouping by glyph structure gave the largest quality gain in the study. With
+the same per-net widths, contiguous scalar groups (2 x 96, 4 x 48, 8 x 24,
 16 x 12) and spatial tiles (2, 4, 8 tiles) all failed the gates on at least
 one of two seeds. Shades, dashes and double lines, mixed with plain lines,
 spoiled the groups they were in; tiles cut the lines along their centres.
@@ -54,9 +63,11 @@ arms of the same weight meet across a cell edge. No firm error falls on a
 cell edge at any of these sizes. At 28 odd, small, anisotropic and 23/24/25
 pixel-wide cells, draw-v3 has a lower MAE than draw-v2 at 26 of them; at
 cells 24 pixels and wider (one sample per pixel) it has more firm pixels
-missing ink on antialiased edges than the shipped seed (300 against 203 in
-total), within the range of draw-v2's own architecture retrained on two
-seeds (231 and 274). Cold and warm cached draws, clipped draws and UTF-8 box
+missing ink on antialiased edges: 300 in total, against 203 for the shipped
+seed and 231 and 274 for draw-v2's own architecture retrained on two seeds.
+Per size, it stays within the largest of those three plus one pixel in
+10,000. Wider draw-v3 nets (80, 96) fit better at 8x16 to 48x96 but miss
+more of these pixels. Cold and warm cached draws, clipped draws and UTF-8 box
 text match coverage exactly (`tools/draw-api-check.py`).
 
 Reproduce the package from the member weights:

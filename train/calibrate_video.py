@@ -19,10 +19,16 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--weights',type=Path,default=Path(__file__).resolve().parents[1]/'weights')
     parser.add_argument('--output',type=Path,required=True)
+    parser.add_argument('--parent',action='append',nargs=2,metavar=('SOURCE','NAME'),
+                        help='a parent net and its video name (neuronte-video-NAME.json); '
+                             'default: pixel-v1 and ascii-v0 from --weights, as v0 was made')
+    parser.add_argument('--bundle',default='neuronte-video-masks-v0.nrt')
+    parser.add_argument('--fallback',type=int,default=1)
     args=parser.parse_args(); args.output.mkdir(parents=True,exist_ok=True)
+    parents=[(Path(source),name) for source,name in args.parent] if args.parent else \
+            [(args.weights/f'neuronte-{name}.json',name) for name in ['pixel-v1','ascii-v0']]
     output=[]
-    for name in ['pixel-v1','ascii-v0']:
-        parent=args.weights/f'neuronte-{name}.json'
+    for parent,name in parents:
         doc=json.loads(parent.read_text())
         old=doc['shape']['tau']; doc['shape']['tau']=old*2
         doc['video_calibration']=dict(version=1,parent=parent.name,parent_sha256=digest(parent),
@@ -32,7 +38,7 @@ def main():
         dest=args.output/f'neuronte-video-{name}.json'
         with dest.open('x') as stream: json.dump(doc,stream,separators=(',',':')); stream.write('\n')
         output.append(str(dest))
-    data,_=pack.bundle(output,fallback=1)
-    with (args.output/'neuronte-video-masks-v0.nrt').open('xb') as stream: stream.write(data)
+    data,_=pack.bundle(output,fallback=args.fallback)
+    with (args.output/args.bundle).open('xb') as stream: stream.write(data)
 
 if __name__=='__main__': main()

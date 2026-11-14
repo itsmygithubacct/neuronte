@@ -352,6 +352,28 @@ class Video(unittest.TestCase):
                 if i==0:reference=np.maximum(reference,0)
             np.testing.assert_allclose(model(x),reference,atol=2e-4,rtol=1e-5)
 
+    def test_helper_hidden_width_is_the_files_own(self):
+        # A narrower helper loads with its own width and evaluates like the
+        # float64 reference; inconsistent or empty hidden layers are refused.
+        from neuronte_video_helpers import Helper
+        doc=json.loads((ROOT/'weights/neuronte-video-speed-v1.json').read_text())
+        rng=np.random.default_rng(16)
+        with tempfile.TemporaryDirectory() as temp:
+            path=Path(temp)/'helper.json'
+            for hidden in [1,32,48]:
+                model=dict(doc,layers=[dict(weight=rng.normal(size=(hidden,24)).tolist(),bias=rng.normal(size=hidden).tolist()),
+                                       dict(weight=rng.normal(size=(1176,hidden)).tolist(),bias=rng.normal(size=1176).tolist())])
+                path.write_text(json.dumps(model));net=Helper(path,'speed',runtime=True)
+                x=rng.random((5,24)).astype(np.float32)
+                reference=np.maximum(x.astype(float)@np.array(model['layers'][0]['weight']).T+model['layers'][0]['bias'],0)
+                reference=reference@np.array(model['layers'][1]['weight']).T+model['layers'][1]['bias']
+                np.testing.assert_allclose(net(x),reference,atol=1e-3,rtol=1e-4)
+            for layers in [[dict(weight=[],bias=[]),doc['layers'][1]],
+                           [dict(weight=rng.normal(size=(32,24)).tolist(),bias=[0.]*32),doc['layers'][1]],
+                           [dict(weight=rng.normal(size=(32,25)).tolist(),bias=[0.]*32),dict(weight=rng.normal(size=(1176,32)).tolist(),bias=[0.]*1176)]]:
+                path.write_text(json.dumps(dict(doc,layers=layers)))
+                with self.assertRaises(ValueError):Helper(path,'speed',runtime=True)
+
     def test_temporal_guard_rejects_bad_retention(self):
         from neuronte_video_helpers import quality_cells,ssim
         model=v.TwoInk('full')

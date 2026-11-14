@@ -79,9 +79,9 @@ def make_data(model,seeds):
     return tuple(np.concatenate(v) for v in [xs,ys,qx,qy]),digest.hexdigest()
 
 
-def fit_net(x,y,outputs,seed,epochs):
+def fit_net(x,y,outputs,seed,epochs,hidden=96):
     torch.manual_seed(seed)
-    net=nn.Sequential(nn.Linear(x.shape[1],96),nn.ReLU(),nn.Linear(96,outputs))
+    net=nn.Sequential(nn.Linear(x.shape[1],hidden),nn.ReLU(),nn.Linear(hidden,outputs))
     opt=torch.optim.Adam(net.parameters(),lr=.003);tx=torch.from_numpy(x);ty=torch.from_numpy(y)
     for epoch in range(epochs):
         order=torch.randperm(len(tx))
@@ -131,12 +131,12 @@ def evaluate(model,speed,quality,seeds,k):
 
 
 def main():
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--output',required=True,type=Path);p.add_argument('--epochs',type=int,default=100);p.add_argument('--weights',type=Path,default=ROOT/'weights/neuronte-split-v5.nrt',help='bundle the helpers are trained against and bound to');a=p.parse_args();a.output.mkdir(parents=True,exist_ok=True)
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--output',required=True,type=Path);p.add_argument('--epochs',type=int,default=100);p.add_argument('--weights',type=Path,default=ROOT/'weights/neuronte-split-v5.nrt',help='bundle the helpers are trained against and bound to');p.add_argument('--hidden',type=int,default=96,help='hidden width of the speed helper (the quality helper stays 96 wide)');a=p.parse_args();a.output.mkdir(parents=True,exist_ok=True)
     torch.set_num_threads(2);model=TwoInk('full',weights=a.weights);(x,y,qx,qy),digest=make_data(model,range(10,18))
     (a.output/'protocol.json').write_text(json.dumps(dict(train_seeds=list(range(10,18)),validation_seeds=[101,102],heldout_seeds=[901,902,903],epochs=a.epochs,speed_gate='>=3x and <=.1dB loss',quality_gate='SSIM loss <=.001 and fewer character changes',training_rgb_sha256=digest,weights=a.weights.name,weights_sha256=hashlib.sha256(a.weights.read_bytes()).hexdigest()),indent=2))
     all_results=[]
     for seed in [0,1]:
-        speed=fit_net(x,y,len(model.scalars),seed,a.epochs);quality=fit_net(qx,qy,2,seed,a.epochs)
+        speed=fit_net(x,y,len(model.scalars),seed,a.epochs,a.hidden);quality=fit_net(qx,qy,2,seed,a.epochs)
         save(speed,a.output/f'speed-seed{seed}.json','speed',seed,digest,a.weights);save(quality,a.output/f'quality-seed{seed}.json','quality',seed,digest,a.weights)
         validation=[evaluate(model,speed,quality,[101,102],k) for k in [16,32,64,96,128]]
         passing=[r for r in validation if r['speed_pass']]

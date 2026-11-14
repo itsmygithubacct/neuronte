@@ -1,6 +1,11 @@
 """Score every packed icon layer independently through the C API.
 
-usage: check_icon_quality.py LIB JSON NRT [--out SCORES] [--report-only]
+usage: check_icon_quality.py LIB JSON NRT [--also JSON]... [--out SCORES] [--report-only]
+
+NRT may be a bundle of colour nets: JSON is its first member and each
+--also names a further member, in any order. The labelled glyphs of all
+members together must be the full batch, each glyph in one member, and
+every glyph is scored through the bundle as the router sends it.
 
 The acceptance gate is mean 16px IoU >= .990, exact palette entries, no
 positive unused coverage, and no lost nonempty or zero-coverage used
@@ -11,6 +16,7 @@ uses the analytic drawings to expose grid-boundary differences.
 """
 import argparse
 import ctypes
+import hashlib
 import json
 import os
 import sys
@@ -88,27 +94,41 @@ def main():
     p.add_argument("nrt")
     p.add_argument("--out")
     p.add_argument("--report-only", action="store_true")
+    p.add_argument("--also", action="append", default=[], help="a further bundle member's JSON")
+    p.add_argument("--target-cache", help="directory reusing targets across files, bound to drawing, grid, pen, tau and glyphs.py")
     a = p.parse_args()
-    with open(a.json) as fh:
-        doc = json.load(fh)
-    pack.check_sources(doc, a.json)
-    labelled = pack.labelled_scalars(doc, a.json)
+    docs = []
+    for path in [a.json] + a.also:
+        with open(path) as fh:
+            docs.append(json.load(fh))
+        pack.check_sources(docs[-1], path)
+    doc = docs[0]
+    labelled = [s for d, path in zip(docs, [a.json] + a.also) for s in pack.labelled_scalars(d, path)]
+    if len(set(labelled)) != len(labelled):
+        raise SystemExit("a glyph is labelled in two members")
+    for d in docs[1:]:
+        if any(d["training"][key] != doc["training"][key] for key in ("grid", "pen_radius")) \
+                or d["shape"]["tau"] != doc["shape"]["tau"]:
+            raise SystemExit("bundle members differ in grid, pen or tau")
     icons, pal = glyphs.colour_icons(), strokes.palette()
     if len(labelled) != 167 or sum(len(icons[chr(s)]) for s in labelled) != 209:
         raise SystemExit("quality gate requires the full 167-icon, 209-layer batch")
-    k = doc["shape"]["glyph_layers"]
+    k = max(d["shape"]["glyph_layers"] for d in docs)
     grid, pen = doc["training"]["grid"], doc["training"]["pen_radius"]
     tau = doc["shape"]["tau"]
     lib = ctypes.CDLL(os.path.abspath(a.lib))
     lib.neuronte_open_file.argtypes = [ctypes.c_char_p, ctypes.POINTER(ctypes.c_void_p)]
     lib.neuronte_set_snap.argtypes = [ctypes.c_void_p, ctypes.c_int]
     lib.neuronte_close.argtypes = [ctypes.c_void_p]
+    lib.neuronte_layers.argtypes = [ctypes.c_void_p]
     lib.neuronte_coverage_layers.argtypes = [ctypes.c_void_p, ctypes.c_uint32,
                                             ctypes.c_int, ctypes.c_int, ctypes.c_int,
                                             ctypes.c_void_p, ctypes.c_void_p]
     handle = ctypes.c_void_p()
     if lib.neuronte_open_file(a.nrt.encode(), ctypes.byref(handle)) != 0:
         raise SystemExit("C library refused the packed net")
+    if lib.neuronte_layers(handle) != k:
+        raise SystemExit("the packed file's layer count differs from the JSON")
     if lib.neuronte_set_snap(handle, 0) != 0:
         raise SystemExit("C library refused snap=0")
     widths = (12, 16, 32)
@@ -117,10 +137,32 @@ def main():
                         "stray_positive": 0,
                         **{theme: {"mean_err": 0., "off_gt32": 0.} for theme in THEMES}}
                for cw in widths}
-    for scalar in labelled:
-        layers = icons[chr(scalar)]
+    with open(glyphs.__file__, "rb") as fh:
+        glyphs_sha = hashlib.sha256(fh.read()).hexdigest()
+
+    def targets(layers):
+        """Per size and layer: the grid target coverage and the analytic mask."""
+        key = hashlib.sha256(json.dumps([repr(layers), grid, pen, tau, glyphs_sha, widths]).encode()).hexdigest()
+        path = os.path.join(a.target_cache, key + ".npz") if a.target_cache else None
+        if path and os.path.exists(path):
+            with np.load(path, allow_pickle=False) as z:
+                return {cw: [(z[f"t{cw}_{i}"], z[f"a{cw}_{i}"]) for i in range(len(layers))] for cw in widths}
         fields = [glyphs.field(shapes, grid, pen, tau).astype(np.float16).astype(np.float32)
                   for _, shapes in layers]
+        out = {cw: [((interpolate(fields[i], points[cw], grid) > 0).reshape(2 * cw, 8, cw, 8).mean((1, 3)),
+                     mask(glyphs.signed_distance(shapes, points[cw], pen), cw))
+                    for i, (_, shapes) in enumerate(layers)] for cw in widths}
+        if path:
+            os.makedirs(a.target_cache, exist_ok=True)
+            tmp = f"{path}.{os.getpid()}.tmp.npz"
+            np.savez(tmp, **{f"{p}{cw}_{i}": v[j] for cw in widths for i, v in enumerate(out[cw])
+                             for j, p in enumerate("ta")})
+            os.replace(tmp, path)
+        return out
+
+    for scalar in labelled:
+        layers = icons[chr(scalar)]
+        prepared = targets(layers)
         want = [pal[layers[i][0]][0] if i < len(layers) else 0 for i in range(k)]
         for cw in widths:
             r = results[str(cw)]
@@ -135,10 +177,8 @@ def main():
             target_cov = np.zeros_like(cov)
             for i, (_, shapes) in enumerate(layers):
                 predicted = cov[i] > .5
-                values = interpolate(fields[i], points[cw], grid)
-                target_cov[i] = (values > 0).reshape(2 * cw, 8, cw, 8).mean((1, 3))
+                target_cov[i], analytic = prepared[cw][i]
                 target = target_cov[i] > .5
-                analytic = mask(glyphs.signed_distance(shapes, points[cw], pen), cw)
                 r["layers"].append({"scalar": f"U+{scalar:04X}", "layer": i,
                                      **counts(target, predicted),
                                      "target_coverage_sum": float(target_cov[i].sum()),

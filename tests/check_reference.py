@@ -33,6 +33,7 @@ import ctypes
 import json
 import math
 import os
+import struct
 import sys
 
 import numpy as np
@@ -272,6 +273,15 @@ def net_of(path):
 nets = [net_of(p) for p in json_paths]
 if len(nets) == 1 and nets[0].colour:
     nets[0].bind(pack.read_colour(made))
+elif args[1:2] == ["--bundle"] and any(n.colour for n in nets):
+    # The members are the bundle's tail, in order, each its own whole image;
+    # a colour member's edge records and snap threshold come from its bytes.
+    lengths = struct.unpack_from(f"<{len(nets)}I", made, 28)
+    off = len(made) - sum(lengths)
+    for n, length in zip(nets, lengths):
+        if n.colour:
+            n.bind(pack.read_colour(made[off:off + length]))
+        off += length
 
 
 def route(s):

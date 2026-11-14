@@ -2,6 +2,7 @@
 
 usage: python3 train/train.py OUT.json [--set ascii|full|...] [--width W]
                               [--steps N] [--device cuda] [--seed S]
+                              [--labelled U+0020..U+0037 ...]
 
 Needs torch and numpy. Writes the weights as JSON and prints one JSON
 line of scores. The target at a point is the field glyphs.py makes: the
@@ -17,6 +18,11 @@ all pixels and over the firm ones, those whose drawing is not within
 0.1 of half covered.
 A set shown blended at large sizes (uilarge) is scored at its own
 sizes, in SOFT, by overlap only, and counts no pixels.
+
+--labelled keeps only the set's characters in the ranges given, in the
+syntax training.labelled records, so one net can be trained for a group
+of a face's characters, to be bundled with the nets of the other groups.
+Every range must hold at least one of the set's characters.
 """
 import argparse
 import hashlib
@@ -51,6 +57,7 @@ p.add_argument("--log-every", type=int, default=1000)
 p.add_argument("--continue-from", help="completed checkpoint for an explicitly restarted cosine phase")
 p.add_argument("--continue-source", help="immutable parent source export, verified against checkpoint hashes")
 p.add_argument("--continue-lr", type=float, default=2e-4, help="initial learning rate for the new continuation phase")
+p.add_argument("--labelled", nargs="+", help="keep only the set's characters in these U+XXXX[..U+YYYY] ranges")
 checkpoint.arguments(p)
 a = p.parse_args()
 if a.steps < 1 or a.tau <= 0 or not math.isfinite(a.tau):
@@ -74,6 +81,21 @@ def sha(rel):
 SOURCES = {f: sha(f) for f in glyphs.sources(a.set) + ["train/train.py", "train/checkpoint.py", "font/code-masks.txt"]}
 TAU, OCT, W, N = a.tau, 6, a.width, a.grid
 SET = glyphs.charset(a.set)
+if a.labelled:
+    keep = []
+    for tok in a.labelled:
+        lo, _, hi = tok.partition("..")
+        try:
+            lo, hi = int(lo.removeprefix("U+"), 16), int((hi or lo).removeprefix("U+"), 16)
+        except ValueError:
+            p.error(f"--labelled {tok!r} is not U+XXXX or U+XXXX..U+YYYY")
+        if not tok.startswith("U+") or (hi != lo and not tok.partition("..")[2].startswith("U+")) or hi < lo:
+            p.error(f"--labelled {tok!r} is not U+XXXX or U+XXXX..U+YYYY")
+        inside = [g for g in SET if lo <= ord(g[0]) <= hi]
+        if not inside:
+            p.error(f"--labelled {tok} holds none of set {a.set}'s characters")
+        keep += inside
+    SET = [g for g in SET if any(g is k for k in keep)]
 CHARS = [c for c, _, _ in SET]
 TIERS = [t for _, t, _ in SET]
 G = len(CHARS)

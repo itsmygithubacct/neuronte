@@ -5,6 +5,8 @@ usage: python3 tests/check_reference.py LIB.so WEIGHTS.json WEIGHTS.nrt
                                         [--gate GATE.json] [--fallback I]
        python3 tests/check_reference.py LIB.so --drawing DRAWING.nrt NET.json FACE.txt
        python3 tests/check_reference.py LIB.so --drawing DRAWING.nrt NET.json ADVANCES.txt
+       python3 tests/check_reference.py LIB.so --drawing-bundle DRAWING.nrt FACE.txt NET.json...
+                                        [--gate GATE.json] [--fallback I]
 
 The numpy side reads the JSON weights and works in float64; a tiled
 (version 6) net or member is evaluated by tests/tiled_reference.py. The C side
@@ -19,6 +21,11 @@ font/ui-10.txt, the net is checked the same way at the face's em too.
 Then every character of the face, drawn by neuronte_draw_text() at that
 em with neuronte_set_binary() on, regular and bold, must be exactly the
 face's pixels, and the pen must move by the face's advance.
+
+A drawing file of a bundle and a face's advances (--drawing-bundle, made
+by train/pack.py --drawing-bundle) is checked as the bundle and as the
+face both: the router, every net against numpy, and every character
+drawn exactly as above, by whichever net the router picks for it.
 
 For a drawing file of one net and an advances file, such as
 font/ui-large-advances.txt, which has no pixels to compare, the net is
@@ -248,6 +255,26 @@ if args[1:2] == ["--bundle"]:
 elif args[1:2] == ["--drawing"] and len(args) == 5:
     nrt_path, json_paths, face_path = args[2], [args[3]], args[4]
     made, table, gate, fallback = pack.drawing([args[3], face_path])[0], [], None, 0
+    face = pack.read_face(face_path)
+    if face is None:
+        soft_adv = pack.read_advances(face_path)
+    else:
+        face_em = face[1]
+elif args[1:2] == ["--drawing-bundle"] and len(args) >= 5:
+    nrt_path, face_path, rest, gate_path, fallback, json_paths = args[2], args[3], iter(args[4:]), None, 0, []
+    for a in rest:
+        if a == "--gate":
+            gate_path = next(rest)
+        elif a == "--fallback":
+            fallback = int(next(rest))
+        else:
+            json_paths.append(a)
+    made, table = pack.face_bundle(face_path, json_paths, gate_path, fallback)
+    gate = None
+    if gate_path:
+        with open(gate_path) as fh:
+            gdoc = json.load(fh)
+        gate = (layers(gdoc), [int(m, 16) for m in gdoc["parity_masks"]])
     face = pack.read_face(face_path)
     if face is None:
         soft_adv = pack.read_advances(face_path)
@@ -486,6 +513,9 @@ if face_em:
     lib.neuronte_set_binary(handle, 1)
     W, H, X, Y = 2 * em + 4, 2 * em + 4, 2, 2
     for ch_, (adv, art) in sorted(glyphs.pixel_face(em, face_path).items()):
+        if lib.neuronte_route(handle, ord(ch_)) != route(ord(ch_)):
+            print(f"FAIL U+{ord(ch_):04X} routed to net {lib.neuronte_route(handle, ord(ch_))}, want {route(ord(ch_))}")
+            failed = True
         ink = np.array([[c == "#" for c in r] for r in art])
         for bold in (0, 1):
             want = np.zeros((H, W), bool)
@@ -534,7 +564,6 @@ if soft_adv:
             print(f"FAIL U+{v:04X} is not measured as the fallback U+003F")
             failed = True
     lib.neuronte_set_binary(handle, 0)
-    net = nets[0]
     texts = ["A", "g", "@", "W", "\u2026", "Ag"]
     drawn = 0
     for em in (36, 48, 64):
@@ -548,7 +577,7 @@ if soft_adv:
                 W, H = pens[-1] + em + 2 + 3, 2 * em + 4
                 want = np.zeros((H, W))
                 for c, x in zip(text, pens):
-                    cov = net.coverage(ord(c), em, 2 * em, 1)
+                    cov = nets[route(ord(c))].coverage(ord(c), em, 2 * em, 1)
                     if bold:
                         wide = np.zeros((2 * em, em + 1))
                         wide[:, :em] = cov

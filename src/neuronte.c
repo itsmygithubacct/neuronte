@@ -28,15 +28,20 @@
  * An advance table (version 4) is the pen step of each character of a
  * proportional face, regular and bold, in steps of a hundredth of an em.
  * A drawing file (version 5) is a directory of whole images: nets, at
- * most one advance table, and colour nets.
+ * most one advance table, and colour nets. Its nets are distance, colour
+ * and tiled members, the first of which draws every scalar, or else one
+ * bundle, whose router sends each scalar to one of its nets as it does
+ * when the bundle opens alone. A face cut into character groups is a
+ * drawing file of one bundle and one advance table.
  *
  * A tiled net (version 6) is one distance glyph cut into a grid of
  * rectangles of the design cell. Each tile is drawn by one of the version 1
  * nets the image carries, from a code made of some of the scalar's bits.
  * Every sample of the whole cell is taken where it falls, in the local
  * coordinates of the tile holding it, so the cell need not divide evenly
- * into tiles. It opens by itself and as a bundle member, and draws as one
- * net: one call per glyph, one cache entry per glyph.
+ * into tiles. It opens by itself, as a bundle member and in a drawing
+ * file, and draws as one net: one call per glyph, one cache entry per
+ * glyph.
  */
 #include "neuronte.h"
 
@@ -912,22 +917,36 @@ static size_t drawing_len(const unsigned char *p)
     return total;
 }
 
+/* A drawing file's nets are either its version 1, 3 and 6 members, the
+ * first of which draws every scalar, or one bundle, which brings its own
+ * nets and router; never both, and never two bundles. */
 static int drawing_open(const unsigned char *p, size_t len, neuronte *n)
 {
     size_t prefix, off, i;
+    int bundled = 0;
 
     if (len < DRAWING_HEAD || (prefix = drawing_prefix(p)) == 0 || len < prefix || drawing_len(p) != len)
         return NEURONTE_ERR_FORMAT;
     for (i = 0, off = prefix; i < rd32(p + 12); i++) {
         size_t ml = rd32(p + DRAWING_HEAD + 8 * i + 4);
         const unsigned char *m = p + off;
+        uint32_t ver;
         int rc = NEURONTE_OK;
         if (memcmp(m, "NEURONTE", 8) != 0)
             return NEURONTE_ERR_FORMAT;
-        switch (rd32(m + 8)) {
+        ver = rd32(m + 8);
+        if (bundled && ver != 4)
+            return NEURONTE_ERR_FORMAT; /* nets beside a bundle's */
+        switch (ver) {
         case 1:
             rc = net_open(m, ml, &n->net[n->nets]);
             n->nets += rc == NEURONTE_OK;
+            break;
+        case 2:
+            if (n->nets)
+                return NEURONTE_ERR_FORMAT;
+            bundled = 1;
+            rc = bundle_open(m, ml, n);
             break;
         case 3:
             rc = colour_open(m, ml, &n->net[n->nets]);
@@ -936,7 +955,11 @@ static int drawing_open(const unsigned char *p, size_t len, neuronte *n)
         case 4:
             rc = adv_open(m, ml, n); /* a second table is refused there */
             break;
-        default: /* a bundle or a drawing file inside one, or a later kind */
+        case 6:
+            rc = tiled_open(m, ml, &n->net[n->nets]);
+            n->nets += rc == NEURONTE_OK;
+            break;
+        default: /* a drawing file inside one, or a later kind */
             rc = NEURONTE_ERR_FORMAT;
         }
         if (rc != NEURONTE_OK)

@@ -1,0 +1,51 @@
+{
+  "format": "neuronte-pointer-manifest",
+  "version": 1,
+  "scalar": 1048577,
+  "model": "weights/neuronte-pointer-v1.nrt",
+  "model_sha256": "39a03fa8cc31ff9c0de0d0f9b8a02d8565a0c6f89ce499324418788c99116856",
+  "source_sha256": {
+    "font/pointer.txt": "62921107358dfc4fbaf0285c69837173a34eb3d610e9c8a7c347c3068c7a6f87",
+    "font/pointer-palette.txt": "4b76488603e2578839c1e121d182760c83e6bba821746bec9f23390e106ca9e4"
+  },
+  "palette_entries": [
+    2,
+    3
+  ],
+  "palette_rgb": [
+    [
+      0,
+      0,
+      0
+    ],
+    [
+      255,
+      255,
+      255
+    ]
+  ],
+  "sizes": [
+    {
+      "width": 16,
+      "height": 32,
+      "supersampling": 2,
+      "hotspot": [
+        1,
+        1
+      ]
+    },
+    {
+      "width": 32,
+      "height": 64,
+      "supersampling": 1,
+      "hotspot": [
+        3,
+        3
+      ]
+    }
+  ],
+  "crop": null,
+  "other_scalars": "unsupported",
+  "validation": "weights/neuronte-pointer-v1.validation.json",
+  "preview": null
+}

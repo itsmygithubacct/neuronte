@@ -310,9 +310,19 @@ test-tiled: build/libneuronte.so build/stream/libneuronte.so build/test_tiled
 
 .PHONY: test-tiled
 
+# The narrower colour nets of 0.1.2, each beside the file it may replace.
+test-colour-marks: build/libneuronte.so
+	sha256sum -c --quiet weights/neuronte-pointer-v1.sha256
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_pointer.py build/libneuronte.so weights/neuronte-pointer-v1.json weights/neuronte-pointer-v1.nrt --max-xor 16:0,0 --max-xor 32:1,2
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_pointer.py build/libneuronte.so weights/neuronte-pointer-v1.seed1.json weights/neuronte-pointer-v1.seed1.nrt --max-xor 16:0,0 --max-xor 32:1,2
+	$(PYTHON) tests/check_reference.py build/libneuronte.so weights/neuronte-pointer-v1.json weights/neuronte-pointer-v1.nrt
+	$(PYTHON) tests/check_reference.py build/libneuronte.so weights/neuronte-pointer-v1.seed1.json weights/neuronte-pointer-v1.seed1.nrt
+
+.PHONY: test-colour-marks
+
 .PHONY: test-widths
 
-test: all $(TESTS) test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7
+test: all $(TESTS) test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7 test-colour-marks
 	cd weights && sha256sum -c --quiet SHA256SUMS
 	# The pointer net keeps its own list, with paths from the top of the tree.
 	sha256sum -c --quiet weights/neuronte-pointer-v0.sha256

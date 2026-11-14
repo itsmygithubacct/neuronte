@@ -1,0 +1,227 @@
+{
+  "scalar": "U+100001",
+  "recipe": "form A, K = 2, width 48, head 16, grid 256, 20,000 steps, CPU, 1 thread; then train/colour_calibrate.py final layer 5,000 steps at its defaults",
+  "gate": "tests/check_pointer.py --max-xor 16:0,0 --max-xor 32:1,2 (the v0 card checks, exact manifest hotspots, per-layer mask pixels off the drawing no more than the v0 pair)",
+  "seeds": {
+    "0": {
+      "json": "weights/neuronte-pointer-v1.json",
+      "sizes": {
+        "16": {
+          "layers": [
+            {
+              "iou": 1.0,
+              "intersection": 118,
+              "union": 118,
+              "target_ink": 118,
+              "predicted_ink": 118
+            },
+            {
+              "iou": 1.0,
+              "intersection": 78,
+              "union": 78,
+              "target_ink": 78,
+              "predicted_ink": 78
+            }
+          ],
+          "layer_xor": [
+            0,
+            0
+          ],
+          "numpy_max_error": 3.8609299857217394e-07,
+          "border_alpha_max": 0.0,
+          "tip_error_pixels": 1,
+          "first_visible_xy": [
+            1,
+            1
+          ],
+          "hotspot": [
+            1,
+            1
+          ],
+          "visible_components": 1,
+          "contrast_pixels": {
+            "dark": 77,
+            "light": 36
+          },
+          "composite_mean_error_255": {
+            "dark": 0.4404324709884655,
+            "light": 0.9520394286320766
+          },
+          "card_passed": true,
+          "max_xor": [
+            0,
+            0
+          ],
+          "passed": true
+        },
+        "32": {
+          "layers": [
+            {
+              "iou": 0.9981203007518797,
+              "intersection": 531,
+              "union": 532,
+              "target_ink": 532,
+              "predicted_ink": 531
+            },
+            {
+              "iou": 0.9965986394557823,
+              "intersection": 293,
+              "union": 294,
+              "target_ink": 293,
+              "predicted_ink": 294
+            }
+          ],
+          "layer_xor": [
+            1,
+            1
+          ],
+          "numpy_max_error": 9.066435110449689e-07,
+          "border_alpha_max": 0.0,
+          "tip_error_pixels": 0,
+          "first_visible_xy": [
+            3,
+            3
+          ],
+          "hotspot": [
+            3,
+            3
+          ],
+          "visible_components": 1,
+          "contrast_pixels": {
+            "dark": 292,
+            "light": 237
+          },
+          "composite_mean_error_255": {
+            "dark": 0.5551350870002381,
+            "light": 1.0828262622078455
+          },
+          "card_passed": true,
+          "max_xor": [
+            1,
+            2
+          ],
+          "passed": true
+        }
+      },
+      "passed": true
+    },
+    "1": {
+      "json": "weights/neuronte-pointer-v1.seed1.json",
+      "sizes": {
+        "16": {
+          "layers": [
+            {
+              "iou": 1.0,
+              "intersection": 118,
+              "union": 118,
+              "target_ink": 118,
+              "predicted_ink": 118
+            },
+            {
+              "iou": 1.0,
+              "intersection": 78,
+              "union": 78,
+              "target_ink": 78,
+              "predicted_ink": 78
+            }
+          ],
+          "layer_xor": [
+            0,
+            0
+          ],
+          "numpy_max_error": 8.037879078437449e-07,
+          "border_alpha_max": 0.0,
+          "tip_error_pixels": 1,
+          "first_visible_xy": [
+            1,
+            1
+          ],
+          "hotspot": [
+            1,
+            1
+          ],
+          "visible_components": 1,
+          "contrast_pixels": {
+            "dark": 78,
+            "light": 36
+          },
+          "composite_mean_error_255": {
+            "dark": 0.47636407726747265,
+            "light": 1.11501936317012
+          },
+          "card_passed": true,
+          "max_xor": [
+            0,
+            0
+          ],
+          "passed": true
+        },
+        "32": {
+          "layers": [
+            {
+              "iou": 0.9981203007518797,
+              "intersection": 531,
+              "union": 532,
+              "target_ink": 532,
+              "predicted_ink": 531
+            },
+            {
+              "iou": 0.9931972789115646,
+              "intersection": 292,
+              "union": 294,
+              "target_ink": 293,
+              "predicted_ink": 293
+            }
+          ],
+          "layer_xor": [
+            1,
+            2
+          ],
+          "numpy_max_error": 1.9864049194406874e-06,
+          "border_alpha_max": 0.0,
+          "tip_error_pixels": 0,
+          "first_visible_xy": [
+            3,
+            3
+          ],
+          "hotspot": [
+            3,
+            3
+          ],
+          "visible_components": 1,
+          "contrast_pixels": {
+            "dark": 293,
+            "light": 236
+          },
+          "composite_mean_error_255": {
+            "dark": 0.5656206278086984,
+            "light": 1.2560422541969274
+          },
+          "card_passed": true,
+          "max_xor": [
+            1,
+            2
+          ],
+          "passed": true
+        }
+      },
+      "passed": true
+    }
+  },
+  "passed": true,
+  "sha256": {
+    "font/pointer.txt": "62921107358dfc4fbaf0285c69837173a34eb3d610e9c8a7c347c3068c7a6f87",
+    "font/pointer-palette.txt": "4b76488603e2578839c1e121d182760c83e6bba821746bec9f23390e106ca9e4",
+    "tests/check_pointer.py": "71855e02660187b584bbc7b9b288f3b36a5da83c44841d244b4d6bc523bd92a7",
+    "weights/neuronte-pointer-v1.json": "4338dadbfd0c6b0561ecf3a6c49e8f2edbb9d9d79c749828f1cc31ae879838a3",
+    "weights/neuronte-pointer-v1.nrt": "39a03fa8cc31ff9c0de0d0f9b8a02d8565a0c6f89ce499324418788c99116856",
+    "weights/neuronte-pointer-v1.raw.json": "0cafb7f3207e0149a8cf177311bfd9c8af9dea6920591fa94e1c1d42eb8de860",
+    "weights/neuronte-pointer-v1.raw.nrt": "b9d09dc72115162d0932140739972cf21313a0d807efd315a12a4e3d996f3fa1",
+    "weights/neuronte-pointer-v1.scores.json": "f338ab63ba03435fa08f1243a059d7d094443aeb79409215049e48476ac0eaab",
+    "weights/neuronte-pointer-v1.seed1.json": "04e4daf99a1568fd9f977df15c363d0e98aa77c47ee7cd17913673ebacc42410",
+    "weights/neuronte-pointer-v1.seed1.nrt": "15a36b7b8edd53f01240647ecc1405c006479dbacf7596731955f3a6a433e35c",
+    "weights/neuronte-pointer-v1.seed1.raw.json": "e4471d4771242f67c742f18929045062c7d06998e98c62bc644470b8df76ef62",
+    "weights/neuronte-pointer-v1.seed1.raw.nrt": "a19b35139f5e43afaf79e0dc7b29cc9946474a102b1c40686cd024acc401a165",
+    "weights/neuronte-pointer-v1.seed1.scores.json": "fff30636439a55a4e99a818fecedaa23d0f192324770f10479fc0d5c7187e41a"
+  }
+}

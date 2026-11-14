@@ -39,6 +39,10 @@ RC9_NETS = $(NETS)
 BRAILLE_V1 = weights/neuronte-braille-v1
 SPLIT_V6 = weights/neuronte-split-v6.nrt
 NETS_V6 = $(ASCII).json $(DRAW).json $(SYMBOL).json $(ACCENT).json $(PIXEL).json $(BRAILLE_V1).json
+# Opt-in bundle: split-v5 with the 49 symbol labels moved to four width-32
+# group nets (train/split_expert.py); split-v5 itself is unchanged.
+SYMBOL_V1 = weights/neuronte-symbol-v1
+SYMBOL_V1_SPLIT = weights/neuronte-split-v5-symbol-v1.nrt
 # The desktop face: one drawing file for each em, a net and the advances
 # of that em's pixel face.
 UI1 = weights/neuronte-ui1-v0
@@ -304,15 +308,31 @@ test-split-v7: build/libneuronte.so build/test_api
 
 .PHONY: test-split-v7
 
+test-split-v7-symbol: build/libneuronte.so build/test_api
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_split_v7_symbol.py build/libneuronte.so
+	./build/test_api weights/neuronte-split-v7-symbol-v1.nrt --full --accent --pixel
+
+.PHONY: test-split-v7-symbol
+
 test-tiled: build/libneuronte.so build/stream/libneuronte.so build/test_tiled
 	./build/test_tiled
 	$(PYTHON) tests/check_tiled.py build/libneuronte.so --stream build/stream/libneuronte.so
 
 .PHONY: test-tiled
 
+test-symbol-v1: build/libneuronte.so build/test_api
+	@set -e; for g in 0 1 2 3; do \
+		$(PYTHON) train/pack.py $(SYMBOL_V1)-g$$g.json build/symbol-v1-g$$g.nrt; \
+		$(PYTHON) tests/check_reference.py build/libneuronte.so $(SYMBOL_V1)-g$$g.json build/symbol-v1-g$$g.nrt; \
+	done
+	$(PYTHON) tests/check_symbol_v1.py build/libneuronte.so
+	./build/test_api $(SYMBOL_V1_SPLIT) --full --accent --pixel
+
+.PHONY: test-symbol-v1
+
 .PHONY: test-widths
 
-test: all $(TESTS) test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7
+test: all $(TESTS) test-widths test-tiled test-symbol-v1 test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7 test-split-v7-symbol
 	cd weights && sha256sum -c --quiet SHA256SUMS
 	# The pointer net keeps its own list, with paths from the top of the tree.
 	sha256sum -c --quiet weights/neuronte-pointer-v0.sha256

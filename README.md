@@ -25,6 +25,7 @@ letter. Desktop adapters fall back for unsupported strings and styles.
 | `neuronte-split-v5` | the font to use | 1,176, over six nets and a router; [recipe and validation](weights/neuronte-split-v5.md) | 48, 128, 192 and 256 | 392,716 | 1,573,128 bytes |
 | `neuronte-split-v6` | RC9 Braille: split-v5 with its Braille net replaced by the tiled `neuronte-braille-v1`; the video player's full-mode bundle; [recipe and validation](weights/neuronte-braille-v1.md) | 1,176, over six nets and a router | 6, 128, 192 and 256 | 384,232 | 1,539,388 bytes |
 | `neuronte-split-v7` | split-v6 with the ASCII character groups added: tiled Braille and `neuronte-ascii-groups-v1`; not a default; [recipe and checks](weights/neuronte-split-v7.md) | 1,176, over ten nets and a router | 6, 64, 128, 192 and 256 | 441,068 | 1,768,128 bytes |
+| `neuronte-split-v7-symbol-v1` | split-v7 with the symbol character groups added: tiled Braille, `neuronte-ascii-groups-v1` and `neuronte-symbol-v1`; not a default; [recipe and checks](weights/neuronte-split-v7-symbol-v1.md) | 1,176, over fourteen nets and a router | 6, 32, 64, 128, 192 and 256 | 461,296 | 1,850,412 bytes |
 | `neuronte-split-v4` | the default before Greek and Russian, kept; most measurements below were made on it | 1,061, over six nets and a router | 48, 128 and 192 | 329,356 | 1,319,616 bytes |
 | `neuronte-full-v3` | explicit RC9 monolithic font; [quality and baseline comparison](weights/neuronte-full-v3.md) | 878, including the Greek and Russian additions | 384 | 331,009 | 1,324,240 bytes |
 | `neuronte-full-v2` | the baseline `split` is measured against | 763 of them in one net, all but the sextants and octants | 320 | 234,881 | 939,728 bytes |
@@ -83,6 +84,13 @@ its ASCII pixels are the qualified group nets'. Measured as a whole bundle on
 two x86 CPUs, it draws uncached ASCII about 2.2 times as fast as split-v6 and
 Braille as fast, and takes 0.1 to 0.3 ms longer to open. It is not a default
 yet. See [its recipe, checks and speed](weights/neuronte-split-v7.md).
+
+`neuronte-split-v7-symbol-v1.nrt` is split-v7 with the four width-32 symbol
+group nets of `neuronte-symbol-v1` added the same way. split-v7's members,
+routing and every non-symbol pixel are unchanged; the 49 symbols draw exactly
+as in `neuronte-split-v5-symbol-v1`, whose uncached symbol coverage measured
+5–6× faster than split-v5 on two x86-64 hosts. It is not a default. See
+[its recipe and checks](weights/neuronte-split-v7-symbol-v1.md).
 
 RC9 also ships the separate `neuronte-emoji-v0.nrt` colour bundle: 300 original
 single-scalar emoji, 600 left/right half labels, three experts, and up to six

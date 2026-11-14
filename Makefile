@@ -314,6 +314,15 @@ test-split-v7-symbol: build/libneuronte.so build/test_api
 
 .PHONY: test-split-v7-symbol
 
+test-split-v8: build/libneuronte.so build/test_api
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_split_v8.py build/libneuronte.so
+	./build/test_api weights/neuronte-split-v8.nrt --full --accent --pixel
+
+pack-split-v8:
+	$(PYTHON) train/build_split_v8.py
+
+.PHONY: test-split-v8 pack-split-v8
+
 test-tiled: build/libneuronte.so build/stream/libneuronte.so build/test_tiled
 	./build/test_tiled
 	$(PYTHON) tests/check_tiled.py build/libneuronte.so --stream build/stream/libneuronte.so
@@ -332,7 +341,7 @@ test-symbol-v1: build/libneuronte.so build/test_api
 
 .PHONY: test-widths
 
-test: all $(TESTS) test-widths test-tiled test-symbol-v1 test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7 test-split-v7-symbol
+test: all $(TESTS) test-widths test-tiled test-symbol-v1 test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7 test-split-v7-symbol test-split-v8
 	cd weights && sha256sum -c --quiet SHA256SUMS
 	# The pointer net keeps its own list, with paths from the top of the tree.
 	sha256sum -c --quiet weights/neuronte-pointer-v0.sha256

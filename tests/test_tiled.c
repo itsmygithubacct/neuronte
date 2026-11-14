@@ -209,6 +209,56 @@ static struct spec dots(void)
     return s;
 }
 
+
+/* An advance table, version 4: every scalar of [lo, hi] steps 50 regular
+ * and 60 bold, with fallback lo. */
+static size_t adv_image(uint32_t lo, uint32_t hi, unsigned char **out)
+{
+    uint32_t count = hi - lo + 1;
+    size_t len = 32 + 8 * (size_t)count;
+    unsigned char *p = calloc(len, 1);
+    assert(p);
+    memcpy(p, "NEURONTE", 8);
+    u32(p + 8, 4); u32(p + 12, 10); u32(p + 16, 10); u32(p + 20, 2); u32(p + 24, count); u32(p + 28, lo);
+    for (uint32_t i = 0; i < count; i++) {
+        u32(p + 32 + 8 * i, lo + i);
+        u32(p + 36 + 8 * i, 50u | 60u << 16);
+    }
+    *out = p;
+    return len;
+}
+
+/* A drawing file, version 5, of the members given, in order. */
+static size_t drawing_image(unsigned char *const *m, const size_t *ml, int count, unsigned char **out)
+{
+    size_t off = 16 + 8 * (size_t)count, len = off;
+    for (int i = 0; i < count; i++) len += ml[i];
+    unsigned char *p = calloc(len, 1);
+    assert(p);
+    memcpy(p, "NEURONTE", 8);
+    u32(p + 8, 5); u32(p + 12, (uint32_t)count);
+    for (int i = 0; i < count; i++) {
+        u32(p + 16 + 8 * i, (uint32_t)off); u32(p + 20 + 8 * i, (uint32_t)ml[i]);
+        memcpy(p + off, m[i], ml[i]);
+        off += ml[i];
+    }
+    *out = p;
+    return len;
+}
+
+/* Two handles give the same coverage, route and nets, bit for bit. */
+static void same_as(neuronte *a, neuronte *b, uint32_t scalar, int w, int h, int ss)
+{
+    float *x = malloc(sizeof(float) * (size_t)w * h), *y = malloc(sizeof(float) * (size_t)w * h);
+    assert(x && y);
+    assert(neuronte_route(a, scalar) == neuronte_route(b, scalar));
+    assert(neuronte_coverage(a, scalar, w, h, ss, x) == NEURONTE_OK);
+    assert(neuronte_coverage(b, scalar, w, h, ss, y) == NEURONTE_OK);
+    assert(memcmp(x, y, sizeof(float) * (size_t)w * h) == 0);
+    free(x);
+    free(y);
+}
+
 int main(void)
 {
     struct spec s = dots();
@@ -278,6 +328,93 @@ int main(void)
         check_cov(n, &s, 0x2801, 9, 17, 0);
         neuronte_close(n);
         free(b);
+    }
+
+    /* In a drawing file: a tiled member draws every scalar; a bundle's
+     * router routes as the bundle does alone, beside an advance table in
+     * either order. Nets beside a bundle, and two bundles, are refused. */
+    {
+        unsigned char *t, *d, *b, *net = calloc(NET_BYTES, 1), *m[4];
+        size_t tl = adv_image(0x20, 0x7E, &t), dl, ml[4];
+        size_t bl = 28 + 8 + 24 + NET_BYTES + len;
+        neuronte *alone = NULL;
+        assert(net);
+        put_net(net, 1, 0);
+        m[0] = p; ml[0] = len; m[1] = t; ml[1] = tl;
+        dl = drawing_image(m, ml, 2, &d);
+        assert(neuronte_open(d, dl, &n) == NEURONTE_OK && opens_file(d, dl));
+        assert(neuronte_nets(n) == 1 && neuronte_advances(n) == 0x5F && neuronte_route(n, 0x41) == 0);
+        check_cov(n, &s, 0x28C3, 23, 47, 0);
+        check_cov(n, &s, 0x2841, 32, 64, 1);
+        neuronte_close(n);
+        free(d);
+
+        b = calloc(bl, 1);
+        assert(b);
+        memcpy(b, "NEURONTE", 8);
+        u32(b + 8, 2); u32(b + 12, 2); u32(b + 16, 2); u32(b + 20, 1); u32(b + 24, 0);
+        u32(b + 28, NET_BYTES); u32(b + 32, (uint32_t)len);
+        u32(b + 36, 0x20); u32(b + 40, 0x4F); u32(b + 44, 0);
+        u32(b + 48, 0x50); u32(b + 52, 0x7E); u32(b + 56, 1);
+        put_net(b + 60, -1, 1);
+        memcpy(b + 60 + NET_BYTES, p, len);
+        assert(neuronte_open(b, bl, &alone) == NEURONTE_OK);
+        for (int order = 0; order < 2; order++) {
+            m[order] = b; ml[order] = bl; m[1 - order] = t; ml[1 - order] = tl;
+            dl = drawing_image(m, ml, 2, &d);
+            assert(neuronte_open(d, dl, &n) == NEURONTE_OK && opens_file(d, dl));
+            assert(neuronte_nets(n) == 2 && neuronte_parameters(n) == neuronte_parameters(alone));
+            assert(neuronte_route(n, 0x41) == 0 && neuronte_route(n, 0x50) == 1 && neuronte_route(n, 0x7E) == 1);
+            assert(neuronte_route(n, 0x2800) == 1 && neuronte_route(n, 0x4E2D) == 1);
+            for (uint32_t c = 0x1E; c <= 0x80; c++) {
+                same_as(n, alone, c, 16, 32, 0);
+                same_as(n, alone, c, 32, 64, 1);
+            }
+            same_as(n, alone, 0x28C3, 9, 17, 0);
+            /* The face's draw call: each character from its own net, the
+             * pen stepping by the table. */
+            {
+                uint32_t got[40 * 64], want[40 * 64];
+                float cov[32 * 64];
+                memset(got, 0, sizeof got);
+                memset(want, 0, sizeof want);
+                assert(neuronte_set_binary(n, 1) == 0);
+                assert(neuronte_draw_text(n, got, 40, 40, 64, 0, 0, 32, 0, "A", 1, 0xFFFFFFFF) == 16);
+                assert(neuronte_text_width(n, "AZ", 2, 1, 32) == 2 * 19);
+                assert(neuronte_coverage(alone, 'A', 32, 64, 0, cov) == 0);
+                for (int y = 0; y < 64; y++)
+                    for (int x = 0; x < 32; x++)
+                        want[y * 40 + x] = cov[y * 32 + x] > .5f ? 0xFFFFFFFF : 0;
+                assert(memcmp(got, want, sizeof got) == 0);
+            }
+            neuronte_close(n);
+            free(d);
+        }
+        static const struct { int count, kinds[3]; const char *what; } bad[] = {
+            {3, {0, 1, 2}, "a bundle and a net"}, {3, {1, 0, 2}, "a net and a bundle"},
+            {3, {0, 0, 2}, "two bundles"}, {3, {0, 3, 2}, "a bundle and a tiled net"},
+            {3, {3, 0, 2}, "a tiled net and a bundle"},
+        };
+        for (size_t i = 0; i < sizeof bad / sizeof *bad; i++) {
+            for (int k = 0; k < bad[i].count; k++) {
+                int kind = bad[i].kinds[k];
+                m[k] = kind == 0 ? b : kind == 1 ? net : kind == 2 ? t : p;
+                ml[k] = kind == 0 ? bl : kind == 1 ? NET_BYTES : kind == 2 ? tl : len;
+            }
+            dl = drawing_image(m, ml, bad[i].count, &d);
+            refuse_bytes(d, dl, bad[i].what);
+            free(d);
+        }
+        /* A damaged bundle member is refused as the bundle is alone. */
+        m[0] = b; ml[0] = bl; m[1] = t; ml[1] = tl;
+        dl = drawing_image(m, ml, 2, &d);
+        u32(d + 32 + 48, 0x40); /* its second range now overlaps the first */
+        refuse_bytes(d, dl, "a bundle member whose ranges overlap");
+        free(d);
+        neuronte_close(alone);
+        free(b);
+        free(t);
+        free(net);
     }
 
     /* A range that does not start on a mask boundary: codes come from
@@ -401,7 +538,7 @@ int main(void)
     }
     free(p);
     printf("test_tiled: exact dispatch and codes at %zu cell sizes, keep and stream paths, bundles, "
-           "64 identity nets, drawing and %d malformed files passed\n",
+           "64 identity nets, drawing, drawing files and %d malformed files passed\n",
            sizeof cells / sizeof *cells, refused);
     return 0;
 }

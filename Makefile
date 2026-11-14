@@ -285,6 +285,13 @@ test-tiled: build/libneuronte.so build/stream/libneuronte.so build/test_tiled
 
 .PHONY: test-tiled
 
+# A face cut into nets: a drawing file of one bundle and an advance table.
+test-face-bundle: build/libneuronte.so build/test_tiled
+	./build/test_tiled
+	$(PYTHON) tests/check_face_bundle.py build/libneuronte.so
+
+.PHONY: test-face-bundle
+
 test-known-bundle: build/libneuronte.so
 	$(PYTHON) tests/check_known_bundle.py build/libneuronte.so
 
@@ -312,7 +319,7 @@ test-tiled: build/libneuronte.so build/stream/libneuronte.so build/test_tiled
 
 .PHONY: test-widths
 
-test: all $(TESTS) test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7
+test: all $(TESTS) test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7 test-face-bundle
 	cd weights && sha256sum -c --quiet SHA256SUMS
 	# The pointer net keeps its own list, with paths from the top of the tree.
 	sha256sum -c --quiet weights/neuronte-pointer-v0.sha256

@@ -7,6 +7,9 @@ usage: python3 train/pack.py WEIGHTS.json OUT.nrt
                              [--fallback-char U+003F] [--bold-add UNITS]
        python3 train/pack.py --drawing OUT.nrt MEMBER...
                              [--fallback-char U+003F] [--bold-add UNITS]
+       python3 train/pack.py --drawing-bundle OUT.nrt ADVANCES NET.json...
+                             [--gate GATE.json] [--fallback I]
+                             [--fallback-char U+003F] [--bold-add UNITS]
 
 The first form packs one net. The second packs a bundle of nets with a
 router: each scalar a net was trained on is drawn by that net, so no two
@@ -16,8 +19,15 @@ for the same nets in the same order) or, with no gate, to net I (0).
 The third packs an advance table for a proportional face, and the fourth
 a drawing file, whose members are kept in the order given. A member is
 weights JSON, packed as a version 1 net; a colour JSON, packed as a
-version 3 net; an advances file or a pixel face, packed as a table; or
-a file already packed, version 1, 3 or 4, copied whole.
+version 3 net; a tiled JSON, packed as a version 6 net; an advances file
+or a pixel face, packed as a table; or a file already packed, version 1,
+2, 3, 4 or 6, copied whole. A packed bundle (version 2) must be the
+drawing file's only member with nets: its router then sends each scalar
+to one of its nets.
+
+The fifth packs a face cut into nets: a drawing file of a bundle of the
+nets, made as the second form makes it, then the advance table of
+ADVANCES, made as the fourth form makes it.
 
 An advances file has one character per line, as the stroke files do: the
 character (or U+XXXX), a space, then its regular and its bold advance in
@@ -133,7 +143,9 @@ A drawing file, version 5:
     16  M x 2 u32 each member's offset from the start of the file, and
                   its length
         the M members, in that order with nothing between them, each a
-                  whole version 1, 3 or 4 file; at most one is version 4
+                  whole version 1, 2, 3, 4 or 6 file; at most one is
+                  version 4, at most one is version 2, and a version 2
+                  member is the only one of version 1, 2, 3 or 6
 
 A tiled net, version 6, packed from a neuronte-tiled-weights JSON. The
 design cell is cut by C + 1 column edges (0 to 1) and R + 1 row edges
@@ -830,6 +842,30 @@ def advances(table, fallback=0x3F):
     return bytes(out)
 
 
+def _bundle_len(raw):
+    """The length a version 2 image's header gives, or 0."""
+    if len(raw) < 28:
+        return 0
+    k, r, fb, g = struct.unpack_from("<4I", raw, 12)
+    if not (1 <= k <= 128 and r <= 65536 and fb < k and g <= 256) or len(raw) < 28 + 4 * k:
+        return 0
+    total = 28 + 4 * k + 12 * r + (4 * (43 + g * 64 + g + k * g + k) if g else 0)
+    return total + sum(struct.unpack_from(f"<{k}I", raw, 28))
+
+
+def _tiled_len(raw):
+    """The length a version 6 image's header gives, or 0."""
+    if len(raw) < 32:
+        return 0
+    c, r, m = struct.unpack_from("<3I", raw, 12)
+    if not (1 <= c <= TILE_AXIS and 1 <= r <= TILE_AXIS and 1 <= m <= min(TILE_NETS, c * r)):
+        return 0
+    prefix = 32 + 4 * (c + 1 + r + 1) + 16 * c * r + 4 * m
+    if len(raw) < prefix:
+        return 0
+    return prefix + sum(struct.unpack_from(f"<{m}I", raw, prefix - 4 * m))
+
+
 def member(path, fallback=0x3F, bold_add=None):
     """One member of a drawing file, as (version, image)."""
     with open(path, "rb") as fh:
@@ -846,6 +882,12 @@ def member(path, fallback=0x3F, bold_add=None):
             n = struct.unpack_from("<I", raw, 24)[0] if len(raw) >= 32 else 0
             if not 1 <= n <= ADV_RECORDS or len(raw) != 32 + 8 * n:
                 raise SystemExit(f"{path}: not a whole version 4 advance table")
+        elif version == 2:
+            if len(raw) != _bundle_len(raw):
+                raise SystemExit(f"{path}: not a whole version 2 bundle")
+        elif version == 6:
+            if len(raw) != _tiled_len(raw):
+                raise SystemExit(f"{path}: not a whole version 6 tiled net")
         elif version != 3:
             raise SystemExit(f"{path}: a version {version} file cannot be a member of a drawing file")
         return version, raw
@@ -857,16 +899,29 @@ def member(path, fallback=0x3F, bold_add=None):
     return 4, advances(read_table(path, bold_add), fallback)
 
 
+MAX_MEMBER = 32 * 1024 * 1024  # the library's cap on one bundle or tiled member
+
+
 def drawing(paths, fallback=0x3F, bold_add=None):
     """The version 5 image of the members, in the order given."""
     if not 1 <= len(paths) <= MEMBERS:
         raise SystemExit(f"a drawing file holds 1 to {MEMBERS} members")
-    members = [member(p, fallback, bold_add) for p in paths]
+    return drawing_images([member(p, fallback, bold_add) for p in paths], paths)
+
+
+def drawing_images(members, names=None):
+    """The version 5 image of already packed (version, image) members."""
+    names = names or [f"member {i}" for i in range(len(members))]
+    if not 1 <= len(members) <= MEMBERS:
+        raise SystemExit(f"a drawing file holds 1 to {MEMBERS} members")
     if sum(v == 4 for v, _ in members) > 1:
         raise SystemExit("a drawing file holds at most one advance table")
-    for p, (_, im) in zip(paths, members):
-        if len(im) > length(1024):
-            raise SystemExit(f"{p}: {len(im)} bytes is more than a member may be, {length(1024)}")
+    if any(v == 2 for v, _ in members) and sum(v in (1, 2, 3, 6) for v, _ in members) > 1:
+        raise SystemExit("a bundle in a drawing file must be its only member with nets")
+    for p, (v, im) in zip(names, members):
+        cap = MAX_MEMBER if v in (2, 6) else length(1024)
+        if len(im) > cap:
+            raise SystemExit(f"{p}: {len(im)} bytes is more than a member may be, {cap}")
     out = bytearray(b"NEURONTE")
     out += struct.pack("<2I", 5, len(members))
     off = 16 + 8 * len(members)
@@ -879,10 +934,25 @@ def drawing(paths, fallback=0x3F, bold_add=None):
     return bytes(out), [v for v, _ in members]
 
 
-def _options(args):
-    """(positional, fallback scalar, bold add) from the table forms' arguments."""
+def face_bundle(face, nets, gate=None, fallback=0, fallback_char=0x3F, bold_add=None):
+    """(version 5 image, ranges) of a face cut into nets: their bundle,
+    then the advance table of face."""
+    image, ranges = bundle(nets, gate, fallback)
+    table = advances(read_table(face, bold_add), fallback_char)
+    return drawing_images([(2, image), (4, table)], ["bundle", face])[0], ranges
+
+
+def _options(args, keep=()):
+    """(positional, fallback scalar, bold add) from the table forms' arguments.
+    Options in keep are passed through with their values."""
     rest, fallback, bold_add, it = [], 0x3F, None, iter(args)
     for a in it:
+        if a in keep:
+            rest.append(a)
+            value = next(it, None)
+            if value is not None:
+                rest.append(value)
+            continue
         if a in ("--fallback-char", "--bold-add"):
             value = next(it, None)
             if value is None:
@@ -916,8 +986,28 @@ if __name__ == "__main__":
             raise SystemExit(__doc__)
         out = rest[0]
         data, versions = drawing(rest[1:], fallback, bold_add)
-        kind = {1: "net", 3: "colour net", 4: "advance table"}
+        kind = {1: "net", 2: "bundle", 3: "colour net", 4: "advance table", 6: "tiled net"}
         print(out, len(data), "bytes, members:", ", ".join(kind[v] for v in versions))
+    elif args[:1] == ["--drawing-bundle"]:
+        rest, fallback_char, bold_add = _options(args[1:], keep=("--gate", "--fallback"))
+        gate, fallback, nets, it = None, 0, [], iter(rest)
+        for a in it:
+            if a in ("--gate", "--fallback"):
+                value = next(it, None)
+                if value is None:
+                    raise SystemExit(f"{a} needs a value")
+                if a == "--gate":
+                    gate = value
+                else:
+                    fallback = int(value)
+            else:
+                nets.append(a)
+        if len(nets) < 3:
+            raise SystemExit(__doc__)
+        out, face, nets = nets[0], nets[1], nets[2:]
+        data, ranges = face_bundle(face, nets, gate, fallback, fallback_char, bold_add)
+        print(out, len(data), "bytes, a bundle of", len(nets), "nets,", len(ranges), "ranges,",
+              "a gate" if gate else f"fallback net {fallback}", "and an advance table")
     elif args[:1] == ["--bundle"] and len(args) >= 3:
         gate, fallback, nets = None, 0, []
         it = iter(args[2:])

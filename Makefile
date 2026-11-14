@@ -33,7 +33,7 @@ RC9_ITALIC_JSON = $(foreach em,$(RC9_ITALIC_SIZES),weights/neuronte-ui$(em)-ital
 # Narrower desktop faces for the faces drawn at H192 and H256 in v0: each a
 # new -v1 drawing file (one net and the same advances), both seeds exact.
 # The -v0 files stay as they were. See weights/neuronte-ui-v1-192-256.md.
-FACES_V1_192_256 = ui13-italic ui16 ui16-italic ui17 ui18 ui18-italic ui19-italic ui20-italic ui22 ui23-italic
+FACES_V1_192_256 = ui13-italic ui16 ui16-italic ui17 ui17-italic ui18 ui18-italic ui19-italic ui20-italic ui21-italic ui22 ui22-italic ui23 ui23-italic ui25 ui25-italic ui26 ui26-italic
 RC9_EMOJI = weights/neuronte-emoji-v0.nrt
 RC9_EMOJI_NETS = weights/neuronte-emoji-e0-v0.json weights/neuronte-emoji-e1-v0.json weights/neuronte-emoji-e2-v0.json
 RC9_NETS = $(NETS)

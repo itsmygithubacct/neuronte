@@ -397,6 +397,103 @@
     }
    }
   },
+  "ui17-italic": {
+   "file": "neuronte-ui17-italic-v1.nrt",
+   "em": 17,
+   "italic": true,
+   "width": 128,
+   "steps": 80000,
+   "parameters": 44801,
+   "bytes": 180240,
+   "v0_width": 256,
+   "v0_steps": 40000,
+   "v0_parameters": 155137,
+   "samples_per_axis": 2,
+   "seeds": {
+    "0": {
+     "exact": 96,
+     "wrong_pixels": 0,
+     "firm_exact": 96,
+     "G1": true,
+     "check_reference_passed": true,
+     "final_loss": 0.009494542144238949,
+     "json_sha256": "0698be24d21d35bd9e498e6ce16f4bc49b62495f50f29714b172791425383c01",
+     "nrt_sha256": "875fab0177fa8850df5f48770fd569ef106a313900dbebeb91cd2b3ee1e7965f",
+     "trained_on": "RTX 3090 (rented)"
+    },
+    "1": {
+     "exact": 96,
+     "wrong_pixels": 0,
+     "firm_exact": 96,
+     "G1": true,
+     "check_reference_passed": true,
+     "final_loss": 0.008562937378883362,
+     "json_sha256": "a9f730876aff0d5c0c1df9a2f08e453c41a7eedbf6d7ab09a2a1edcdddcbf8d0",
+     "nrt_sha256": "2563f91cf4bc3cf0416ed151f951dac09244d99c5a5f47017dfc31fe0ac7f9e7",
+     "trained_on": "RTX 3090 (rented)"
+    }
+   },
+   "benchmark": {
+    "Intel Core i7-6820HQ": {
+     "v0": {
+      "exact": 96,
+      "open": 1.3096,
+      "result": "round4/Intel Core i7-6820HQ/20261114T043834Z-kilix-face-6rg6q_ug.json",
+      "cpu_model": "Intel(R) Core(TM) i7-6820HQ CPU @ 2.70GHz",
+      "coverage": 1068.7104,
+      "draw-cold": 1089.6096,
+      "draw-warm": 0.2496
+     },
+     "w128-80k-s0": {
+      "exact": 96,
+      "open": 0.4967,
+      "result": "round4/Intel Core i7-6820HQ/20261114T043834Z-kilix-face-6rg6q_ug.json",
+      "cpu_model": "Intel(R) Core(TM) i7-6820HQ CPU @ 2.70GHz",
+      "coverage": 336.5568,
+      "draw-cold": 342.6816,
+      "draw-warm": 0.2496
+     },
+     "w128-80k-s1": {
+      "exact": 96,
+      "open": 0.4958,
+      "result": "round4/Intel Core i7-6820HQ/20261114T043834Z-kilix-face-6rg6q_ug.json",
+      "cpu_model": "Intel(R) Core(TM) i7-6820HQ CPU @ 2.70GHz",
+      "coverage": 357.3312,
+      "draw-cold": 362.592,
+      "draw-warm": 0.2496
+     }
+    },
+    "Intel Core i7-10700F": {
+     "v0": {
+      "exact": 96,
+      "open": 0.8754,
+      "result": "round4/Intel Core i7-10700F/20261114T043810Z-kilix-face-zwsex2gp.json",
+      "cpu_model": "Intel(R) Core(TM) i7-10700F CPU @ 2.90GHz",
+      "coverage": 820.2816,
+      "draw-cold": 832.608,
+      "draw-warm": 0.1728
+     },
+     "w128-80k-s0": {
+      "exact": 96,
+      "open": 0.3171,
+      "result": "round4/Intel Core i7-10700F/20261114T043810Z-kilix-face-zwsex2gp.json",
+      "cpu_model": "Intel(R) Core(TM) i7-10700F CPU @ 2.90GHz",
+      "coverage": 251.52,
+      "draw-cold": 254.3712,
+      "draw-warm": 0.1728
+     },
+     "w128-80k-s1": {
+      "exact": 96,
+      "open": 0.3194,
+      "result": "round4/Intel Core i7-10700F/20261114T043810Z-kilix-face-zwsex2gp.json",
+      "cpu_model": "Intel(R) Core(TM) i7-10700F CPU @ 2.90GHz",
+      "coverage": 265.4688,
+      "draw-cold": 272.1408,
+      "draw-warm": 0.1728
+     }
+    }
+   }
+  },
   "ui18": {
    "file": "neuronte-ui18-v1.nrt",
    "em": 18,
@@ -785,6 +882,103 @@
     }
    }
   },
+  "ui21-italic": {
+   "file": "neuronte-ui21-italic-v1.nrt",
+   "em": 21,
+   "italic": true,
+   "width": 128,
+   "steps": 80000,
+   "parameters": 44801,
+   "bytes": 180240,
+   "v0_width": 256,
+   "v0_steps": 40000,
+   "v0_parameters": 155137,
+   "samples_per_axis": 2,
+   "seeds": {
+    "0": {
+     "exact": 96,
+     "wrong_pixels": 0,
+     "firm_exact": 96,
+     "G1": true,
+     "check_reference_passed": true,
+     "final_loss": 0.009378213435411453,
+     "json_sha256": "e3ebc49be5e54ab71efa9a7b088fcb675bc61a520abc1e9da6d00d97f51cf892",
+     "nrt_sha256": "10e6f7dbec8c4aaf55552037d482614d76e04ba21a43e242928fece4dd20abe6",
+     "trained_on": "RTX 3090 (rented)"
+    },
+    "1": {
+     "exact": 96,
+     "wrong_pixels": 0,
+     "firm_exact": 96,
+     "G1": true,
+     "check_reference_passed": true,
+     "final_loss": 0.008807091973721981,
+     "json_sha256": "d6358abaf9128c3ab9434f3220977990aad27cab4b0f3a9dee30c58fcef86684",
+     "nrt_sha256": "e42684827562514a64bf05e0f921a6941f7f3814fe34a26536d43e92c813a825",
+     "trained_on": "RTX 3090 (rented)"
+    }
+   },
+   "benchmark": {
+    "Intel Core i7-6820HQ": {
+     "v0": {
+      "exact": 96,
+      "open": 1.3015,
+      "result": "round3/Intel Core i7-6820HQ/20261114T043024Z-kilix-face-qx2qymke.json",
+      "cpu_model": "Intel(R) Core(TM) i7-6820HQ CPU @ 2.70GHz",
+      "coverage": 1663.6512,
+      "draw-cold": 1665.3696,
+      "draw-warm": 0.3744
+     },
+     "w128-80k-s0": {
+      "exact": 96,
+      "open": 0.5019,
+      "result": "round3/Intel Core i7-6820HQ/20261114T043024Z-kilix-face-qx2qymke.json",
+      "cpu_model": "Intel(R) Core(TM) i7-6820HQ CPU @ 2.70GHz",
+      "coverage": 479.1744,
+      "draw-cold": 487.6704,
+      "draw-warm": 0.3744
+     },
+     "w128-80k-s1": {
+      "exact": 96,
+      "open": 0.4791,
+      "result": "round3/Intel Core i7-6820HQ/20261114T043024Z-kilix-face-qx2qymke.json",
+      "cpu_model": "Intel(R) Core(TM) i7-6820HQ CPU @ 2.70GHz",
+      "coverage": 525.5808,
+      "draw-cold": 537.4176,
+      "draw-warm": 0.3744
+     }
+    },
+    "Intel Core i7-10700F": {
+     "v0": {
+      "exact": 96,
+      "open": 0.8807,
+      "result": "round3/Intel Core i7-10700F/20261114T042630Z-kilix-face-suylzbis.json",
+      "cpu_model": "Intel(R) Core(TM) i7-10700F CPU @ 2.90GHz",
+      "coverage": 1283.6064,
+      "draw-cold": 1284.2112,
+      "draw-warm": 0.2592
+     },
+     "w128-80k-s0": {
+      "exact": 96,
+      "open": 0.3168,
+      "result": "round3/Intel Core i7-10700F/20261114T042630Z-kilix-face-suylzbis.json",
+      "cpu_model": "Intel(R) Core(TM) i7-10700F CPU @ 2.90GHz",
+      "coverage": 358.08,
+      "draw-cold": 365.3952,
+      "draw-warm": 0.2592
+     },
+     "w128-80k-s1": {
+      "exact": 96,
+      "open": 0.3185,
+      "result": "round3/Intel Core i7-10700F/20261114T042630Z-kilix-face-suylzbis.json",
+      "cpu_model": "Intel(R) Core(TM) i7-10700F CPU @ 2.90GHz",
+      "coverage": 393.0336,
+      "draw-cold": 401.712,
+      "draw-warm": 0.2592
+     }
+    }
+   }
+  },
   "ui22": {
    "file": "neuronte-ui22-v1.nrt",
    "em": 22,
@@ -882,6 +1076,200 @@
     }
    }
   },
+  "ui22-italic": {
+   "file": "neuronte-ui22-italic-v1.nrt",
+   "em": 22,
+   "italic": true,
+   "width": 160,
+   "steps": 80000,
+   "parameters": 66241,
+   "bytes": 266000,
+   "v0_width": 256,
+   "v0_steps": 20000,
+   "v0_parameters": 155137,
+   "samples_per_axis": 2,
+   "seeds": {
+    "0": {
+     "exact": 96,
+     "wrong_pixels": 0,
+     "firm_exact": 96,
+     "G1": true,
+     "check_reference_passed": true,
+     "final_loss": 0.007844807580113411,
+     "json_sha256": "ba3830a2dafa85a1bdd60b244ed8d08d70a794b2f6df71ba9a8e2655ae760adc",
+     "nrt_sha256": "64b516bfb0e82866ba01b500eddeaf8d01b4a3df2e53762a5b55fdb754519ee1",
+     "trained_on": "RTX 3090 (rented)"
+    },
+    "1": {
+     "exact": 96,
+     "wrong_pixels": 0,
+     "firm_exact": 96,
+     "G1": true,
+     "check_reference_passed": true,
+     "final_loss": 0.007386669050902128,
+     "json_sha256": "b7978bc170e1e8b7547823f46671985b5989a4e5f0b1f452122af2df6ad5ca17",
+     "nrt_sha256": "21f031a4b9efbc5ac1b0af87e727fd95aff64f141c5d62b86439964393b0055d",
+     "trained_on": "RTX 3090 (rented)"
+    }
+   },
+   "benchmark": {
+    "Intel Core i7-6820HQ": {
+     "v0": {
+      "exact": 96,
+      "open": 1.3246,
+      "result": "round4/Intel Core i7-6820HQ/20261114T044139Z-kilix-face-ulxll9gi.json",
+      "cpu_model": "Intel(R) Core(TM) i7-6820HQ CPU @ 2.70GHz",
+      "coverage": 2039.616,
+      "draw-cold": 1934.0352,
+      "draw-warm": 0.4032
+     },
+     "w160-80k-s0": {
+      "exact": 96,
+      "open": 0.5487,
+      "result": "round4/Intel Core i7-6820HQ/20261114T044139Z-kilix-face-ulxll9gi.json",
+      "cpu_model": "Intel(R) Core(TM) i7-6820HQ CPU @ 2.70GHz",
+      "coverage": 781.6512,
+      "draw-cold": 786.096,
+      "draw-warm": 0.4032
+     },
+     "w160-80k-s1": {
+      "exact": 96,
+      "open": 0.5514,
+      "result": "round4/Intel Core i7-6820HQ/20261114T044139Z-kilix-face-ulxll9gi.json",
+      "cpu_model": "Intel(R) Core(TM) i7-6820HQ CPU @ 2.70GHz",
+      "coverage": 810.1248,
+      "draw-cold": 817.6512,
+      "draw-warm": 0.4032
+     }
+    },
+    "Intel Core i7-10700F": {
+     "v0": {
+      "exact": 96,
+      "open": 0.8922,
+      "result": "round4/Intel Core i7-10700F/20261114T044031Z-kilix-face-f7i9yl17.json",
+      "cpu_model": "Intel(R) Core(TM) i7-10700F CPU @ 2.90GHz",
+      "coverage": 1556.2272,
+      "draw-cold": 1478.0448,
+      "draw-warm": 0.2784
+     },
+     "w160-80k-s0": {
+      "exact": 96,
+      "open": 0.3385,
+      "result": "round4/Intel Core i7-10700F/20261114T044031Z-kilix-face-f7i9yl17.json",
+      "cpu_model": "Intel(R) Core(TM) i7-10700F CPU @ 2.90GHz",
+      "coverage": 584.544,
+      "draw-cold": 583.1712,
+      "draw-warm": 0.2784
+     },
+     "w160-80k-s1": {
+      "exact": 96,
+      "open": 0.3339,
+      "result": "round4/Intel Core i7-10700F/20261114T044031Z-kilix-face-f7i9yl17.json",
+      "cpu_model": "Intel(R) Core(TM) i7-10700F CPU @ 2.90GHz",
+      "coverage": 607.9008,
+      "draw-cold": 610.9824,
+      "draw-warm": 0.2784
+     }
+    }
+   }
+  },
+  "ui23": {
+   "file": "neuronte-ui23-v1.nrt",
+   "em": 23,
+   "italic": false,
+   "width": 128,
+   "steps": 80000,
+   "parameters": 44801,
+   "bytes": 180240,
+   "v0_width": 192,
+   "v0_steps": 20000,
+   "v0_parameters": 91777,
+   "samples_per_axis": 2,
+   "seeds": {
+    "0": {
+     "exact": 96,
+     "wrong_pixels": 0,
+     "firm_exact": 96,
+     "G1": true,
+     "check_reference_passed": true,
+     "final_loss": 0.008326893672347069,
+     "json_sha256": "44dcb7c3ab6a0b6c8d3033bed2a2bf30b649fc9c6f34383a9463b72221b17005",
+     "nrt_sha256": "51d703481c4fd41a387bde048a8cdda00ef2eae4762f678b71e1c16cd2bba59a",
+     "trained_on": "RTX 3090 (rented)"
+    },
+    "1": {
+     "exact": 96,
+     "wrong_pixels": 0,
+     "firm_exact": 96,
+     "G1": true,
+     "check_reference_passed": true,
+     "final_loss": 0.00772775337100029,
+     "json_sha256": "4fa3193af6947591986b4cd75ef29854307aa78a9d653b12515d8989ae2dac65",
+     "nrt_sha256": "3f919254d8ef91af224cac8fa4e7e683983cf6c2c46e666e49e186d2bb52bcca",
+     "trained_on": "RTX 3090 (rented)"
+    }
+   },
+   "benchmark": {
+    "Intel Core i7-6820HQ": {
+     "v0": {
+      "exact": 96,
+      "open": 0.7513,
+      "result": "round3/Intel Core i7-6820HQ/20261114T043230Z-kilix-face-2xcjimr2.json",
+      "cpu_model": "Intel(R) Core(TM) i7-6820HQ CPU @ 2.70GHz",
+      "coverage": 1275.8304,
+      "draw-cold": 1229.3376,
+      "draw-warm": 0.4128
+     },
+     "w128-80k-s0": {
+      "exact": 96,
+      "open": 0.4926,
+      "result": "round3/Intel Core i7-6820HQ/20261114T043230Z-kilix-face-2xcjimr2.json",
+      "cpu_model": "Intel(R) Core(TM) i7-6820HQ CPU @ 2.70GHz",
+      "coverage": 590.8512,
+      "draw-cold": 566.9184,
+      "draw-warm": 0.4128
+     },
+     "w128-80k-s1": {
+      "exact": 96,
+      "open": 0.5018,
+      "result": "round3/Intel Core i7-6820HQ/20261114T043230Z-kilix-face-2xcjimr2.json",
+      "cpu_model": "Intel(R) Core(TM) i7-6820HQ CPU @ 2.70GHz",
+      "coverage": 607.4688,
+      "draw-cold": 581.5776,
+      "draw-warm": 0.4128
+     }
+    },
+    "Intel Core i7-10700F": {
+     "v0": {
+      "exact": 96,
+      "open": 0.4763,
+      "result": "round3/Intel Core i7-10700F/20261114T042805Z-kilix-face-w5xskkx8.json",
+      "cpu_model": "Intel(R) Core(TM) i7-10700F CPU @ 2.90GHz",
+      "coverage": 975.3408,
+      "draw-cold": 936.8448,
+      "draw-warm": 0.288
+     },
+     "w128-80k-s0": {
+      "exact": 96,
+      "open": 0.3194,
+      "result": "round3/Intel Core i7-10700F/20261114T042805Z-kilix-face-w5xskkx8.json",
+      "cpu_model": "Intel(R) Core(TM) i7-10700F CPU @ 2.90GHz",
+      "coverage": 440.2368,
+      "draw-cold": 421.3152,
+      "draw-warm": 0.288
+     },
+     "w128-80k-s1": {
+      "exact": 96,
+      "open": 0.3213,
+      "result": "round3/Intel Core i7-10700F/20261114T042805Z-kilix-face-w5xskkx8.json",
+      "cpu_model": "Intel(R) Core(TM) i7-10700F CPU @ 2.90GHz",
+      "coverage": 459.3792,
+      "draw-cold": 433.2672,
+      "draw-warm": 0.288
+     }
+    }
+   }
+  },
   "ui23-italic": {
    "file": "neuronte-ui23-italic-v1.nrt",
    "em": 23,
@@ -975,6 +1363,394 @@
       "coverage": 731.76,
       "draw-cold": 674.3136,
       "draw-warm": 0.288
+     }
+    }
+   }
+  },
+  "ui25": {
+   "file": "neuronte-ui25-v1.nrt",
+   "em": 25,
+   "italic": false,
+   "width": 160,
+   "steps": 40000,
+   "parameters": 66241,
+   "bytes": 266000,
+   "v0_width": 192,
+   "v0_steps": 20000,
+   "v0_parameters": 91777,
+   "samples_per_axis": 1,
+   "seeds": {
+    "0": {
+     "exact": 96,
+     "wrong_pixels": 0,
+     "firm_exact": 96,
+     "G1": true,
+     "check_reference_passed": true,
+     "final_loss": 0.007397690322250128,
+     "json_sha256": "9741b5665569864fb25bf4c3fe7c0fecede64ed51165c3401ecb188dae0ae08a",
+     "nrt_sha256": "aba777f640fa42eb47c96db25f2c54be89bbec9f665fb08b13db619c45fc55d4",
+     "trained_on": "RTX 3090 (rented)"
+    },
+    "1": {
+     "exact": 96,
+     "wrong_pixels": 0,
+     "firm_exact": 96,
+     "G1": true,
+     "check_reference_passed": true,
+     "final_loss": 0.007482132874429226,
+     "json_sha256": "92685438a1d5692ce0c5fe65b904b7ee32c90b9bfffbec900e83e4f6b28b7250",
+     "nrt_sha256": "443da26e3c1bb41b1a41d5067a937dac3957842b3668cb98d3f35df19bf12984",
+     "trained_on": "RTX 3090 (rented)"
+    }
+   },
+   "benchmark": {
+    "Intel Core i7-6820HQ": {
+     "v0": {
+      "exact": 96,
+      "open": 0.7496,
+      "result": "round3/Intel Core i7-6820HQ/20261114T043319Z-kilix-face-p454be1k.json",
+      "cpu_model": "Intel(R) Core(TM) i7-6820HQ CPU @ 2.70GHz",
+      "coverage": 378.3936,
+      "draw-cold": 382.9056,
+      "draw-warm": 0.48
+     },
+     "w160-40k-s0": {
+      "exact": 96,
+      "open": 0.5644,
+      "result": "round3/Intel Core i7-6820HQ/20261114T043319Z-kilix-face-p454be1k.json",
+      "cpu_model": "Intel(R) Core(TM) i7-6820HQ CPU @ 2.70GHz",
+      "coverage": 278.7168,
+      "draw-cold": 279.1008,
+      "draw-warm": 0.4704
+     },
+     "w160-40k-s1": {
+      "exact": 96,
+      "open": 0.564,
+      "result": "round3/Intel Core i7-6820HQ/20261114T043319Z-kilix-face-p454be1k.json",
+      "cpu_model": "Intel(R) Core(TM) i7-6820HQ CPU @ 2.70GHz",
+      "coverage": 281.9904,
+      "draw-cold": 281.5776,
+      "draw-warm": 0.48
+     }
+    },
+    "Intel Core i7-10700F": {
+     "v0": {
+      "exact": 96,
+      "open": 0.4617,
+      "result": "round3/Intel Core i7-10700F/20261114T042841Z-kilix-face-99frsk12.json",
+      "cpu_model": "Intel(R) Core(TM) i7-10700F CPU @ 2.90GHz",
+      "coverage": 283.728,
+      "draw-cold": 285.7152,
+      "draw-warm": 0.3264
+     },
+     "w160-40k-s0": {
+      "exact": 96,
+      "open": 0.3339,
+      "result": "round3/Intel Core i7-10700F/20261114T042841Z-kilix-face-99frsk12.json",
+      "cpu_model": "Intel(R) Core(TM) i7-10700F CPU @ 2.90GHz",
+      "coverage": 205.9296,
+      "draw-cold": 207.0336,
+      "draw-warm": 0.3264
+     },
+     "w160-40k-s1": {
+      "exact": 96,
+      "open": 0.3355,
+      "result": "round3/Intel Core i7-10700F/20261114T042841Z-kilix-face-99frsk12.json",
+      "cpu_model": "Intel(R) Core(TM) i7-10700F CPU @ 2.90GHz",
+      "coverage": 210.4224,
+      "draw-cold": 208.8864,
+      "draw-warm": 0.3264
+     }
+    }
+   }
+  },
+  "ui25-italic": {
+   "file": "neuronte-ui25-italic-v1.nrt",
+   "em": 25,
+   "italic": true,
+   "width": 160,
+   "steps": 80000,
+   "parameters": 66241,
+   "bytes": 266000,
+   "v0_width": 256,
+   "v0_steps": 40000,
+   "v0_parameters": 155137,
+   "samples_per_axis": 1,
+   "seeds": {
+    "0": {
+     "exact": 96,
+     "wrong_pixels": 0,
+     "firm_exact": 96,
+     "G1": true,
+     "check_reference_passed": true,
+     "final_loss": 0.007211351301521063,
+     "json_sha256": "894bbde7c6a27af67855e811d2b0a96830d58b7b518bf49348e29610ecdec5a9",
+     "nrt_sha256": "041767a06898b463b8b05c9548be24893bd09322ac652aa4850d2bbbdbb3e269",
+     "trained_on": "RTX 3090 (rented)"
+    },
+    "1": {
+     "exact": 96,
+     "wrong_pixels": 0,
+     "firm_exact": 96,
+     "G1": true,
+     "check_reference_passed": true,
+     "final_loss": 0.006720991339534521,
+     "json_sha256": "1673badbec9cba12983edd64c9a1c79cb858a7b3995ec0f94760956d96616552",
+     "nrt_sha256": "4814e1baab787fac7484e1398a805b4c4681210e9351dc4b27a75fb669912d6b",
+     "trained_on": "RTX 3090 (rented)"
+    }
+   },
+   "benchmark": {
+    "Intel Core i7-6820HQ": {
+     "v0": {
+      "exact": 96,
+      "open": 1.3284,
+      "result": "round3/Intel Core i7-6820HQ/20261114T043420Z-kilix-face-13qwbcd8.json",
+      "cpu_model": "Intel(R) Core(TM) i7-6820HQ CPU @ 2.70GHz",
+      "coverage": 620.3712,
+      "draw-cold": 602.0256,
+      "draw-warm": 0.48
+     },
+     "w160-80k-s0": {
+      "exact": 96,
+      "open": 0.5459,
+      "result": "round3/Intel Core i7-6820HQ/20261114T043420Z-kilix-face-13qwbcd8.json",
+      "cpu_model": "Intel(R) Core(TM) i7-6820HQ CPU @ 2.70GHz",
+      "coverage": 266.5728,
+      "draw-cold": 267.456,
+      "draw-warm": 0.48
+     },
+     "w160-80k-s1": {
+      "exact": 96,
+      "open": 0.5488,
+      "result": "round3/Intel Core i7-6820HQ/20261114T043420Z-kilix-face-13qwbcd8.json",
+      "cpu_model": "Intel(R) Core(TM) i7-6820HQ CPU @ 2.70GHz",
+      "coverage": 279.4272,
+      "draw-cold": 280.1568,
+      "draw-warm": 0.48
+     }
+    },
+    "Intel Core i7-10700F": {
+     "v0": {
+      "exact": 96,
+      "open": 0.8788,
+      "result": "round3/Intel Core i7-10700F/20261114T042927Z-kilix-face-cyi35p2_.json",
+      "cpu_model": "Intel(R) Core(TM) i7-10700F CPU @ 2.90GHz",
+      "coverage": 471.3696,
+      "draw-cold": 459.2448,
+      "draw-warm": 0.336
+     },
+     "w160-80k-s0": {
+      "exact": 96,
+      "open": 0.3355,
+      "result": "round3/Intel Core i7-10700F/20261114T042927Z-kilix-face-cyi35p2_.json",
+      "cpu_model": "Intel(R) Core(TM) i7-10700F CPU @ 2.90GHz",
+      "coverage": 198.2592,
+      "draw-cold": 198.1344,
+      "draw-warm": 0.336
+     },
+     "w160-80k-s1": {
+      "exact": 96,
+      "open": 0.3335,
+      "result": "round3/Intel Core i7-10700F/20261114T042927Z-kilix-face-cyi35p2_.json",
+      "cpu_model": "Intel(R) Core(TM) i7-10700F CPU @ 2.90GHz",
+      "coverage": 206.9664,
+      "draw-cold": 208.6944,
+      "draw-warm": 0.336
+     }
+    }
+   }
+  },
+  "ui26": {
+   "file": "neuronte-ui26-v1.nrt",
+   "em": 26,
+   "italic": false,
+   "width": 128,
+   "steps": 80000,
+   "parameters": 44801,
+   "bytes": 180240,
+   "v0_width": 192,
+   "v0_steps": 20000,
+   "v0_parameters": 91777,
+   "samples_per_axis": 1,
+   "seeds": {
+    "0": {
+     "exact": 96,
+     "wrong_pixels": 0,
+     "firm_exact": 96,
+     "G1": true,
+     "check_reference_passed": true,
+     "final_loss": 0.007864163257181644,
+     "json_sha256": "01c7d5f9d771f8e86fc32624262733fc5d458e6939944f3c77ca8b145672d245",
+     "nrt_sha256": "da970439f49e955d22d127d755e264c2d0e04b0fbb9f2bb02bbcd4a857485cbf",
+     "trained_on": "RTX 3090 (rented)"
+    },
+    "1": {
+     "exact": 96,
+     "wrong_pixels": 0,
+     "firm_exact": 96,
+     "G1": true,
+     "check_reference_passed": true,
+     "final_loss": 0.007610491942614317,
+     "json_sha256": "3272e14e8189b734e78a8258ca1556ad00f8f0fff96df9595ea42864d4bc782d",
+     "nrt_sha256": "c9b4dd655a9b06f4aa0dcfe606080d3c3a4589f4f2e08b8a166e4851d4e945a3",
+     "trained_on": "RTX 3090 (rented)"
+    }
+   },
+   "benchmark": {
+    "Intel Core i7-6820HQ": {
+     "v0": {
+      "exact": 96,
+      "open": 0.7497,
+      "result": "round3/Intel Core i7-6820HQ/20261114T043503Z-kilix-face-vuiom0hg.json",
+      "cpu_model": "Intel(R) Core(TM) i7-6820HQ CPU @ 2.70GHz",
+      "coverage": 395.9712,
+      "draw-cold": 404.3808,
+      "draw-warm": 0.5088
+     },
+     "w128-80k-s0": {
+      "exact": 96,
+      "open": 0.5042,
+      "result": "round3/Intel Core i7-6820HQ/20261114T043503Z-kilix-face-vuiom0hg.json",
+      "cpu_model": "Intel(R) Core(TM) i7-6820HQ CPU @ 2.70GHz",
+      "coverage": 193.0944,
+      "draw-cold": 196.752,
+      "draw-warm": 0.5088
+     },
+     "w128-80k-s1": {
+      "exact": 96,
+      "open": 0.505,
+      "result": "round3/Intel Core i7-6820HQ/20261114T043503Z-kilix-face-vuiom0hg.json",
+      "cpu_model": "Intel(R) Core(TM) i7-6820HQ CPU @ 2.70GHz",
+      "coverage": 211.2,
+      "draw-cold": 215.3856,
+      "draw-warm": 0.5088
+     }
+    },
+    "Intel Core i7-10700F": {
+     "v0": {
+      "exact": 96,
+      "open": 0.4756,
+      "result": "round3/Intel Core i7-10700F/20261114T042959Z-kilix-face-69g0pphe.json",
+      "cpu_model": "Intel(R) Core(TM) i7-10700F CPU @ 2.90GHz",
+      "coverage": 298.6944,
+      "draw-cold": 305.3088,
+      "draw-warm": 0.3552
+     },
+     "w128-80k-s0": {
+      "exact": 96,
+      "open": 0.3219,
+      "result": "round3/Intel Core i7-10700F/20261114T042959Z-kilix-face-69g0pphe.json",
+      "cpu_model": "Intel(R) Core(TM) i7-10700F CPU @ 2.90GHz",
+      "coverage": 143.856,
+      "draw-cold": 145.1904,
+      "draw-warm": 0.3456
+     },
+     "w128-80k-s1": {
+      "exact": 96,
+      "open": 0.3226,
+      "result": "round3/Intel Core i7-10700F/20261114T042959Z-kilix-face-69g0pphe.json",
+      "cpu_model": "Intel(R) Core(TM) i7-10700F CPU @ 2.90GHz",
+      "coverage": 156.3648,
+      "draw-cold": 157.9104,
+      "draw-warm": 0.3552
+     }
+    }
+   }
+  },
+  "ui26-italic": {
+   "file": "neuronte-ui26-italic-v1.nrt",
+   "em": 26,
+   "italic": true,
+   "width": 160,
+   "steps": 80000,
+   "parameters": 66241,
+   "bytes": 266000,
+   "v0_width": 256,
+   "v0_steps": 20000,
+   "v0_parameters": 155137,
+   "samples_per_axis": 1,
+   "seeds": {
+    "0": {
+     "exact": 96,
+     "wrong_pixels": 0,
+     "firm_exact": 96,
+     "G1": true,
+     "check_reference_passed": true,
+     "final_loss": 0.007178551983088255,
+     "json_sha256": "8797a744327a5b2d03bac041bb7b52fced866b1c63f45df2f144f355869f1577",
+     "nrt_sha256": "b418f0d0acb477bcbeb17165729ccd1d91a6c2b872e3f416a704d2610ceb6607",
+     "trained_on": "RTX 3090 (rented)"
+    },
+    "1": {
+     "exact": 96,
+     "wrong_pixels": 0,
+     "firm_exact": 96,
+     "G1": true,
+     "check_reference_passed": true,
+     "final_loss": 0.006935466080904007,
+     "json_sha256": "d6ef5883fb7a735444eab28c8ccbddb7aee020a4426fc38a3444a21f034f2602",
+     "nrt_sha256": "8fcc02056e631f94dfddbfecfc75c128b0727e03ce0ebc1ea69a85a0e1817ed0",
+     "trained_on": "RTX 3090 (rented)"
+    }
+   },
+   "benchmark": {
+    "Intel Core i7-6820HQ": {
+     "v0": {
+      "exact": 96,
+      "open": 1.3137,
+      "result": "round3/Intel Core i7-6820HQ/20261114T043610Z-kilix-face-af_woyn3.json",
+      "cpu_model": "Intel(R) Core(TM) i7-6820HQ CPU @ 2.70GHz",
+      "coverage": 691.9296,
+      "draw-cold": 705.7824,
+      "draw-warm": 0.5184
+     },
+     "w160-80k-s0": {
+      "exact": 96,
+      "open": 0.5499,
+      "result": "round3/Intel Core i7-6820HQ/20261114T043610Z-kilix-face-af_woyn3.json",
+      "cpu_model": "Intel(R) Core(TM) i7-6820HQ CPU @ 2.70GHz",
+      "coverage": 284.5536,
+      "draw-cold": 289.7856,
+      "draw-warm": 0.5184
+     },
+     "w160-80k-s1": {
+      "exact": 96,
+      "open": 0.5476,
+      "result": "round3/Intel Core i7-6820HQ/20261114T043610Z-kilix-face-af_woyn3.json",
+      "cpu_model": "Intel(R) Core(TM) i7-6820HQ CPU @ 2.70GHz",
+      "coverage": 308.1216,
+      "draw-cold": 313.7376,
+      "draw-warm": 0.5184
+     }
+    },
+    "Intel Core i7-10700F": {
+     "v0": {
+      "exact": 96,
+      "open": 0.8846,
+      "result": "round3/Intel Core i7-10700F/20261114T043049Z-kilix-face-ogqv3q0e.json",
+      "cpu_model": "Intel(R) Core(TM) i7-10700F CPU @ 2.90GHz",
+      "coverage": 526.656,
+      "draw-cold": 531.84,
+      "draw-warm": 0.3552
+     },
+     "w160-80k-s0": {
+      "exact": 96,
+      "open": 0.3332,
+      "result": "round3/Intel Core i7-10700F/20261114T043049Z-kilix-face-ogqv3q0e.json",
+      "cpu_model": "Intel(R) Core(TM) i7-10700F CPU @ 2.90GHz",
+      "coverage": 210.528,
+      "draw-cold": 211.7184,
+      "draw-warm": 0.3552
+     },
+     "w160-80k-s1": {
+      "exact": 96,
+      "open": 0.3348,
+      "result": "round3/Intel Core i7-10700F/20261114T043049Z-kilix-face-ogqv3q0e.json",
+      "cpu_model": "Intel(R) Core(TM) i7-10700F CPU @ 2.90GHz",
+      "coverage": 227.4528,
+      "draw-cold": 230.6304,
+      "draw-warm": 0.3552
      }
     }
    }

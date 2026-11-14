@@ -576,6 +576,21 @@ def main():
         picture = renderer.decode(colours)
         return picture[:geometry['h'], :geometry['w']] if a.pixel_size else picture
 
+    blocks_frame = None
+
+    def draw_blocks(frame):
+        """draw_pixels(fitter.encode(...)) of a decoded frame. With a
+        block-structured ink map (the video masks) each sample is copied into
+        its block, the same bytes without the eight-colour records."""
+        nonlocal blocks_frame
+        samples = pad_cells(frame, fitter)
+        if renderer.block is None:
+            return draw_pixels(fitter.encode(samples))
+        shape = (samples.shape[0] * renderer.block[0], samples.shape[1] * renderer.block[1], 3)
+        if blocks_frame is None or blocks_frame.shape != shape:
+            blocks_frame = np.empty(shape, np.uint8)
+        return renderer.draw_samples(samples, blocks_frame)
+
     def present_pixels(picture):
         return presenter.frame(picture, geometry['c'], geometry['r'], geometry['left'], geometry['top'],
                                natural=bool(a.pixel_size))
@@ -667,7 +682,7 @@ def main():
                 frame = raw if isinstance(raw, tuple) else np.frombuffer(raw, np.uint8).reshape(shape)
                 if preview and paused:                      # a paused seek/resize gets one picture, then holds
                     if a.mode == 'pixels':
-                        picture = render_natural(frame) if a.pixel_size else draw_pixels(fitter.encode(pad_cells(frame, fitter)))
+                        picture = render_natural(frame) if a.pixel_size else draw_blocks(frame)
                         payload = present_pixels(picture)
                     else:
                         payload = text(renderer, renderer.fit(frame), None, geometry['left'], geometry['top'])
@@ -686,8 +701,8 @@ def main():
                         t2 = t1
                         picture = render_natural(frame)
                     else:
-                        colours = fitter.encode(pad_cells(frame, fitter)); t2 = time.perf_counter()
-                        picture = draw_pixels(colours)
+                        t2 = time.perf_counter()
+                        picture = draw_blocks(frame)
                     t3 = time.perf_counter()
                     payload = present_pixels(picture)
                 else:

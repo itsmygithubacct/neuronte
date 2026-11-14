@@ -135,6 +135,27 @@ class MultiInk:
         if np.all((masks == 0) | (masks == 1)):
             self.ink_indices = (masks[0] + 2*masks[1] + 4*masks[2]).astype(np.uint8)
         self.mix = np.stack([np.prod(np.stack([masks[b] if k >> b & 1 else 1 - masks[b] for b in range(3)]), axis=0) for k in range(8)])
+        # When the actual binary ink map is the 2x4 sample layout enlarged
+        # by whole blocks, drawing a cell is copying each of its eight
+        # samples into its block: draw_samples. Found by comparison with the
+        # actual map, never assumed; other maps keep decode.
+        self.block = self.block_scale(self.ink_indices)
+
+    @classmethod
+    def block_scale(cls, ink_indices):
+        """(rows, columns) of each block when a binary ink map is the 2 x 4
+        sample layout (row labels, then column) enlarged by whole blocks,
+        else None."""
+        if ink_indices is None:
+            return None
+        height, width = ink_indices.shape
+        if height % 4 or width % 2:
+            return None
+        labels = np.array([[label * 2 + x for x in range(2)] for label in cls.row_labels])
+        scale = (height // 4, width // 2)
+        if np.array_equal(ink_indices, np.repeat(np.repeat(labels, scale[0], 0), scale[1], 1)):
+            return scale
+        return None
 
     def encode(self, rgb):
         p = patches(rgb, self.width, self.height)
@@ -246,6 +267,35 @@ class MultiInk:
                                     width, height, indices.ctypes.data)
         if result:
             raise ValueError(f'native planar composition failed: {result}')
+        return out
+
+    def draw_samples(self, samples, out=None):
+        """Draw an image of one RGB8 sample a block (2 x 4 blocks a cell, the
+        layout MultiInk(..., 2, 4).encode reads) at this model's cell size.
+
+        The result is byte for byte self.decode(MultiInk(..., 2, 4).encode(
+        samples)); it is valid only when self.block is set, i.e. when the
+        actual binary ink map is that layout enlarged by whole blocks. An
+        optional output array of the picture's shape is reused.
+        """
+        if self.block is None:
+            raise ValueError('drawing samples needs a block-structured binary ink map')
+        samples = np.asarray(samples)
+        if (samples.dtype != np.uint8 or samples.ndim != 3 or samples.shape[2] != 3 or
+                samples.shape[0] % 4 or samples.shape[1] % 2 or min(samples.shape[:2]) < 1):
+            raise ValueError('samples must be nonempty HxWx3 uint8, H a multiple of 4 and W of 2')
+        (sy, sx), (height, width) = self.block, samples.shape[:2]
+        shape = (height * sy, width * sx, 3)
+        if out is None:
+            out = np.empty(shape, np.uint8)
+        if (not isinstance(out, np.ndarray) or out.shape != shape or out.dtype != np.uint8 or
+                not out.flags.c_contiguous or not out.flags.writeable):
+            raise ValueError('output must be a writable contiguous RGB array of the picture\'s size')
+        if np.shares_memory(samples, out):
+            raise ValueError('samples and output must not overlap')
+        rows = out.reshape(height, sy, width * sx, 3)
+        rows[:, 0] = np.repeat(samples, sx, axis=1)
+        rows[:, 1:] = rows[:, :1]
         return out
 
     def decode(self, colours):

@@ -82,7 +82,15 @@ fails before the player changes the terminal's input mode.
 The default, `--mode pixels`, gives every cell eight colours in a 2 × 4
 arrangement of blocks, mixed by the three video masks drawn at 8 × 16 pixels
 a cell, and sends the result with the kitty graphics protocol. The file is
-scaled to one pixel a block, so the fit is exact. Pictures are presented the
+scaled to one pixel a block, so the fit is exact. The three masks are drawn once,
+when the player starts; no net is evaluated per frame. They are exactly
+binary, and their actual 8 × 16 ink map is the 2 × 4 block layout enlarged
+to 4 × 4 pixels a block, which the player checks against the drawn map.
+When it is, each decoded sample is copied into its block
+(`MultiInk.draw_samples`), the same bytes as building the eight-colour
+records and drawing them, at a fraction of the cost; any other map keeps
+the record path. Frame logs then report this drawing as `draw` and `fit`
+as zero. Pictures are presented the
 way `kilix-mpv` and `kitty-framebuffer` present them: each is complete under
 its own image id before the one before it is deleted, inside one synchronized
 update. For a local kitty or Kilix the pixels go through three shared-memory

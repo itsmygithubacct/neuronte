@@ -103,7 +103,10 @@ unknown-character routing, ASCII and Braille are unchanged; each replaced
 character draws exactly as in the bundle it was reviewed in. The symbol groups
 passed their gates. The pixel and accent groups failed their declared strict
 gates at some sizes and were chosen after a visual review of the regressions,
-which their cards list. It is not a default. Rebuild it with
+which their cards list. Measured as a whole bundle on two x86 CPUs, it draws
+uncached symbols about 5.5 times as fast as split-v7, pixel characters 2.1
+times and accent characters 1.95 times; ASCII and Braille cost the same, and
+it takes about 1 ms longer to open. It is not a default. Rebuild it with
 `make pack-split-v8`; see [its recipe, checks and speed](weights/neuronte-split-v8.md).
 
 RC9 also ships the separate `neuronte-emoji-v0.nrt` colour bundle: 300 original

@@ -95,7 +95,58 @@ that nothing else moved. They do not assert the strict pixel or accent gates.
 
 ## Speed
 
-Not yet measured as a whole bundle.
+Measured as a whole bundle with kilix-bench `e21e5cd`, against split-v5 and
+split-v7 in the same runs, on two x86 hosts, an Intel i7-10700F and an
+i7-6820HQ (on mains power), each on one pinned core with the benchmark lock
+held for the whole run. Five corpora: ASCII (95), Braille (256), the 49
+symbols, the 327 pixel characters and the 318 accent characters. One warmup
+and ten measured rounds, a fresh process per job, rounds shuffled; 3,828
+trials in all. ARM was not measured, and no figure here is carried over from
+the parts' own campaigns.
+
+Uncached `neuronte_coverage()`, geometric mean over cells of (other bundle /
+split-v8); above 1 means split-v8 is faster. Cells are 8x16, 16x32 and 48x96,
+and also 25x49 for Braille. Figures are i7-10700F / i7-6820HQ.
+
+| Corpus | split-v5 | split-v7 |
+|---|---:|---:|
+| Symbols (49) | 5.51 / 5.40 | 5.58 / 5.43 |
+| Pixel characters (327) | 2.11 / 2.09 | 2.11 / 2.10 |
+| Accent characters (318) | 1.95 / 1.94 | 1.96 / 1.95 |
+| Printable ASCII (95) | 2.26 / 2.23 | 1.01 / 1.00 |
+| Braille (256) | 11.47 / 11.50 | 1.00 / 1.00 |
+
+Median µs per glyph at 16x32, uncached coverage:
+
+| CPU | Corpus | split-v5 | split-v7 | split-v8 |
+|---|---|---:|---:|---:|
+| i7-10700F | symbols | 2,210.3 | 2,223.5 | 401.6 |
+| i7-10700F | pixel | 1,713.1 | 1,708.7 | 803.4 |
+| i7-10700F | accent | 6,251.9 | 6,186.9 | 3,098.0 |
+| i7-10700F | ASCII | 2,051.9 | 916.1 | 905.2 |
+| i7-10700F | Braille | 539.2 | 32.6 | 32.8 |
+| i7-6820HQ | symbols | 2,977.3 | 2,973.0 | 551.3 |
+| i7-6820HQ | pixel | 2,285.7 | 2,290.0 | 1,082.5 |
+| i7-6820HQ | accent | 8,282.9 | 8,200.3 | 4,162.6 |
+| i7-6820HQ | ASCII | 2,731.1 | 1,222.6 | 1,224.6 |
+| i7-6820HQ | Braille | 727.7 | 44.1 | 44.0 |
+
+Pixels are identical on both hosts, and split-v8 draws ASCII and Braille
+exactly as split-v7, so those two cost the same. A first draw tracks
+coverage, and a primed (cached) draw costs the same for all three bundles.
+
+**Opening is the cost.** One model open, including the first 8x16 buffer,
+ranges over the five corpus runs:
+
+| CPU | split-v5 ms | split-v7 ms | split-v8 ms |
+|---|---:|---:|---:|
+| i7-10700F | 1.68–1.82 | 1.84–1.97 | 2.88–3.05 |
+| i7-6820HQ | 2.59–2.61 | 2.81–2.84 | 3.72–4.27 |
+
+That is 0.9 to 1.4 ms more than split-v7, paid once per process; the eleven
+appended members are the likely cause. Table routing is within 0.4 ns of
+split-v7 on the ASCII, Braille and symbol corpora, and 0.6 to 1.8 ns faster
+on the pixel and accent corpora.
 
 ## Status
 

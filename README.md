@@ -52,6 +52,11 @@ letter. Desktop adapters fall back for unsupported strings and styles.
 | `neuronte-icon-v1` | the icons in colour, a version 3 file by itself, not in the bundle | 167: the 133 in `font/icons.txt` and 34 powerline and progress glyphs, up to 6 layers each | 256 | 159,492 | 650,216 bytes |
 | `neuronte-ui28-italic-v0` | the italic at 28 pixels, trained for 40,000 steps: at the default 20,000 no width from 384 to 768 had both seeds exact | printable ASCII and the ellipsis, 96, with their advances | 384 | 331,009 | 1,325,072 bytes |
 | `neuronte-ui32-italic-v0` | the italic at 32 pixels, trained for 40,000 steps; both seeds exact at width 512 | printable ASCII and the ellipsis, 96, with their advances | 512 | 572,417 | 2,290,704 bytes |
+| `neuronte-ui13-italic-v1` | narrower v1 of the desktop face at 13 px italic, trained 40,000 steps, both seeds exact; v0 is unchanged and still the default; [recipe and speed](weights/neuronte-ui-v1-192-256.md) | printable ASCII and the ellipsis, 96, with their advances | 96 | 27,457 | 110,864 bytes |
+| `neuronte-ui16-italic-v1`, `neuronte-ui18-v1` | narrower v1 of the desktop faces at 16 px italic and 18 px, trained 80,000 steps, both seeds exact; v0 is unchanged and still the default; [recipe and speed](weights/neuronte-ui-v1-192-256.md) | printable ASCII and the ellipsis, 96, with their advances | 96 | 27,457 | 110,864 bytes each |
+| `neuronte-ui16-v1`, `neuronte-ui19-italic-v1` | narrower v1 of the desktop faces at 16 px and 19 px italic, trained 40,000 steps, both seeds exact; v0 is unchanged and still the default; [recipe and speed](weights/neuronte-ui-v1-192-256.md) | printable ASCII and the ellipsis, 96, with their advances | 128 | 44,801 | 180,240 bytes each |
+| `neuronte-ui17-v1`, `neuronte-ui18-italic-v1`, `neuronte-ui20-italic-v1`, `neuronte-ui22-v1` | narrower v1 of the desktop faces at 17 px, 18 px italic, 20 px italic and 22 px, trained 80,000 steps, both seeds exact; v0 is unchanged and still the default; [recipe and speed](weights/neuronte-ui-v1-192-256.md) | printable ASCII and the ellipsis, 96, with their advances | 128 | 44,801 | 180,240 bytes each |
+| `neuronte-ui23-italic-v1` | narrower v1 of the desktop face at 23 px italic, trained 40,000 steps, both seeds exact; v0 is unchanged and still the default; [recipe and speed](weights/neuronte-ui-v1-192-256.md) | printable ASCII and the ellipsis, 96, with their advances | 160 | 66,241 | 266,000 bytes |
 
 `neuronte-split-v5.nrt` is the default: 1,176 labelled scalars, including
 49 Greek and 66 Russian letters, in a 1,573,128-byte bundle. It differs from
@@ -99,6 +104,11 @@ reproduce all 96 source glyphs and their regular/bold masks and advances exactly
 at each native size. Tiny grids reuse some shapes; exact reproduction does not
 imply distinct or readable letters at every size. Sizes 1/2 and scalable italic
 remain explicit consumer fallback.
+
+Narrower [v1 desktop faces](weights/neuronte-ui-v1-192-256.md) exist for the sizes whose v0 nets
+are 192 or 256 wide. Each is a new file beside its v0, with the same advances, and both seeds
+reproduce all 96 glyphs exactly at the native em. They draw a whole face faster, which is the
+cost a desktop pays when it builds its letter cells. The installer and Kilix 95 still load v0.
 
 `neuronte-split` draws each character with one small net picked for it.
 It draws ASCII, symbols, blocks and the mosaics four to seven times

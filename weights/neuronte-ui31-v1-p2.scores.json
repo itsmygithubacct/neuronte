@@ -1,0 +1,219 @@
+{
+  "set": "ui31",
+  "chars": 12,
+  "width": 96,
+  "steps": 40000,
+  "seed": 0,
+  "pen": 0.017741935483870968,
+  "unlabelled": 0.0,
+  "params": 27457,
+  "final_loss": 0.004757344257086515,
+  "w31_s1": {
+    "iou_mean": 1.0,
+    "iou_min": 1.0,
+    "worst": [
+      "U+003F ?",
+      "U+003E >",
+      "U+003C <"
+    ],
+    "nearest_ok": 12,
+    "glyphs": [
+      {
+        "scalar": "U+0038",
+        "intersection": 178,
+        "union": 178,
+        "target_ink": 178,
+        "predicted_ink": 178
+      },
+      {
+        "scalar": "U+0039",
+        "intersection": 148,
+        "union": 148,
+        "target_ink": 148,
+        "predicted_ink": 148
+      },
+      {
+        "scalar": "U+003A",
+        "intersection": 30,
+        "union": 30,
+        "target_ink": 30,
+        "predicted_ink": 30
+      },
+      {
+        "scalar": "U+003B",
+        "intersection": 46,
+        "union": 46,
+        "target_ink": 46,
+        "predicted_ink": 46
+      },
+      {
+        "scalar": "U+003C",
+        "intersection": 111,
+        "union": 111,
+        "target_ink": 111,
+        "predicted_ink": 111
+      },
+      {
+        "scalar": "U+003D",
+        "intersection": 96,
+        "union": 96,
+        "target_ink": 96,
+        "predicted_ink": 96
+      },
+      {
+        "scalar": "U+003E",
+        "intersection": 109,
+        "union": 109,
+        "target_ink": 109,
+        "predicted_ink": 109
+      },
+      {
+        "scalar": "U+003F",
+        "intersection": 101,
+        "union": 101,
+        "target_ink": 101,
+        "predicted_ink": 101
+      },
+      {
+        "scalar": "U+0040",
+        "intersection": 328,
+        "union": 328,
+        "target_ink": 328,
+        "predicted_ink": 328
+      },
+      {
+        "scalar": "U+0041",
+        "intersection": 156,
+        "union": 156,
+        "target_ink": 156,
+        "predicted_ink": 156
+      },
+      {
+        "scalar": "U+0042",
+        "intersection": 214,
+        "union": 214,
+        "target_ink": 214,
+        "predicted_ink": 214
+      },
+      {
+        "scalar": "U+0043",
+        "intersection": 152,
+        "union": 152,
+        "target_ink": 152,
+        "predicted_ink": 152
+      }
+    ],
+    "exact": 12,
+    "differ": [],
+    "wrong_pixels": 0,
+    "firm_exact": 12,
+    "firm_differ": [],
+    "firm_wrong_pixels": 0
+  },
+  "w31_s2": {
+    "iou_mean": 0.9995344877243042,
+    "iou_min": 0.994413435459137,
+    "worst": [
+      "U+0038 8",
+      "U+0043 C",
+      "U+003C <"
+    ],
+    "nearest_ok": 12,
+    "glyphs": [
+      {
+        "scalar": "U+0038",
+        "intersection": 178,
+        "union": 179,
+        "target_ink": 178,
+        "predicted_ink": 179
+      },
+      {
+        "scalar": "U+0039",
+        "intersection": 148,
+        "union": 148,
+        "target_ink": 148,
+        "predicted_ink": 148
+      },
+      {
+        "scalar": "U+003A",
+        "intersection": 30,
+        "union": 30,
+        "target_ink": 30,
+        "predicted_ink": 30
+      },
+      {
+        "scalar": "U+003B",
+        "intersection": 46,
+        "union": 46,
+        "target_ink": 46,
+        "predicted_ink": 46
+      },
+      {
+        "scalar": "U+003C",
+        "intersection": 111,
+        "union": 111,
+        "target_ink": 111,
+        "predicted_ink": 111
+      },
+      {
+        "scalar": "U+003D",
+        "intersection": 96,
+        "union": 96,
+        "target_ink": 96,
+        "predicted_ink": 96
+      },
+      {
+        "scalar": "U+003E",
+        "intersection": 109,
+        "union": 109,
+        "target_ink": 109,
+        "predicted_ink": 109
+      },
+      {
+        "scalar": "U+003F",
+        "intersection": 101,
+        "union": 101,
+        "target_ink": 101,
+        "predicted_ink": 101
+      },
+      {
+        "scalar": "U+0040",
+        "intersection": 328,
+        "union": 328,
+        "target_ink": 328,
+        "predicted_ink": 328
+      },
+      {
+        "scalar": "U+0041",
+        "intersection": 156,
+        "union": 156,
+        "target_ink": 156,
+        "predicted_ink": 156
+      },
+      {
+        "scalar": "U+0042",
+        "intersection": 214,
+        "union": 214,
+        "target_ink": 214,
+        "predicted_ink": 214
+      },
+      {
+        "scalar": "U+0043",
+        "intersection": 152,
+        "union": 152,
+        "target_ink": 152,
+        "predicted_ink": 152
+      }
+    ],
+    "exact": 11,
+    "differ": [
+      "U+0038 8"
+    ],
+    "wrong_pixels": 1,
+    "firm_exact": 11,
+    "firm_differ": [
+      "U+0038 8"
+    ],
+    "firm_wrong_pixels": 1
+  }
+}

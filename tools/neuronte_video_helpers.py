@@ -43,14 +43,21 @@ class Helper:
         if not isinstance(layers,list) or len(layers)!=2 or not all(isinstance(x,dict) for x in layers):
             raise ValueError('video helper needs two layer objects')
         self.layers=[(np.asarray(x.get('weight'),np.float32),np.asarray(x.get('bias'),np.float32)) for x in layers]
-        sizes=[24 if kind=='speed' else 51,96,scalars if kind=='speed' else 2]
+        # The hidden width is the file's own (v0 and v1 helpers are 96 wide).
+        hidden=self.layers[0][0].shape[0] if self.layers[0][0].ndim==2 else 0
+        if not 1<=hidden<=1024:raise ValueError('invalid video helper layer')
+        sizes=[24 if kind=='speed' else 51,hidden,scalars if kind=='speed' else 2]
         if len(self.layers)!=2:raise ValueError('video helper needs two layers')
         for i,(w,b) in enumerate(self.layers):
             if w.shape!=(sizes[i+1],sizes[i]) or b.shape!=(sizes[i+1],) or not np.isfinite(w).all() or not np.isfinite(b).all():raise ValueError('invalid video helper layer')
 
+        # Contiguous transposed copies: the same products, without BLAS
+        # walking a transposed operand on every frame.
+        self.forward=[(np.ascontiguousarray(w.T),b) for w,b in self.layers]
+
     def __call__(self,x):
-        for i,(w,b) in enumerate(self.layers):
-            x=x@w.T+b
+        for i,(w,b) in enumerate(self.forward):
+            x=x@w+b
             if i==0:x=np.maximum(x,0)
         return x
 

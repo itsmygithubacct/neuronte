@@ -113,6 +113,38 @@ class Video(unittest.TestCase):
         fractional=v.MultiInk(ROOT/'weights/neuronte-split-v4.nrt')
         self.assertIsNone(fractional.ink_indices)
 
+    def test_block_drawing_matches_eight_colour_decode(self):
+        # The player's default pixels mode: samples copied into blocks must
+        # be byte for byte the eight-colour records drawn by decode, with the
+        # independent continuous blend as the second reference.
+        fitter=v.MultiInk(cell_w=2,cell_h=4)
+        rng=np.random.default_rng(91)
+        for width,height in [(4,8),(8,16),(16,32),(6,12)]:
+            model=v.MultiInk(cell_w=width,cell_h=height)
+            self.assertEqual(model.block,(height//4,width//2))
+            for rows,cols in [(1,1),(3,5),(7,2)]:
+                samples=rng.integers(0,256,(rows*4,cols*2,3),dtype=np.uint8)
+                colours=fitter.encode(samples)
+                drawn=model.draw_samples(samples)
+                np.testing.assert_array_equal(drawn,model.decode(colours))
+                blend=np.clip(np.rint(v.unpatch(np.einsum('rckd,khw->rchwd',colours.astype(np.float32),model.mix))),0,255).astype(np.uint8)
+                np.testing.assert_array_equal(drawn,blend)
+                out=np.empty_like(drawn)
+                self.assertIs(model.draw_samples(samples,out),out)
+                np.testing.assert_array_equal(out,drawn)
+            with self.assertRaises(ValueError):model.draw_samples(samples[:3])
+            with self.assertRaises(ValueError):model.draw_samples(samples,np.empty((1,1,3),np.uint8))
+        # A map that is not the sample layout enlarged keeps decode: an
+        # exchanged pair of inks, a fractional bundle, an odd block.
+        ink=v.MultiInk(cell_w=8,cell_h=16).ink_indices
+        self.assertEqual(v.MultiInk.block_scale(ink),(4,4))
+        exchanged=ink.copy();exchanged[0,0]=1
+        self.assertIsNone(v.MultiInk.block_scale(exchanged))
+        self.assertIsNone(v.MultiInk.block_scale(ink[:15]))
+        self.assertIsNone(v.MultiInk.block_scale(ink[:,::-1].copy()))
+        self.assertIsNone(v.MultiInk(ROOT/'weights/neuronte-split-v4.nrt',cell_w=8,cell_h=16).block)
+        with self.assertRaises(ValueError):v.MultiInk(ROOT/'weights/neuronte-split-v4.nrt',cell_w=8,cell_h=16).draw_samples(np.zeros((4,2,3),np.uint8))
+
     def test_native_rgb_composition_matches_independent_blend_and_odd_edges(self):
         rng = np.random.default_rng(71)
         for width, height in ((1,1), (1,9), (7,1), (17,13), (945,531)):
@@ -319,6 +351,28 @@ class Video(unittest.TestCase):
                 reference=reference@np.array(layer['weight']).T+np.array(layer['bias'])
                 if i==0:reference=np.maximum(reference,0)
             np.testing.assert_allclose(model(x),reference,atol=2e-4,rtol=1e-5)
+
+    def test_helper_hidden_width_is_the_files_own(self):
+        # A narrower helper loads with its own width and evaluates like the
+        # float64 reference; inconsistent or empty hidden layers are refused.
+        from neuronte_video_helpers import Helper
+        doc=json.loads((ROOT/'weights/neuronte-video-speed-v1.json').read_text())
+        rng=np.random.default_rng(16)
+        with tempfile.TemporaryDirectory() as temp:
+            path=Path(temp)/'helper.json'
+            for hidden in [1,32,48]:
+                model=dict(doc,layers=[dict(weight=rng.normal(size=(hidden,24)).tolist(),bias=rng.normal(size=hidden).tolist()),
+                                       dict(weight=rng.normal(size=(1176,hidden)).tolist(),bias=rng.normal(size=1176).tolist())])
+                path.write_text(json.dumps(model));net=Helper(path,'speed',runtime=True)
+                x=rng.random((5,24)).astype(np.float32)
+                reference=np.maximum(x.astype(float)@np.array(model['layers'][0]['weight']).T+model['layers'][0]['bias'],0)
+                reference=reference@np.array(model['layers'][1]['weight']).T+model['layers'][1]['bias']
+                np.testing.assert_allclose(net(x),reference,atol=1e-3,rtol=1e-4)
+            for layers in [[dict(weight=[],bias=[]),doc['layers'][1]],
+                           [dict(weight=rng.normal(size=(32,24)).tolist(),bias=[0.]*32),doc['layers'][1]],
+                           [dict(weight=rng.normal(size=(32,25)).tolist(),bias=[0.]*32),dict(weight=rng.normal(size=(1176,32)).tolist(),bias=[0.]*1176)]]:
+                path.write_text(json.dumps(dict(doc,layers=layers)))
+                with self.assertRaises(ValueError):Helper(path,'speed',runtime=True)
 
     def test_temporal_guard_rejects_bad_retention(self):
         from neuronte_video_helpers import quality_cells,ssim

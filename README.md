@@ -25,12 +25,16 @@ letter. Desktop adapters fall back for unsupported strings and styles.
 | `neuronte-split-v5` | the font to use | 1,176, over six nets and a router; [recipe and validation](weights/neuronte-split-v5.md) | 48, 128, 192 and 256 | 392,716 | 1,573,128 bytes |
 | `neuronte-split-v6` | RC9 Braille: split-v5 with its Braille net replaced by the tiled `neuronte-braille-v1`; the video player's full-mode bundle; [recipe and validation](weights/neuronte-braille-v1.md) | 1,176, over six nets and a router | 6, 128, 192 and 256 | 384,232 | 1,539,388 bytes |
 | `neuronte-split-v7` | split-v6 with the ASCII character groups added: tiled Braille and `neuronte-ascii-groups-v1`; not a default; [recipe and checks](weights/neuronte-split-v7.md) | 1,176, over ten nets and a router | 6, 64, 128, 192 and 256 | 441,068 | 1,768,128 bytes |
+| `neuronte-split-v7-symbol-v1` | split-v7 with the symbol character groups added: tiled Braille, `neuronte-ascii-groups-v1` and `neuronte-symbol-v1`; not a default; [recipe and checks](weights/neuronte-split-v7-symbol-v1.md) | 1,176, over fourteen nets and a router | 6, 32, 64, 128, 192 and 256 | 461,296 | 1,850,412 bytes |
+| `neuronte-split-v8` | split-v7 with the symbol, pixel and accent character groups added: tiled Braille, `neuronte-ascii-groups-v1`, `neuronte-symbol-v1`, `neuronte-pixel-groups-v1` and `neuronte-accent-groups-v1`; the pixel and accent groups failed their declared strict gates and were chosen by visual review; not a default; [recipe, checks and speed](weights/neuronte-split-v8.md) | 1,176, over twenty-one nets and a router | 6, 32, 64, 128, 192 and 256 | 699,511 | 2,805,688 bytes |
 | `neuronte-split-v4` | the default before Greek and Russian, kept; most measurements below were made on it | 1,061, over six nets and a router | 48, 128 and 192 | 329,356 | 1,319,616 bytes |
 | `neuronte-full-v3` | explicit RC9 monolithic font; [quality and baseline comparison](weights/neuronte-full-v3.md) | 878, including the Greek and Russian additions | 384 | 331,009 | 1,324,240 bytes |
 | `neuronte-full-v2` | the baseline `split` is measured against | 763 of them in one net, all but the sextants and octants | 320 | 234,881 | 939,728 bytes |
 | `neuronte-ascii-v0` | the original ASCII expert | the 95 printable ASCII characters | 128 | 44,801 | 179,408 bytes |
 | `neuronte-ascii-groups-v1` | ASCII character groups; [recipe and validation](weights/neuronte-ascii-next.md) | the 95 printable ASCII characters | 4×64 | 56,836 | 228,252 bytes |
 | `neuronte-ascii-spatial-v1` | compact ASCII spatial halves; [recipe and validation](weights/neuronte-ascii-next.md) | the 95 printable ASCII characters | 2×64 | 28,418 | 114,172 bytes |
+| `neuronte-pixel-groups-v1` | pixel character groups, seed 1; failed the declared strict geometry gates; [recipe, validation and exceptions](weights/neuronte-pixel-groups-v1.md) | the 327 block, sextant and octant characters | 4×64 | 56,836 | 228,372 bytes |
+| `neuronte-accent-groups-v1` | accent script groups, seed 0; failed the declared strict gates; [recipe, validation and exceptions](weights/neuronte-accent-groups-v1.md) | the 318 accented Latin, spacing-mark, Greek and Russian characters | 192, 128 and 128 | 181,379 | 726,336 bytes |
 | `neuronte-ui1-v0`, `neuronte-ui2-v0`, `neuronte-ui3-v0`, `neuronte-ui4-v0`, `neuronte-ui5-v0`, `neuronte-ui6-v0`, `neuronte-ui7-v0` | the desktop face at an em of 1, 2, 3, 4, 5, 6 and 7 pixels | printable ASCII and the ellipsis, 96, with their advances | 96 | 27,457 | 110,864 bytes each |
 | `neuronte-ui8-v0`, `neuronte-ui9-v0`, `neuronte-ui10-v0`, `neuronte-ui11-v0` | the desktop face: proportional binary text at an em of 8, 9, 10 and 11 pixels | printable ASCII and the ellipsis, 96, with their advances | 96 | 27,457 | 110,864 bytes each |
 | `neuronte-ui12-v0`, `neuronte-ui14-v0` | the desktop face at an em of 12 pixels and of 14 | printable ASCII and the ellipsis, 96, with their advances | 128 | 44,801 | 180,240 bytes each |
@@ -83,6 +87,27 @@ its ASCII pixels are the qualified group nets'. Measured as a whole bundle on
 two x86 CPUs, it draws uncached ASCII about 2.2 times as fast as split-v6 and
 Braille as fast, and takes 0.1 to 0.3 ms longer to open. It is not a default
 yet. See [its recipe, checks and speed](weights/neuronte-split-v7.md).
+
+`neuronte-split-v7-symbol-v1.nrt` is split-v7 with the four width-32 symbol
+group nets of `neuronte-symbol-v1` added the same way. split-v7's members,
+routing and every non-symbol pixel are unchanged; the 49 symbols draw exactly
+as in `neuronte-split-v5-symbol-v1`, whose uncached symbol coverage measured
+5–6× faster than split-v5 on two x86-64 hosts. It is not a default. See
+[its recipe and checks](weights/neuronte-split-v7-symbol-v1.md).
+
+`neuronte-split-v8.nrt` is split-v7 with three more sets of group nets added
+the same way, one `train/known_bundle.py` step each: the symbol groups of
+`neuronte-symbol-v1`, the pixel groups of `neuronte-pixel-groups-v1` and the
+accent script groups of `neuronte-accent-groups-v1`. split-v7's ten members,
+unknown-character routing, ASCII and Braille are unchanged; each replaced
+character draws exactly as in the bundle it was reviewed in. The symbol groups
+passed their gates. The pixel and accent groups failed their declared strict
+gates at some sizes and were chosen after a visual review of the regressions,
+which their cards list. Measured as a whole bundle on two x86 CPUs, it draws
+uncached symbols about 5.5 times as fast as split-v7, pixel characters 2.1
+times and accent characters 1.95 times; ASCII and Braille cost the same, and
+it takes about 1 ms longer to open. It is not a default. Rebuild it with
+`make pack-split-v8`; see [its recipe, checks and speed](weights/neuronte-split-v8.md).
 
 RC9 also ships the separate `neuronte-emoji-v0.nrt` colour bundle: 300 original
 single-scalar emoji, 600 left/right half labels, three experts, and up to six

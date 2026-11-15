@@ -151,6 +151,21 @@ pays that cost again, so one rectangle is the default. `--stats` reports
 written to shared memory) and `cpu_s` (the player's processor seconds:
 in total, from its first source frame to the end, and its ffmpeg decoder).
 
+Measured on an i7-6820HQ and an i7-10700F (20 s generated clips, 960 × 540
+at 30 frames a second, the player's processor time a frame against the
+player without the options; the two hosts agree to a few hundredths):
+`--skip-threshold 4 --partial-limit 0.25` costs 0.33 to 0.36 of the time
+and sends 0.11 of the bytes on a screen recording at 240 × 67 cells (0.56
+to 0.60 and 0.06 at 80 × 24), and 0.25 to 0.28 of the time and 0.05 of the
+bytes on still shots with a caption (0.41 to 0.45 and 0.02 at 80 × 24).
+With threshold 0 the pictures are exact and still shots cost 0.29 to 0.31
+of the time at 240 × 67, but scattered small changes on a screen recording
+(a clock, the cursor, typing) often do not fit one rectangle, so the screen
+saves only about a tenth. Video in which every cell changes (camera noise,
+film grain, a moving camera) gains nothing and costs 1.00 to 1.02 of the
+time at 240 × 67 and up to about 1.05 at 80 × 24. So the options stay off
+by default; they suit screen recordings, slides and edited still shots.
+
 For a comparison at a fixed pixel resolution, use
 `python3 tools/neuronte-play.py FILE --pixel-size 945x531 --no-status`.
 ffmpeg scales directly to 945 × 531 RGB samples with Lanczos. Each 2 × 4

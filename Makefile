@@ -322,6 +322,11 @@ test-colour-marks: build/libneuronte.so
 	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_flame.py build/libneuronte.so weights/neuronte-flame-v1.seed1.json weights/neuronte-flame-v1.seed1.nrt --max-xor 16:7,2,0 --max-xor 32:6,3,5
 	$(PYTHON) tests/check_reference.py build/libneuronte.so weights/neuronte-flame-v1.json weights/neuronte-flame-v1.nrt
 	$(PYTHON) tests/check_reference.py build/libneuronte.so weights/neuronte-flame-v1.seed1.json weights/neuronte-flame-v1.seed1.nrt
+	sha256sum -c --quiet weights/neuronte-icon-v2.sha256
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_icon_quality.py build/libneuronte.so weights/neuronte-icon-v2.g0.json weights/neuronte-icon-v2.nrt --also weights/neuronte-icon-v2.g1.json --also weights/neuronte-icon-v2.g2.json --also weights/neuronte-icon-v2.g3.json
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --bundle weights/neuronte-icon-v2.nrt weights/neuronte-icon-v2.g0.json weights/neuronte-icon-v2.g1.json weights/neuronte-icon-v2.g2.json weights/neuronte-icon-v2.g3.json
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_icon_quality.py build/libneuronte.so weights/neuronte-icon-v2.seed1.g0.json weights/neuronte-icon-v2.seed1.nrt --also weights/neuronte-icon-v2.seed1.g1.json --also weights/neuronte-icon-v2.seed1.g2.json --also weights/neuronte-icon-v2.seed1.g3.json
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --bundle weights/neuronte-icon-v2.seed1.nrt weights/neuronte-icon-v2.seed1.g0.json weights/neuronte-icon-v2.seed1.g1.json weights/neuronte-icon-v2.seed1.g2.json weights/neuronte-icon-v2.seed1.g3.json
 
 .PHONY: test-colour-marks
 

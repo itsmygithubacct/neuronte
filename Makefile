@@ -108,6 +108,33 @@ UI37 = weights/neuronte-ui37-v0
 UI38 = weights/neuronte-ui38-v0
 UI39 = weights/neuronte-ui39-v0
 UI43 = weights/neuronte-ui43-v0
+# Desktop faces v1 at 33-39 and 43 px: each a drawing file of one bundle of small
+# nets, each drawing only the em rows of its own characters, and the advances.
+# Seed 0 is shipped; seed 1 is kept so the exact gate reruns on both.
+UI33_V1 = weights/neuronte-ui33-v1
+UI33_V1_NETS = $(UI33_V1)-p0.json $(UI33_V1)-p1.json $(UI33_V1)-p2.json $(UI33_V1)-p3.json $(UI33_V1)-p4.json $(UI33_V1)-p5.json $(UI33_V1)-p6.json $(UI33_V1)-p7.json $(UI33_V1)-p8.json $(UI33_V1)-p9.json $(UI33_V1)-p10.json $(UI33_V1)-p11.json $(UI33_V1)-p12.json $(UI33_V1)-p13.json $(UI33_V1)-p14.json $(UI33_V1)-p15.json
+UI33_V1_SEED1 = $(UI33_V1).seed1-p0.json $(UI33_V1).seed1-p1.json $(UI33_V1).seed1-p2.json $(UI33_V1).seed1-p3.json $(UI33_V1).seed1-p4.json $(UI33_V1).seed1-p5.json $(UI33_V1).seed1-p6.json $(UI33_V1).seed1-p7.json $(UI33_V1).seed1-p8.json $(UI33_V1).seed1-p9.json $(UI33_V1).seed1-p10.json $(UI33_V1).seed1-p11.json $(UI33_V1).seed1-p12.json $(UI33_V1).seed1-p13.json $(UI33_V1).seed1-p14.json $(UI33_V1).seed1-p15.json
+UI34_V1 = weights/neuronte-ui34-v1
+UI34_V1_NETS = $(UI34_V1)-p0.json $(UI34_V1)-p1.json $(UI34_V1)-p2.json $(UI34_V1)-p3.json $(UI34_V1)-p4.json $(UI34_V1)-p5.json $(UI34_V1)-p6.json $(UI34_V1)-p7.json $(UI34_V1)-p8.json $(UI34_V1)-p9.json $(UI34_V1)-p10.json $(UI34_V1)-p11.json $(UI34_V1)-p12.json $(UI34_V1)-p13.json $(UI34_V1)-p14.json $(UI34_V1)-p15.json $(UI34_V1)-p16.json $(UI34_V1)-p17.json $(UI34_V1)-p18.json $(UI34_V1)-p19.json $(UI34_V1)-p20.json $(UI34_V1)-p21.json $(UI34_V1)-p22.json $(UI34_V1)-p23.json $(UI34_V1)-p24.json $(UI34_V1)-p25.json $(UI34_V1)-p26.json $(UI34_V1)-p27.json $(UI34_V1)-p28.json $(UI34_V1)-p29.json $(UI34_V1)-p30.json $(UI34_V1)-p31.json
+UI34_V1_SEED1 = $(UI34_V1).seed1-p0.json $(UI34_V1).seed1-p1.json $(UI34_V1).seed1-p2.json $(UI34_V1).seed1-p3.json $(UI34_V1).seed1-p4.json $(UI34_V1).seed1-p5.json $(UI34_V1).seed1-p6.json $(UI34_V1).seed1-p7.json $(UI34_V1).seed1-p8.json $(UI34_V1).seed1-p9.json $(UI34_V1).seed1-p10.json $(UI34_V1).seed1-p11.json $(UI34_V1).seed1-p12.json $(UI34_V1).seed1-p13.json $(UI34_V1).seed1-p14.json $(UI34_V1).seed1-p15.json $(UI34_V1).seed1-p16.json $(UI34_V1).seed1-p17.json $(UI34_V1).seed1-p18.json $(UI34_V1).seed1-p19.json $(UI34_V1).seed1-p20.json $(UI34_V1).seed1-p21.json $(UI34_V1).seed1-p22.json $(UI34_V1).seed1-p23.json $(UI34_V1).seed1-p24.json $(UI34_V1).seed1-p25.json $(UI34_V1).seed1-p26.json $(UI34_V1).seed1-p27.json $(UI34_V1).seed1-p28.json $(UI34_V1).seed1-p29.json $(UI34_V1).seed1-p30.json $(UI34_V1).seed1-p31.json
+UI35_V1 = weights/neuronte-ui35-v1
+UI35_V1_NETS = $(UI35_V1)-p0.json $(UI35_V1)-p1.json $(UI35_V1)-p2.json $(UI35_V1)-p3.json $(UI35_V1)-p4.json $(UI35_V1)-p5.json $(UI35_V1)-p6.json $(UI35_V1)-p7.json $(UI35_V1)-p8.json $(UI35_V1)-p9.json $(UI35_V1)-p10.json $(UI35_V1)-p11.json $(UI35_V1)-p12.json $(UI35_V1)-p13.json $(UI35_V1)-p14.json $(UI35_V1)-p15.json $(UI35_V1)-p16.json $(UI35_V1)-p17.json $(UI35_V1)-p18.json $(UI35_V1)-p19.json $(UI35_V1)-p20.json $(UI35_V1)-p21.json $(UI35_V1)-p22.json $(UI35_V1)-p23.json $(UI35_V1)-p24.json $(UI35_V1)-p25.json $(UI35_V1)-p26.json $(UI35_V1)-p27.json $(UI35_V1)-p28.json $(UI35_V1)-p29.json $(UI35_V1)-p30.json $(UI35_V1)-p31.json
+UI35_V1_SEED1 = $(UI35_V1).seed1-p0.json $(UI35_V1).seed1-p1.json $(UI35_V1).seed1-p2.json $(UI35_V1).seed1-p3.json $(UI35_V1).seed1-p4.json $(UI35_V1).seed1-p5.json $(UI35_V1).seed1-p6.json $(UI35_V1).seed1-p7.json $(UI35_V1).seed1-p8.json $(UI35_V1).seed1-p9.json $(UI35_V1).seed1-p10.json $(UI35_V1).seed1-p11.json $(UI35_V1).seed1-p12.json $(UI35_V1).seed1-p13.json $(UI35_V1).seed1-p14.json $(UI35_V1).seed1-p15.json $(UI35_V1).seed1-p16.json $(UI35_V1).seed1-p17.json $(UI35_V1).seed1-p18.json $(UI35_V1).seed1-p19.json $(UI35_V1).seed1-p20.json $(UI35_V1).seed1-p21.json $(UI35_V1).seed1-p22.json $(UI35_V1).seed1-p23.json $(UI35_V1).seed1-p24.json $(UI35_V1).seed1-p25.json $(UI35_V1).seed1-p26.json $(UI35_V1).seed1-p27.json $(UI35_V1).seed1-p28.json $(UI35_V1).seed1-p29.json $(UI35_V1).seed1-p30.json $(UI35_V1).seed1-p31.json
+UI36_V1 = weights/neuronte-ui36-v1
+UI36_V1_NETS = $(UI36_V1)-p0.json $(UI36_V1)-p1.json $(UI36_V1)-p2.json $(UI36_V1)-p3.json $(UI36_V1)-p4.json $(UI36_V1)-p5.json $(UI36_V1)-p6.json $(UI36_V1)-p7.json $(UI36_V1)-p8.json $(UI36_V1)-p9.json $(UI36_V1)-p10.json $(UI36_V1)-p11.json $(UI36_V1)-p12.json $(UI36_V1)-p13.json $(UI36_V1)-p14.json $(UI36_V1)-p15.json
+UI36_V1_SEED1 = $(UI36_V1).seed1-p0.json $(UI36_V1).seed1-p1.json $(UI36_V1).seed1-p2.json $(UI36_V1).seed1-p3.json $(UI36_V1).seed1-p4.json $(UI36_V1).seed1-p5.json $(UI36_V1).seed1-p6.json $(UI36_V1).seed1-p7.json $(UI36_V1).seed1-p8.json $(UI36_V1).seed1-p9.json $(UI36_V1).seed1-p10.json $(UI36_V1).seed1-p11.json $(UI36_V1).seed1-p12.json $(UI36_V1).seed1-p13.json $(UI36_V1).seed1-p14.json $(UI36_V1).seed1-p15.json
+UI37_V1 = weights/neuronte-ui37-v1
+UI37_V1_NETS = $(UI37_V1)-p0.json $(UI37_V1)-p1.json $(UI37_V1)-p2.json $(UI37_V1)-p3.json $(UI37_V1)-p4.json $(UI37_V1)-p5.json $(UI37_V1)-p6.json $(UI37_V1)-p7.json $(UI37_V1)-p8.json $(UI37_V1)-p9.json $(UI37_V1)-p10.json $(UI37_V1)-p11.json $(UI37_V1)-p12.json $(UI37_V1)-p13.json $(UI37_V1)-p14.json $(UI37_V1)-p15.json
+UI37_V1_SEED1 = $(UI37_V1).seed1-p0.json $(UI37_V1).seed1-p1.json $(UI37_V1).seed1-p2.json $(UI37_V1).seed1-p3.json $(UI37_V1).seed1-p4.json $(UI37_V1).seed1-p5.json $(UI37_V1).seed1-p6.json $(UI37_V1).seed1-p7.json $(UI37_V1).seed1-p8.json $(UI37_V1).seed1-p9.json $(UI37_V1).seed1-p10.json $(UI37_V1).seed1-p11.json $(UI37_V1).seed1-p12.json $(UI37_V1).seed1-p13.json $(UI37_V1).seed1-p14.json $(UI37_V1).seed1-p15.json
+UI38_V1 = weights/neuronte-ui38-v1
+UI38_V1_NETS = $(UI38_V1)-p0.json $(UI38_V1)-p1.json $(UI38_V1)-p2.json $(UI38_V1)-p3.json $(UI38_V1)-p4.json $(UI38_V1)-p5.json $(UI38_V1)-p6.json $(UI38_V1)-p7.json $(UI38_V1)-p8.json $(UI38_V1)-p9.json $(UI38_V1)-p10.json $(UI38_V1)-p11.json $(UI38_V1)-p12.json $(UI38_V1)-p13.json $(UI38_V1)-p14.json $(UI38_V1)-p15.json $(UI38_V1)-p16.json $(UI38_V1)-p17.json $(UI38_V1)-p18.json $(UI38_V1)-p19.json $(UI38_V1)-p20.json $(UI38_V1)-p21.json $(UI38_V1)-p22.json $(UI38_V1)-p23.json $(UI38_V1)-p24.json $(UI38_V1)-p25.json $(UI38_V1)-p26.json $(UI38_V1)-p27.json $(UI38_V1)-p28.json $(UI38_V1)-p29.json $(UI38_V1)-p30.json $(UI38_V1)-p31.json
+UI38_V1_SEED1 = $(UI38_V1).seed1-p0.json $(UI38_V1).seed1-p1.json $(UI38_V1).seed1-p2.json $(UI38_V1).seed1-p3.json $(UI38_V1).seed1-p4.json $(UI38_V1).seed1-p5.json $(UI38_V1).seed1-p6.json $(UI38_V1).seed1-p7.json $(UI38_V1).seed1-p8.json $(UI38_V1).seed1-p9.json $(UI38_V1).seed1-p10.json $(UI38_V1).seed1-p11.json $(UI38_V1).seed1-p12.json $(UI38_V1).seed1-p13.json $(UI38_V1).seed1-p14.json $(UI38_V1).seed1-p15.json $(UI38_V1).seed1-p16.json $(UI38_V1).seed1-p17.json $(UI38_V1).seed1-p18.json $(UI38_V1).seed1-p19.json $(UI38_V1).seed1-p20.json $(UI38_V1).seed1-p21.json $(UI38_V1).seed1-p22.json $(UI38_V1).seed1-p23.json $(UI38_V1).seed1-p24.json $(UI38_V1).seed1-p25.json $(UI38_V1).seed1-p26.json $(UI38_V1).seed1-p27.json $(UI38_V1).seed1-p28.json $(UI38_V1).seed1-p29.json $(UI38_V1).seed1-p30.json $(UI38_V1).seed1-p31.json
+UI39_V1 = weights/neuronte-ui39-v1
+UI39_V1_NETS = $(UI39_V1)-p0.json $(UI39_V1)-p1.json $(UI39_V1)-p2.json $(UI39_V1)-p3.json $(UI39_V1)-p4.json $(UI39_V1)-p5.json $(UI39_V1)-p6.json $(UI39_V1)-p7.json $(UI39_V1)-p8.json $(UI39_V1)-p9.json $(UI39_V1)-p10.json $(UI39_V1)-p11.json $(UI39_V1)-p12.json $(UI39_V1)-p13.json $(UI39_V1)-p14.json $(UI39_V1)-p15.json $(UI39_V1)-p16.json $(UI39_V1)-p17.json $(UI39_V1)-p18.json $(UI39_V1)-p19.json $(UI39_V1)-p20.json $(UI39_V1)-p21.json $(UI39_V1)-p22.json $(UI39_V1)-p23.json $(UI39_V1)-p24.json $(UI39_V1)-p25.json $(UI39_V1)-p26.json $(UI39_V1)-p27.json $(UI39_V1)-p28.json $(UI39_V1)-p29.json $(UI39_V1)-p30.json $(UI39_V1)-p31.json
+UI39_V1_SEED1 = $(UI39_V1).seed1-p0.json $(UI39_V1).seed1-p1.json $(UI39_V1).seed1-p2.json $(UI39_V1).seed1-p3.json $(UI39_V1).seed1-p4.json $(UI39_V1).seed1-p5.json $(UI39_V1).seed1-p6.json $(UI39_V1).seed1-p7.json $(UI39_V1).seed1-p8.json $(UI39_V1).seed1-p9.json $(UI39_V1).seed1-p10.json $(UI39_V1).seed1-p11.json $(UI39_V1).seed1-p12.json $(UI39_V1).seed1-p13.json $(UI39_V1).seed1-p14.json $(UI39_V1).seed1-p15.json $(UI39_V1).seed1-p16.json $(UI39_V1).seed1-p17.json $(UI39_V1).seed1-p18.json $(UI39_V1).seed1-p19.json $(UI39_V1).seed1-p20.json $(UI39_V1).seed1-p21.json $(UI39_V1).seed1-p22.json $(UI39_V1).seed1-p23.json $(UI39_V1).seed1-p24.json $(UI39_V1).seed1-p25.json $(UI39_V1).seed1-p26.json $(UI39_V1).seed1-p27.json $(UI39_V1).seed1-p28.json $(UI39_V1).seed1-p29.json $(UI39_V1).seed1-p30.json $(UI39_V1).seed1-p31.json
+UI43_V1 = weights/neuronte-ui43-v1
+UI43_V1_NETS = $(UI43_V1)-p0.json $(UI43_V1)-p1.json $(UI43_V1)-p2.json $(UI43_V1)-p3.json $(UI43_V1)-p4.json $(UI43_V1)-p5.json $(UI43_V1)-p6.json $(UI43_V1)-p7.json $(UI43_V1)-p8.json $(UI43_V1)-p9.json $(UI43_V1)-p10.json $(UI43_V1)-p11.json $(UI43_V1)-p12.json $(UI43_V1)-p13.json $(UI43_V1)-p14.json $(UI43_V1)-p15.json $(UI43_V1)-p16.json $(UI43_V1)-p17.json $(UI43_V1)-p18.json $(UI43_V1)-p19.json $(UI43_V1)-p20.json $(UI43_V1)-p21.json $(UI43_V1)-p22.json $(UI43_V1)-p23.json $(UI43_V1)-p24.json $(UI43_V1)-p25.json $(UI43_V1)-p26.json $(UI43_V1)-p27.json $(UI43_V1)-p28.json $(UI43_V1)-p29.json $(UI43_V1)-p30.json $(UI43_V1)-p31.json
+UI43_V1_SEED1 = $(UI43_V1).seed1-p0.json $(UI43_V1).seed1-p1.json $(UI43_V1).seed1-p2.json $(UI43_V1).seed1-p3.json $(UI43_V1).seed1-p4.json $(UI43_V1).seed1-p5.json $(UI43_V1).seed1-p6.json $(UI43_V1).seed1-p7.json $(UI43_V1).seed1-p8.json $(UI43_V1).seed1-p9.json $(UI43_V1).seed1-p10.json $(UI43_V1).seed1-p11.json $(UI43_V1).seed1-p12.json $(UI43_V1).seed1-p13.json $(UI43_V1).seed1-p14.json $(UI43_V1).seed1-p15.json $(UI43_V1).seed1-p16.json $(UI43_V1).seed1-p17.json $(UI43_V1).seed1-p18.json $(UI43_V1).seed1-p19.json $(UI43_V1).seed1-p20.json $(UI43_V1).seed1-p21.json $(UI43_V1).seed1-p22.json $(UI43_V1).seed1-p23.json $(UI43_V1).seed1-p24.json $(UI43_V1).seed1-p25.json $(UI43_V1).seed1-p26.json $(UI43_V1).seed1-p27.json $(UI43_V1).seed1-p28.json $(UI43_V1).seed1-p29.json $(UI43_V1).seed1-p30.json $(UI43_V1).seed1-p31.json
 # Above 32 px, one scalable net for every em, drawn blended, with its advances.
 UILARGE = weights/neuronte-ui-large-v0
 # Desktop faces v1: each a drawing file of one bundle of small nets, each net
@@ -277,6 +304,14 @@ pack: $(ASCII).json $(FULL).json $(NETS) $(GATE) $(PRIOR_NETS) $(PRIOR_GATE) $(U
 	$(PYTHON) train/pack.py --drawing $(UI38).nrt $(UI38).json font/ui-38.txt
 	$(PYTHON) train/pack.py --drawing $(UI39).nrt $(UI39).json font/ui-39.txt
 	$(PYTHON) train/pack.py --drawing $(UI43).nrt $(UI43).json font/ui-43.txt
+	$(PYTHON) train/pack.py --drawing-bundle $(UI33_V1).nrt font/ui-33.txt $(UI33_V1_NETS)
+	$(PYTHON) train/pack.py --drawing-bundle $(UI34_V1).nrt font/ui-34.txt $(UI34_V1_NETS)
+	$(PYTHON) train/pack.py --drawing-bundle $(UI35_V1).nrt font/ui-35.txt $(UI35_V1_NETS)
+	$(PYTHON) train/pack.py --drawing-bundle $(UI36_V1).nrt font/ui-36.txt $(UI36_V1_NETS)
+	$(PYTHON) train/pack.py --drawing-bundle $(UI37_V1).nrt font/ui-37.txt $(UI37_V1_NETS)
+	$(PYTHON) train/pack.py --drawing-bundle $(UI38_V1).nrt font/ui-38.txt $(UI38_V1_NETS)
+	$(PYTHON) train/pack.py --drawing-bundle $(UI39_V1).nrt font/ui-39.txt $(UI39_V1_NETS)
+	$(PYTHON) train/pack.py --drawing-bundle $(UI43_V1).nrt font/ui-43.txt $(UI43_V1_NETS)
 	$(PYTHON) train/pack.py --drawing $(UILARGE).nrt $(UILARGE).json font/ui-large-advances.txt
 	$(PYTHON) train/pack.py --drawing-bundle $(UI24_V1).nrt font/ui-24.txt $(UI24_V1_NETS)
 	$(PYTHON) train/pack.py --drawing-bundle $(UI24I_V1).nrt font/ui-24-italic.txt $(UI24I_V1_NETS)
@@ -418,6 +453,36 @@ pack-faces-wide-v1:
 
 .PHONY: test-faces-wide-v1 pack-faces-wide-v1
 
+# The desktop faces v1 at 33-39 and 43 px: every character of both seeds exactly its drawing.
+test-faces-v1-h512: build/libneuronte.so
+	mkdir -p build/faces-v1-h512
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle $(UI33_V1).nrt font/ui-33.txt $(UI33_V1_NETS)
+	$(PYTHON) train/pack.py --drawing-bundle build/faces-v1-h512/neuronte-ui33-v1.seed1.nrt font/ui-33.txt $(UI33_V1_SEED1)
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle build/faces-v1-h512/neuronte-ui33-v1.seed1.nrt font/ui-33.txt $(UI33_V1_SEED1)
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle $(UI34_V1).nrt font/ui-34.txt $(UI34_V1_NETS)
+	$(PYTHON) train/pack.py --drawing-bundle build/faces-v1-h512/neuronte-ui34-v1.seed1.nrt font/ui-34.txt $(UI34_V1_SEED1)
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle build/faces-v1-h512/neuronte-ui34-v1.seed1.nrt font/ui-34.txt $(UI34_V1_SEED1)
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle $(UI35_V1).nrt font/ui-35.txt $(UI35_V1_NETS)
+	$(PYTHON) train/pack.py --drawing-bundle build/faces-v1-h512/neuronte-ui35-v1.seed1.nrt font/ui-35.txt $(UI35_V1_SEED1)
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle build/faces-v1-h512/neuronte-ui35-v1.seed1.nrt font/ui-35.txt $(UI35_V1_SEED1)
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle $(UI36_V1).nrt font/ui-36.txt $(UI36_V1_NETS)
+	$(PYTHON) train/pack.py --drawing-bundle build/faces-v1-h512/neuronte-ui36-v1.seed1.nrt font/ui-36.txt $(UI36_V1_SEED1)
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle build/faces-v1-h512/neuronte-ui36-v1.seed1.nrt font/ui-36.txt $(UI36_V1_SEED1)
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle $(UI37_V1).nrt font/ui-37.txt $(UI37_V1_NETS)
+	$(PYTHON) train/pack.py --drawing-bundle build/faces-v1-h512/neuronte-ui37-v1.seed1.nrt font/ui-37.txt $(UI37_V1_SEED1)
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle build/faces-v1-h512/neuronte-ui37-v1.seed1.nrt font/ui-37.txt $(UI37_V1_SEED1)
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle $(UI38_V1).nrt font/ui-38.txt $(UI38_V1_NETS)
+	$(PYTHON) train/pack.py --drawing-bundle build/faces-v1-h512/neuronte-ui38-v1.seed1.nrt font/ui-38.txt $(UI38_V1_SEED1)
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle build/faces-v1-h512/neuronte-ui38-v1.seed1.nrt font/ui-38.txt $(UI38_V1_SEED1)
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle $(UI39_V1).nrt font/ui-39.txt $(UI39_V1_NETS)
+	$(PYTHON) train/pack.py --drawing-bundle build/faces-v1-h512/neuronte-ui39-v1.seed1.nrt font/ui-39.txt $(UI39_V1_SEED1)
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle build/faces-v1-h512/neuronte-ui39-v1.seed1.nrt font/ui-39.txt $(UI39_V1_SEED1)
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle $(UI43_V1).nrt font/ui-43.txt $(UI43_V1_NETS)
+	$(PYTHON) train/pack.py --drawing-bundle build/faces-v1-h512/neuronte-ui43-v1.seed1.nrt font/ui-43.txt $(UI43_V1_SEED1)
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle build/faces-v1-h512/neuronte-ui43-v1.seed1.nrt font/ui-43.txt $(UI43_V1_SEED1)
+
+.PHONY: test-faces-v1-h512
+
 test-known-bundle: build/libneuronte.so
 	$(PYTHON) tests/check_known_bundle.py build/libneuronte.so
 
@@ -464,7 +529,7 @@ test-symbol-v1: build/libneuronte.so build/test_api
 
 .PHONY: test-widths
 
-test: all $(TESTS) test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7 test-face-bundle test-symbol-v1 test-split-v7-symbol test-split-v8 test-faces-v1 test-faces-v1-192-256 test-known-bundle test-faces-wide-v1
+test: all $(TESTS) test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7 test-face-bundle test-symbol-v1 test-split-v7-symbol test-split-v8 test-faces-v1 test-faces-v1-192-256 test-known-bundle test-faces-wide-v1 test-faces-v1-h512
 	cd weights && sha256sum -c --quiet SHA256SUMS
 	# The pointer net keeps its own list, with paths from the top of the tree.
 	sha256sum -c --quiet weights/neuronte-pointer-v0.sha256

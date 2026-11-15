@@ -99,11 +99,15 @@ def empty_net(masks):
 
 
 def tiled_doc(net, empty, y0, y1):
+    # Above the band, the band, below it; a row of no height is left out (row edges must rise
+    # strictly), as at 1 px, whose band reaches the bottom of the cell.
+    rows, tiles = [0.0], []
+    for lo, hi, n, mask in ((0.0, y0, 0, 0), (y0, y1, 1, 0x1FFFFF), (y1, 2.0, 0, 0)):
+        if hi > lo:
+            rows.append(hi)
+            tiles.append({"net": n, "mask": mask, "base": 0, "code": "place"})
     return {"format": "neuronte-tiled-weights", "version": 1, "first": 0, "last": 0x1FFFFF,
-            "columns": [0.0, 1.0], "rows": [0.0, y0, y1, 2.0], "nets": [empty, net],
-            "tiles": [{"net": 0, "mask": 0, "base": 0, "code": "place"},
-                      {"net": 1, "mask": 0x1FFFFF, "base": 0, "code": "place"},
-                      {"net": 0, "mask": 0, "base": 0, "code": "place"}]}
+            "columns": [0.0, 1.0], "rows": rows, "nets": [empty, net], "tiles": tiles}
 
 
 def main():

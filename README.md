@@ -39,6 +39,7 @@ letter. Desktop adapters fall back for unsupported strings and styles.
 | `neuronte-ui23-v0`, `neuronte-ui25-v0` | the desktop face at an em of 23 pixels and of 25 | printable ASCII and the ellipsis, 96, with their advances | 192 | 91,777 | 368,144 bytes each |
 | `neuronte-ui17-v0` | the desktop face at an em of 17 pixels | printable ASCII and the ellipsis, 96, with their advances | 256 | 155,137 | 621,584 bytes |
 | `neuronte-ui19-v0`, `neuronte-ui20-v0`, `neuronte-ui21-v0` | the desktop face at an em of 19, 20 and 21 pixels | printable ASCII and the ellipsis, 96, with their advances | 160 | 66,241 | 266,000 bytes each |
+| `neuronte-ui1-v1`, `neuronte-ui2-v1`, `neuronte-ui3-v1`, `neuronte-ui4-v1`, `neuronte-ui5-v1`, `neuronte-ui6-v1`, `neuronte-ui7-v1`, `neuronte-ui8-v1`, `neuronte-ui9-v1`, `neuronte-ui10-v1`, `neuronte-ui11-v1`, `neuronte-ui12-v1`, `neuronte-ui13-v1`, `neuronte-ui14-v1`, `neuronte-ui15-v1`, `neuronte-ui19-v1`, `neuronte-ui20-v1`, `neuronte-ui21-v1`, `neuronte-ui3-italic-v1`, `neuronte-ui4-italic-v1`, `neuronte-ui5-italic-v1`, `neuronte-ui6-italic-v1`, `neuronte-ui7-italic-v1`, `neuronte-ui8-italic-v1`, `neuronte-ui9-italic-v1`, `neuronte-ui10-italic-v1`, `neuronte-ui11-italic-v1`, `neuronte-ui12-italic-v1`, `neuronte-ui14-italic-v1`, `neuronte-ui15-italic-v1` | the same faces as their v0, every character exactly the same pixels, drawn 4 to 30 times faster: each a drawing file of one bundle of 32 or 96 small nets, each drawing only the em rows of its own characters (one such net at 1 and 2 px); v0 is unchanged and still the default; [recipe and speed](weights/neuronte-ui-v1-small.md) | printable ASCII and the ellipsis, 96, with their advances | 16 per net (20 for ui12, ui12-italic, ui15 and ui19; 24 for ui21) | 2,017 to 257,376 | 9,788 to 1,119,068 bytes |
 | `neuronte-ui24-v0`, `neuronte-ui27-v0`, `neuronte-ui28-v0`, `neuronte-ui29-v0`, `neuronte-ui30-v0` | the desktop face at an em of 24, 27, 28, 29 and 30 pixels | printable ASCII and the ellipsis, 96, with their advances | 384 | 331,009 | 1,325,072 bytes each |
 | `neuronte-ui31-v0`, `neuronte-ui33-v0`, `neuronte-ui34-v0`, `neuronte-ui35-v0`, `neuronte-ui36-v0`, `neuronte-ui37-v0`, `neuronte-ui38-v0`, `neuronte-ui39-v0`, `neuronte-ui43-v0` | the desktop face at an em of 31, 33, 34, 35, 36, 37, 38, 39 and 43 pixels | printable ASCII and the ellipsis, 96, with their advances | 512 | 572,417 | 2,290,704 bytes each |
 | `neuronte-ui32-v0` | the desktop face at an em of 32 pixels | printable ASCII and the ellipsis, 96, with their advances | 768 | 1,251,841 | 5,008,400 bytes |
@@ -92,6 +93,13 @@ Both seeds pass the stated C gates, and the complete source/two-seed sheets
 were reviewed at 16 and 32 px per cell. The [emoji recipe and quality report](weights/neuronte-emoji-v0.md)
 record the calibration, exact sampling policy and lower overlap at some other
 sizes. Joined sequences, flags and skin-tone sequences are outside this set.
+
+The [v1 small desktop faces](weights/neuronte-ui-v1-small.md), 1 to 15 px and 19 to 21 px, and the
+italics 3 to 12, 14 and 15 px, are new files beside their v0, with the same advances. Both seeds draw
+all 96 glyphs, regular and bold, exactly as the drawings at the native em. They draw a whole face 4
+to 30 times faster, the cost a desktop pays when it builds its letter cells; opening a 96-net file
+takes 0.6 to 1.3 ms longer than its v0, and with the opening counted a face still builds 3 to 29
+times faster. The installer and Kilix 95 still load v0.
 
 The [17 additional desktop italic faces](weights/neuronte-italic-v0.md) complete
 native sizes 3–32 while preserving the 13 earlier faces. Both matching seeds

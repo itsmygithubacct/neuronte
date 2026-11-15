@@ -1,5 +1,23 @@
 # Changes
 
+## 0.1.3
+
+No weight file changed, and the code that runs the nets is unchanged: every
+file draws the pixels and advances it drew in 0.1.2. The library's own
+sha256 changes, so caches keyed by it are rebuilt once.
+
+- **Packed text masks** (`src/bits.c`). `neuronte_bits_pack()` and
+  `neuronte_alpha_pack()` turn drawn 32-bit pixels into 1-bit or 8-bit
+  rows. `neuronte_bits_compose()` lays kept 1-bit letters into a line, bold
+  or not, in one call. A program that draws the same small text over and
+  over can keep each letter after the net has drawn it once and run no net
+  after that. With them the Kilix 95 desktop draws a string in less time
+  than DejaVu through FreeType at every size measured, from 8 to 48 px;
+  laid from Python the same letters took 5 to 15 times as long. The
+  measurements are in the
+  [Neuronte 2 benchmarks](https://github.com/itsmygithubacct/neuronte-v2/blob/main/BENCHMARKS.md).
+- `make test-bits` checks the three calls against a pixel loop.
+
 ## 0.1.2
 
 0.1.1 is commit `4134bf9`, the Neuronte that Plebian OS 0.2.3 RC9 installs;

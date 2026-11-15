@@ -184,7 +184,7 @@ FLAME = weights/neuronte-flame-v0
 # The icon net: a colour net, form A, a version 3 file by itself. It is not
 # in the bundle; neuronte-split-v5 is the default font.
 ICON = weights/neuronte-icon-v1
-OBJS = build/neuronte.o build/utf8.o build/video.o
+OBJS = build/neuronte.o build/utf8.o build/video.o build/bits.o
 TOOLS = build/neuronte-render build/neuronte-bench
 TESTS = build/test_utf8 build/test_api build/test_tiled
 
@@ -593,7 +593,12 @@ test-colour-marks: build/libneuronte.so
 
 .PHONY: test-widths
 
-test: all $(TESTS) test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7 test-face-bundle test-symbol-v1 test-split-v7-symbol test-split-v8 test-faces-v1 test-faces-v1-192-256 test-known-bundle test-faces-wide-v1 test-faces-v1-h512 test-colour-marks test-faces-v1-small test-emoji-v1
+# The packed text mask calls against a pixel loop.
+test-bits: build/libneuronte.so
+	$(PYTHON) tests/check_bits.py build/libneuronte.so
+.PHONY: test-bits
+
+test: all $(TESTS) test-bits test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7 test-face-bundle test-symbol-v1 test-split-v7-symbol test-split-v8 test-faces-v1 test-faces-v1-192-256 test-known-bundle test-faces-wide-v1 test-faces-v1-h512 test-colour-marks test-faces-v1-small test-emoji-v1
 	cd weights && sha256sum -c --quiet SHA256SUMS
 	# The pointer net keeps its own list, with paths from the top of the tree.
 	sha256sum -c --quiet weights/neuronte-pointer-v0.sha256

@@ -285,6 +285,43 @@ int neuronte_draw_text_stroke(neuronte *n, uint32_t *pixels, int stride, int wid
                               int x, int y, int em_px, int stroke_px, const char *text, size_t len,
                               uint32_t color);
 
+/* Packed text masks. A program that keeps each letter's pixels after the
+ * net has drawn it once can lay a line out of the kept letters with these,
+ * without running a net. Rows are top to bottom and tightly packed.
+ *
+ * A 1-bit row is (width + 7) / 8 bytes, leftmost pixel in the highest bit.
+ * neuronte_bits_pack() sets a bit wherever the 0xAARRGGBB pixel is not zero
+ * and needs out_len >= that row size times height. neuronte_alpha_pack()
+ * writes each pixel's alpha as one byte and needs width * height bytes.
+ * Both return NEURONTE_OK, or NEURONTE_ERR_ARG having written nothing. */
+int neuronte_bits_pack(const uint32_t *pixels, int stride, int width, int height, uint8_t *out,
+                       size_t out_len);
+int neuronte_alpha_pack(const uint32_t *pixels, int stride, int width, int height, uint8_t *out,
+                        size_t out_len);
+
+/* One kept letter: where its 1-bit rows start in the atlas, how many
+ * columns of it hold ink, and how far the pen moves after it. A letter of
+ * width 0 has no rows. */
+typedef struct neuronte_bits_cell {
+    uint32_t offset;
+    uint16_t width;
+    uint16_t advance;
+    uint16_t bold_advance;
+    uint16_t reserved;
+} neuronte_bits_cell;
+
+/* Lay kept letters into one 1-bit line of out_width by rows pixels. The
+ * atlas holds each letter as rows 1-bit rows of its own width; text lists
+ * the letters by their index in cells. The line is cleared, then each
+ * letter is ORed in with its left edge at the pen, and again one pixel to
+ * the right when bold is not zero. Returns the pen after the last letter.
+ * NEURONTE_ERR_ARG, with nothing written, when a buffer is too small, an
+ * index or a letter's rows fall outside their array, or a letter or the
+ * pen would pass out_width. */
+int neuronte_bits_compose(uint8_t *out, size_t out_len, int out_width, int rows,
+                          const uint8_t *atlas, size_t atlas_len, const neuronte_bits_cell *cells,
+                          size_t cell_count, const uint32_t *text, size_t text_len, int bold);
+
 #ifdef __cplusplus
 }
 #endif

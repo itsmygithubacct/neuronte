@@ -64,9 +64,18 @@ Measured as a whole bundle with kilix-bench `e21e5cd`, against split-v5,
 split-v6 and the ASCII package (`neuronte-split-ascii-groups-v1`) in the same
 runs. Two x86 hosts, an Intel i7-10700F and an i7-6820HQ, each on one pinned
 core with the benchmark lock held for the whole run. One warmup and ten
-measured rounds, a fresh process per job, rounds shuffled. ARM was not
-measured for this bundle, and no figure here is carried over from the ASCII or
-Braille campaigns.
+measured rounds, a fresh process per job, rounds shuffled. No x86 figure
+here is carried over from the ASCII or Braille campaigns.
+
+A later run on an Arm Cortex-A72 board used the same harness, rounds and
+bundles on one pinned core. The board throttled to about 1.6 GHz for part of
+the run; trials of the bundles were interleaved, so the ratios are fair and
+the absolute times are slower than an unthrottled A72 would give. Every
+coverage hash agrees with both x86 hosts. Uncached ASCII coverage was 2.65
+times faster than split-v5 and split-v6 there, and uncached Braille equal to
+split-v6 and 27.6 times faster than split-v5. Opening cost about 1.1 ms more
+than split-v6 (13 to 14 percent), and an ASCII route lookup took 49.5 ns
+against split-v6's 27.2 ns, about 1 percent of a primed 8x16 ASCII draw.
 
 Uncached `neuronte_coverage()`, geometric mean over cells of (other bundle /
 split-v7); above 1 means split-v7 is faster. Figures are i7-10700F /

@@ -42,6 +42,10 @@ FACES_V1_192_256 = ui13-italic ui16 ui16-italic ui17 ui17-italic ui18 ui18-itali
 FACES_WIDE_V1 = ui32:8 ui27-italic:8 ui31:8 ui31-italic:8 ui32-italic:8
 RC9_EMOJI = weights/neuronte-emoji-v0.nrt
 RC9_EMOJI_NETS = weights/neuronte-emoji-e0-v0.json weights/neuronte-emoji-e1-v0.json weights/neuronte-emoji-e2-v0.json
+# Emoji v1: the same 300 emoji as v0 in 12 difficulty-balanced experts of
+# width 192 (font/emoji-partition-balanced-12.json). Not a default.
+EMOJI_V1 = weights/neuronte-emoji-v1.nrt
+EMOJI_V1_NETS = $(foreach i,0 1 2 3 4 5 6 7 8 9 10 11,weights/neuronte-emoji-e$(i)-v1.json)
 RC9_NETS = $(NETS)
 # RC9 Braille: the tiled Braille expert, a version 6 file, and split-v6,
 # which is split-v5 with only its Braille member replaced. Video full mode
@@ -534,6 +538,14 @@ test-split-v7: build/libneuronte.so build/test_api
 
 .PHONY: test-split-v7
 
+pack-emoji-v1: $(EMOJI_V1_NETS)
+	$(PYTHON) tools/pack-bundle-members.py $(EMOJI_V1) $(EMOJI_V1_NETS)
+
+test-emoji-v1: all
+	$(PYTHON) tests/check_emoji.py build/libneuronte.so $(EMOJI_V1) $(EMOJI_V1_NETS) --manifest font/emoji-manifest.json --experts 12 --target-cache build/emoji-target-cache --out build/emoji-v1-check.json
+
+.PHONY: pack-emoji-v1 test-emoji-v1
+
 test-split-v7-symbol: build/libneuronte.so build/test_api
 	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_split_v7_symbol.py build/libneuronte.so
 	./build/test_api weights/neuronte-split-v7-symbol-v1.nrt --full --accent --pixel
@@ -581,7 +593,7 @@ test-colour-marks: build/libneuronte.so
 
 .PHONY: test-widths
 
-test: all $(TESTS) test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7 test-face-bundle test-symbol-v1 test-split-v7-symbol test-split-v8 test-faces-v1 test-faces-v1-192-256 test-known-bundle test-faces-wide-v1 test-faces-v1-h512 test-colour-marks test-faces-v1-small
+test: all $(TESTS) test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7 test-face-bundle test-symbol-v1 test-split-v7-symbol test-split-v8 test-faces-v1 test-faces-v1-192-256 test-known-bundle test-faces-wide-v1 test-faces-v1-h512 test-colour-marks test-faces-v1-small test-emoji-v1
 	cd weights && sha256sum -c --quiet SHA256SUMS
 	# The pointer net keeps its own list, with paths from the top of the tree.
 	sha256sum -c --quiet weights/neuronte-pointer-v0.sha256

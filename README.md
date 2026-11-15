@@ -139,6 +139,15 @@ to 30 times faster, the cost a desktop pays when it builds its letter cells; ope
 takes 0.6 to 1.3 ms longer than its v0, and with the opening counted a face still builds 3 to 29
 times faster. The installer and Kilix 95 still load v0.
 
+`neuronte-emoji-v1.nrt` draws the same 300 emoji, with the same labels,
+palettes and half API, from twelve 192-wide experts over a
+difficulty-balanced partition (`font/emoji-partition-balanced-12.json`) in
+place of three 512-wide ones. It is 4,785,292 bytes. Both seeds pass v0's
+unchanged gates, and on two x86 CPUs it draws uncached emoji about five times
+as fast as v0 on the same library build. It trades a little overlap at 12 and
+32 px for 16 px, as v0's calibrated expert does. It is not a default. See
+[its recipe, gates and speed](weights/neuronte-emoji-v1.md).
+
 The [17 additional desktop italic faces](weights/neuronte-italic-v0.md) complete
 native sizes 3–32 while preserving the 13 earlier faces. Both matching seeds
 reproduce all 96 source glyphs and their regular/bold masks and advances exactly
@@ -218,12 +227,12 @@ a letter and a mark, such as ß æ œ ð þ ø ł đ ħ ŋ ĳ, are drawn in
 | `train/glyphs.py` | The character sets. Makes box drawing and blocks from their Unicode names, Braille from the dot bits, sextants and octants from the cells they fill, accented letters from a letter and a mark, powerline and progress as one foreground layer, and the target the net learns. `python3 train/glyphs.py` checks the sets |
 | `train/mosaics.py` | Makes `font/octants.txt`, and checks the sextants and the octant patterns encoded elsewhere against the same Unicode data |
 | `train/train.py` | Trains a net on one set. Needs torch, and wants a GPU |
-| `train/colour.py` | Trains a colour net, on `font/icons.txt` or another drawing and palette named with `--drawing` and `--palette`, with `--blank` scalars trained to draw nothing. Needs torch, and wants a GPU. The default collection includes drawn icons and generated powerline/progress glyphs |
+| `train/colour.py` | Trains a colour net, on `font/icons.txt` or another drawing and palette named with `--drawing` and `--palette`, with `--blank` scalars trained to draw nothing. `--shard I/N`, `--group I/N` or `--partition FILE --part I` trains one expert's share of the scalars. Needs torch, and wants a GPU. The default collection includes drawn icons and generated powerline/progress glyphs |
 | `train/calibrate_colour.py` | Applies a recorded uniform distance offset to a separate colour weight file, preserving the original training artifact |
 | `train/snap.py` | The straight edges of a colour glyph, measured from the drawings when the weights are packed, and the warp that snaps them |
 | `train/gate.py` | Trains the router's gate for a bundle of nets. Needs torch; a CPU is enough |
 | `train/pack.py` | Packs weights JSON into the binary file the C library loads: a distance net, a colour net, a bundle, an advance table, or a drawing file. A pixel face such as `font/ui-10.txt` packs as an advance table, bold one pixel more. Documents the layouts |
-| `weights/` | The trained weights as JSON, the packed files, the scores and `SHA256SUMS`. `neuronte-draw-v2`, `neuronte-symbol-v0`, `neuronte-accent-v1`, `neuronte-pixel-v1`, `neuronte-braille-v0` and `neuronte-gate-v3` are the parts of `neuronte-split-v4`, with `neuronte-ascii-v0`. `neuronte-full-v2` is here so that `make test` and `make bench` run from a clone. `neuronte-ui1-v0` through `neuronte-ui39-v0`, one for every em, and `neuronte-ui43-v0` are the desktop face, each a drawing file of one net and its advances. `neuronte-uiEM-italic-v0` covers every integer native italic size 3–32. `neuronte-braille-v1` is the tiled Braille part of `neuronte-split-v6`. The `-v1` faces at 24 to 30 px draw the same pixels as their `-v0`, each as a drawing file of one bundle of small nets with seed 1's nets kept beside seed 0's (`neuronte-ui-v1.md`). `neuronte-ui-large-v0` is the scalable upright face from 33 px; `neuronte-flame-v0`, `neuronte-icon-v1` and `neuronte-emoji-v0` are separate colour files |
+| `weights/` | The trained weights as JSON, the packed files, the scores and `SHA256SUMS`. `neuronte-draw-v2`, `neuronte-symbol-v0`, `neuronte-accent-v1`, `neuronte-pixel-v1`, `neuronte-braille-v0` and `neuronte-gate-v3` are the parts of `neuronte-split-v4`, with `neuronte-ascii-v0`. `neuronte-full-v2` is here so that `make test` and `make bench` run from a clone. `neuronte-ui1-v0` through `neuronte-ui39-v0`, one for every em, and `neuronte-ui43-v0` are the desktop face, each a drawing file of one net and its advances. `neuronte-uiEM-italic-v0` covers every integer native italic size 3–32. `neuronte-braille-v1` is the tiled Braille part of `neuronte-split-v6`. The `-v1` faces at 24 to 30 px draw the same pixels as their `-v0`, each as a drawing file of one bundle of small nets with seed 1's nets kept beside seed 0's (`neuronte-ui-v1.md`). `neuronte-ui-large-v0` is the scalable upright face from 33 px; `neuronte-flame-v0`, `neuronte-icon-v1`, `neuronte-emoji-v0` and `neuronte-emoji-v1` are separate colour files |
 | `include/neuronte.h`, `src/` | The C library |
 | `tools/neuronte-render.c` | Draws lines of text into a PPM file |
 | `tools/neuronte-bench.c` | Times a net per cell, or a full net against a bundle per class of character |

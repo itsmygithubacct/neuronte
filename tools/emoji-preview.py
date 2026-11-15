@@ -26,6 +26,7 @@ def main():
     p.add_argument('--size', type=int, default=16, help='one cell width; glyph spans two cells')
     p.add_argument('--columns', type=int, default=10)
     p.add_argument('--codes', help='comma separated hexadecimal scalars for a detail sheet')
+    p.add_argument('--title', help='names of the rendered columns after the source (default: seed0, seed1)')
     a = p.parse_args()
     pal = strokes.palette(str(ROOT/'font/emoji-palette.txt'))
     drawings = strokes.parse_layers(str(ROOT/'font/emoji.txt'), pal)
@@ -44,7 +45,8 @@ def main():
     ch = 2*size+29
     out = Image.new('RGB', (cw*a.columns, 38+ch*((len(codes)+a.columns-1)//a.columns)), (235,237,241))
     draw = ImageDraw.Draw(out)
-    draw.text((8,8), f'RC9 emoji {size}px/cell: source, seed0'+(', seed1' if a.other_weights else '')+'; dark / light', fill=(22,27,34))
+    names = a.title or ('seed0'+(', seed1' if a.other_weights else ''))
+    draw.text((8,8), f'RC9 emoji {size}px/cell: source, {names}; dark / light', fill=(22,27,34))
     for index, scalar in enumerate(codes):
         x = index % a.columns*cw
         y = 38+index//a.columns*ch

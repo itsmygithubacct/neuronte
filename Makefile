@@ -32,6 +32,10 @@ RC9_ITALIC_SIZES = 3 4 5 6 7 8 9 13 15 17 19 21 23 25 27 29 31
 RC9_ITALIC_JSON = $(foreach em,$(RC9_ITALIC_SIZES),weights/neuronte-ui$(em)-italic-v0.json)
 RC9_EMOJI = weights/neuronte-emoji-v0.nrt
 RC9_EMOJI_NETS = weights/neuronte-emoji-e0-v0.json weights/neuronte-emoji-e1-v0.json weights/neuronte-emoji-e2-v0.json
+# Emoji v1: the same 300 emoji as v0 in 12 difficulty-balanced experts of
+# width 192 (font/emoji-partition-balanced-12.json). Not a default.
+EMOJI_V1 = weights/neuronte-emoji-v1.nrt
+EMOJI_V1_NETS = $(foreach i,0 1 2 3 4 5 6 7 8 9 10 11,weights/neuronte-emoji-e$(i)-v1.json)
 RC9_NETS = $(NETS)
 # RC9 Braille: the tiled Braille expert, a version 6 file, and split-v6,
 # which is split-v5 with only its Braille member replaced. Video full mode
@@ -304,6 +308,14 @@ test-split-v7: build/libneuronte.so build/test_api
 
 .PHONY: test-split-v7
 
+pack-emoji-v1: $(EMOJI_V1_NETS)
+	$(PYTHON) tools/pack-bundle-members.py $(EMOJI_V1) $(EMOJI_V1_NETS)
+
+test-emoji-v1: all
+	$(PYTHON) tests/check_emoji.py build/libneuronte.so $(EMOJI_V1) $(EMOJI_V1_NETS) --manifest font/emoji-manifest.json --experts 12 --target-cache build/emoji-target-cache --out build/emoji-v1-check.json
+
+.PHONY: pack-emoji-v1 test-emoji-v1
+
 test-tiled: build/libneuronte.so build/stream/libneuronte.so build/test_tiled
 	./build/test_tiled
 	$(PYTHON) tests/check_tiled.py build/libneuronte.so --stream build/stream/libneuronte.so
@@ -312,7 +324,7 @@ test-tiled: build/libneuronte.so build/stream/libneuronte.so build/test_tiled
 
 .PHONY: test-widths
 
-test: all $(TESTS) test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7
+test: all $(TESTS) test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7 test-emoji-v1
 	cd weights && sha256sum -c --quiet SHA256SUMS
 	# The pointer net keeps its own list, with paths from the top of the tree.
 	sha256sum -c --quiet weights/neuronte-pointer-v0.sha256

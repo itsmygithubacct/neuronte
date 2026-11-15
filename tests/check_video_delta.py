@@ -124,9 +124,12 @@ class Playback(unittest.TestCase):
                     self.assertLessEqual(worst, 4)
                     # Each frame is one level from the one before. Compared with the
                     # previous frame nothing would ever be sent; compared with what
-                    # was sent, every fifth frame is.
+                    # was sent, the fifth frame after a send has moved every cell 5
+                    # levels and is sent whole, and so is the frame after it (a
+                    # change that large is followed by one frame sent uncompared).
                     sends = [n for n, r in enumerate(records) if r['bytes']]
-                    self.assertEqual(sends, list(range(0, frames, 5)))
+                    self.assertEqual(sends, [0] + [n for k in range(0, frames, 6) for n in (5 + k, 6 + k) if n < frames])
+                    self.assertTrue(all(r['delta'] == 'full' for r in records if r['bytes']))
             model, records, summary = run(MOVING, '--transport', transport, '--skip-threshold', '6', '--partial-limit', '.5', frames=frames)
             truth_moving = reference(MOVING, 8, 6, frames)
             worst = max(int(np.abs(p.astype(int) - enlarge(s)).max()) for p, s in zip(held(model, records), truth_moving))
@@ -185,20 +188,21 @@ class Controls(unittest.TestCase):
         frames = np.frombuffer(raw, np.uint8).reshape(-1, 24, 16, 3)
         return enlarge(frames[round(last['pts'] * 30)])
 
-    def play_timed(self, source, *options, keys=(), signals=(), timeout=30):
+    def play_timed(self, source, *options, keys=(), signals=(), timeout=60):
         cmd = [sys.executable, str(ROOT / 'tools/neuronte-play.py'), source, '--cols', '8', '--rows', '6', '--no-status',
                '--no-audio', *options]
         environment = dict(os.environ, COLUMNS='80', LINES='24'); environment.pop('KITTY_WINDOW_ID', None)
         r, w = os.pipe()
         child = subprocess.Popen(cmd + ['--input-fd', str(r)], stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                  stdin=subprocess.DEVNULL, env=environment, pass_fds=[r])
-        os.close(r); model = KittyModel(); began = time.monotonic()
+        os.close(r); model = KittyModel(); spawned = time.monotonic(); began = None
         events = sorted([(t, 'key', k) for t, k in keys] + [(t, 'signal', s) for t, s in signals])
         os.set_blocking(child.stdout.fileno(), False)
         try:
             import select
             while True:
-                now = time.monotonic() - began
+                if began is None and model.updates: began = time.monotonic()    # keys are timed from the first picture
+                now = time.monotonic() - began if began is not None else -1.
                 while events and events[0][0] <= now:
                     _, kind, what = events.pop(0)
                     if kind == 'key': os.write(w, what)
@@ -207,7 +211,7 @@ class Controls(unittest.TestCase):
                     chunk = os.read(child.stdout.fileno(), 1 << 16)
                     if not chunk: break
                     model.feed(chunk)
-                if now > timeout: raise AssertionError('player did not finish')
+                if time.monotonic() - spawned > timeout: raise AssertionError('player did not finish')
             child.wait(timeout=5)
         finally:
             os.close(w)
@@ -217,24 +221,24 @@ class Controls(unittest.TestCase):
 
     def test_seek_pause_resize_and_loop_start_from_a_whole_picture(self):
         with tempfile.TemporaryDirectory() as temp:
-            source = self.clip(temp); stats = Path(temp) / 'stats'; log = Path(temp) / 'log'
+            source = self.clip(temp, 20); stats = Path(temp) / 'stats'; log = Path(temp) / 'log'
             for transport in ('shm', 'inline'):
                 with self.subTest(transport=transport):
                     code, model, err = self.play_timed(
                         source, '--transport', transport, '--skip-threshold', '0', '--partial-limit', '.5', '--stats', str(stats),
-                        '--log', str(log), keys=[(1., b'\x1b[C'), (1.6, b' '), (2.0, b'\x1b[D'), (2.4, b' '), (3.4, b'q')],
-                        signals=[(2.9, signal.SIGWINCH)])
+                        '--log', str(log), keys=[(1., b'\x1b[C'), (3., b' '), (3.5, b'\x1b[D'), (4.5, b' '), (8.5, b'q')],
+                        signals=[(6., signal.SIGWINCH)])     # seconds apart: a restarted decoder can be slow to start
                     self.assertEqual(code, 0, err)
                     summary = json.loads(stats.read_text()); self.assertEqual(summary['seeks'], 2)
                     records = [json.loads(line) for line in log.read_text().splitlines()]
-                    # After the start, the seek during playback and the resize, the first
-                    # frame sent is whole. (The paused seek sends its whole picture before
-                    # the loop, unlogged; the frame after it may then be an edit.)
-                    restarts = [n for n, r in enumerate(records) if n == 0 or r['pts'] < records[n - 1]['pts'] or
-                                abs(r['pts'] - records[n - 1]['pts'] - 1 / 30) > .02]
-                    first = [next((r['delta'] for r in records[n:] if r.get('bytes')), None) for n in restarts]
-                    self.assertGreaterEqual(len(restarts), 4, restarts)
-                    self.assertLessEqual(sum(kind != 'full' for kind in first), 1, first)
+                    # After the start, every seek, the resize and every loop, the first frame
+                    # sent is whole. A paused seek sends its whole picture before the loop,
+                    # unlogged; the frame after it (logged as first) may then be an edit.
+                    firsts = [n for n, r in enumerate(records) if r.get('first')]
+                    kinds = [next((r['delta'] for r in records[n:] if r.get('bytes')), None) for n in firsts]
+                    self.assertGreaterEqual(len(firsts), 3, firsts)
+                    self.assertEqual(kinds[0], 'full')
+                    self.assertLessEqual(sum(kind not in ('full', None) for kind in kinds), 1, kinds)
                     self.assertGreaterEqual(summary['delta']['full'], 3)
                     self.assertGreater(summary['delta']['partial'] + summary['delta']['unchanged'], 0)
                     # Every edit landed inside the picture shown (the model raises otherwise),
@@ -242,10 +246,10 @@ class Controls(unittest.TestCase):
                     self.assertEqual(model.commands['f'], sum(1 for r in records if r.get('delta') == 'partial' and r.get('bytes')))
                     np.testing.assert_array_equal(model.pictures[-2], self.truth(source, records))
             code, model, err = self.play_timed(self.clip(temp, 2), '--skip-threshold', '0', '--partial-limit', '.5', '--loop',
-                                               '--stats', str(stats), '--log', str(log), keys=[(5.5, b'q')], timeout=20)
+                                               '--stats', str(stats), '--log', str(log), keys=[(5.5, b'q')], timeout=40)
             self.assertEqual(code, 0, err)
             records = [json.loads(line) for line in log.read_text().splitlines()]
-            wraps = [n for n in range(1, len(records)) if records[n]['pts'] < records[n - 1]['pts']]
+            wraps = [n for n in range(1, len(records)) if records[n].get('first')]
             self.assertTrue(wraps, 'the clip did not loop')
             for n in wraps:
                 first = next((r for r in records[n:] if r.get('bytes')), None)
@@ -300,6 +304,32 @@ class Units(unittest.TestCase):
         self.assertTrue(np.all(delta.sent[:4, 2:] == 7)); self.assertTrue(np.all(delta.sent[4:] == 0)); self.assertTrue(np.all(delta.sent[:4, :2] == 0))
         self.assertEqual(delta.counts, dict(unchanged=0, partial=1, full=1))
         delta.reset(); self.assertEqual(delta.plan(b, 2, 2, .2), 'full')
+
+    def test_after_a_large_change_frames_go_whole_uncompared_for_a_while(self):
+        delta = play.Delta(0, .25)
+        a = np.zeros((8 * 4, 8 * 2, 3), np.uint8); delta.commit(a, 'full', 0.)
+        calls = []; real = delta.changed
+        delta.changed = lambda *x, **k: calls.append(1) or real(*x, **k)
+        frame = 0; kinds = []
+        def step(picture):
+            nonlocal frame
+            frame += 1; plan = delta.plan(picture, 8, 8, frame / 30); kinds.append(plan if plan in (None, 'full') else 'partial')
+            delta.commit(picture, plan, frame / 30)
+        for n in range(1, 80): step(a + (n % 2))                  # everything changes every frame
+        compared = len(calls)
+        self.assertEqual(kinds.count('full'), 79)
+        self.assertLessEqual(compared, 9)                         # 1, 2, 4, ... 32 frames between comparisons
+        self.assertEqual(delta.wait, play.Delta.WAIT)
+        for n in range(40): step(a + (79 % 2))                    # then nothing changes
+        self.assertIn(None, kinds[79:]); self.assertEqual(delta.wait, 0)
+        self.assertEqual(kinds[-1], None)
+        # a whole picture that was not kept (the terminal was busy) is never compared against
+        delta = play.Delta(0, .25); delta.commit(a, 'full', 0.)
+        self.assertEqual(delta.plan(a + 1, 8, 8, .1), 'full'); self.assertEqual(delta.rest, 1)
+        self.assertEqual(delta.plan(a + 1, 8, 8, .2), 'full'); delta.commit(a + 1, 'full', .2)   # rest 0: kept
+        self.assertTrue(delta.fresh); self.assertIsNone(delta.plan(a + 1, 8, 8, .3))
+        delta.rest = 2; delta.commit(a + 2, 'full', .4); self.assertFalse(delta.fresh)
+        self.assertEqual([delta.plan(a + 2, 8, 8, .5), delta.plan(a + 2, 8, 8, .6), delta.plan(a + 2, 8, 8, .7)], ['full'] * 3)
 
     def test_refresh_counts_video_time(self):
         delta = play.Delta(0, 1., refresh=2.)

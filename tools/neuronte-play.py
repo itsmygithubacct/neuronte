@@ -176,29 +176,29 @@ class Presenter:
 
     def publish(self, pictures):
         """Write each picture to its own free shared-memory object. Returns
-        their names, or None (and writes none) when too few are free."""
-        found, slots = [], len(self.names)
+        their names, or None (and leaves none behind) when too few are free."""
+        names, slots, slot = [], len(self.names), self.slot
         for tries in range(slots):              # the terminal unlinks a name once it has read it
-            if len(found) == len(pictures): break
+            if len(names) == len(pictures): break
             candidate = self.names[(self.slot + tries) % slots]
-            if not os.path.exists('/dev/shm/' + candidate): found.append((tries, candidate))
-        if len(found) < len(pictures): return None
-        names = []
-        for (tries, candidate), picture in zip(found, pictures):
             try:
                 fd = os.open('/dev/shm/' + candidate, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
-            except FileExistsError:             # taken since it was found: give the others back
-                for name in names:
-                    try: os.unlink('/dev/shm/' + name)
-                    except FileNotFoundError: pass
-                return None
+            except FileExistsError:
+                continue
             # Cropping an odd-width picture leaves strided rows. NumPy's
             # strided tobytes walks individual elements; a contiguous
             # buffer uses row copies and can be written without another copy.
-            data = memoryview(np.ascontiguousarray(picture))
+            data = memoryview(np.ascontiguousarray(pictures[len(names)]))
             with os.fdopen(fd, 'wb') as f: f.write(data)
             self.shm_bytes += data.nbytes
-            names.append(candidate); self.slot = (self.slot + tries + 1) % slots
+            names.append(candidate); slot = (self.slot + tries + 1) % slots
+        if len(names) < len(pictures):          # too few free: take back what was written
+            for name, picture in zip(names, pictures):
+                try: os.unlink('/dev/shm/' + name)
+                except FileNotFoundError: pass
+                self.shm_bytes -= picture.nbytes
+            return None
+        self.slot = slot
         return names
 
     def frame(self, frame, cols, rows, left, top, natural=False):
@@ -288,24 +288,31 @@ class Delta:
     by more than the threshold in any channel. plan() decides each frame:
     None (nothing changed: send nothing), 'full' (send the whole picture as
     today) or a list of cell rectangles (x0, y0, x1, y1) to write into the
-    picture on screen."""
+    picture on screen.
+
+    Comparing costs time that is wasted when everything changes, so after a
+    frame whose change was too large the next 1, 2, 4 ... up to WAIT frames
+    are sent whole without comparing, and the samples are kept only for the
+    frame that will be compared next."""
 
     BAND = 8                                # cell rows compared at a time, so a large change stops early
+    WAIT = 32                               # the longest run of frames sent whole without comparing
 
     def __init__(self, threshold, limit=None, rects=1, refresh=10.):
         self.threshold, self.limit, self.rects, self.refresh = threshold, limit, rects, refresh
-        self.sent = None; self.full_at = None
+        self.sent = None; self.fresh = False; self.full_at = None; self.wait = self.rest = 0
         self.counts = dict(unchanged=0, partial=0, full=0)
 
     def reset(self):
-        """After a seek, resize, restart or anything else the screen has not seen: the next frame is full."""
-        self.sent = None
+        """After a seek, resize, restart or anything else the screen has not seen: the next frame is full and compared after."""
+        self.sent = None; self.fresh = False; self.wait = self.rest = 0
 
-    def changed(self, samples, rows, cols, budget=None):
+    def changed(self, samples, rows, cols, budget=None, area=None):
         """Cells changed against what was sent, as rows x cols booleans; None
-        once more than budget cells have changed (budget 0: any change)."""
+        once more than budget cells have changed (budget 0: any change), or
+        once one rectangle around them would cover more than area cells."""
         a = samples.reshape(rows, 4, cols, 6); b = self.sent.reshape(rows, 4, cols, 6)
-        found = np.zeros((rows, cols), bool); count = 0
+        found = np.zeros((rows, cols), bool); count = 0; top = left = right = None
         for y in range(0, rows, self.BAND):
             pa, pb = a[y:y + self.BAND], b[y:y + self.BAND]
             if self.threshold:                  # uint8 without wrapping: the larger less the smaller
@@ -316,6 +323,13 @@ class Delta:
             if budget is not None:
                 count += int(np.count_nonzero(band))
                 if count > budget: return None
+            if area is not None:
+                hit = np.flatnonzero(band.any(axis=0))
+                if hit.size:
+                    if top is None: top, left, right = y + int(np.flatnonzero(band.any(axis=1))[0]), int(hit[0]), int(hit[-1]) + 1
+                    else: left, right = min(left, int(hit[0])), max(right, int(hit[-1]) + 1)
+                    bottom = y + int(np.flatnonzero(band.any(axis=1))[-1]) + 1
+                    if (bottom - top) * (right - left) > area: return None
         return found
 
     def boxes(self, changed):
@@ -337,18 +351,28 @@ class Delta:
             i = int(np.argmin(costs)); boxes[i:i + 2] = [union(boxes[i], boxes[i + 1])]
         return boxes
 
+    def too_large(self):
+        """The change was too large: send whole, and wait longer before comparing again."""
+        self.wait = min(self.WAIT, max(1, 2 * self.wait)); self.rest = self.wait
+        return 'full'
+
     def plan(self, samples, rows, cols, now):
         """now: the frame's time in the file, so a refresh falls on the same frames in every run."""
         if self.sent is None or self.sent.shape != samples.shape: return 'full'
         if self.refresh and now - self.full_at >= self.refresh: return 'full'
+        if self.rest: self.rest -= 1; return 'full'
+        if not self.fresh: return 'full'        # the last whole picture was not kept (e.g. the terminal was busy)
         total = rows * cols
         if self.limit is None:                  # skip only: any change sends the whole picture
-            return None if self.changed(samples, rows, cols, budget=0) is not None else 'full'
-        changed = self.changed(samples, rows, cols, budget=int(self.limit * total))
-        if changed is None: return 'full'
+            if self.changed(samples, rows, cols, budget=0) is None: return self.too_large()
+            self.wait = 0; return None
+        limit = int(self.limit * total)
+        changed = self.changed(samples, rows, cols, budget=limit, area=limit if self.rects == 1 else None)
+        if changed is None: return self.too_large()
+        self.wait = 0
         if not changed.any(): return None
         boxes = self.boxes(changed)
-        if sum((x1 - x0) * (y1 - y0) for x0, y0, x1, y1 in boxes) > self.limit * total: return 'full'
+        if sum((x1 - x0) * (y1 - y0) for x0, y0, x1, y1 in boxes) > limit: return self.too_large()
         return boxes
 
     def commit(self, samples, plan, now):
@@ -356,8 +380,10 @@ class Delta:
         decoder's current one: the next frame is read only after this."""
         if plan is None: self.counts['unchanged'] += 1; return
         if plan == 'full':
+            self.full_at = now; self.counts['full'] += 1
+            if self.rest: self.fresh = False; return        # not compared next: no need to keep it
             if self.sent is None or self.sent.shape != samples.shape: self.sent = np.empty_like(samples)
-            np.copyto(self.sent, samples); self.full_at = now; self.counts['full'] += 1; return
+            np.copyto(self.sent, samples); self.fresh = True; return
         for x0, y0, x1, y1 in plan:
             self.sent[y0 * 4:y1 * 4, x0 * 2:x1 * 2] = samples[y0 * 4:y1 * 4, x0 * 2:x1 * 2]
         self.counts['partial'] += 1
@@ -863,6 +889,7 @@ def main():
                 pts = origin + index / fps; index += 1; count += 1
                 if count == 1: frames_cpu = time.process_time()
                 now = clock.time(); record = dict(n=count, t=round(time.monotonic(), 6), pts=round(pts, 4), clock=round(now, 4), read_ms=round(read_time * 1e3, 3))
+                if index == 1: record['first'] = True      # the first frame after the start, a seek, a resize or a loop
                 if not a.untimed and now > pts + 1 / fps and shown:
                     dropped += 1; record['dropped'] = True; read_time = 0.
                     if log: log.write(json.dumps(record) + '\n')

@@ -131,8 +131,13 @@ or cells), send less when little changes:
 The whole picture is also sent for the first frame, after every seek,
 resize and `--loop` restart, after a paused seek's picture, and whenever the
 changes are larger than the limit. Comparison stops as soon as a band of
-eight cell rows takes the change past the limit, so frames where everything
-moves cost little extra. A frame the terminal had no room for (shared
+eight cell rows takes the change past the limit, and after a frame whose
+change was too large the next 1, 2, 4 and so on up to 32 frames are sent
+whole without comparing at all (the samples are kept only for the frame
+that will be compared next), so video in which everything moves costs
+almost nothing extra; a quieter scene is noticed within about a second.
+`--log` marks the first frame after the start, a seek, a resize or a loop
+with `first`. A frame the terminal had no room for (shared
 memory still unread) or that a seek cancelled was never sent, so its change
 goes with the next frame.
 

@@ -317,6 +317,11 @@ test-colour-marks: build/libneuronte.so
 	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_pointer.py build/libneuronte.so weights/neuronte-pointer-v1.seed1.json weights/neuronte-pointer-v1.seed1.nrt --max-xor 16:0,0 --max-xor 32:1,2
 	$(PYTHON) tests/check_reference.py build/libneuronte.so weights/neuronte-pointer-v1.json weights/neuronte-pointer-v1.nrt
 	$(PYTHON) tests/check_reference.py build/libneuronte.so weights/neuronte-pointer-v1.seed1.json weights/neuronte-pointer-v1.seed1.nrt
+	sha256sum -c --quiet weights/neuronte-flame-v1.sha256
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_flame.py build/libneuronte.so weights/neuronte-flame-v1.json weights/neuronte-flame-v1.nrt --max-xor 16:7,2,0 --max-xor 32:6,3,5
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_flame.py build/libneuronte.so weights/neuronte-flame-v1.seed1.json weights/neuronte-flame-v1.seed1.nrt --max-xor 16:7,2,0 --max-xor 32:6,3,5
+	$(PYTHON) tests/check_reference.py build/libneuronte.so weights/neuronte-flame-v1.json weights/neuronte-flame-v1.nrt
+	$(PYTHON) tests/check_reference.py build/libneuronte.so weights/neuronte-flame-v1.seed1.json weights/neuronte-flame-v1.seed1.nrt
 
 .PHONY: test-colour-marks
 

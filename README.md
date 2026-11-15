@@ -49,6 +49,7 @@ letter. Desktop adapters fall back for unsupported strings and styles.
 | `neuronte-ui24-italic-v0`, `neuronte-ui30-italic-v0` | the italic at 24 and 30 pixels | printable ASCII and the ellipsis, 96, with their advances | 384 | 331,009 | 1,325,072 bytes each |
 | `neuronte-ui-large-v0` | the desktop face at every em from 33 pixels up, drawn blended | printable ASCII and the ellipsis, 96, with their advances | 384 | 331,009 | 1,325,072 bytes |
 | `neuronte-flame-v0` | the Kilix flame, for the Start button at 16 px and the desktop icon at 32: a colour net, version 3, of three layers | one mark, at U+100000; the printable ASCII and U+FFFD draw nothing | 64 | 16,914 | 68,124 bytes |
+| `neuronte-flame-v1` | the flame of `neuronte-flame-v0`, narrower and faster, drawn the same way; see its card | one mark, at U+100000; the printable ASCII and U+FFFD draw nothing | 56 | 14,226 | 57,372 bytes |
 | `neuronte-icon-v1` | the icons in colour, a version 3 file by itself, not in the bundle | 167: the 133 in `font/icons.txt` and 34 powerline and progress glyphs, up to 6 layers each | 256 | 159,492 | 650,216 bytes |
 | `neuronte-pointer-v1` | the NW mouse pointer of `neuronte-pointer-v0`, narrower and faster, with the same sizes (16x32 and 32x64) and hotspots; see its card | one mark, at U+100001; other scalars are not guaranteed blank | 48 | 10,380 | 41,984 bytes |
 | `neuronte-ui28-italic-v0` | the italic at 28 pixels, trained for 40,000 steps: at the default 20,000 no width from 384 to 768 had both seeds exact | printable ASCII and the ellipsis, 96, with their advances | 384 | 331,009 | 1,325,072 bytes |
@@ -235,8 +236,9 @@ optional in-process video decoder, which links FFmpeg's libraries, has
   which are not in that list, match `weights/neuronte-pointer-v0.sha256`
   and `weights/neuronte-pointer-v1.sha256`. That is the only check
   `make test` makes of `neuronte-pointer-v0`. `make test-colour-marks`
-  runs the pointer gate of `weights/neuronte-pointer-v1.md` on both of
-  v1's seeds, and checks v1 against the float64 reference;
+  runs the gates of `weights/neuronte-pointer-v1.md` and
+  `weights/neuronte-flame-v1.md` on both seeds of each, checks their
+  hash lists, and checks both against the float64 reference;
 - UTF-8 decoding follows Unicode's maximal-subpart rule, so a bad byte
   becomes one U+FFFD and never swallows the next character;
 - the loader refuses a short, long or damaged file, or one of a shape it

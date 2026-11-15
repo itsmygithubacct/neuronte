@@ -169,6 +169,12 @@ UI30_V1_SEED1 = $(foreach g,$(GROUPS16),$(UI30_V1).seed1-p$(g).json)
 UI30I_V1 = weights/neuronte-ui30-italic-v1
 UI30I_V1_NETS = $(foreach g,$(GROUPS8),$(UI30I_V1)-p$(g).json)
 UI30I_V1_SEED1 = $(foreach g,$(GROUPS8),$(UI30I_V1).seed1-p$(g).json)
+
+# Small desktop faces v1: each a drawing file of one bundle of small nets, each net drawing
+# only the em rows of its own characters, and the face's advances. Listed as face:members.
+# Seed 0 is shipped; seed 1 is kept so the exact gate reruns on both. The -v0 files stay as
+# they were. See weights/neuronte-ui-v1-small.md.
+FACES_V1_SMALL = ui1:1 ui2:1 ui3:32 ui3-italic:32 ui4:96 ui4-italic:32 ui5:32 ui5-italic:96 ui6:96 ui6-italic:96 ui7:32 ui7-italic:96 ui8:32 ui8-italic:32 ui9:96 ui9-italic:96 ui10:96 ui10-italic:96 ui11:96 ui11-italic:96 ui12:96 ui12-italic:96 ui13:96 ui14:96 ui14-italic:96 ui15:96 ui15-italic:96 ui19:96 ui20:96 ui21:32
 # The Kilix flame: one colour net, version 3, drawn at U+100000.
 FLAME = weights/neuronte-flame-v0
 # The icon net: a colour net, form A, a version 3 file by itself. It is not
@@ -483,6 +489,32 @@ test-faces-v1-h512: build/libneuronte.so
 
 .PHONY: test-faces-v1-h512
 
+# Small desktop faces v1: every character of both seeds exactly its drawing at its em.
+test-faces-v1-small: build/libneuronte.so
+	@set -e; mkdir -p build/faces-v1-small; for spec in $(FACES_V1_SMALL); do \
+		f=$${spec%:*}; k=$${spec#*:}; n=weights/neuronte-$$f-v1; t=font/$$(echo $$f | sed 's/^ui/ui-/').txt; \
+		m0=; m1=; g=0; while [ $$g -lt $$k ]; do m0="$$m0 $$n-g$$g.json"; m1="$$m1 $$n.seed1-g$$g.json"; g=$$((g+1)); done; \
+		if [ $$k = 1 ]; then \
+			$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $$n.nrt $$m0 $$t; \
+			$(PYTHON) train/pack.py --drawing build/faces-v1-small/$$f.seed1.nrt $$m1 $$t > /dev/null; \
+			$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing build/faces-v1-small/$$f.seed1.nrt $$m1 $$t; \
+		else \
+			$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle $$n.nrt $$t $$m0; \
+			$(PYTHON) train/pack.py --drawing-bundle build/faces-v1-small/$$f.seed1.nrt $$t $$m1 > /dev/null; \
+			$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle build/faces-v1-small/$$f.seed1.nrt $$t $$m1; \
+		fi; \
+	done
+
+pack-faces-v1-small:
+	@set -e; mkdir -p build/faces-v1-small; for spec in $(FACES_V1_SMALL); do \
+		f=$${spec%:*}; k=$${spec#*:}; n=weights/neuronte-$$f-v1; t=font/$$(echo $$f | sed 's/^ui/ui-/').txt; \
+		m0=; m1=; g=0; while [ $$g -lt $$k ]; do m0="$$m0 $$n-g$$g.json"; m1="$$m1 $$n.seed1-g$$g.json"; g=$$((g+1)); done; \
+		if [ $$k = 1 ]; then $(PYTHON) train/pack.py --drawing $$n.nrt $$m0 $$t; \
+		else $(PYTHON) train/pack.py --drawing-bundle $$n.nrt $$t $$m0; fi; \
+	done
+
+.PHONY: test-faces-v1-small pack-faces-v1-small
+
 test-known-bundle: build/libneuronte.so
 	$(PYTHON) tests/check_known_bundle.py build/libneuronte.so
 
@@ -549,7 +581,7 @@ test-colour-marks: build/libneuronte.so
 
 .PHONY: test-widths
 
-test: all $(TESTS) test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7 test-face-bundle test-symbol-v1 test-split-v7-symbol test-split-v8 test-faces-v1 test-faces-v1-192-256 test-known-bundle test-faces-wide-v1 test-faces-v1-h512 test-colour-marks
+test: all $(TESTS) test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7 test-face-bundle test-symbol-v1 test-split-v7-symbol test-split-v8 test-faces-v1 test-faces-v1-192-256 test-known-bundle test-faces-wide-v1 test-faces-v1-h512 test-colour-marks test-faces-v1-small
 	cd weights && sha256sum -c --quiet SHA256SUMS
 	# The pointer net keeps its own list, with paths from the top of the tree.
 	sha256sum -c --quiet weights/neuronte-pointer-v0.sha256

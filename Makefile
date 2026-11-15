@@ -100,6 +100,38 @@ UI39 = weights/neuronte-ui39-v0
 UI43 = weights/neuronte-ui43-v0
 # Above 32 px, one scalable net for every em, drawn blended, with its advances.
 UILARGE = weights/neuronte-ui-large-v0
+# Desktop faces v1: each a drawing file of one bundle of small nets, each net
+# drawing only the em rows of its own characters, and the face's advances.
+# Seed 0 is shipped; seed 1 is kept so the exact gate reruns on both.
+GROUPS8 = 0 1 2 3 4 5 6 7
+GROUPS16 = $(GROUPS8) 8 9 10 11 12 13 14 15
+UI24_V1 = weights/neuronte-ui24-v1
+UI24_V1_NETS = $(foreach g,$(GROUPS16),$(UI24_V1)-p$(g).json)
+UI24_V1_SEED1 = $(foreach g,$(GROUPS16),$(UI24_V1).seed1-p$(g).json)
+UI24I_V1 = weights/neuronte-ui24-italic-v1
+UI24I_V1_NETS = $(foreach g,$(GROUPS16),$(UI24I_V1)-p$(g).json)
+UI24I_V1_SEED1 = $(foreach g,$(GROUPS16),$(UI24I_V1).seed1-p$(g).json)
+UI27_V1 = weights/neuronte-ui27-v1
+UI27_V1_NETS = $(foreach g,$(GROUPS16),$(UI27_V1)-p$(g).json)
+UI27_V1_SEED1 = $(foreach g,$(GROUPS16),$(UI27_V1).seed1-p$(g).json)
+UI28_V1 = weights/neuronte-ui28-v1
+UI28_V1_NETS = $(foreach g,$(GROUPS16),$(UI28_V1)-p$(g).json)
+UI28_V1_SEED1 = $(foreach g,$(GROUPS16),$(UI28_V1).seed1-p$(g).json)
+UI28I_V1 = weights/neuronte-ui28-italic-v1
+UI28I_V1_NETS = $(foreach g,$(GROUPS16),$(UI28I_V1)-p$(g).json)
+UI28I_V1_SEED1 = $(foreach g,$(GROUPS16),$(UI28I_V1).seed1-p$(g).json)
+UI29_V1 = weights/neuronte-ui29-v1
+UI29_V1_NETS = $(foreach g,$(GROUPS16),$(UI29_V1)-p$(g).json)
+UI29_V1_SEED1 = $(foreach g,$(GROUPS16),$(UI29_V1).seed1-p$(g).json)
+UI29I_V1 = weights/neuronte-ui29-italic-v1
+UI29I_V1_NETS = $(foreach g,$(GROUPS16),$(UI29I_V1)-p$(g).json)
+UI29I_V1_SEED1 = $(foreach g,$(GROUPS16),$(UI29I_V1).seed1-p$(g).json)
+UI30_V1 = weights/neuronte-ui30-v1
+UI30_V1_NETS = $(foreach g,$(GROUPS16),$(UI30_V1)-p$(g).json)
+UI30_V1_SEED1 = $(foreach g,$(GROUPS16),$(UI30_V1).seed1-p$(g).json)
+UI30I_V1 = weights/neuronte-ui30-italic-v1
+UI30I_V1_NETS = $(foreach g,$(GROUPS8),$(UI30I_V1)-p$(g).json)
+UI30I_V1_SEED1 = $(foreach g,$(GROUPS8),$(UI30I_V1).seed1-p$(g).json)
 # The Kilix flame: one colour net, version 3, drawn at U+100000.
 FLAME = weights/neuronte-flame-v0
 # The icon net: a colour net, form A, a version 3 file by itself. It is not
@@ -236,6 +268,15 @@ pack: $(ASCII).json $(FULL).json $(NETS) $(GATE) $(PRIOR_NETS) $(PRIOR_GATE) $(U
 	$(PYTHON) train/pack.py --drawing $(UI39).nrt $(UI39).json font/ui-39.txt
 	$(PYTHON) train/pack.py --drawing $(UI43).nrt $(UI43).json font/ui-43.txt
 	$(PYTHON) train/pack.py --drawing $(UILARGE).nrt $(UILARGE).json font/ui-large-advances.txt
+	$(PYTHON) train/pack.py --drawing-bundle $(UI24_V1).nrt font/ui-24.txt $(UI24_V1_NETS)
+	$(PYTHON) train/pack.py --drawing-bundle $(UI24I_V1).nrt font/ui-24-italic.txt $(UI24I_V1_NETS)
+	$(PYTHON) train/pack.py --drawing-bundle $(UI27_V1).nrt font/ui-27.txt $(UI27_V1_NETS)
+	$(PYTHON) train/pack.py --drawing-bundle $(UI28_V1).nrt font/ui-28.txt $(UI28_V1_NETS)
+	$(PYTHON) train/pack.py --drawing-bundle $(UI28I_V1).nrt font/ui-28-italic.txt $(UI28I_V1_NETS)
+	$(PYTHON) train/pack.py --drawing-bundle $(UI29_V1).nrt font/ui-29.txt $(UI29_V1_NETS)
+	$(PYTHON) train/pack.py --drawing-bundle $(UI29I_V1).nrt font/ui-29-italic.txt $(UI29I_V1_NETS)
+	$(PYTHON) train/pack.py --drawing-bundle $(UI30_V1).nrt font/ui-30.txt $(UI30_V1_NETS)
+	$(PYTHON) train/pack.py --drawing-bundle $(UI30I_V1).nrt font/ui-30-italic.txt $(UI30I_V1_NETS)
 	$(PYTHON) train/pack.py $(FLAME).json $(FLAME).nrt
 	# A colour file is packed the same way: python3 train/pack.py colour.json colour.nrt
 	# make test builds a small synthetic one under build/; $(FLAME) is a trained one.
@@ -296,6 +337,39 @@ test-face-bundle: build/libneuronte.so build/test_tiled
 
 .PHONY: test-face-bundle
 
+# The desktop faces v1: every character of both seeds exactly its drawing.
+test-faces-v1: build/libneuronte.so
+	mkdir -p build/faces-v1
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle $(UI24_V1).nrt font/ui-24.txt $(UI24_V1_NETS)
+	$(PYTHON) train/pack.py --drawing-bundle build/faces-v1/neuronte-ui24-v1.seed1.nrt font/ui-24.txt $(UI24_V1_SEED1)
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle build/faces-v1/neuronte-ui24-v1.seed1.nrt font/ui-24.txt $(UI24_V1_SEED1)
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle $(UI24I_V1).nrt font/ui-24-italic.txt $(UI24I_V1_NETS)
+	$(PYTHON) train/pack.py --drawing-bundle build/faces-v1/neuronte-ui24-italic-v1.seed1.nrt font/ui-24-italic.txt $(UI24I_V1_SEED1)
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle build/faces-v1/neuronte-ui24-italic-v1.seed1.nrt font/ui-24-italic.txt $(UI24I_V1_SEED1)
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle $(UI27_V1).nrt font/ui-27.txt $(UI27_V1_NETS)
+	$(PYTHON) train/pack.py --drawing-bundle build/faces-v1/neuronte-ui27-v1.seed1.nrt font/ui-27.txt $(UI27_V1_SEED1)
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle build/faces-v1/neuronte-ui27-v1.seed1.nrt font/ui-27.txt $(UI27_V1_SEED1)
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle $(UI28_V1).nrt font/ui-28.txt $(UI28_V1_NETS)
+	$(PYTHON) train/pack.py --drawing-bundle build/faces-v1/neuronte-ui28-v1.seed1.nrt font/ui-28.txt $(UI28_V1_SEED1)
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle build/faces-v1/neuronte-ui28-v1.seed1.nrt font/ui-28.txt $(UI28_V1_SEED1)
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle $(UI28I_V1).nrt font/ui-28-italic.txt $(UI28I_V1_NETS)
+	$(PYTHON) train/pack.py --drawing-bundle build/faces-v1/neuronte-ui28-italic-v1.seed1.nrt font/ui-28-italic.txt $(UI28I_V1_SEED1)
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle build/faces-v1/neuronte-ui28-italic-v1.seed1.nrt font/ui-28-italic.txt $(UI28I_V1_SEED1)
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle $(UI29_V1).nrt font/ui-29.txt $(UI29_V1_NETS)
+	$(PYTHON) train/pack.py --drawing-bundle build/faces-v1/neuronte-ui29-v1.seed1.nrt font/ui-29.txt $(UI29_V1_SEED1)
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle build/faces-v1/neuronte-ui29-v1.seed1.nrt font/ui-29.txt $(UI29_V1_SEED1)
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle $(UI29I_V1).nrt font/ui-29-italic.txt $(UI29I_V1_NETS)
+	$(PYTHON) train/pack.py --drawing-bundle build/faces-v1/neuronte-ui29-italic-v1.seed1.nrt font/ui-29-italic.txt $(UI29I_V1_SEED1)
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle build/faces-v1/neuronte-ui29-italic-v1.seed1.nrt font/ui-29-italic.txt $(UI29I_V1_SEED1)
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle $(UI30_V1).nrt font/ui-30.txt $(UI30_V1_NETS)
+	$(PYTHON) train/pack.py --drawing-bundle build/faces-v1/neuronte-ui30-v1.seed1.nrt font/ui-30.txt $(UI30_V1_SEED1)
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle build/faces-v1/neuronte-ui30-v1.seed1.nrt font/ui-30.txt $(UI30_V1_SEED1)
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle $(UI30I_V1).nrt font/ui-30-italic.txt $(UI30I_V1_NETS)
+	$(PYTHON) train/pack.py --drawing-bundle build/faces-v1/neuronte-ui30-italic-v1.seed1.nrt font/ui-30-italic.txt $(UI30I_V1_SEED1)
+	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle build/faces-v1/neuronte-ui30-italic-v1.seed1.nrt font/ui-30-italic.txt $(UI30I_V1_SEED1)
+
+.PHONY: test-faces-v1
+
 test-known-bundle: build/libneuronte.so
 	$(PYTHON) tests/check_known_bundle.py build/libneuronte.so
 
@@ -348,7 +422,7 @@ test-symbol-v1: build/libneuronte.so build/test_api
 
 .PHONY: test-widths
 
-test: all $(TESTS) test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7 test-face-bundle test-symbol-v1 test-split-v7-symbol test-split-v8
+test: all $(TESTS) test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7 test-face-bundle test-symbol-v1 test-split-v7-symbol test-split-v8 test-faces-v1
 	cd weights && sha256sum -c --quiet SHA256SUMS
 	# The pointer net keeps its own list, with paths from the top of the tree.
 	sha256sum -c --quiet weights/neuronte-pointer-v0.sha256

@@ -30,6 +30,11 @@ RC9_SPLIT = $(SPLIT)
 RC9_FULL = weights/neuronte-full-v3
 RC9_ITALIC_SIZES = 3 4 5 6 7 8 9 13 15 17 19 21 23 25 27 29 31
 RC9_ITALIC_JSON = $(foreach em,$(RC9_ITALIC_SIZES),weights/neuronte-ui$(em)-italic-v0.json)
+# Faster v1 desktop faces for five of the widest v0 faces: each a new -v1
+# drawing file of one bundle of 8 nets, one per contiguous group of 12
+# characters, and the same advances. Both seeds exact; the -v0 files stay as
+# they were. Each entry is FACE:GROUPS. See weights/neuronte-ui-wide-v1.md.
+FACES_WIDE_V1 = ui32:8 ui27-italic:8 ui31:8 ui31-italic:8 ui32-italic:8
 RC9_EMOJI = weights/neuronte-emoji-v0.nrt
 RC9_EMOJI_NETS = weights/neuronte-emoji-e0-v0.json weights/neuronte-emoji-e1-v0.json weights/neuronte-emoji-e2-v0.json
 RC9_NETS = $(NETS)
@@ -292,6 +297,28 @@ test-face-bundle: build/libneuronte.so build/test_tiled
 
 .PHONY: test-face-bundle
 
+# Seed 0 is the packed -v1 file; seed 1 is packed into build/ and held to the
+# same gate: every letter regular and bold exactly the face's pixels.
+test-faces-wide-v1: build/libneuronte.so
+	@set -e; for e in $(FACES_WIDE_V1); do f=$${e%:*}; k=$${e#*:}; \
+		t=font/$$(echo $$f | sed 's/^ui/ui-/').txt; n0=; n1=; i=0; \
+		while [ $$i -lt $$k ]; do n0="$$n0 weights/neuronte-$$f-v1-p$$i.json"; \
+			n1="$$n1 weights/neuronte-$$f-v1-p$$i.seed1.json"; i=$$((i + 1)); done; \
+		echo "$$f seed 0"; \
+		$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle weights/neuronte-$$f-v1.nrt $$t $$n0; \
+		$(PYTHON) train/pack.py --drawing-bundle build/neuronte-$$f-v1.seed1.nrt $$t $$n1 > /dev/null; \
+		echo "$$f seed 1"; \
+		$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle build/neuronte-$$f-v1.seed1.nrt $$t $$n1; \
+	done
+
+pack-faces-wide-v1:
+	@set -e; for e in $(FACES_WIDE_V1); do f=$${e%:*}; k=$${e#*:}; n=; i=0; \
+		while [ $$i -lt $$k ]; do n="$$n weights/neuronte-$$f-v1-p$$i.json"; i=$$((i + 1)); done; \
+		$(PYTHON) train/pack.py --drawing-bundle weights/neuronte-$$f-v1.nrt font/$$(echo $$f | sed 's/^ui/ui-/').txt $$n; \
+	done
+
+.PHONY: test-faces-wide-v1 pack-faces-wide-v1
+
 test-known-bundle: build/libneuronte.so
 	$(PYTHON) tests/check_known_bundle.py build/libneuronte.so
 
@@ -319,7 +346,7 @@ test-tiled: build/libneuronte.so build/stream/libneuronte.so build/test_tiled
 
 .PHONY: test-widths
 
-test: all $(TESTS) test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7 test-face-bundle
+test: all $(TESTS) test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7 test-face-bundle test-faces-wide-v1
 	cd weights && sha256sum -c --quiet SHA256SUMS
 	# The pointer net keeps its own list, with paths from the top of the tree.
 	sha256sum -c --quiet weights/neuronte-pointer-v0.sha256

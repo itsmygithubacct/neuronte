@@ -52,6 +52,8 @@ letter. Desktop adapters fall back for unsupported strings and styles.
 | `neuronte-icon-v1` | the icons in colour, a version 3 file by itself, not in the bundle | 167: the 133 in `font/icons.txt` and 34 powerline and progress glyphs, up to 6 layers each | 256 | 159,492 | 650,216 bytes |
 | `neuronte-ui28-italic-v0` | the italic at 28 pixels, trained for 40,000 steps: at the default 20,000 no width from 384 to 768 had both seeds exact | printable ASCII and the ellipsis, 96, with their advances | 384 | 331,009 | 1,325,072 bytes |
 | `neuronte-ui32-italic-v0` | the italic at 32 pixels, trained for 40,000 steps; both seeds exact at width 512 | printable ASCII and the ellipsis, 96, with their advances | 512 | 572,417 | 2,290,704 bytes |
+| `neuronte-ui32-v1`, `neuronte-ui27-italic-v1`, `neuronte-ui31-v1` | faster v1 of the desktop faces at 32 px, 27 px italic and 31 px: one bundle of 8 nets, one per group of 12 characters, trained 40,000 steps, both seeds exact; v0 is unchanged and still the default; [recipe and speed](weights/neuronte-ui-wide-v1.md) | printable ASCII and the ellipsis, 96, with their advances | 8 × 96 | 219,656 | 881,256 bytes each |
+| `neuronte-ui31-italic-v1`, `neuronte-ui32-italic-v1` | faster v1 of the desktop faces at 31 px italic and 32 px italic: one bundle of 8 nets, one per group of 12 characters, trained 40,000 steps, both seeds exact; v0 is unchanged and still the default; [recipe and speed](weights/neuronte-ui-wide-v1.md) | printable ASCII and the ellipsis, 96, with their advances | 8 × 128 | 358,408 | 1,436,264 bytes each |
 
 `neuronte-split-v5.nrt` is the default: 1,176 labelled scalars, including
 49 Greek and 66 Russian letters, in a 1,573,128-byte bundle. It differs from
@@ -99,6 +101,12 @@ reproduce all 96 source glyphs and their regular/bold masks and advances exactly
 at each native size. Tiny grids reuse some shapes; exact reproduction does not
 imply distinct or readable letters at every size. Sizes 1/2 and scalable italic
 remain explicit consumer fallback.
+
+Faster [v1 desktop faces](weights/neuronte-ui-wide-v1.md) exist for ui32, ui27 italic, ui31, ui31 italic
+and ui32 italic, among the widest v0 nets. Each is a new file beside its v0 with the same advances:
+one bundle of 8 small nets, each drawing 12 of the 96 characters. Both seeds reproduce all 96 glyphs
+exactly at the native em, and a whole face draws 6 to 18 times faster uncached, the cost a desktop pays
+when it builds its letter cells. The installer and Kilix 95 still load v0.
 
 `neuronte-split` draws each character with one small net picked for it.
 It draws ASCII, symbols, blocks and the mosaics four to seven times

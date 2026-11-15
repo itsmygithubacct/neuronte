@@ -593,7 +593,7 @@ test-colour-marks: build/libneuronte.so
 
 .PHONY: test-widths
 
-test: all $(TESTS) test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7 test-face-bundle test-symbol-v1 test-split-v7-symbol test-split-v8 test-faces-v1 test-faces-v1-192-256 test-known-bundle test-faces-wide-v1 test-faces-v1-h512 test-colour-marks test-faces-v1-small test-emoji-v1
+test: all $(TESTS) test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7 test-face-bundle test-symbol-v1 test-split-v7-symbol test-split-v8 test-faces-v1 test-faces-v1-192-256 test-known-bundle test-faces-wide-v1 test-faces-v1-h512 test-colour-marks test-faces-v1-small test-emoji-v1 test-video-delta
 	cd weights && sha256sum -c --quiet SHA256SUMS
 	# The pointer net keeps its own list, with paths from the top of the tree.
 	sha256sum -c --quiet weights/neuronte-pointer-v0.sha256
@@ -684,6 +684,12 @@ clean:
 
 # Video is an optional Python/numpy/scipy tool; its tests are separate from
 # the dependency-light C/font acceptance suite.
+# Change-only output of the player's pixels mode (--skip-threshold,
+# --partial-limit) is also part of `make test`: its unit tests need only
+# numpy, and its playback tests are skipped where ffmpeg is not installed.
+.PHONY: test-video-delta
+test-video-delta: build/libneuronte.so
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_video_delta.py
 .PHONY: test-video
 .PHONY: test-bench-errors
 test-bench-errors:
@@ -693,6 +699,7 @@ test-video: build/libneuronte.so build/video-decoder-bench build/test_video buil
 	./build/test_video
 	./build/test_video_portable
 	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_video.py
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_video_delta.py
 	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_video_decoder.py
 	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_reference.py build/libneuronte.so --bundle weights/neuronte-video-masks-v0.nrt weights/neuronte-video-pixel-v1.json weights/neuronte-video-ascii-v0.json --fallback 1
 

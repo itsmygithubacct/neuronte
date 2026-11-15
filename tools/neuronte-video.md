@@ -98,6 +98,54 @@ objects that the terminal unlinks as it reads them; if all three are still
 unread the frame is skipped, not queued. Elsewhere, and with `--transport
 inline`, they are compressed and sent through the terminal's own stream.
 
+### Sending only what changed
+
+By default every frame of the pixels mode is a new picture. Three options,
+all off by default and only for the default pixels mode (not `--pixel-size`
+or cells), send less when little changes:
+
+- `--skip-threshold LEVELS` (0 to 255). The player keeps the decoded
+  samples it last sent to the terminal (two by four a cell). A cell has
+  changed when any of its samples differs from what was sent by more than
+  LEVELS in any colour channel. When no cell has changed, nothing is sent:
+  the frame still counts as shown, and `--log` records it as `unchanged`
+  with no bytes. Otherwise the whole picture is sent exactly as without the
+  option. Comparing with what was sent, not with the frame before, means
+  small differences cannot add up: every sample on the screen stays within
+  LEVELS of the true frame, however long the video. With 0 only identical
+  frames are skipped, and the picture on the screen after every frame is
+  byte for byte what it is without the option.
+- `--partial-limit FRACTION` (with `--skip-threshold`). When the changed
+  cells fit in one rectangle (`--partial-rects N` allows up to N) covering
+  at most FRACTION of the picture's cells, only that rectangle is drawn and
+  written into the picture already on the screen, as frame data loaded into
+  frame 1 of the existing image (kitty graphics `a=f,r=1` with `x` and `y`),
+  through shared memory or inline like a whole picture, inside one
+  synchronized update. The rest of the picture is left as it was. In Kilix,
+  which sets `KITTY_KILIX_RENDERING=1`, edits through shared memory carry
+  its `N=1` hint, which keeps the edited frame in memory only; other
+  terminals never receive it.
+- `--refresh SECONDS` (default 10, 0 for never). With either option the
+  whole picture is sent at least once in this many seconds of video.
+
+The whole picture is also sent for the first frame, after every seek,
+resize and `--loop` restart, after a paused seek's picture, and whenever the
+changes are larger than the limit. Comparison stops as soon as a band of
+eight cell rows takes the change past the limit, so frames where everything
+moves cost little extra. A frame the terminal had no room for (shared
+memory still unread) or that a seek cancelled was never sent, so its change
+goes with the next frame.
+
+A frame edit is not free for the terminal: kitty and Kilix copy the whole
+current frame out of their image cache, compose the rectangle into it and
+store the whole frame again, then (Kilix) upload only the rectangle. In
+Kilix an edit of one rectangle therefore costs about half of a whole picture
+at 240 × 67 cells and less for smaller grids, and every further rectangle
+pays that cost again, so one rectangle is the default. `--stats` reports
+`delta` (frames unchanged, partial and full), `shm_bytes` (picture bytes
+written to shared memory) and `cpu_s` (the player's processor seconds:
+in total, from its first source frame to the end, and its ffmpeg decoder).
+
 For a comparison at a fixed pixel resolution, use
 `python3 tools/neuronte-play.py FILE --pixel-size 945x531 --no-status`.
 ffmpeg scales directly to 945 × 531 RGB samples with Lanczos. Each 2 × 4

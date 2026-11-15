@@ -13,6 +13,8 @@ time are dropped instead of slowing playback down.
           cell; the result is sent with the kitty graphics protocol, so it
           needs a terminal that has it. --pixel-size instead draws at 2 x 4
           pixels a cell, retaining each decoded sample at natural size.
+          --skip-threshold and --partial-limit (off by default) send
+          nothing for an unchanged frame, or only the changed rectangle.
   cells   one character and two colours per cell, written as ordinary
           truecolour text, so the terminal's own font draws it. This is an
           exhaustive search and shows a few frames a second at best.
@@ -26,6 +28,7 @@ import ctypes
 import fcntl
 import json
 import os
+import resource
 import secrets
 import select
 import shutil
@@ -159,12 +162,44 @@ class Presenter:
     image is complete under its own id before the previous one is deleted,
     inside one synchronized update, so the terminal never shows a gap."""
 
-    def __init__(self, out, transport):
+    def __init__(self, out, transport, slots=3, transient=False):
         self.out, self.transport = out, transport
+        # Kilix (KITTY_KILIX_RENDERING=1) keeps frame data marked N=1 in memory
+        # only; an edit then costs it far less. Stock kitty does not know the key.
+        self.hint = ',N=1' if transient else ''
         base = 0x4e520000 | secrets.randbelow(0x7fff) << 1
         self.ids = (base, base + 1); self.current = None
-        self.names = [f'neuronte-play-{os.getpid()}-{secrets.token_hex(6)}-{i}' for i in range(3)]
-        self.slot = 0; self.skipped = 0; self.pending = None
+        # Three objects a picture; a frame edit of several rectangles takes
+        # one object each, so --partial-limit sizes the pool by --partial-rects.
+        self.names = [f'neuronte-play-{os.getpid()}-{secrets.token_hex(6)}-{i}' for i in range(slots)]
+        self.slot = 0; self.skipped = 0; self.pending = None; self.shm_bytes = 0
+
+    def publish(self, pictures):
+        """Write each picture to its own free shared-memory object. Returns
+        their names, or None (and writes none) when too few are free."""
+        found, slots = [], len(self.names)
+        for tries in range(slots):              # the terminal unlinks a name once it has read it
+            if len(found) == len(pictures): break
+            candidate = self.names[(self.slot + tries) % slots]
+            if not os.path.exists('/dev/shm/' + candidate): found.append((tries, candidate))
+        if len(found) < len(pictures): return None
+        names = []
+        for (tries, candidate), picture in zip(found, pictures):
+            try:
+                fd = os.open('/dev/shm/' + candidate, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+            except FileExistsError:             # taken since it was found: give the others back
+                for name in names:
+                    try: os.unlink('/dev/shm/' + name)
+                    except FileNotFoundError: pass
+                return None
+            # Cropping an odd-width picture leaves strided rows. NumPy's
+            # strided tobytes walks individual elements; a contiguous
+            # buffer uses row copies and can be written without another copy.
+            data = memoryview(np.ascontiguousarray(picture))
+            with os.fdopen(fd, 'wb') as f: f.write(data)
+            self.shm_bytes += data.nbytes
+            names.append(candidate); self.slot = (self.slot + tries + 1) % slots
+        return names
 
     def frame(self, frame, cols, rows, left, top, natural=False):
         """The bytes that replace the picture, or None when the terminal has
@@ -174,29 +209,44 @@ class Presenter:
         span = '' if natural else f'c={cols},r={rows},'
         head = f'a=T,f=24,s={w},v={h},i={new},p=1,{span}z=-1,C=1,q=2'
         out = [b'\x1b[?2026h', f'\x1b[{top};{left}H'.encode()]
-        name = None
+        names = []
         if self.transport == 'shm':
-            for tries in range(3):              # the terminal unlinks a name once it has read it
-                candidate = self.names[(self.slot + tries) % 3]
-                try:
-                    fd = os.open('/dev/shm/' + candidate, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
-                except FileExistsError:
-                    continue
-                # Cropping an odd-width picture leaves strided rows. NumPy's
-                # strided tobytes walks individual elements; a contiguous
-                # buffer uses row copies and can be written without another copy.
-                with os.fdopen(fd, 'wb') as f: f.write(memoryview(np.ascontiguousarray(frame)))
-                name = candidate; self.slot = (self.slot + tries + 1) % 3; break
-            if name is None:
+            names = self.publish([frame])
+            if names is None:
                 self.skipped += 1; return None
-            out.append(f'\x1b_G{head},t=s;'.encode() + base64.standard_b64encode(name.encode()) + b'\x1b\\')
+            out.append(f'\x1b_G{head},t=s;'.encode() + base64.standard_b64encode(names[0].encode()) + b'\x1b\\')
         else:
             data = base64.standard_b64encode(zlib.compress(memoryview(np.ascontiguousarray(frame)), 1))
             for start in range(0, len(data), 4096):
                 more = int(start + 4096 < len(data))
                 out.append(b'\x1b_G' + (head + ',o=z,' if not start else '').encode() + f'm={more};'.encode() + data[start:start+4096] + b'\x1b\\')
         if self.current is not None: out.append(f'\x1b_Ga=d,d=I,i={self.current},q=2;\x1b\\'.encode())
-        out.append(b'\x1b[?2026l'); self.pending = (self.current, name); self.current = new
+        out.append(b'\x1b[?2026l'); self.pending = (self.current, names); self.current = new
+        return b''.join(out)
+
+    def edit(self, parts):
+        """The bytes that write (x, y, picture) rectangles, in pixels, into the
+        picture now shown (kitty graphics: frame data loaded into frame 1 of
+        the existing image), inside one synchronized update; None when the
+        terminal has not yet taken enough earlier objects (shared memory)."""
+        if self.current is None: raise ValueError('a frame edit needs a picture on screen')
+        out = [b'\x1b[?2026h']; names = []
+        if self.transport == 'shm':
+            names = self.publish([picture for _, _, picture in parts])
+            if names is None:
+                self.skipped += 1; return None
+        for n, (x, y, picture) in enumerate(parts):
+            h, w = picture.shape[:2]
+            head = f'a=f,i={self.current},r=1,x={x},y={y},s={w},v={h},f=24{self.hint},q=2'
+            if self.transport == 'shm':
+                out.append(f'\x1b_G{head},t=s;'.encode() + base64.standard_b64encode(names[n].encode()) + b'\x1b\\')
+                continue
+            data = base64.standard_b64encode(zlib.compress(memoryview(np.ascontiguousarray(picture)), 1))
+            for start in range(0, len(data), 4096):
+                more = int(start + 4096 < len(data))
+                control = f'{head},o=z,m={more}' if not start else f'a=f,i={self.current},r=1,q=2,m={more}'
+                out.append(f'\x1b_G{control};'.encode() + data[start:start+4096] + b'\x1b\\')
+        out.append(b'\x1b[?2026l'); self.pending = (self.current, names)
         return b''.join(out)
 
     def sent(self):
@@ -205,8 +255,8 @@ class Presenter:
     def discard(self):
         """A seek/resize can cancel a packed picture before it reaches the terminal."""
         if self.pending is not None:
-            self.current, name = self.pending
-            if name is not None:
+            self.current, names = self.pending
+            for name in names:
                 try: os.unlink('/dev/shm/' + name)
                 except FileNotFoundError: pass
             self.pending = None
@@ -226,6 +276,91 @@ class Presenter:
             try: os.unlink('/dev/shm/' + name)
             except OSError: pass
         return tail
+
+
+class Delta:
+    """Change-only output for pixels mode (--skip-threshold, --partial-limit).
+
+    Keeps the samples last SENT to the terminal, not the previous frame, so
+    differences below the threshold cannot add up over time: every sample on
+    screen stays within the threshold of the true frame. A cell (2 x 4
+    samples) has changed when any of its samples differs from what was sent
+    by more than the threshold in any channel. plan() decides each frame:
+    None (nothing changed: send nothing), 'full' (send the whole picture as
+    today) or a list of cell rectangles (x0, y0, x1, y1) to write into the
+    picture on screen."""
+
+    BAND = 8                                # cell rows compared at a time, so a large change stops early
+
+    def __init__(self, threshold, limit=None, rects=1, refresh=10.):
+        self.threshold, self.limit, self.rects, self.refresh = threshold, limit, rects, refresh
+        self.sent = None; self.full_at = None
+        self.counts = dict(unchanged=0, partial=0, full=0)
+
+    def reset(self):
+        """After a seek, resize, restart or anything else the screen has not seen: the next frame is full."""
+        self.sent = None
+
+    def changed(self, samples, rows, cols, budget=None):
+        """Cells changed against what was sent, as rows x cols booleans; None
+        once more than budget cells have changed (budget 0: any change)."""
+        a = samples.reshape(rows, 4, cols, 6); b = self.sent.reshape(rows, 4, cols, 6)
+        found = np.zeros((rows, cols), bool); count = 0
+        for y in range(0, rows, self.BAND):
+            pa, pb = a[y:y + self.BAND], b[y:y + self.BAND]
+            if self.threshold:                  # uint8 without wrapping: the larger less the smaller
+                band = (np.maximum(pa, pb) - np.minimum(pa, pb) > self.threshold).any(axis=(1, 3))
+            else:
+                band = (pa != pb).any(axis=(1, 3))
+            found[y:y + self.BAND] = band
+            if budget is not None:
+                count += int(np.count_nonzero(band))
+                if count > budget: return None
+        return found
+
+    def boxes(self, changed):
+        """At most self.rects rectangles covering every changed cell: runs of
+        changed rows, each as wide as its changes, nearest runs merged."""
+        rows = np.flatnonzero(changed.any(axis=1))
+        runs = []
+        for y in rows:
+            if runs and y == runs[-1][1]: runs[-1][1] = y + 1
+            else: runs.append([y, y + 1])
+        boxes = []
+        for y0, y1 in runs:
+            columns = np.flatnonzero(changed[y0:y1].any(axis=0))
+            boxes.append((int(columns[0]), int(y0), int(columns[-1]) + 1, int(y1)))
+        def area(b): return (b[2] - b[0]) * (b[3] - b[1])
+        def union(p, q): return (min(p[0], q[0]), min(p[1], q[1]), max(p[2], q[2]), max(p[3], q[3]))
+        while len(boxes) > self.rects:          # merge the neighbours whose union adds the least area
+            costs = [area(union(boxes[i], boxes[i + 1])) - area(boxes[i]) - area(boxes[i + 1]) for i in range(len(boxes) - 1)]
+            i = int(np.argmin(costs)); boxes[i:i + 2] = [union(boxes[i], boxes[i + 1])]
+        return boxes
+
+    def plan(self, samples, rows, cols, now):
+        """now: the frame's time in the file, so a refresh falls on the same frames in every run."""
+        if self.sent is None or self.sent.shape != samples.shape: return 'full'
+        if self.refresh and now - self.full_at >= self.refresh: return 'full'
+        total = rows * cols
+        if self.limit is None:                  # skip only: any change sends the whole picture
+            return None if self.changed(samples, rows, cols, budget=0) is not None else 'full'
+        changed = self.changed(samples, rows, cols, budget=int(self.limit * total))
+        if changed is None: return 'full'
+        if not changed.any(): return None
+        boxes = self.boxes(changed)
+        if sum((x1 - x0) * (y1 - y0) for x0, y0, x1, y1 in boxes) > self.limit * total: return 'full'
+        return boxes
+
+    def commit(self, samples, plan, now):
+        """Record what reached the terminal. The frame's buffer is still the
+        decoder's current one: the next frame is read only after this."""
+        if plan is None: self.counts['unchanged'] += 1; return
+        if plan == 'full':
+            if self.sent is None or self.sent.shape != samples.shape: self.sent = np.empty_like(samples)
+            np.copyto(self.sent, samples); self.full_at = now; self.counts['full'] += 1; return
+        for x0, y0, x1, y1 in plan:
+            self.sent[y0 * 4:y1 * 4, x0 * 2:x1 * 2] = samples[y0 * 4:y1 * 4, x0 * 2:x1 * 2]
+        self.counts['partial'] += 1
 
 
 def text(renderer, cells, previous, left, top):
@@ -481,8 +616,26 @@ def main():
     p.add_argument('--input-fd', type=int, help='read keys from this descriptor instead of the terminal')
     p.add_argument('--log', help='write one JSON line of timings per source frame')
     p.add_argument('--stats', help='write a JSON summary at the end')
+    p.add_argument('--skip-threshold', type=int, metavar='LEVELS',
+                   help='pixels mode: send nothing for a frame in which no sample differs from what was last sent '
+                        'by more than this many levels in any channel (0: only identical frames); default off')
+    p.add_argument('--partial-limit', type=float, metavar='FRACTION',
+                   help='with --skip-threshold: when the changed cells fit in rectangles covering at most this '
+                        'fraction of the picture, write only those into the picture on screen; default off')
+    p.add_argument('--partial-rects', type=int, default=1, metavar='N',
+                   help='--partial-limit: at most this many rectangles a frame (default: 1)')
+    p.add_argument('--refresh', type=float, default=10., metavar='SECONDS',
+                   help='with --skip-threshold: send the whole picture at least once in this many seconds of video (default: 10; 0: never)')
     p.add_argument('--weights'); p.add_argument('--library')
     a = p.parse_args()
+    if a.skip_threshold is not None:
+        if a.mode != 'pixels' or a.pixel_size: p.error('--skip-threshold requires pixels mode without --pixel-size')
+        if not 0 <= a.skip_threshold <= 255: p.error('--skip-threshold must be from 0 to 255')
+    if a.partial_limit is not None:
+        if a.skip_threshold is None: p.error('--partial-limit requires --skip-threshold')
+        if not 0 < a.partial_limit <= 1: p.error('--partial-limit must be above 0 and at most 1')
+    if not 1 <= a.partial_rects <= 16: p.error('--partial-rects must be from 1 to 16')
+    if not a.refresh >= 0: p.error('--refresh must be nonnegative')
     if a.pixel_size and (a.mode != 'pixels' or a.cols is not None or a.rows is not None):
         p.error('--pixel-size requires pixels mode and cannot be combined with --cols or --rows')
     if a.decoded_format != 'auto' and not a.pixel_size: p.error('--decoded-format requires --pixel-size')
@@ -591,6 +744,18 @@ def main():
             blocks_frame = np.empty(shape, np.uint8)
         return renderer.draw_samples(samples, blocks_frame)
 
+    def draw_cells(samples):
+        """draw_blocks of whole cells already padded: a rectangle of a frame edit."""
+        if renderer.block is None: return draw_pixels(fitter.encode(samples))
+        return renderer.draw_samples(samples)
+
+    def present_delta(samples, plan):
+        """The payload a Delta plan takes: b'' to send nothing, else a frame edit."""
+        if plan is None: return b''
+        parts = [(x0 * CELL[0], y0 * CELL[1], draw_cells(samples[y0 * 4:y1 * 4, x0 * 2:x1 * 2]))
+                 for x0, y0, x1, y1 in plan]
+        return presenter.edit(parts)
+
     def present_pixels(picture):
         return presenter.frame(picture, geometry['c'], geometry['r'], geometry['left'], geometry['top'],
                                natural=bool(a.pixel_size))
@@ -607,9 +772,11 @@ def main():
         if planar: return renderer.render_gbrp(frame, out=output_frame)
         return renderer.render_rgb24(frame, out=output_frame)
 
-    presenter = Presenter(out, transport)
+    presenter = Presenter(out, transport, slots=3 * (a.partial_rects if a.partial_limit is not None else 1),
+                          transient=transport == 'shm' and os.environ.get('KITTY_KILIX_RENDERING') == '1')
+    delta = Delta(a.skip_threshold, a.partial_limit, a.partial_rects, a.refresh) if a.skip_threshold is not None else None
     keys = None
-    source = clock = None; shown = dropped = count = skipped = seeks = 0; failure = ''; resized = []
+    source = clock = None; shown = dropped = count = skipped = seeks = 0; failure = ''; resized = []; frames_cpu = None
     # Opening a bad log path must fail before changing the terminal's input mode.
     log = open(a.log, 'w', buffering=1) if a.log else None; late = []; cost = dict(read=0., fit=0., draw=0., pack=0., write=0.); wire = 0
     for number in (signal.SIGTERM, signal.SIGHUP):          # leave through finally, so the terminal and the sound are put back
@@ -635,6 +802,7 @@ def main():
                 pending['record'].update(dropped=True, interrupted=True)
                 if log: log.write(json.dumps(pending['record']) + '\n')
             presenter.discard(); pending = None; read_time = 0.; preview = paused
+            if delta: delta.reset()
             if not waiting and not paused: clock.pause(True)
             waiting = True
             origin = position; index = 0; previous = None; source = decoder(origin)
@@ -686,17 +854,36 @@ def main():
                         payload = present_pixels(picture)
                     else:
                         payload = text(renderer, renderer.fit(frame), None, geometry['left'], geometry['top'])
-                    if payload: out.write(payload); out.flush(); presenter.sent()
+                    if payload:
+                        out.write(payload); out.flush(); presenter.sent()
+                        if delta: delta.commit(pad_cells(frame, fitter), 'full', origin)
                     index = 1; preview = False; read_time = 0.
                     continue
                 preview = False
                 pts = origin + index / fps; index += 1; count += 1
+                if count == 1: frames_cpu = time.process_time()
                 now = clock.time(); record = dict(n=count, t=round(time.monotonic(), 6), pts=round(pts, 4), clock=round(now, 4), read_ms=round(read_time * 1e3, 3))
                 if not a.untimed and now > pts + 1 / fps and shown:
                     dropped += 1; record['dropped'] = True; read_time = 0.
                     if log: log.write(json.dumps(record) + '\n')
                     continue
-                if a.mode == 'pixels':
+                commit = None
+                if a.mode == 'pixels' and delta is not None:
+                    t2 = time.perf_counter()
+                    samples = pad_cells(frame, fitter)
+                    plan = delta.plan(samples, geometry['r'], geometry['c'], pts)
+                    record['delta'] = 'unchanged' if plan is None else plan if plan == 'full' else 'partial'
+                    record['plan_ms'] = round((time.perf_counter() - t2) * 1e3, 3)
+                    if plan == 'full':
+                        picture = draw_blocks(frame); t3 = time.perf_counter()
+                        present = lambda picture=picture: present_pixels(picture)
+                    else:
+                        if plan: record['rects'] = len(plan)
+                        t3 = time.perf_counter()
+                        present = lambda samples=samples, plan=plan: present_delta(samples, plan)
+                    payload = present()
+                    commit = lambda samples=samples, plan=plan, pts=pts: delta.commit(samples, plan, pts)
+                elif a.mode == 'pixels':
                     if a.pixel_size:
                         t2 = t1
                         picture = render_natural(frame)
@@ -704,7 +891,8 @@ def main():
                         t2 = time.perf_counter()
                         picture = draw_blocks(frame)
                     t3 = time.perf_counter()
-                    payload = present_pixels(picture)
+                    present = lambda picture=picture: present_pixels(picture)
+                    payload = present()
                 else:
                     if helper is not None:
                         k = helper.doc['inference']['candidates']
@@ -715,21 +903,21 @@ def main():
                     t2 = t3 = time.perf_counter()
                     payload = text(renderer, cells, previous, geometry['left'], geometry['top']); previous = cells
                 t4 = time.perf_counter()
-                pending = dict(payload=payload, pts=pts, record=record,
+                pending = dict(payload=payload, pts=pts, record=record, commit=commit,
                                costs=(read_time, t2 - t1, t3 - t2, t4 - t3))
                 if payload is None and a.untimed:
-                    pending['picture'] = picture   # keep this frame until the consumer has space
+                    pending['present'] = present   # keep this frame until the consumer has space
                 read_time = 0.
             if not a.untimed and clock.time() < pending['pts']: continue
             payload, pts, record = pending['payload'], pending['pts'], pending['record']
             if payload is None and a.untimed:
                 retry = time.perf_counter()
-                payload = present_pixels(pending['picture'])
+                payload = pending['present']()
                 costs = pending['costs']
                 pending['costs'] = (*costs[:3], costs[3] + time.perf_counter() - retry)
                 if payload is None: continue
                 pending['payload'] = payload
-                del pending['picture']
+                del pending['present']
             if payload is None:                             # the terminal is behind: skip, do not queue
                 skipped += 1; record['skipped'] = True; pending = None
                 if log: log.write(json.dumps(record) + '\n')
@@ -737,6 +925,7 @@ def main():
             lateness = (clock.time() - pts) * 1e3
             wrote = time.perf_counter()
             out.write(payload); out.flush(); presenter.sent(); t5 = time.perf_counter(); shown += 1; wire += len(payload); late.append(lateness)
+            if pending['commit']: pending['commit']()
             for name, value in zip(('read', 'fit', 'draw', 'pack'), pending['costs']):
                 cost[name] += value
                 record[name + '_ms'] = round(value * 1e3, 3)
@@ -750,6 +939,7 @@ def main():
     except ValueError as exc:
         failure = str(exc)
     finally:
+        if frames_cpu is not None: frames_cpu = time.process_time() - frames_cpu
         for number in (signal.SIGTERM, signal.SIGHUP, signal.SIGINT): signal.signal(number, signal.SIG_IGN)   # a second signal must not cut this short
         elapsed = time.perf_counter() - began
         tail = presenter.close()                            # first: the pictures in /dev/shm are the one thing nobody else removes
@@ -767,6 +957,14 @@ def main():
                    transport=transport if a.mode == 'pixels' else 'text', sound=type(clock).__name__ == 'Sound' if clock else False,
                    late_ms=dict(median=round(float(np.median(late)), 2), p95=round(float(np.percentile(late, 95)), 2), max=round(float(late.max()), 2)),
                    mean_ms={k: round(v / shown * 1e3, 3) if shown else 0 for k, v in cost.items()}, wire_bytes=wire, notes=notes)
+    own, children = resource.getrusage(resource.RUSAGE_SELF), resource.getrusage(resource.RUSAGE_CHILDREN)
+    # frames: this process from the first source frame to the last (no start-up); children: an ffmpeg decoder
+    summary.update(shm_bytes=presenter.shm_bytes, cpu_s=dict(player=round(own.ru_utime + own.ru_stime, 4),
+                                                            frames=round(frames_cpu or 0., 4),
+                                                            children=round(children.ru_utime + children.ru_stime, 4)))
+    if delta:
+        summary['delta'] = dict(threshold=a.skip_threshold, partial_limit=a.partial_limit, partial_rects=a.partial_rects,
+                                refresh=a.refresh, **delta.counts)
     summary.update(decoded_size=[geometry['w'], geometry['h']], decoded_format=decoded, decoder='+'.join(sorted(used - {'libav-declined'})),
                    image_size=(list(a.pixel_size) if a.pixel_size else
                                [geometry['c'] * CELL[0], geometry['r'] * CELL[1]]) if a.mode == 'pixels' else None)

@@ -18,6 +18,10 @@ The drawings are font/icons.txt and the palette font/palette.txt, unless
 flame in font/flame.txt and font/flame-palette.txt. The weights record
 both files and their sha256, so the packer reads the same ones.
 
+--shard I/N takes every Nth drawing in scalar order from the Ith; --group
+I/N takes the Ith of N contiguous runs in scalar order instead, so a bundle
+of narrower experts routes by a few ranges.
+
 --blank names scalars that are not drawn, trained with every layer
 "outside everywhere" and every entry 0. A net of one drawing, such as the
 flame, otherwise draws that drawing for every scalar it is asked for. The
@@ -74,6 +78,8 @@ p.add_argument("--scores-out", help="write full-precision scores and every used 
 p.add_argument("--log-every", type=int, default=1000, help="progress interval on stderr (0 disables)")
 p.add_argument("--wide", action="store_true", help="2x2 drawings, train left and right 1x2 halves")
 p.add_argument("--shard", help="strided glyph partition INDEX/COUNT, both halves stay together")
+p.add_argument("--group", help="contiguous glyph partition INDEX/COUNT in scalar order (sizes differ by at most one), "
+                               "both halves stay together")
 p.add_argument("--matmul-precision", choices=("highest", "high"), default="highest")
 checkpoint.arguments(p)
 a = p.parse_args()
@@ -109,6 +115,15 @@ if a.shard:
     if not 0 <= index < count:
         p.error("shard must have 0 <= INDEX < COUNT")
     ICONS = {c: ICONS[c] for c in sorted(ICONS)[index::count]}
+if a.group:
+    if a.shard:
+        p.error("--group and --shard are different partitions; give one")
+    index, count = map(int, a.group.split("/"))
+    if not 0 <= index < count <= len(ICONS):
+        p.error("group must have 0 <= INDEX < COUNT <= the number of drawings")
+    order = sorted(ICONS)
+    lo, hi = len(order) * index // count, len(order) * (index + 1) // count
+    ICONS = {c: ICONS[c] for c in order[lo:hi]}
 if a.wide:
     ICONS = wide_halves(ICONS)
 LABELLED = list(ICONS)
@@ -348,9 +363,11 @@ doc = {
     "palette": {name: {"entry": n, "dark": f"#{d[0]:02X}{d[1]:02X}{d[2]:02X}" if d else None,
                        "light": f"#{li[0]:02X}{li[1]:02X}{li[2]:02X}" if li else None}
                 for name, (n, d, li) in PAL.items()},
-    "training": {"set": os.path.splitext(os.path.basename(DRAWING))[0] + ("-" + a.shard.replace("/", "of") if a.shard else ""), "labelled": " ".join(f"U+{scalar(c):04X}" for c in LABELLED), "sources_sha256": SOURCES,
+    "training": {"set": os.path.splitext(os.path.basename(DRAWING))[0] + ("-" + a.shard.replace("/", "of") if a.shard else "")
+                 + ("-g" + a.group.replace("/", "of") if a.group else ""), "labelled": " ".join(f"U+{scalar(c):04X}" for c in LABELLED), "sources_sha256": SOURCES,
                  "drawing": DRAWING, "palette": PALETTE, "blank": a.blank,
                  "cell_columns": 2 if a.wide else 1, "shard": a.shard,
+                 **({"group": a.group} if a.group else {}),
                  "matmul_precision": a.matmul_precision,
                  "drawings_sha256": {"version": 1, "glyphs": drawing_hashes(ICONS, map(scalar, LABELLED))},
                  "pen_radius": a.pen, "grid": N, "steps": a.steps, "seed": a.seed},

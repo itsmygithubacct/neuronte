@@ -1,0 +1,175 @@
+{
+  "scalar": "U+100000",
+  "recipe": "form A, K = 3, width 64 -> 56, grid 256, blanks U+0020..U+007E and U+FFFD, 20,000 steps (trained on one CUDA GPU); then train/colour_calibrate.py final layer 5,000 steps at its defaults (CPU, 1 thread)",
+  "gate": "tests/check_flame.py --max-xor 16:7,2,0 --max-xor 32:6,3,5 (entries 2/3/4 exact; composite max <= 32/255 and mean <= 2/255 on both themes in the middle square at 16 and 32 px; consumer premultiplied max <= 32; the 96 blanks write nothing; per-layer mask pixels off the drawing no more than flame-v0) and tests/check_reference.py",
+  "seeds": {
+    "0": {
+      "json": "weights/neuronte-flame-v1.json",
+      "sizes": {
+        "16": {
+          "samples": 2,
+          "entries": [
+            2,
+            3,
+            4
+          ],
+          "entries_ok": true,
+          "layer_xor": [
+            0,
+            0,
+            0
+          ],
+          "dark": {
+            "max": 11.883307456970215,
+            "mean": 0.4644067585468292
+          },
+          "light": {
+            "max": 11.883307456970215,
+            "mean": 0.6919832229614258
+          },
+          "consumer": {
+            "max": 12.15625,
+            "mean": 0.536865234375,
+            "visible_pixels": 129
+          },
+          "blank_pixels_written": 0,
+          "blank_max_coverage": 0.0,
+          "max_xor": [
+            7,
+            2,
+            0
+          ],
+          "passed": true
+        },
+        "32": {
+          "samples": 1,
+          "entries": [
+            2,
+            3,
+            4
+          ],
+          "entries_ok": true,
+          "layer_xor": [
+            0,
+            0,
+            0
+          ],
+          "dark": {
+            "max": 27.162431716918945,
+            "mean": 0.5083732604980469
+          },
+          "light": {
+            "max": 27.162431716918945,
+            "mean": 0.7183858752250671
+          },
+          "consumer": {
+            "max": 27.0,
+            "mean": 0.543609619140625,
+            "visible_pixels": 453
+          },
+          "blank_pixels_written": 0,
+          "blank_max_coverage": 0.0,
+          "max_xor": [
+            6,
+            3,
+            5
+          ],
+          "passed": true
+        }
+      },
+      "passed": true
+    },
+    "1": {
+      "json": "weights/neuronte-flame-v1.seed1.json",
+      "sizes": {
+        "16": {
+          "samples": 2,
+          "entries": [
+            2,
+            3,
+            4
+          ],
+          "entries_ok": true,
+          "layer_xor": [
+            0,
+            0,
+            0
+          ],
+          "dark": {
+            "max": 10.998464584350586,
+            "mean": 0.4649643898010254
+          },
+          "light": {
+            "max": 10.998464584350586,
+            "mean": 0.6764534115791321
+          },
+          "consumer": {
+            "max": 11.4375,
+            "mean": 0.513336181640625,
+            "visible_pixels": 129
+          },
+          "blank_pixels_written": 0,
+          "blank_max_coverage": 0.0,
+          "max_xor": [
+            7,
+            2,
+            0
+          ],
+          "passed": true
+        },
+        "32": {
+          "samples": 1,
+          "entries": [
+            2,
+            3,
+            4
+          ],
+          "entries_ok": true,
+          "layer_xor": [
+            0,
+            0,
+            0
+          ],
+          "dark": {
+            "max": 26.016231536865234,
+            "mean": 0.46998143196105957
+          },
+          "light": {
+            "max": 27.327985763549805,
+            "mean": 0.6712029576301575
+          },
+          "consumer": {
+            "max": 28.25,
+            "mean": 0.5115509033203125,
+            "visible_pixels": 453
+          },
+          "blank_pixels_written": 0,
+          "blank_max_coverage": 0.0,
+          "max_xor": [
+            6,
+            3,
+            5
+          ],
+          "passed": true
+        }
+      },
+      "passed": true
+    }
+  },
+  "passed": true,
+  "sha256": {
+    "font/flame.txt": "e2ac8cb8f1f6b6c3429a55270af5d76db64106d186500616fbf2543bcdfe530d",
+    "font/flame-palette.txt": "287082718286d13afb482f111f39ce20684e61a5b6192f081b1ca4d23015a373",
+    "tests/check_flame.py": "86a69b163e13e4b605da10fbc4fb84e85bcfe4f6267a7d26611f8023ca632ecc",
+    "weights/neuronte-flame-v1.json": "1f31fc6b8d419282468922f500e8faf15a0ec020aba6fb7b9813f836db2a7cd7",
+    "weights/neuronte-flame-v1.nrt": "eca551241b2f46934412c348a6e96bee13dafac214439a9c6d5c7bf0d11713bf",
+    "weights/neuronte-flame-v1.raw.json": "dc84a60b0c642a9616903b88c70eadb90874f9e7ad41e1b96a464c010e99c56d",
+    "weights/neuronte-flame-v1.raw.nrt": "075af675ff3e6b3015b4f1ce2edccfb242e154fd331872b7afd5da4ff3d5999f",
+    "weights/neuronte-flame-v1.scores.json": "b314e80d481418c3dfba79624a94a560127cd354f9c74b600b50781a29c56c77",
+    "weights/neuronte-flame-v1.seed1.json": "d6d9821754f9c90903e07f47577de55dcddcedf611b579792b654ef01241837d",
+    "weights/neuronte-flame-v1.seed1.nrt": "245280dc18b95e9ed91a3a3b08535479d153514011f8ea4609531ceca9f4348f",
+    "weights/neuronte-flame-v1.seed1.raw.json": "c7afd99af809ae1102ad534e31ff2d0be1667f9865bf1c944b145d7c93317c59",
+    "weights/neuronte-flame-v1.seed1.raw.nrt": "a31bf32e8bc1517608fcbf00fd5cec0cf22b0d659fd05fbf2361fde0c8ea84bf",
+    "weights/neuronte-flame-v1.seed1.scores.json": "d1d4ca39c33ebc0f38ac9be063aaae43c73211d16cebcfd6e3e3ea6adcbbe18c"
+  }
+}

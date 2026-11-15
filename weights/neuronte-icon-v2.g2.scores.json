@@ -1,0 +1,1388 @@
+{
+  "summary": {
+    "form": "A",
+    "layers": 3,
+    "icons": 42,
+    "width": 96,
+    "steps": 80000,
+    "seed": 0,
+    "params": 27651,
+    "head_params": 2575,
+    "final_loss": 0.003155658021569252,
+    "head_wrong": 0,
+    "head_wrong_all": 0,
+    "w12_s2": {
+      "iou_mean": 0.9329,
+      "iou_min": 0.4286,
+      "worst": [
+        "U+F0F6 layer 1",
+        "U+F090 layer 0",
+        "U+F0A0 layer 0"
+      ],
+      "stray_unused": 0,
+      "dark": {
+        "mean_err": 0.51,
+        "off_gt32": 0.0003
+      },
+      "light": {
+        "mean_err": 0.52,
+        "off_gt32": 0.0003
+      }
+    },
+    "w16_s2": {
+      "iou_mean": 0.9907,
+      "iou_min": 0.9143,
+      "worst": [
+        "U+F06E layer 0",
+        "U+F08B layer 0",
+        "U+F070 layer 0"
+      ],
+      "stray_unused": 0,
+      "dark": {
+        "mean_err": 0.56,
+        "off_gt32": 0.0001
+      },
+      "light": {
+        "mean_err": 0.57,
+        "off_gt32": 0.0001
+      }
+    },
+    "w32_s1": {
+      "iou_mean": 0.9909,
+      "iou_min": 0.9457,
+      "worst": [
+        "U+F0E7 layer 0",
+        "U+F06E layer 0",
+        "U+F070 layer 0"
+      ],
+      "stray_unused": 0,
+      "dark": {
+        "mean_err": 0.62,
+        "off_gt32": 0.0036
+      },
+      "light": {
+        "mean_err": 0.63,
+        "off_gt32": 0.0038
+      }
+    }
+  },
+  "per_size": {
+    "w12_s2": {
+      "iou_mean": 0.9328823089599609,
+      "iou_min": 0.4285714328289032,
+      "lost_used": 0,
+      "layers": [
+        {
+          "scalar": "U+F066",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 28,
+          "union": 28,
+          "target_ink": 28,
+          "predicted_ink": 28
+        },
+        {
+          "scalar": "U+F067",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 32,
+          "union": 32,
+          "target_ink": 32,
+          "predicted_ink": 32
+        },
+        {
+          "scalar": "U+F068",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 16,
+          "union": 16,
+          "target_ink": 16,
+          "predicted_ink": 16
+        },
+        {
+          "scalar": "U+F06E",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 44,
+          "union": 44,
+          "target_ink": 44,
+          "predicted_ink": 44
+        },
+        {
+          "scalar": "U+F070",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 48,
+          "union": 48,
+          "target_ink": 48,
+          "predicted_ink": 48
+        },
+        {
+          "scalar": "U+F071",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 44,
+          "union": 44,
+          "target_ink": 44,
+          "predicted_ink": 44
+        },
+        {
+          "scalar": "U+F071",
+          "layer": 1,
+          "iou": 1.0,
+          "intersection": 8,
+          "union": 8,
+          "target_ink": 8,
+          "predicted_ink": 8
+        },
+        {
+          "scalar": "U+F073",
+          "layer": 0,
+          "iou": 0.8831169009208679,
+          "intersection": 68,
+          "union": 77,
+          "target_ink": 68,
+          "predicted_ink": 77
+        },
+        {
+          "scalar": "U+F075",
+          "layer": 0,
+          "iou": 0.8933333158493042,
+          "intersection": 67,
+          "union": 75,
+          "target_ink": 67,
+          "predicted_ink": 75
+        },
+        {
+          "scalar": "U+F077",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 16,
+          "union": 16,
+          "target_ink": 16,
+          "predicted_ink": 16
+        },
+        {
+          "scalar": "U+F078",
+          "layer": 0,
+          "iou": 0.9411764740943909,
+          "intersection": 16,
+          "union": 17,
+          "target_ink": 16,
+          "predicted_ink": 17
+        },
+        {
+          "scalar": "U+F07B",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 67,
+          "union": 67,
+          "target_ink": 67,
+          "predicted_ink": 67
+        },
+        {
+          "scalar": "U+F07C",
+          "layer": 0,
+          "iou": 0.9210526347160339,
+          "intersection": 70,
+          "union": 76,
+          "target_ink": 70,
+          "predicted_ink": 76
+        },
+        {
+          "scalar": "U+F084",
+          "layer": 0,
+          "iou": 0.9090909361839294,
+          "intersection": 30,
+          "union": 33,
+          "target_ink": 31,
+          "predicted_ink": 32
+        },
+        {
+          "scalar": "U+F08B",
+          "layer": 0,
+          "iou": 0.7878788113594055,
+          "intersection": 26,
+          "union": 33,
+          "target_ink": 26,
+          "predicted_ink": 33
+        },
+        {
+          "scalar": "U+F08D",
+          "layer": 0,
+          "iou": 0.9677419066429138,
+          "intersection": 30,
+          "union": 31,
+          "target_ink": 30,
+          "predicted_ink": 31
+        },
+        {
+          "scalar": "U+F090",
+          "layer": 0,
+          "iou": 0.7368420958518982,
+          "intersection": 28,
+          "union": 38,
+          "target_ink": 28,
+          "predicted_ink": 38
+        },
+        {
+          "scalar": "U+F093",
+          "layer": 0,
+          "iou": 0.8181818127632141,
+          "intersection": 36,
+          "union": 44,
+          "target_ink": 36,
+          "predicted_ink": 44
+        },
+        {
+          "scalar": "U+F095",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 38,
+          "union": 38,
+          "target_ink": 38,
+          "predicted_ink": 38
+        },
+        {
+          "scalar": "U+F09C",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 49,
+          "union": 49,
+          "target_ink": 49,
+          "predicted_ink": 49
+        },
+        {
+          "scalar": "U+F09C",
+          "layer": 1,
+          "iou": 1.0,
+          "intersection": 2,
+          "union": 2,
+          "target_ink": 2,
+          "predicted_ink": 2
+        },
+        {
+          "scalar": "U+F0A0",
+          "layer": 0,
+          "iou": 0.7631579041481018,
+          "intersection": 29,
+          "union": 38,
+          "target_ink": 29,
+          "predicted_ink": 38
+        },
+        {
+          "scalar": "U+F0AC",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 88,
+          "union": 88,
+          "target_ink": 88,
+          "predicted_ink": 88
+        },
+        {
+          "scalar": "U+F0AD",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 33,
+          "union": 33,
+          "target_ink": 33,
+          "predicted_ink": 33
+        },
+        {
+          "scalar": "U+F0B0",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 36,
+          "union": 36,
+          "target_ink": 36,
+          "predicted_ink": 36
+        },
+        {
+          "scalar": "U+F0B1",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 74,
+          "union": 74,
+          "target_ink": 74,
+          "predicted_ink": 74
+        },
+        {
+          "scalar": "U+F0C0",
+          "layer": 0,
+          "iou": 0.9466666579246521,
+          "intersection": 71,
+          "union": 75,
+          "target_ink": 71,
+          "predicted_ink": 75
+        },
+        {
+          "scalar": "U+F0C1",
+          "layer": 0,
+          "iou": 0.9629629850387573,
+          "intersection": 52,
+          "union": 54,
+          "target_ink": 52,
+          "predicted_ink": 54
+        },
+        {
+          "scalar": "U+F0C2",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 45,
+          "union": 45,
+          "target_ink": 45,
+          "predicted_ink": 45
+        },
+        {
+          "scalar": "U+F0C4",
+          "layer": 0,
+          "iou": 0.9824561476707458,
+          "intersection": 56,
+          "union": 57,
+          "target_ink": 56,
+          "predicted_ink": 57
+        },
+        {
+          "scalar": "U+F0C5",
+          "layer": 0,
+          "iou": 0.8611111044883728,
+          "intersection": 62,
+          "union": 72,
+          "target_ink": 62,
+          "predicted_ink": 72
+        },
+        {
+          "scalar": "U+F0C6",
+          "layer": 0,
+          "iou": 0.9130434989929199,
+          "intersection": 42,
+          "union": 46,
+          "target_ink": 42,
+          "predicted_ink": 46
+        },
+        {
+          "scalar": "U+F0C7",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 95,
+          "union": 95,
+          "target_ink": 95,
+          "predicted_ink": 95
+        },
+        {
+          "scalar": "U+F0C7",
+          "layer": 1,
+          "iou": 0.9130434989929199,
+          "intersection": 21,
+          "union": 23,
+          "target_ink": 21,
+          "predicted_ink": 23
+        },
+        {
+          "scalar": "U+F0C7",
+          "layer": 2,
+          "iou": 1.0,
+          "intersection": 4,
+          "union": 4,
+          "target_ink": 4,
+          "predicted_ink": 4
+        },
+        {
+          "scalar": "U+F0C9",
+          "layer": 0,
+          "iou": 0.9411764740943909,
+          "intersection": 32,
+          "union": 34,
+          "target_ink": 32,
+          "predicted_ink": 34
+        },
+        {
+          "scalar": "U+F0CE",
+          "layer": 0,
+          "iou": 0.8205128312110901,
+          "intersection": 64,
+          "union": 78,
+          "target_ink": 64,
+          "predicted_ink": 78
+        },
+        {
+          "scalar": "U+F0D1",
+          "layer": 0,
+          "iou": 0.9137930870056152,
+          "intersection": 53,
+          "union": 58,
+          "target_ink": 53,
+          "predicted_ink": 58
+        },
+        {
+          "scalar": "U+F0E0",
+          "layer": 0,
+          "iou": 0.9230769276618958,
+          "intersection": 72,
+          "union": 78,
+          "target_ink": 72,
+          "predicted_ink": 78
+        },
+        {
+          "scalar": "U+F0E0",
+          "layer": 1,
+          "iou": 0.8571428656578064,
+          "intersection": 12,
+          "union": 14,
+          "target_ink": 12,
+          "predicted_ink": 14
+        },
+        {
+          "scalar": "U+F0E2",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 27,
+          "union": 27,
+          "target_ink": 27,
+          "predicted_ink": 27
+        },
+        {
+          "scalar": "U+F0E7",
+          "layer": 0,
+          "iou": 0.8421052694320679,
+          "intersection": 16,
+          "union": 19,
+          "target_ink": 16,
+          "predicted_ink": 19
+        },
+        {
+          "scalar": "U+F0EB",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 40,
+          "union": 40,
+          "target_ink": 40,
+          "predicted_ink": 40
+        },
+        {
+          "scalar": "U+F0F3",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 56,
+          "union": 56,
+          "target_ink": 56,
+          "predicted_ink": 56
+        },
+        {
+          "scalar": "U+F0F6",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 81,
+          "union": 81,
+          "target_ink": 81,
+          "predicted_ink": 81
+        },
+        {
+          "scalar": "U+F0F6",
+          "layer": 1,
+          "iou": 0.4285714328289032,
+          "intersection": 3,
+          "union": 7,
+          "target_ink": 3,
+          "predicted_ink": 7
+        },
+        {
+          "scalar": "U+F108",
+          "layer": 0,
+          "iou": 0.9019607901573181,
+          "intersection": 46,
+          "union": 51,
+          "target_ink": 46,
+          "predicted_ink": 51
+        },
+        {
+          "scalar": "U+F109",
+          "layer": 0,
+          "iou": 0.9491525292396545,
+          "intersection": 56,
+          "union": 59,
+          "target_ink": 56,
+          "predicted_ink": 59
+        }
+      ]
+    },
+    "w16_s2": {
+      "iou_mean": 0.9907435178756714,
+      "iou_min": 0.9142857193946838,
+      "lost_used": 0,
+      "layers": [
+        {
+          "scalar": "U+F066",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 48,
+          "union": 48,
+          "target_ink": 48,
+          "predicted_ink": 48
+        },
+        {
+          "scalar": "U+F067",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 44,
+          "union": 44,
+          "target_ink": 44,
+          "predicted_ink": 44
+        },
+        {
+          "scalar": "U+F068",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 20,
+          "union": 20,
+          "target_ink": 20,
+          "predicted_ink": 20
+        },
+        {
+          "scalar": "U+F06E",
+          "layer": 0,
+          "iou": 0.9142857193946838,
+          "intersection": 64,
+          "union": 70,
+          "target_ink": 64,
+          "predicted_ink": 70
+        },
+        {
+          "scalar": "U+F070",
+          "layer": 0,
+          "iou": 0.9411764740943909,
+          "intersection": 80,
+          "union": 85,
+          "target_ink": 80,
+          "predicted_ink": 85
+        },
+        {
+          "scalar": "U+F071",
+          "layer": 0,
+          "iou": 0.976190447807312,
+          "intersection": 82,
+          "union": 84,
+          "target_ink": 82,
+          "predicted_ink": 84
+        },
+        {
+          "scalar": "U+F071",
+          "layer": 1,
+          "iou": 1.0,
+          "intersection": 14,
+          "union": 14,
+          "target_ink": 14,
+          "predicted_ink": 14
+        },
+        {
+          "scalar": "U+F073",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 144,
+          "union": 144,
+          "target_ink": 144,
+          "predicted_ink": 144
+        },
+        {
+          "scalar": "U+F075",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 138,
+          "union": 138,
+          "target_ink": 138,
+          "predicted_ink": 138
+        },
+        {
+          "scalar": "U+F077",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 36,
+          "union": 36,
+          "target_ink": 36,
+          "predicted_ink": 36
+        },
+        {
+          "scalar": "U+F078",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 36,
+          "union": 36,
+          "target_ink": 36,
+          "predicted_ink": 36
+        },
+        {
+          "scalar": "U+F07B",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 114,
+          "union": 114,
+          "target_ink": 114,
+          "predicted_ink": 114
+        },
+        {
+          "scalar": "U+F07C",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 142,
+          "union": 142,
+          "target_ink": 142,
+          "predicted_ink": 142
+        },
+        {
+          "scalar": "U+F084",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 60,
+          "union": 60,
+          "target_ink": 60,
+          "predicted_ink": 60
+        },
+        {
+          "scalar": "U+F08B",
+          "layer": 0,
+          "iou": 0.9354838728904724,
+          "intersection": 58,
+          "union": 62,
+          "target_ink": 58,
+          "predicted_ink": 62
+        },
+        {
+          "scalar": "U+F08D",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 48,
+          "union": 48,
+          "target_ink": 48,
+          "predicted_ink": 48
+        },
+        {
+          "scalar": "U+F090",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 60,
+          "union": 60,
+          "target_ink": 60,
+          "predicted_ink": 60
+        },
+        {
+          "scalar": "U+F093",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 80,
+          "union": 80,
+          "target_ink": 80,
+          "predicted_ink": 80
+        },
+        {
+          "scalar": "U+F095",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 72,
+          "union": 72,
+          "target_ink": 72,
+          "predicted_ink": 72
+        },
+        {
+          "scalar": "U+F09C",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 90,
+          "union": 90,
+          "target_ink": 90,
+          "predicted_ink": 90
+        },
+        {
+          "scalar": "U+F09C",
+          "layer": 1,
+          "iou": 1.0,
+          "intersection": 4,
+          "union": 4,
+          "target_ink": 4,
+          "predicted_ink": 4
+        },
+        {
+          "scalar": "U+F0A0",
+          "layer": 0,
+          "iou": 0.9659090638160706,
+          "intersection": 85,
+          "union": 88,
+          "target_ink": 85,
+          "predicted_ink": 88
+        },
+        {
+          "scalar": "U+F0AC",
+          "layer": 0,
+          "iou": 0.9671052694320679,
+          "intersection": 147,
+          "union": 152,
+          "target_ink": 148,
+          "predicted_ink": 151
+        },
+        {
+          "scalar": "U+F0AD",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 53,
+          "union": 53,
+          "target_ink": 53,
+          "predicted_ink": 53
+        },
+        {
+          "scalar": "U+F0B0",
+          "layer": 0,
+          "iou": 0.9841269850730896,
+          "intersection": 62,
+          "union": 63,
+          "target_ink": 62,
+          "predicted_ink": 63
+        },
+        {
+          "scalar": "U+F0B1",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 130,
+          "union": 130,
+          "target_ink": 130,
+          "predicted_ink": 130
+        },
+        {
+          "scalar": "U+F0C0",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 139,
+          "union": 139,
+          "target_ink": 139,
+          "predicted_ink": 139
+        },
+        {
+          "scalar": "U+F0C1",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 96,
+          "union": 96,
+          "target_ink": 96,
+          "predicted_ink": 96
+        },
+        {
+          "scalar": "U+F0C2",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 87,
+          "union": 87,
+          "target_ink": 87,
+          "predicted_ink": 87
+        },
+        {
+          "scalar": "U+F0C4",
+          "layer": 0,
+          "iou": 0.9814814925193787,
+          "intersection": 106,
+          "union": 108,
+          "target_ink": 108,
+          "predicted_ink": 106
+        },
+        {
+          "scalar": "U+F0C5",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 136,
+          "union": 136,
+          "target_ink": 136,
+          "predicted_ink": 136
+        },
+        {
+          "scalar": "U+F0C6",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 82,
+          "union": 82,
+          "target_ink": 82,
+          "predicted_ink": 82
+        },
+        {
+          "scalar": "U+F0C7",
+          "layer": 0,
+          "iou": 0.9936708807945251,
+          "intersection": 157,
+          "union": 158,
+          "target_ink": 157,
+          "predicted_ink": 158
+        },
+        {
+          "scalar": "U+F0C7",
+          "layer": 1,
+          "iou": 1.0,
+          "intersection": 50,
+          "union": 50,
+          "target_ink": 50,
+          "predicted_ink": 50
+        },
+        {
+          "scalar": "U+F0C7",
+          "layer": 2,
+          "iou": 1.0,
+          "intersection": 6,
+          "union": 6,
+          "target_ink": 6,
+          "predicted_ink": 6
+        },
+        {
+          "scalar": "U+F0C9",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 60,
+          "union": 60,
+          "target_ink": 60,
+          "predicted_ink": 60
+        },
+        {
+          "scalar": "U+F0CE",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 144,
+          "union": 144,
+          "target_ink": 144,
+          "predicted_ink": 144
+        },
+        {
+          "scalar": "U+F0D1",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 108,
+          "union": 108,
+          "target_ink": 108,
+          "predicted_ink": 108
+        },
+        {
+          "scalar": "U+F0E0",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 144,
+          "union": 144,
+          "target_ink": 144,
+          "predicted_ink": 144
+        },
+        {
+          "scalar": "U+F0E0",
+          "layer": 1,
+          "iou": 0.9642857313156128,
+          "intersection": 27,
+          "union": 28,
+          "target_ink": 28,
+          "predicted_ink": 27
+        },
+        {
+          "scalar": "U+F0E2",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 44,
+          "union": 44,
+          "target_ink": 44,
+          "predicted_ink": 44
+        },
+        {
+          "scalar": "U+F0E7",
+          "layer": 0,
+          "iou": 0.9666666388511658,
+          "intersection": 29,
+          "union": 30,
+          "target_ink": 29,
+          "predicted_ink": 30
+        },
+        {
+          "scalar": "U+F0EB",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 76,
+          "union": 76,
+          "target_ink": 76,
+          "predicted_ink": 76
+        },
+        {
+          "scalar": "U+F0F3",
+          "layer": 0,
+          "iou": 0.9795918464660645,
+          "intersection": 96,
+          "union": 98,
+          "target_ink": 96,
+          "predicted_ink": 98
+        },
+        {
+          "scalar": "U+F0F6",
+          "layer": 0,
+          "iou": 0.9857142567634583,
+          "intersection": 138,
+          "union": 140,
+          "target_ink": 138,
+          "predicted_ink": 140
+        },
+        {
+          "scalar": "U+F0F6",
+          "layer": 1,
+          "iou": 1.0,
+          "intersection": 16,
+          "union": 16,
+          "target_ink": 16,
+          "predicted_ink": 16
+        },
+        {
+          "scalar": "U+F108",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 106,
+          "union": 106,
+          "target_ink": 106,
+          "predicted_ink": 106
+        },
+        {
+          "scalar": "U+F109",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 100,
+          "union": 100,
+          "target_ink": 100,
+          "predicted_ink": 100
+        }
+      ]
+    },
+    "w32_s1": {
+      "iou_mean": 0.9908884763717651,
+      "iou_min": 0.9457364082336426,
+      "lost_used": 0,
+      "layers": [
+        {
+          "scalar": "U+F066",
+          "layer": 0,
+          "iou": 0.9739583134651184,
+          "intersection": 187,
+          "union": 192,
+          "target_ink": 192,
+          "predicted_ink": 187
+        },
+        {
+          "scalar": "U+F067",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 176,
+          "union": 176,
+          "target_ink": 176,
+          "predicted_ink": 176
+        },
+        {
+          "scalar": "U+F068",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 80,
+          "union": 80,
+          "target_ink": 80,
+          "predicted_ink": 80
+        },
+        {
+          "scalar": "U+F06E",
+          "layer": 0,
+          "iou": 0.9676259160041809,
+          "intersection": 269,
+          "union": 278,
+          "target_ink": 276,
+          "predicted_ink": 271
+        },
+        {
+          "scalar": "U+F070",
+          "layer": 0,
+          "iou": 0.9699699878692627,
+          "intersection": 323,
+          "union": 333,
+          "target_ink": 330,
+          "predicted_ink": 326
+        },
+        {
+          "scalar": "U+F071",
+          "layer": 0,
+          "iou": 0.988095223903656,
+          "intersection": 332,
+          "union": 336,
+          "target_ink": 332,
+          "predicted_ink": 336
+        },
+        {
+          "scalar": "U+F071",
+          "layer": 1,
+          "iou": 1.0,
+          "intersection": 56,
+          "union": 56,
+          "target_ink": 56,
+          "predicted_ink": 56
+        },
+        {
+          "scalar": "U+F073",
+          "layer": 0,
+          "iou": 0.998251736164093,
+          "intersection": 571,
+          "union": 572,
+          "target_ink": 572,
+          "predicted_ink": 571
+        },
+        {
+          "scalar": "U+F075",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 552,
+          "union": 552,
+          "target_ink": 552,
+          "predicted_ink": 552
+        },
+        {
+          "scalar": "U+F077",
+          "layer": 0,
+          "iou": 0.9855072498321533,
+          "intersection": 136,
+          "union": 138,
+          "target_ink": 138,
+          "predicted_ink": 136
+        },
+        {
+          "scalar": "U+F078",
+          "layer": 0,
+          "iou": 0.9927536249160767,
+          "intersection": 137,
+          "union": 138,
+          "target_ink": 138,
+          "predicted_ink": 137
+        },
+        {
+          "scalar": "U+F07B",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 457,
+          "union": 457,
+          "target_ink": 457,
+          "predicted_ink": 457
+        },
+        {
+          "scalar": "U+F07C",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 569,
+          "union": 569,
+          "target_ink": 569,
+          "predicted_ink": 569
+        },
+        {
+          "scalar": "U+F084",
+          "layer": 0,
+          "iou": 0.9956896305084229,
+          "intersection": 231,
+          "union": 232,
+          "target_ink": 231,
+          "predicted_ink": 232
+        },
+        {
+          "scalar": "U+F08B",
+          "layer": 0,
+          "iou": 0.9709543585777283,
+          "intersection": 234,
+          "union": 241,
+          "target_ink": 234,
+          "predicted_ink": 241
+        },
+        {
+          "scalar": "U+F08D",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 192,
+          "union": 192,
+          "target_ink": 192,
+          "predicted_ink": 192
+        },
+        {
+          "scalar": "U+F090",
+          "layer": 0,
+          "iou": 0.9960474371910095,
+          "intersection": 252,
+          "union": 253,
+          "target_ink": 252,
+          "predicted_ink": 253
+        },
+        {
+          "scalar": "U+F093",
+          "layer": 0,
+          "iou": 0.9968152642250061,
+          "intersection": 313,
+          "union": 314,
+          "target_ink": 314,
+          "predicted_ink": 313
+        },
+        {
+          "scalar": "U+F095",
+          "layer": 0,
+          "iou": 0.9929577708244324,
+          "intersection": 282,
+          "union": 284,
+          "target_ink": 282,
+          "predicted_ink": 284
+        },
+        {
+          "scalar": "U+F09C",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 356,
+          "union": 356,
+          "target_ink": 356,
+          "predicted_ink": 356
+        },
+        {
+          "scalar": "U+F09C",
+          "layer": 1,
+          "iou": 1.0,
+          "intersection": 16,
+          "union": 16,
+          "target_ink": 16,
+          "predicted_ink": 16
+        },
+        {
+          "scalar": "U+F0A0",
+          "layer": 0,
+          "iou": 0.9826589822769165,
+          "intersection": 340,
+          "union": 346,
+          "target_ink": 340,
+          "predicted_ink": 346
+        },
+        {
+          "scalar": "U+F0AC",
+          "layer": 0,
+          "iou": 0.9795570969581604,
+          "intersection": 575,
+          "union": 587,
+          "target_ink": 578,
+          "predicted_ink": 584
+        },
+        {
+          "scalar": "U+F0AD",
+          "layer": 0,
+          "iou": 0.9909909963607788,
+          "intersection": 220,
+          "union": 222,
+          "target_ink": 221,
+          "predicted_ink": 221
+        },
+        {
+          "scalar": "U+F0B0",
+          "layer": 0,
+          "iou": 0.9841897487640381,
+          "intersection": 249,
+          "union": 253,
+          "target_ink": 250,
+          "predicted_ink": 252
+        },
+        {
+          "scalar": "U+F0B1",
+          "layer": 0,
+          "iou": 0.9980732202529907,
+          "intersection": 518,
+          "union": 519,
+          "target_ink": 518,
+          "predicted_ink": 519
+        },
+        {
+          "scalar": "U+F0C0",
+          "layer": 0,
+          "iou": 0.9856887459754944,
+          "intersection": 551,
+          "union": 559,
+          "target_ink": 556,
+          "predicted_ink": 554
+        },
+        {
+          "scalar": "U+F0C1",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 376,
+          "union": 376,
+          "target_ink": 376,
+          "predicted_ink": 376
+        },
+        {
+          "scalar": "U+F0C2",
+          "layer": 0,
+          "iou": 0.9942362904548645,
+          "intersection": 345,
+          "union": 347,
+          "target_ink": 345,
+          "predicted_ink": 347
+        },
+        {
+          "scalar": "U+F0C4",
+          "layer": 0,
+          "iou": 0.9854369163513184,
+          "intersection": 406,
+          "union": 412,
+          "target_ink": 410,
+          "predicted_ink": 408
+        },
+        {
+          "scalar": "U+F0C5",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 536,
+          "union": 536,
+          "target_ink": 536,
+          "predicted_ink": 536
+        },
+        {
+          "scalar": "U+F0C6",
+          "layer": 0,
+          "iou": 0.9906832575798035,
+          "intersection": 319,
+          "union": 322,
+          "target_ink": 319,
+          "predicted_ink": 322
+        },
+        {
+          "scalar": "U+F0C7",
+          "layer": 0,
+          "iou": 0.996835470199585,
+          "intersection": 630,
+          "union": 632,
+          "target_ink": 630,
+          "predicted_ink": 632
+        },
+        {
+          "scalar": "U+F0C7",
+          "layer": 1,
+          "iou": 1.0,
+          "intersection": 200,
+          "union": 200,
+          "target_ink": 200,
+          "predicted_ink": 200
+        },
+        {
+          "scalar": "U+F0C7",
+          "layer": 2,
+          "iou": 1.0,
+          "intersection": 24,
+          "union": 24,
+          "target_ink": 24,
+          "predicted_ink": 24
+        },
+        {
+          "scalar": "U+F0C9",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 240,
+          "union": 240,
+          "target_ink": 240,
+          "predicted_ink": 240
+        },
+        {
+          "scalar": "U+F0CE",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 572,
+          "union": 572,
+          "target_ink": 572,
+          "predicted_ink": 572
+        },
+        {
+          "scalar": "U+F0D1",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 436,
+          "union": 436,
+          "target_ink": 436,
+          "predicted_ink": 436
+        },
+        {
+          "scalar": "U+F0E0",
+          "layer": 0,
+          "iou": 1.0,
+          "intersection": 576,
+          "union": 576,
+          "target_ink": 576,
+          "predicted_ink": 576
+        },
+        {
+          "scalar": "U+F0E0",
+          "layer": 1,
+          "iou": 0.9803921580314636,
+          "intersection": 100,
+          "union": 102,
+          "target_ink": 100,
+          "predicted_ink": 102
+        },
+        {
+          "scalar": "U+F0E2",
+          "layer": 0,
+          "iou": 0.9942196607589722,
+          "intersection": 172,
+          "union": 173,
+          "target_ink": 173,
+          "predicted_ink": 172
+        },
+        {
+          "scalar": "U+F0E7",
+          "layer": 0,
+          "iou": 0.9457364082336426,
+          "intersection": 122,
+          "union": 129,
+          "target_ink": 123,
+          "predicted_ink": 128
+        },
+        {
+          "scalar": "U+F0EB",
+          "layer": 0,
+          "iou": 0.9798657894134521,
+          "intersection": 292,
+          "union": 298,
+          "target_ink": 292,
+          "predicted_ink": 298
+        },
+        {
+          "scalar": "U+F0F3",
+          "layer": 0,
+          "iou": 0.9872123003005981,
+          "intersection": 386,
+          "union": 391,
+          "target_ink": 386,
+          "predicted_ink": 391
+        },
+        {
+          "scalar": "U+F0F6",
+          "layer": 0,
+          "iou": 0.9946236610412598,
+          "intersection": 555,
+          "union": 558,
+          "target_ink": 555,
+          "predicted_ink": 558
+        },
+        {
+          "scalar": "U+F0F6",
+          "layer": 1,
+          "iou": 0.9710144996643066,
+          "intersection": 67,
+          "union": 69,
+          "target_ink": 67,
+          "predicted_ink": 69
+        },
+        {
+          "scalar": "U+F108",
+          "layer": 0,
+          "iou": 0.9976019263267517,
+          "intersection": 416,
+          "union": 417,
+          "target_ink": 416,
+          "predicted_ink": 417
+        },
+        {
+          "scalar": "U+F109",
+          "layer": 0,
+          "iou": 0.9950000047683716,
+          "intersection": 398,
+          "union": 400,
+          "target_ink": 398,
+          "predicted_ink": 400
+        }
+      ]
+    }
+  }
+}

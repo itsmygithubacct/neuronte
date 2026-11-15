@@ -30,6 +30,10 @@ RC9_SPLIT = $(SPLIT)
 RC9_FULL = weights/neuronte-full-v3
 RC9_ITALIC_SIZES = 3 4 5 6 7 8 9 13 15 17 19 21 23 25 27 29 31
 RC9_ITALIC_JSON = $(foreach em,$(RC9_ITALIC_SIZES),weights/neuronte-ui$(em)-italic-v0.json)
+# Narrower desktop faces for the faces drawn at H192 and H256 in v0: each a
+# new -v1 drawing file (one net and the same advances), both seeds exact.
+# The -v0 files stay as they were. See weights/neuronte-ui-v1-192-256.md.
+FACES_V1_192_256 = ui13-italic ui16 ui16-italic ui17 ui17-italic ui18 ui18-italic ui19-italic ui20-italic ui21-italic ui22 ui22-italic ui23 ui23-italic ui25 ui25-italic ui26 ui26-italic
 RC9_EMOJI = weights/neuronte-emoji-v0.nrt
 RC9_EMOJI_NETS = weights/neuronte-emoji-e0-v0.json weights/neuronte-emoji-e1-v0.json weights/neuronte-emoji-e2-v0.json
 RC9_NETS = $(NETS)
@@ -288,6 +292,22 @@ test-rc9-italics: all
 		$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing weights/neuronte-ui$$em-italic-v0.nrt weights/neuronte-ui$$em-italic-v0.json font/ui-$$em-italic.txt; \
 	done
 
+# Seed 0 is the packed -v1 file; seed 1 is packed into build/ and held to the same gate.
+test-faces-v1-192-256: build/libneuronte.so
+	@set -e; for f in $(FACES_V1_192_256); do \
+		t=font/$$(echo $$f | sed 's/^ui/ui-/').txt; \
+		$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing weights/neuronte-$$f-v1.nrt weights/neuronte-$$f-v1.json $$t; \
+		$(PYTHON) train/pack.py --drawing build/neuronte-$$f-v1.seed1.nrt weights/neuronte-$$f-v1.seed1.json $$t > /dev/null; \
+		$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing build/neuronte-$$f-v1.seed1.nrt weights/neuronte-$$f-v1.seed1.json $$t; \
+	done
+
+pack-faces-v1-192-256:
+	@set -e; for f in $(FACES_V1_192_256); do \
+		$(PYTHON) train/pack.py --drawing weights/neuronte-$$f-v1.nrt weights/neuronte-$$f-v1.json font/$$(echo $$f | sed 's/^ui/ui-/').txt; \
+	done
+
+.PHONY: test-faces-v1-192-256 pack-faces-v1-192-256
+
 test-rc9-emoji: all
 	$(PYTHON) tests/check_emoji.py build/libneuronte.so $(RC9_EMOJI) $(RC9_EMOJI_NETS) --manifest font/emoji-manifest.json --target-cache build/emoji-target-cache --out build/emoji-publication-check.json
 
@@ -422,7 +442,7 @@ test-symbol-v1: build/libneuronte.so build/test_api
 
 .PHONY: test-widths
 
-test: all $(TESTS) test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7 test-face-bundle test-symbol-v1 test-split-v7-symbol test-split-v8 test-faces-v1
+test: all $(TESTS) test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7 test-face-bundle test-symbol-v1 test-split-v7-symbol test-split-v8 test-faces-v1 test-faces-v1-192-256
 	cd weights && sha256sum -c --quiet SHA256SUMS
 	# The pointer net keeps its own list, with paths from the top of the tree.
 	sha256sum -c --quiet weights/neuronte-pointer-v0.sha256

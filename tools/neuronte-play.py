@@ -209,12 +209,23 @@ class Presenter:
         span = '' if natural else f'c={cols},r={rows},'
         head = f'a=T,f=24,s={w},v={h},i={new},p=1,{span}z=-1,C=1,q=2'
         out = [b'\x1b[?2026h', f'\x1b[{top};{left}H'.encode()]
-        names = []
-        if self.transport == 'shm':
-            names = self.publish([frame])
-            if names is None:
+        names = ()
+        if self.transport == 'shm':                 # one picture: publish() inlined, this runs every frame
+            slots = len(self.names)
+            for tries in range(slots):              # the terminal unlinks a name once it has read it
+                candidate = self.names[(self.slot + tries) % slots]
+                try:
+                    fd = os.open('/dev/shm/' + candidate, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+                except FileExistsError:
+                    continue
+                # Cropping an odd-width picture leaves strided rows. NumPy's
+                # strided tobytes walks individual elements; a contiguous
+                # buffer uses row copies and can be written without another copy.
+                with os.fdopen(fd, 'wb') as f: f.write(memoryview(np.ascontiguousarray(frame)))
+                names = (candidate,); self.slot = (self.slot + tries + 1) % slots; self.shm_bytes += frame.nbytes; break
+            if not names:
                 self.skipped += 1; return None
-            out.append(f'\x1b_G{head},t=s;'.encode() + base64.standard_b64encode(names[0].encode()) + b'\x1b\\')
+            out.append(f'\x1b_G{head},t=s;'.encode() + base64.standard_b64encode(candidate.encode()) + b'\x1b\\')
         else:
             data = base64.standard_b64encode(zlib.compress(memoryview(np.ascontiguousarray(frame)), 1))
             for start in range(0, len(data), 4096):
@@ -358,9 +369,9 @@ class Delta:
 
     def plan(self, samples, rows, cols, now):
         """now: the frame's time in the file, so a refresh falls on the same frames in every run."""
+        if self.rest: self.rest -= 1; return 'full'     # backing off: the common case when everything moves, so first
         if self.sent is None or self.sent.shape != samples.shape: return 'full'
         if self.refresh and now - self.full_at >= self.refresh: return 'full'
-        if self.rest: self.rest -= 1; return 'full'
         if not self.fresh: return 'full'        # the last whole picture was not kept (e.g. the terminal was busy)
         total = rows * cols
         if self.limit is None:                  # skip only: any change sends the whole picture
@@ -757,12 +768,13 @@ def main():
 
     blocks_frame = None
 
-    def draw_blocks(frame):
-        """draw_pixels(fitter.encode(...)) of a decoded frame. With a
-        block-structured ink map (the video masks) each sample is copied into
-        its block, the same bytes without the eight-colour records."""
+    def draw_blocks(frame, samples=None):
+        """draw_pixels(fitter.encode(...)) of a decoded frame (samples: the
+        frame already padded to whole cells). With a block-structured ink map
+        (the video masks) each sample is copied into its block, the same
+        bytes without the eight-colour records."""
         nonlocal blocks_frame
-        samples = pad_cells(frame, fitter)
+        if samples is None: samples = pad_cells(frame, fitter)
         if renderer.block is None:
             return draw_pixels(fitter.encode(samples))
         shape = (samples.shape[0] * renderer.block[0], samples.shape[1] * renderer.block[1], 3)
@@ -894,22 +906,22 @@ def main():
                     dropped += 1; record['dropped'] = True; read_time = 0.
                     if log: log.write(json.dumps(record) + '\n')
                     continue
-                commit = None
+                commit = picture = plan = None
                 if a.mode == 'pixels' and delta is not None:
                     t2 = time.perf_counter()
                     samples = pad_cells(frame, fitter)
                     plan = delta.plan(samples, geometry['r'], geometry['c'], pts)
-                    record['delta'] = 'unchanged' if plan is None else plan if plan == 'full' else 'partial'
-                    record['plan_ms'] = round((time.perf_counter() - t2) * 1e3, 3)
+                    if log:
+                        record['delta'] = 'unchanged' if plan is None else plan if plan == 'full' else 'partial'
+                        record['plan_ms'] = round((time.perf_counter() - t2) * 1e3, 3)
+                        if plan and plan != 'full': record['rects'] = len(plan)
                     if plan == 'full':
-                        picture = draw_blocks(frame); t3 = time.perf_counter()
-                        present = lambda picture=picture: present_pixels(picture)
+                        picture = draw_blocks(frame, samples); t3 = time.perf_counter()
+                        payload = present_pixels(picture)
                     else:
-                        if plan: record['rects'] = len(plan)
                         t3 = time.perf_counter()
-                        present = lambda samples=samples, plan=plan: present_delta(samples, plan)
-                    payload = present()
-                    commit = lambda samples=samples, plan=plan, pts=pts: delta.commit(samples, plan, pts)
+                        payload = present_delta(samples, plan)
+                    commit = (samples, plan, pts)
                 elif a.mode == 'pixels':
                     if a.pixel_size:
                         t2 = t1
@@ -918,8 +930,7 @@ def main():
                         t2 = time.perf_counter()
                         picture = draw_blocks(frame)
                     t3 = time.perf_counter()
-                    present = lambda picture=picture: present_pixels(picture)
-                    payload = present()
+                    payload = present_pixels(picture)
                 else:
                     if helper is not None:
                         k = helper.doc['inference']['candidates']
@@ -932,8 +943,9 @@ def main():
                 t4 = time.perf_counter()
                 pending = dict(payload=payload, pts=pts, record=record, commit=commit,
                                costs=(read_time, t2 - t1, t3 - t2, t4 - t3))
-                if payload is None and a.untimed:
-                    pending['present'] = present   # keep this frame until the consumer has space
+                if payload is None and a.untimed:   # keep this frame until the consumer has space
+                    pending['present'] = (lambda picture=picture: present_pixels(picture)) if picture is not None else \
+                                         (lambda samples=samples, plan=plan: present_delta(samples, plan))
                 read_time = 0.
             if not a.untimed and clock.time() < pending['pts']: continue
             payload, pts, record = pending['payload'], pending['pts'], pending['record']
@@ -952,7 +964,7 @@ def main():
             lateness = (clock.time() - pts) * 1e3
             wrote = time.perf_counter()
             out.write(payload); out.flush(); presenter.sent(); t5 = time.perf_counter(); shown += 1; wire += len(payload); late.append(lateness)
-            if pending['commit']: pending['commit']()
+            if pending['commit']: delta.commit(*pending['commit'])
             for name, value in zip(('read', 'fit', 'draw', 'pack'), pending['costs']):
                 cost[name] += value
                 record[name + '_ms'] = round(value * 1e3, 3)

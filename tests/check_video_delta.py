@@ -8,6 +8,7 @@ player's own decoder command and drawn as the pixels mode draws it.
 """
 import importlib.util
 import json
+import math
 import os
 import signal
 import subprocess
@@ -186,7 +187,9 @@ class Controls(unittest.TestCase):
         raw = subprocess.run(v.decoder_command(source, 16, 24, 30., start=0., exact_pixels=False)[:-1] + ['-'],
                              capture_output=True, check=True).stdout
         frames = np.frombuffer(raw, np.uint8).reshape(-1, 24, 16, 3)
-        return enlarge(frames[round(last['pts'] * 30)])
+        # A resize restarts the decoder at the clock's position, between two
+        # frames: the decoder then starts at the next frame, not the nearest.
+        return enlarge(frames[math.ceil(last['pts'] * 30 - 1e-3)])
 
     def play_timed(self, source, *options, keys=(), signals=(), timeout=60):
         cmd = [sys.executable, str(ROOT / 'tools/neuronte-play.py'), source, '--cols', '8', '--rows', '6', '--no-status',

@@ -23,6 +23,15 @@ Tiers:
              U+0100..U+017F and the spacing marks, made here from an
              ASCII letter and the marks in font/marks.txt, by the Unicode
              decomposition, or taken from font/letters.txt.
+    tsymbol  the terminal symbols split-v9 adds (TERMINAL_SYMBOLS): drawn
+             in font/symbols.txt below its terminal heading, and the
+             superscript and subscript digits, two fractions and two
+             ordinals made here from strokes.txt's digits and letters.
+    tletter  the letters split-v9 adds (TERMINAL_LETTERS): Greek with tonos
+             and dialytika and Cyrillic beyond Russian, made like the
+             accent tier from a letter and a mark, or taken from
+             font/letters.txt. The symbol and accent tiers leave both
+             lists out, so every set trained before is unchanged.
     ui1      the desktop face, printable ASCII and U+2026, from
     ...      font/ui-EM.txt, one file for every em from 1 to 128 except
     ui128    44. Stems are one pixel wide through 16, two from 17
@@ -38,7 +47,8 @@ Tiers:
              a pen 3/32 em wide, the 32 px drawing's three-pixel stem.
 
 Sets, each a list of tiers: ascii; draw (box, block, shade, braille);
-symbol; accent; full, which is all of those; and three sets for choosing
+symbol; accent; full, which is all of those; tsymbol, tletter and
+terminal (both); and three sets for choosing
 how the mosaics join the bundle: pixel (block, mosaic), pixelbraille
 (block, mosaic, braille) and boxshade (box, shade). The sets ui1 to
 ui128, except ui44, the italic sets ui3i to ui32i, and uilarge, are each their
@@ -557,13 +567,44 @@ def bottom_x(shapes, right=False):
     return max(xs) if right else (min(xs) + max(xs)) / 2
 
 
+def with_mark(letter, mark, base, marks, centre_x=CENTRE_X):
+    """The shapes of letter (None for a spacing mark alone) with mark."""
+    capital = letter is not None and letter.isupper()
+    if letter in CARON_BESIDE and mark == 0x30C:
+        mark, at = 0x315, CARON_BESIDE[letter]
+    elif letter in COMMA_BELOW and mark == 0x327:
+        mark = 0x326
+    elif letter in TURNED_COMMA and mark == 0x327:
+        mark = 0x312
+    if letter in DOTLESS and mark in ABOVE:
+        letter = DOTLESS[letter]
+    shapes = [] if letter is None else base[letter]
+    if mark in ABOVE:
+        shapes = shortened(shapes, capital)
+        if letter is None:
+            at = 0.5
+        elif letter in centre_x:
+            at = centre_x[letter]
+        else:
+            xs = [x for x, _ in points(shapes)]
+            at = (min(xs) + max(xs)) / 2
+        dy = -RAISE if capital else 0.0
+    elif mark in BELOW:
+        at = 0.5 if letter is None else bottom_x(shapes, right=mark == 0x328)
+        dy = 0.0
+    else:
+        dy = 0.0  # beside the stem, at the x chosen above
+    dx = at - 0.5
+    return shapes + moved(marks[mark], lambda x, y: (x + dx, y + dy))
+
+
 def accents():
     """{char: shapes} for the accent tier."""
     base = strokes.parse(strokes.STROKES)
     letters = strokes.parse(LETTERS)
     base.update(letters)
     marks = {ord(c): m for c, m in strokes.parse(MARKS).items()}
-    out = dict(letters)
+    out = {c: g for c, g in letters.items() if ord(c) not in TERMINAL}
     del out["\u0237"]  # dotless j is a base, not in the set: it is Latin Extended-B
     wanted = [c for c in range(0xC0, 0x180) if c != 0xD7] + sorted(SPACING)
     for c in wanted:
@@ -577,33 +618,107 @@ def accents():
             letter, mark = nfd[0], ord(nfd[1])
         else:
             raise ValueError(f"U+{c:04X} {unicodedata.name(ch)}: no rule; draw it in letters.txt")
-        capital = letter is not None and letter.isupper()
-        if letter in CARON_BESIDE and mark == 0x30C:
-            mark, at = 0x315, CARON_BESIDE[letter]
-        elif letter in COMMA_BELOW and mark == 0x327:
-            mark = 0x326
-        elif letter in TURNED_COMMA and mark == 0x327:
-            mark = 0x312
-        if letter in DOTLESS and mark in ABOVE:
-            letter = DOTLESS[letter]
-        shapes = [] if letter is None else base[letter]
-        if mark in ABOVE:
-            shapes = shortened(shapes, capital)
-            if letter is None:
-                at = 0.5
-            elif letter in CENTRE_X:
-                at = CENTRE_X[letter]
-            else:
-                xs = [x for x, _ in points(shapes)]
-                at = (min(xs) + max(xs)) / 2
-            dy = -RAISE if capital else 0.0
-        elif mark in BELOW:
-            at = 0.5 if letter is None else bottom_x(shapes, right=mark == 0x328)
-            dy = 0.0
-        else:
-            dy = 0.0  # beside the stem, at the x chosen above
-        dx = at - 0.5
-        out[ch] = shapes + moved(marks[mark], lambda x, y: (x + dx, y + dy))
+        out[ch] = with_mark(letter, mark, base, marks)
+    return out
+
+
+# The terminal characters split-v9 adds, in code point order. The symbol and
+# accent tiers leave them out; tsymbol and tletter are made of exactly these.
+TERMINAL_SYMBOLS = tuple(sorted(
+    [0x2713, 0x2715, 0x2716, 0x2717, 0x2718, 0x2611] +
+    [0x2194, 0x2195, 0x2196, 0x2198, 0x2199, 0x21A9, 0x21AA, 0x21B5, 0x21D0, 0x21D1, 0x21D2, 0x21D3, 0x21D4,
+     0x279C, 0x27A4, 0x25B6, 0x25C0, 0x25B4, 0x25C2] +
+    [0x25E6, 0x2023, 0x25CB, 0x25C7, 0x25A0, 0x25A1, 0x25AA, 0x25AB, 0x2605, 0x2606] +
+    [0xB1, 0x2212, 0x2264, 0x2265, 0x2260] +
+    [0xA2, 0xA3, 0xA5, 0x20AC, 0x20BD, 0x20B4, 0xB5, 0xAE, 0x2122] +
+    [0x2070, 0xB9, 0xB2, 0xB3] + list(range(0x2074, 0x207A)) + list(range(0x2080, 0x208A)) + [0xBC, 0xBE, 0xAA, 0xBA] +
+    [0x2039, 0xAB, 0xBB, 0x2020, 0x2021, 0xA7, 0xB6, 0xA1, 0xBF, 0xA6, 0xAC, 0x201E] +
+    [0x221E, 0x221A, 0x2211, 0x220F, 0x222B, 0x2202, 0x2206, 0x2207, 0x2208, 0x2209,
+     0x2229, 0x222A, 0x2282, 0x2283, 0x2286, 0x2287, 0x2227, 0x2228] +
+    [0x2387, 0x2630, 0x23CE, 0x2318, 0x2325, 0x21E7, 0x2303, 0x23F1, 0x26A0, 0x2116]))
+TERMINAL_LETTERS = tuple(sorted(
+    [0x386, 0x388, 0x389, 0x38A, 0x38C, 0x38E, 0x38F, 0x390, 0x3AA, 0x3AB,
+     0x3AC, 0x3AD, 0x3AE, 0x3AF, 0x3B0, 0x3CA, 0x3CB, 0x3CC, 0x3CD, 0x3CE] +
+    [0x400] + list(range(0x402, 0x410)) + [0x450] + list(range(0x452, 0x460)) + [0x490, 0x491]))
+TERMINAL = frozenset(TERMINAL_SYMBOLS + TERMINAL_LETTERS)
+
+# Scaled digits and letters. Strokes.txt's digits fill x 0.2..0.8 and y
+# 0.4..1.5; each copy keeps the pen, so it is a little bolder for its size.
+SUPERSCRIPT = {0x2070: "0", 0xB9: "1", 0xB2: "2", 0xB3: "3", **{0x2070 + d: str(d) for d in range(4, 10)}}
+SUBSCRIPT = {0x2080 + d: str(d) for d in range(10)}
+SCRIPT_SCALE, SUPER_TOP, SUB_TOP = 0.55, 0.36, 1.04
+FRACTIONS = {0xBC: "14", 0xBE: "34"}     # numerator, denominator, laid out as U+00BD
+FRACTION_SCALE = 0.5
+ORDINALS = {0xAA: "a", 0xBA: "o"}        # raised, smaller, underlined
+ORDINAL_SCALE = 0.6
+# Where marks above centre on Greek and Cyrillic smalls whose ends lean.
+TERMINAL_CENTRE_X = {**CENTRE_X, "\u03b1": 0.47, "\u03b9": 0.44, "\u03b5": 0.53}
+TERMINAL_DOTLESS = {"\u0456": "\u0131"}  # Ukrainian i takes its marks on the dotless i
+# A Greek capital with tonos, as monotonic Greek sets it: the letter narrowed
+# to the right of the cell, the tonos, a narrowed acute, before it at cap top.
+TONOS_RIGHT, TONOS_SQUEEZE, TONOS_X, TONOS_NARROW, TONOS_DY = 0.97, 0.72, 0.145, 0.6, 0.07
+
+
+def _scaled(shapes, k, cx, top, src_top=0.4):
+    return moved(shapes, lambda x, y: (cx + (x - 0.5) * k, top + (y - src_top) * k))
+
+
+def terminal_symbols():
+    """{char: shapes} for the tsymbol tier."""
+    drawn = strokes.parse(strokes.SYMBOLS)
+    digits = strokes.parse(strokes.STROKES)
+    out = {c: g for c, g in drawn.items() if ord(c) in TERMINAL}
+    made = {}
+    for cp, d in SUPERSCRIPT.items():
+        made[chr(cp)] = _scaled(digits[d], SCRIPT_SCALE, 0.5, SUPER_TOP)
+    for cp, d in SUBSCRIPT.items():
+        made[chr(cp)] = _scaled(digits[d], SCRIPT_SCALE, 0.5, SUB_TOP)
+    for cp, (num, den) in FRACTIONS.items():
+        k = FRACTION_SCALE
+        made[chr(cp)] = (_scaled(digits[num], k, 0.24, 0.4) + [("seg", 0.8, 0.45, 0.2, 1.45, None)] +
+                         _scaled(digits[den], k, 0.71, 1.5 - 1.1 * k))
+    for cp, letter in ORDINALS.items():
+        made[chr(cp)] = (_scaled(digits[letter], ORDINAL_SCALE, 0.5, 0.4, src_top=0.8) +
+                         [("seg", 0.28, 0.98, 0.72, 0.98, None)])
+    if set(out) & set(made):
+        raise ValueError("symbols.txt draws a terminal symbol glyphs.py makes")
+    out.update(made)
+    return out
+
+
+def terminal_letters():
+    """{char: shapes} for the tletter tier."""
+    base = strokes.parse(strokes.STROKES)
+    letters = strokes.parse(LETTERS)
+    base.update(letters)
+    marks = {ord(c): m for c, m in strokes.parse(MARKS).items()}
+    out = {c: g for c, g in letters.items() if ord(c) in TERMINAL_LETTERS}
+    for c in TERMINAL_LETTERS:
+        ch = chr(c)
+        if ch in out:
+            continue
+        nfd = unicodedata.normalize("NFD", ch)
+        letter, rest = nfd[0], [ord(m) for m in nfd[1:]]
+        if rest == [0x308, 0x301]:
+            rest = [0x344]   # dialytika and tonos, one mark
+        if letter not in base or len(rest) != 1 or rest[0] not in marks:
+            raise ValueError(f"U+{c:04X} {unicodedata.name(ch)}: no rule; draw it in letters.txt")
+        mark = rest[0]
+        if letter.isupper() and 0x391 <= ord(letter) <= 0x3A9 and mark == 0x301:
+            acute = marks[0x301]
+            mx = sum(x for x, _ in points(acute)) / len(list(points(acute)))
+            out[ch] = (moved(base[letter], lambda x, y: (TONOS_RIGHT - (TONOS_RIGHT - x) * TONOS_SQUEEZE, y)) +
+                       moved(acute, lambda x, y: (TONOS_X + (x - mx) * TONOS_NARROW, y + TONOS_DY)))
+            continue
+        if letter in TERMINAL_DOTLESS and mark in ABOVE:
+            letter = TERMINAL_DOTLESS[letter]
+        if mark == 0x344:  # placed as a mark above a small letter
+            shapes = shortened(base[letter], False)
+            xs = [x for x, _ in points(shapes)]
+            at = TERMINAL_CENTRE_X.get(letter, (min(xs) + max(xs)) / 2)
+            out[ch] = shapes + moved(marks[mark], lambda x, y: (x + at - 0.5, y))
+            continue
+        out[ch] = with_mark(letter, mark, base, marks, TERMINAL_CENTRE_X)
     return out
 
 
@@ -854,6 +969,9 @@ SETS = {
     "pixelbraille": ["block", "mosaic", "braille"],
     "boxshade": ["box", "shade"],
     "braille": ["braille"],
+    "tsymbol": ["tsymbol"],
+    "tletter": ["tletter"],
+    "terminal": ["tsymbol", "tletter"],
     **{f"ui{em}": [f"ui{em}"] for em in UI_TOP},
     **{f"ui{em}i": [f"ui{em}i"] for em in UI_ITALIC},
     "uilarge": ["uilarge"],
@@ -878,7 +996,7 @@ def tier(name):
     if name == "mosaic":
         return [(chr(c), lattice(*m)) for c, m in sorted(mosaics().items())]
     if name == "symbol":
-        sym = strokes.parse(strokes.SYMBOLS)
+        sym = {c: g for c, g in strokes.parse(strokes.SYMBOLS).items() if ord(c) not in TERMINAL}
         made = asterisks()
         if set(sym) & set(made):
             raise ValueError("symbols.txt draws an asterisk glyphs.py makes")
@@ -887,6 +1005,14 @@ def tier(name):
     if name == "accent":
         acc = accents()
         return [(c, acc[c]) for c in sorted(acc)]
+    if name in ("tsymbol", "tletter"):
+        made = terminal_symbols() if name == "tsymbol" else terminal_letters()
+        want = TERMINAL_SYMBOLS if name == "tsymbol" else TERMINAL_LETTERS
+        if sorted(map(ord, made)) != list(want):
+            missing = sorted(set(want) - set(map(ord, made)))
+            raise ValueError(f"{name}: the drawings and the list differ; missing "
+                             + " ".join(f"U+{c:04X}" for c in missing))
+        return [(c, made[c]) for c in sorted(made)]
     if name == "uilarge":
         g = strokes.parse(UI_LARGE)
         if sorted(g) != [chr(c) for c in range(32, 127)] + ["\u2026"]:
@@ -999,10 +1125,10 @@ def layer_seams(layers, n=160, delta=0.02, pen=0.075, allow=4):
 def sources(name):
     """The files the set is made from, for the weights' record."""
     tiers = SETS[name]
-    files = ["font/strokes.txt"] if "ascii" in tiers or "accent" in tiers else []
-    if "symbol" in tiers:
+    files = ["font/strokes.txt"] if {"ascii", "accent", "tsymbol", "tletter"} & set(tiers) else []
+    if "symbol" in tiers or "tsymbol" in tiers:
         files.append("font/symbols.txt")
-    if "accent" in tiers:
+    if "accent" in tiers or "tletter" in tiers:
         files += ["font/letters.txt", "font/marks.txt"]
     if "mosaic" in tiers:
         files.append("font/octants.txt")

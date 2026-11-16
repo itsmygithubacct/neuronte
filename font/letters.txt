@@ -171,3 +171,36 @@ U+044D E 5,11.5 3,3.5 225 495 | P 4.6,11.5 8,11.5
 U+044E P 1.5,8 1.5,15 | P 1.5,11.5 3.8,11.5 | E 6.2,11.5 2.4,3.5 0 360
 U+044F P 8,15 8,8 5,8 | E 5,9.8 2.8,1.8 270 90 | P 5,11.6 8,11.6 | P 5,11.6 2,15
 U+0451 P 2,11.5 8,11.5 | E 5,11.5 3,3.5 0 -310 | P 3.3,4.2 3.3,4.8 | P 6.7,4.2 6.7,4.8
+#
+# Cyrillic beyond Russian, for split-v9 (train/glyphs.py tier tletter).
+# Written for this project; no font was read. The accent tier above leaves
+# these out. Letters with a mark (U+0400, U+0403, U+0407, U+040C, U+040D,
+# U+040E and their smalls) are made by glyphs.py from these and marks.txt.
+# Dze, the Ukrainian I and Je have the strokes of S, I, J and s, i, j; the
+# small i here is dotted, and glyphs.py puts marks on the dotless i.
+U+0405 E 5,6.75 2.8,2.75 325 90 | E 5,12.25 3,2.75 270 505
+U+0406 P 3,4 7,4 | P 5,4 5,15 | P 3,15 7,15
+U+0408 P 4.5,4 7.5,4 7.5,12 | E 5,12 2.5,3 0 160
+U+0455 E 5,9.75 2.6,1.75 325 90 | E 5,13.25 2.8,1.75 270 505
+U+0456 P 3.5,8 5,8 5,15 | P 3.5,15 7,15 | P 5,4.7 5,5.3
+U+0458 P 4,8 6.5,8 6.5,16.5 | E 4,16.5 2.5,2.5 0 140 | P 6.5,4.7 6.5,5.3
+# Dje and Tshe: a T with a shoulder; Dje's leg ends in a hook. The smalls
+# are h with a bar across the ascender, like U+0127.
+U+0402 P 0.8,4 6.4,4 | P 3,4 3,15 | E 5.7,10.6 2.7,2.4 180 360 | P 8.4,10.6 8.4,14.2 | E 6.9,14.2 1.5,1.6 0 130
+U+040B P 0.8,4 6.4,4 | P 3,4 3,15 | E 5.7,10.6 2.7,2.4 180 360 | P 8.4,10.6 8.4,15
+U+0452 P 2,3.5 2,15 | E 5,11 3,3 180 360 | P 8,11 8,17.2 | E 6.5,17.2 1.5,1.6 0 140 | P 0.4,5.6 4.6,5.6
+U+045B P 2,3.5 2,15 | E 5,11 3,3 180 360 | P 8,11 8,15 | P 0.4,5.6 4.6,5.6
+# Ukrainian Ie: Es with a bar.
+U+0404 E 5,9.5 3,5.5 40 320 | P 2,9.5 6,9.5
+U+0454 E 5,11.5 3,3.5 45 315 | P 2,11.5 6,11.5
+# Lje and Nje: El and En joined to the bowl of the soft sign.
+U+0409 P 0.4,14.9 1.2,14 1.8,10 2,4 5.2,4 5.2,15 7,15 | E 7,12.1 2.4,2.9 270 450 | P 5.2,9.2 7,9.2
+U+040A P 1,4 1,15 | P 1,9.2 5.2,9.2 | P 5.2,4 5.2,15 7,15 | E 7,12.1 2.4,2.9 270 450 | P 5.2,9.2 7,9.2
+U+0459 P 0.4,14.9 1.2,14.2 1.8,11.5 2,8 5.2,8 5.2,15 7,15 | E 7,13.2 2.4,1.8 270 450 | P 5.2,11.4 7,11.4
+U+045A P 1,8 1,15 | P 1,11.4 5.2,11.4 | P 5.2,8 5.2,15 7,15 | E 7,13.2 2.4,1.8 270 450 | P 5.2,11.4 7,11.4
+# Dzhe: a box open at the top, with a tail from the middle of its foot.
+U+040F P 2,4 2,15 8,15 8,4 | P 5,15 5,17.6
+U+045F P 2,8 2,15 8,15 8,8 | P 5,15 5,17.6
+# Ghe with upturn: Ghe whose bar turns up at its end.
+U+0490 P 2,15 2,4 7.6,4 7.6,1.8
+U+0491 P 2.5,15 2.5,8 7.5,8 7.5,5.8

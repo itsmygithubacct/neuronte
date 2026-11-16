@@ -523,7 +523,9 @@ class Video(unittest.TestCase):
         import shutil,threading,time
         if not shutil.which('ffmpeg') or not shutil.which('ffprobe'):self.skipTest('ffmpeg is not installed')
         cmd=[sys.executable,str(ROOT/'tools/neuronte-play.py'),source or 'color=c=red:size=32x48:rate=10[a];color=c=blue:size=32x48:rate=10[b];[a][b]hstack']
-        cmd+=([] if source else ['--lavfi'])+(['--cols','6','--rows','3'] if grid else [])+['--no-status',*args]
+        # These tests are about sending and timing whole pictures, so every
+        # frame is sent whole (change-only output is tested in check_video_delta.py).
+        cmd+=([] if source else ['--lavfi'])+(['--cols','6','--rows','3'] if grid else [])+['--no-status','--skip-threshold','off',*args]
         env=dict(os.environ,COLUMNS='80',LINES='24');env.pop('KITTY_WINDOW_ID',None)
         if extra_env:env.update(extra_env)
         r,w=os.pipe()
@@ -1050,7 +1052,7 @@ class Video(unittest.TestCase):
                 r,w=os.pipe()
                 cmd=[sys.executable,str(ROOT/'tools/neuronte-play.py'),'color=c=red:size=32x48:rate=10',
                      '--lavfi','--cols','6','--rows','3','--no-status','--untimed','--frames','8',
-                     '--transport','shm','--input-fd',str(r)]
+                     '--transport','shm','--skip-threshold','off','--input-fd',str(r)]
                 env=dict(os.environ,COLUMNS='80',LINES='24');env.pop('KITTY_WINDOW_ID',None)
                 child=subprocess.Popen(cmd,stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.PIPE,env=env,pass_fds=[r])
                 os.close(r);procs.append(child);pipes.append(w)

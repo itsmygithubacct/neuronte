@@ -13,8 +13,9 @@ time are dropped instead of slowing playback down.
           cell; the result is sent with the kitty graphics protocol, so it
           needs a terminal that has it. --pixel-size instead draws at 2 x 4
           pixels a cell, retaining each decoded sample at natural size.
-          --skip-threshold and --partial-limit (off by default) send
-          nothing for an unchanged frame, or only the changed rectangle.
+          By default a frame that has not visibly changed is not sent,
+          and in kitty or Kilix only the changed rectangle of a frame is;
+          --skip-threshold off sends every frame whole.
   cells   one character and two colours per cell, written as ordinary
           truecolour text, so the terminal's own font draws it. This is an
           exhaustive search and shows a few frames a second at best.
@@ -149,6 +150,21 @@ def pad_cells(frame, fitter):
     if bottom or right:
         return np.pad(frame, ((0, bottom), (0, right), (0, 0)), mode='edge')
     return frame
+
+
+DEFAULT_THRESHOLD, DEFAULT_PARTIAL_LIMIT = 4, 0.25
+
+
+def level_or_off(value):
+    if value == 'off': return value
+    try: return int(value)
+    except ValueError: raise argparse.ArgumentTypeError('expected a whole number of levels or off')
+
+
+def fraction_or_off(value):
+    if value == 'off': return value
+    try: return float(value)
+    except ValueError: raise argparse.ArgumentTypeError('expected a fraction or off')
 
 
 def shared_memory_reaches_terminal():
@@ -653,24 +669,34 @@ def main():
     p.add_argument('--input-fd', type=int, help='read keys from this descriptor instead of the terminal')
     p.add_argument('--log', help='write one JSON line of timings per source frame')
     p.add_argument('--stats', help='write a JSON summary at the end')
-    p.add_argument('--skip-threshold', type=int, metavar='LEVELS',
+    p.add_argument('--skip-threshold', type=level_or_off, metavar='LEVELS',
                    help='pixels mode: send nothing for a frame in which no sample differs from what was last sent '
-                        'by more than this many levels in any channel (0: only identical frames); default off')
-    p.add_argument('--partial-limit', type=float, metavar='FRACTION',
+                        'by more than this many levels in any channel (0: only identical frames; off: send every '
+                        f'frame whole); default {DEFAULT_THRESHOLD} (off with --pixel-size)')
+    p.add_argument('--partial-limit', type=fraction_or_off, metavar='FRACTION',
                    help='with --skip-threshold: when the changed cells fit in rectangles covering at most this '
-                        'fraction of the picture, write only those into the picture on screen; default off')
+                        'fraction of the picture, write only those into the picture on screen; default '
+                        f'{DEFAULT_PARTIAL_LIMIT} in kitty or Kilix, off elsewhere')
     p.add_argument('--partial-rects', type=int, default=1, metavar='N',
                    help='--partial-limit: at most this many rectangles a frame (default: 1)')
     p.add_argument('--refresh', type=float, default=10., metavar='SECONDS',
                    help='with --skip-threshold: send the whole picture at least once in this many seconds of video (default: 10; 0: never)')
     p.add_argument('--weights'); p.add_argument('--library')
     a = p.parse_args()
-    if a.skip_threshold is not None:
-        if a.mode != 'pixels' or a.pixel_size: p.error('--skip-threshold requires pixels mode without --pixel-size')
+    # Change-only output is the default of the pixels mode: None means the
+    # option was not given, 'off' turns it off.
+    whole = a.mode != 'pixels' or bool(a.pixel_size)
+    if a.skip_threshold not in (None, 'off'):
+        if whole: p.error('--skip-threshold requires pixels mode without --pixel-size')
         if not 0 <= a.skip_threshold <= 255: p.error('--skip-threshold must be from 0 to 255')
-    if a.partial_limit is not None:
-        if a.skip_threshold is None: p.error('--partial-limit requires --skip-threshold')
+    if a.skip_threshold is None: a.skip_threshold = 'off' if whole else DEFAULT_THRESHOLD
+    if a.partial_limit not in (None, 'off'):
+        if a.skip_threshold == 'off': p.error('--partial-limit requires --skip-threshold')
         if not 0 < a.partial_limit <= 1: p.error('--partial-limit must be above 0 and at most 1')
+    if a.partial_limit is None:   # frame edits are known to work in kitty and Kilix
+        a.partial_limit = DEFAULT_PARTIAL_LIMIT if a.skip_threshold != 'off' and os.environ.get('KITTY_WINDOW_ID') else 'off'
+    if a.skip_threshold == 'off': a.skip_threshold = None
+    if a.partial_limit == 'off': a.partial_limit = None
     if not 1 <= a.partial_rects <= 16: p.error('--partial-rects must be from 1 to 16')
     if not a.refresh >= 0: p.error('--refresh must be nonnegative')
     if a.pixel_size and (a.mode != 'pixels' or a.cols is not None or a.rows is not None):

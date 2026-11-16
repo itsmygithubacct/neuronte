@@ -100,23 +100,26 @@ inline`, they are compressed and sent through the terminal's own stream.
 
 ### Sending only what changed
 
-By default every frame of the pixels mode is a new picture. Three options,
-all off by default and only for the default pixels mode (not `--pixel-size`
-or cells), send less when little changes:
+The pixels mode (not `--pixel-size` or cells) sends less when little
+changes. By default a frame in which no sample has moved by more than 4
+levels is not sent at all, and in kitty or Kilix (`KITTY_WINDOW_ID` is set)
+a frame whose changes fit in a quarter of the picture is sent as an edit of
+that rectangle only. `--skip-threshold off` sends every frame whole as a new
+picture; `--partial-limit off` keeps the skipping but not the edits.
 
-- `--skip-threshold LEVELS` (0 to 255). The player keeps the decoded
-  samples it last sent to the terminal (two by four a cell). A cell has
+- `--skip-threshold LEVELS` (0 to 255, or `off`; default 4). The player
+  keeps the decoded samples it last sent to the terminal (two by four a cell). A cell has
   changed when any of its samples differs from what was sent by more than
   LEVELS in any colour channel. When no cell has changed, nothing is sent:
   the frame still counts as shown, and `--log` records it as `unchanged`
-  with no bytes. Otherwise the whole picture is sent exactly as without the
-  option. Comparing with what was sent, not with the frame before, means
+  with no bytes. Otherwise the whole picture is sent exactly as with `off`. Comparing with what was sent, not with the frame before, means
   small differences cannot add up: every sample on the screen stays within
   LEVELS of the true frame, however long the video. With 0 only identical
   frames are skipped, and the picture on the screen after every frame is
-  byte for byte what it is without the option.
-- `--partial-limit FRACTION` (with `--skip-threshold`). When the changed
-  cells fit in one rectangle (`--partial-rects N` allows up to N) covering
+  byte for byte what it is with `off`.
+- `--partial-limit FRACTION` (above 0 to 1, or `off`; default 0.25 in kitty
+  or Kilix, off elsewhere, since other terminals' frame editing has not been
+  tested; needs `--skip-threshold`). When the changed cells fit in one rectangle (`--partial-rects N` allows up to N) covering
   at most FRACTION of the picture's cells, only that rectangle is drawn and
   written into the picture already on the screen, as frame data loaded into
   frame 1 of the existing image (kitty graphics `a=f,r=1` with `x` and `y`),
@@ -153,7 +156,8 @@ in total, from its first source frame to the end, and its ffmpeg decoder).
 
 Measured on an i7-6820HQ and an i7-10700F (20 s generated clips, 960 × 540
 at 30 frames a second, the player's processor time a frame as a share of
-today's player; bytes likewise). `--skip-threshold 4 --partial-limit 0.25`:
+`--skip-threshold off`; bytes likewise), with the defaults (threshold 4,
+partial limit 0.25):
 
 | Clip | 240 × 67 time | bytes | 80 × 24 time | bytes |
 |---|---:|---:|---:|---:|
@@ -168,9 +172,9 @@ recording (a clock, the cursor, typing) often do not fit one rectangle, so
 there the saving at threshold 0 is about a tenth. Two rectangles
 (`--partial-rects 2`) save at most a few hundredths more and cost up to
 1.2 times as much on video in which every cell changes, because the early
-stop on the rectangle's size needs a single rectangle. The options stay off
-by default: video in which everything moves gains nothing and, at 80 × 24,
-costs a few hundredths more.
+stop on the rectangle's size needs a single rectangle. Video in which
+everything moves gains nothing and, at 80 × 24, can cost a few hundredths
+more; for such video `--skip-threshold off` is the cheapest.
 
 For a comparison at a fixed pixel resolution, use
 `python3 tools/neuronte-play.py FILE --pixel-size 945x531 --no-status`.

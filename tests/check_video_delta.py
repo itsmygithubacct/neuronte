@@ -1,5 +1,7 @@
 """Change-only output of the player's default pixels mode: --skip-threshold,
---partial-limit, --partial-rects and --refresh.
+--partial-limit, --partial-rects and --refresh, on by default (threshold 4,
+and in kitty or Kilix partial limit 0.25); --skip-threshold off sends every
+frame whole, which the tests call today's picture.
 
 Every playback test runs the real player and reads its output with a model
 of the terminal (tests/kitty_model.py), then compares the picture the
@@ -88,7 +90,7 @@ class Playback(unittest.TestCase):
     def test_threshold_zero_holds_todays_picture_after_every_frame(self):
         frames = 90
         for transport in ('shm', 'inline'):
-            today = held(*run(MOVING, '--transport', transport, frames=frames)[:2])
+            today = held(*run(MOVING, '--transport', transport, '--skip-threshold', 'off', frames=frames)[:2])
             truth = reference(MOVING, 8, 6, frames)
             for picture, samples in zip(today, truth):
                 np.testing.assert_array_equal(picture, enlarge(samples))
@@ -373,9 +375,32 @@ class Units(unittest.TestCase):
             finally:
                 presenter.close(drain=0)
 
+    @unittest.skipUnless(NEEDS, 'ffmpeg is not installed')
+    def test_defaults(self):
+        def settings(*options, kitty=False):
+            with tempfile.TemporaryDirectory() as temp:
+                stats = Path(temp) / 'stats'
+                environment = dict(os.environ, COLUMNS='80', LINES='24'); environment.pop('KITTY_WINDOW_ID', None)
+                if kitty: environment['KITTY_WINDOW_ID'] = '1'
+                subprocess.run([sys.executable, str(ROOT / 'tools/neuronte-play.py'), 'color=c=gray:size=16x24:rate=30', '--lavfi',
+                                '--no-status', '--untimed', '--frames', '5', '--transport', 'inline', '--stats', str(stats), *options],
+                               stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, stdin=subprocess.DEVNULL, env=environment, check=True)
+                delta = json.loads(stats.read_text()).get('delta')
+                return delta and (delta['threshold'], delta['partial_limit'])
+        self.assertEqual(settings('--cols', '8', '--rows', '6', kitty=True), (4, 0.25))      # kitty or Kilix: frame edits too
+        self.assertEqual(settings('--cols', '8', '--rows', '6'), (4, None))                 # elsewhere: unchanged frames only
+        self.assertEqual(settings('--cols', '8', '--rows', '6', '--partial-limit', '.5'), (4, 0.5))
+        self.assertEqual(settings('--cols', '8', '--rows', '6', '--skip-threshold', '0', kitty=True), (0, 0.25))
+        self.assertEqual(settings('--cols', '8', '--rows', '6', '--skip-threshold', 'off', kitty=True), None)
+        self.assertEqual(settings('--cols', '8', '--rows', '6', '--skip-threshold', '4', '--partial-limit', 'off', kitty=True), (4, None))
+        self.assertEqual(settings('--pixel-size', '16x24', kitty=True), None)
+        self.assertEqual(settings('--cols', '8', '--rows', '6', '--mode', 'cells', kitty=True), None)
+
     def test_options_are_checked(self):
         for options, message in [(['--skip-threshold', '256'], b'from 0 to 255'), (['--skip-threshold', '-1'], b'from 0 to 255'),
-                                 (['--partial-limit', '.5'], b'requires --skip-threshold'),
+                                 (['--skip-threshold', 'off', '--partial-limit', '.5'], b'requires --skip-threshold'),
+                                 (['--skip-threshold', 'some'], b'whole number of levels or off'),
+                                 (['--partial-limit', 'half'], b'a fraction or off'),
                                  (['--skip-threshold', '0', '--partial-limit', '0'], b'above 0'),
                                  (['--skip-threshold', '0', '--partial-limit', '1.5'], b'above 0'),
                                  (['--skip-threshold', '0', '--partial-rects', '0'], b'from 1 to 16'),

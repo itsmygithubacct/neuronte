@@ -90,4 +90,31 @@ with tempfile.TemporaryDirectory(prefix='known-bundle-') as tmp:
  h=opened(candidate)
  try:assert lib.neuronte_route(h,0x400)==1
  finally:lib.neuronte_close(h)
-print('check_known_bundle: exact known pixels, original unknown/unrelated routing and pixels, partial/no-gate cases, malformed inputs passed')
+ # add_known: nets for scalars with no table row; everything else routes and draws as before.
+ extra=[]
+ for i,lab in enumerate(('U+2713 U+2717','U+0386 U+0388..U+038A')):
+  doc=json.loads(paths[0].read_text());doc['training']['labelled']=lab
+  doc['layers']['out']['bias']=[.05*(i+1)]
+  q=directory/f'extra{i}.json';q.write_text(json.dumps(doc));extra.append(q)
+ added,info=known_bundle.add_known(combined,extra)
+ assert info['added_scalars']==6 and info['members']==10
+ assert info['original_member_sha256']==[known_bundle.digest(m) for m in known_bundle._parse(combined,1)[-1]]
+ before,after=opened(combined),opened(added)
+ extras=[opened(pack.pack(str(q))) for q in extra]
+ try:
+  for i,cs in enumerate(((0x2713,0x2717),(0x386,0x388,0x389,0x38a))):
+   for c in cs:
+    assert lib.neuronte_route(after,c)==8+i
+    assert coverage(after,c)==coverage(extras[i],c)
+  for c in codes|set(range(32,127))|{0x2712,0x2714,0x2716,0x2718,0x387,0x38b}:
+   if c in (0x2713,0x2717,0x386,0x388,0x389,0x38a):continue
+   assert lib.neuronte_route(after,c)==lib.neuronte_route(before,c)
+  for c in sorted(codes)[::97]+list(range(32,127)):
+   assert coverage(after,c)==coverage(before,c)
+ finally:
+  for h in [before,after,*extras]:lib.neuronte_close(h)
+ for bad in ([paths[0]],extra+[extra[0]]):
+  try:known_bundle.add_known(combined,bad)
+  except ValueError:pass
+  else:raise AssertionError('addition of a tabled or repeated scalar accepted')
+print('check_known_bundle: exact known pixels, original unknown/unrelated routing and pixels, partial/no-gate cases, malformed inputs, add_known passed')

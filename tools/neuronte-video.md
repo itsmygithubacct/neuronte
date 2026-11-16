@@ -152,19 +152,25 @@ written to shared memory) and `cpu_s` (the player's processor seconds:
 in total, from its first source frame to the end, and its ffmpeg decoder).
 
 Measured on an i7-6820HQ and an i7-10700F (20 s generated clips, 960 × 540
-at 30 frames a second, the player's processor time a frame against the
-player without the options; the two hosts agree to a few hundredths):
-`--skip-threshold 4 --partial-limit 0.25` costs 0.33 to 0.36 of the time
-and sends 0.11 of the bytes on a screen recording at 240 × 67 cells (0.56
-to 0.60 and 0.06 at 80 × 24), and 0.25 to 0.28 of the time and 0.05 of the
-bytes on still shots with a caption (0.41 to 0.45 and 0.02 at 80 × 24).
-With threshold 0 the pictures are exact and still shots cost 0.29 to 0.31
-of the time at 240 × 67, but scattered small changes on a screen recording
-(a clock, the cursor, typing) often do not fit one rectangle, so the screen
-saves only about a tenth. Video in which every cell changes (camera noise,
-film grain, a moving camera) gains nothing and costs 1.00 to 1.02 of the
-time at 240 × 67 and up to about 1.05 at 80 × 24. So the options stay off
-by default; they suit screen recordings, slides and edited still shots.
+at 30 frames a second, the player's processor time a frame as a share of
+today's player; bytes likewise). `--skip-threshold 4 --partial-limit 0.25`:
+
+| Clip | 240 × 67 time | bytes | 80 × 24 time | bytes |
+|---|---:|---:|---:|---:|
+| fixed camera, one person walking | 0.27–0.31 | 0.03 | 0.59–0.61 | 0.02 |
+| screen recording | 0.34–0.38 | 0.11 | 0.57–0.60 | 0.06 |
+| still shots with a caption | 0.26–0.30 | 0.05 | 0.41–0.45 | 0.02 |
+| moving camera, motion graphics, grain | 1.00–1.02 | 1.00 | 0.99–1.04 | 0.72–1.00 |
+
+With threshold 0 the pictures are exact and the fixed camera still costs
+0.33 to 0.38 of the time at 240 × 67. Scattered small changes on a screen
+recording (a clock, the cursor, typing) often do not fit one rectangle, so
+there the saving at threshold 0 is about a tenth. Two rectangles
+(`--partial-rects 2`) save at most a few hundredths more and cost up to
+1.2 times as much on video in which every cell changes, because the early
+stop on the rectangle's size needs a single rectangle. The options stay off
+by default: video in which everything moves gains nothing and, at 80 × 24,
+costs a few hundredths more.
 
 For a comparison at a fixed pixel resolution, use
 `python3 tools/neuronte-play.py FILE --pixel-size 945x531 --no-status`.

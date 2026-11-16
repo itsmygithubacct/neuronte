@@ -1,5 +1,51 @@
 # Changes
 
+## 0.1.4
+
+Every file of 0.1.3 is still here byte for byte and draws the same pixels
+and advances. No default changes: `neuronte-split-v5` stays the terminal
+font and the hand-drawn desktop faces stay the faces. The library's own
+sha256 changes, so caches keyed by it are rebuilt once.
+
+### New nets
+
+- `neuronte-split-v9`: split-v8 with 165 more terminal characters on
+  fourteen group nets: 113 symbols (check and cross marks, arrows, bullets
+  and shapes, `± ≤ ≥ ≠`, currency, superscripts and fractions, math
+  operators), 20 Greek letters with tonos and dialytika, and 32 Cyrillic
+  letters beyond Russian. Every character split-v8 draws, and every
+  character neither was trained on, draws exactly as in split-v8. The new
+  characters draw about 4.6 times as fast as split-v8 drew them from its
+  fallback. **Every new group missed the limits declared for it before
+  training**; they ship by the owner's choice after a side-by-side review,
+  and [the card](weights/neuronte-split-v9.md) says where each missed.
+- `neuronte-ui-scaled-v0`: one desktop face for every size from 17 to
+  32 px, the strokes of the large face with stems snapped to whole pixels,
+  in a file of 1.8 MB. Italic is the same letters sheared as they are
+  drawn, with `neuronte-ui-scaled-italic-advances-v0`. It is a different
+  face from the hand-drawn ones for those sizes, not a copy: about a third
+  of the advances differ, by at most 2 px.
+  [Card](weights/neuronte-ui-scaled-v0.md).
+- `neuronte-ui-large-v1`: the face above 32 px as four smaller nets, about
+  13 times as fast the first time a size is used, with the advances of
+  `neuronte-ui-large-v0`. **It missed the overlap limit declared for it**
+  (at 32 px, and on its worst letter at 48 and 96 px) and ships by the
+  owner's decision. [Card](weights/neuronte-ui-large-v1.md).
+- `neuronte-ui-scaled-latin1-v0` and `neuronte-ui-large-latin1-v1`: the
+  same two faces with the 58 accented letters from U+00C0 to U+00FF. Their
+  ASCII letters are the ASCII-only files' exactly.
+
+### Library
+
+- A drawing file may carry a table of letter edges (format version 7);
+  the library snaps those stems to whole pixels below the file's cell
+  width, as it already did for colour glyphs. A file without the table
+  draws as before. An older library refuses a file with one.
+- `neuronte_untrained()` tells a program whether a bundle was trained on a
+  character, and `neuronte_set_untrained()` makes the library draw a mark
+  in place of an untrained one. It is off unless asked for: by default an
+  untrained character is still drawn by whichever net the gate picks.
+
 ## 0.1.3
 
 No weight file changed, and the code that runs the nets is unchanged: every

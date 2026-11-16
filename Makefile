@@ -552,6 +552,78 @@ test-emoji-v1: all
 
 .PHONY: pack-emoji-v1 test-emoji-v1
 
+# Letter edge tables (drawing member version 7): snapped letters against a
+# float64 reference, everything else byte for byte the file without one.
+test-letter-snap: build/libneuronte.so
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_letter_snap.py build/libneuronte.so
+
+.PHONY: test-letter-snap
+
+# The scalable desktop face for 17 to 32 px (weights/neuronte-ui-scaled-v0.md):
+# both seeds repack to the packer's bytes (seed 0 is the shipped file),
+# every snapped letter matches the float64 reference at every em from 8 to
+# 32, and from 33 px it draws as the same nets without the letter table.
+UI_SCALED = weights/neuronte-ui-scaled-v0
+UI_SCALED_G = 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
+test-ui-scaled: build/libneuronte.so
+	@set -e; mkdir -p build/ui-scaled; \
+	for seed in "" .seed1; do \
+		m=""; for g in $(UI_SCALED_G); do m="$$m $(UI_SCALED)$$seed-g$$g.json"; done; \
+		$(PYTHON) train/pack.py --drawing-bundle build/ui-scaled/face$$seed.nrt font/ui-scaled-advances.txt $$m \
+			--letter-edges uilarge --snap-below 33 > /dev/null; \
+		OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_letter_snap.py build/libneuronte.so build/ui-scaled/face$$seed.nrt \
+			font/ui-scaled-advances.txt uilarge 33 off $$m; \
+	done; \
+	cmp build/ui-scaled/face.nrt $(UI_SCALED).nrt; \
+	$(PYTHON) train/pack.py --advances font/ui-scaled-italic-advances.txt build/ui-scaled/italic.nrt > /dev/null; \
+	cmp build/ui-scaled/italic.nrt weights/neuronte-ui-scaled-italic-advances-v0.nrt; \
+	echo "test-ui-scaled: passed"
+
+.PHONY: test-ui-scaled
+
+# The large face v1, 33 px and up (weights/neuronte-ui-large-v1.md): both
+# seeds repack to the packer's bytes and pass the float64 reference check.
+UI_LARGE_V1 = weights/neuronte-ui-large-v1
+test-ui-large-v1: build/libneuronte.so
+	@set -e; mkdir -p build/ui-large-v1; \
+	for seed in "" .seed1; do \
+		m=""; for g in 0 1 2 3; do m="$$m $(UI_LARGE_V1)$$seed-g$$g.json"; done; \
+		$(PYTHON) train/pack.py --drawing-bundle build/ui-large-v1/face$$seed.nrt font/ui-large-advances.txt $$m > /dev/null; \
+		$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle build/ui-large-v1/face$$seed.nrt \
+			font/ui-large-advances.txt $$m; \
+	done; \
+	cmp build/ui-large-v1/face.nrt $(UI_LARGE_V1).nrt; \
+	echo "test-ui-large-v1: passed"
+
+.PHONY: test-ui-large-v1
+
+# The same two faces with the Latin-1 letters ui-large composes
+# (train/glyphs.py large_latin1; 2 nets 192 wide, weights/neuronte-ui-latin1-v0-gG.json):
+# both seeds repack; the 17 to 32 px face's snapped letters match the float64
+# reference; the large face passes the reference check.
+UI_LATIN1 = weights/neuronte-ui-latin1-v0
+test-ui-latin1: build/libneuronte.so
+	@set -e; mkdir -p build/ui-latin1; \
+	for seed in "" .seed1; do \
+		x=""; for g in 0 1; do x="$$x $(UI_LATIN1)$$seed-g$$g.json"; done; \
+		m=""; for g in $(UI_SCALED_G); do m="$$m $(UI_SCALED)$$seed-g$$g.json"; done; \
+		$(PYTHON) train/pack.py --drawing-bundle build/ui-latin1/scaled$$seed.nrt font/ui-scaled-latin1-advances.txt $$m $$x \
+			--letter-edges uilargex --snap-below 33 > /dev/null; \
+		OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_letter_snap.py build/libneuronte.so build/ui-latin1/scaled$$seed.nrt \
+			font/ui-scaled-latin1-advances.txt uilargex 33 off $$m $$x; \
+		m=""; for g in 0 1 2 3; do m="$$m $(UI_LARGE_V1)$$seed-g$$g.json"; done; \
+		$(PYTHON) train/pack.py --drawing-bundle build/ui-latin1/large$$seed.nrt font/ui-large-latin1-advances.txt $$m $$x > /dev/null; \
+		$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle build/ui-latin1/large$$seed.nrt \
+			font/ui-large-latin1-advances.txt $$m $$x; \
+	done; \
+	cmp build/ui-latin1/scaled.nrt weights/neuronte-ui-scaled-latin1-v0.nrt; \
+	cmp build/ui-latin1/large.nrt weights/neuronte-ui-large-latin1-v1.nrt; \
+	$(PYTHON) train/pack.py --advances font/ui-scaled-latin1-italic-advances.txt build/ui-latin1/italic.nrt > /dev/null; \
+	cmp build/ui-latin1/italic.nrt weights/neuronte-ui-scaled-latin1-italic-advances-v0.nrt; \
+	echo "test-ui-latin1: passed"
+
+.PHONY: test-ui-latin1
+
 test-split-v7-symbol: build/libneuronte.so build/test_api
 	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_split_v7_symbol.py build/libneuronte.so
 	./build/test_api weights/neuronte-split-v7-symbol-v1.nrt --full --accent --pixel
@@ -621,7 +693,7 @@ test-bits: build/libneuronte.so
 	$(PYTHON) tests/check_bits.py build/libneuronte.so
 .PHONY: test-bits
 
-test: all $(TESTS) test-bits test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7 test-face-bundle test-symbol-v1 test-split-v7-symbol test-split-v8 test-split-v9 test-faces-v1 test-faces-v1-192-256 test-known-bundle test-untrained test-faces-wide-v1 test-faces-v1-h512 test-colour-marks test-faces-v1-small test-emoji-v1
+test: all $(TESTS) test-bits test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7 test-face-bundle test-symbol-v1 test-split-v7-symbol test-split-v8 test-split-v9 test-faces-v1 test-faces-v1-192-256 test-known-bundle test-untrained test-faces-wide-v1 test-faces-v1-h512 test-colour-marks test-faces-v1-small test-emoji-v1 test-letter-snap test-ui-scaled test-ui-large-v1 test-ui-latin1
 	cd weights && sha256sum -c --quiet SHA256SUMS
 	# The pointer net keeps its own list, with paths from the top of the tree.
 	sha256sum -c --quiet weights/neuronte-pointer-v0.sha256

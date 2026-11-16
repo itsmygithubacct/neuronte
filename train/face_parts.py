@@ -3,6 +3,7 @@
 usage: python3 train/face_parts.py OUT_DIR --set ui24 [--groups K] [--band]
                                    [--width W] [--steps N] [--seeds 0,1]
                                    [--device cuda] [--log-every N]
+                                   [--candidates M --uniform U --near K --clamp C] [--pen R]
 
 A face set (uiEM, uiEMi or uilarge, train/glyphs.py) is cut two ways.
 
@@ -16,7 +17,8 @@ design cell (0..1 across, 0..2 down) is cut into three row tiles of a
 version 6 tiled net: above the ink, the ink band and below it. For a
 pixel face the band is the em rows from UI_TOP[em]: y from UI_TOP / em to
 (UI_TOP + em) / em, which fall on whole pixel rows at the face's em. For
-uilarge it is BAND_LARGE, chosen to hold all of the ink. The tiles above
+uilarge, and its composed Latin-1 sets uilargex and uilargel1, it is
+BAND_LARGE, chosen to hold all of the ink. The tiles above
 and below are drawn by EMPTY, a width-1 net that is outside the ink
 everywhere: no weights, an output bias of -8.
 
@@ -36,6 +38,15 @@ Outputs, in OUT_DIR: one neuronte-weights JSON per net (NAME-gG-sS.json),
 for --band one neuronte-tiled-weights JSON per net (NAME-gG-sS.tiled.json),
 NAME-sS.scores.json with the exact-pixel score at the face's em, and
 NAME.identity.json. Pack them with pack.py.
+
+--candidates, --uniform, --near and --clamp change the sampling: how many
+candidate points each character draws per step, how many of the first are
+fitted, how many of those nearest an edge, and a clamp of the fitted target
+to -C..C in the field's own units, so the fit spends less on the far field
+that no draw reads. Their defaults are train.py's recipe; a run with
+them trains exactly as before. --pen draws the set's strokes with another
+pen (radius in cell widths), as uilarge's strokes are drawn thinner for a
+face scaled to small ems.
 MIT licence; see LICENSE.
 """
 import argparse
@@ -76,7 +87,7 @@ def band(name):
     em = face_em(name)
     if em is not None:
         return f32(glyphs.UI_TOP[em] / em), f32((glyphs.UI_TOP[em] + em) / em)
-    if name == "uilarge":
+    if name in ("uilarge", "uilargex", "uilargel1"):  # the composed Latin-1 letters keep uilarge's ink rows
         return BAND_LARGE
     raise ValueError(f"no ink band for set {name}")
 
@@ -122,10 +133,19 @@ def main():
     p.add_argument("--device", default="cuda")
     p.add_argument("--log-every", type=int, default=1000)
     p.add_argument("--name", help="file stem; default SET-[b]gK-wW-NNk")
+    p.add_argument("--candidates", type=int, default=1024, help="candidate points per character per step")
+    p.add_argument("--uniform", type=int, default=128, help="of them, the first this many are fitted")
+    p.add_argument("--near", type=int, default=128, help="and this many nearest an edge")
+    p.add_argument("--pen", type=float, help="pen radius in cell widths; default the set's own (glyphs.PENS)")
+    p.add_argument("--clamp", type=float, default=1.0,
+                   help="fit the target clamped to -C..C (the stored field's units are unchanged; 1 is train.py's)")
     a = p.parse_args()
     seeds = [int(s) for s in a.seeds.split(",")]
     if len(set(seeds)) != len(seeds) or not 1 <= a.width <= 1024 or a.steps < 1:
         p.error("distinct seeds, a width of 1 to 1024 and a positive step count")
+    if not (1 <= a.uniform <= a.candidates and 1 <= a.near <= a.candidates and 0 < a.clamp <= 1):
+        p.error("uniform and near of 1 to candidates, clamp in (0, 1]")
+    default_sampling = (a.candidates, a.uniform, a.near, a.clamp) == (1024, 128, 128, 1.0)
     import torch
     torch.backends.cuda.matmul.allow_tf32 = False
     torch.backends.cudnn.allow_tf32 = False
@@ -134,7 +154,9 @@ def main():
     a.out.mkdir(parents=True, exist_ok=True)
 
     sources = {f: digest(ROOT / f) for f in glyphs.sources(a.set) + ["train/face_parts.py", "font/code-masks.txt"]}
-    pen = glyphs.PENS.get(a.set, glyphs.PEN)
+    pen = glyphs.PENS.get(a.set, glyphs.PEN) if a.pen is None else a.pen
+    if not 0 < pen < 0.5:
+        p.error("a pen radius between 0 and half a cell width")
     rows = glyphs.charset(a.set)
     chars = [c for c, _, _ in rows]
     G = len(chars)
@@ -215,12 +237,14 @@ def main():
     started = time.monotonic()
     log = []
     for step in range(a.steps):
-        draws = {s: torch.rand(per, 1024, 2, generator=gens[s]) * span for s in seeds}
+        draws = {s: torch.rand(per, a.candidates, 2, generator=gens[s]) * span for s in seeds}
         cand = torch.stack([draws[s] for s in seed_of])
         tc = target(cand)
-        near = tc.abs().topk(128, dim=2, largest=False).indices
-        xy = torch.cat([cand[:, :, :128], torch.gather(cand, 2, near[..., None].expand(-1, -1, -1, 2))], 2)
-        y = torch.cat([tc[:, :, :128], torch.gather(tc, 2, near)], 2)
+        near = tc.abs().topk(a.near, dim=2, largest=False).indices
+        xy = torch.cat([cand[:, :, :a.uniform], torch.gather(cand, 2, near[..., None].expand(-1, -1, -1, 2))], 2)
+        y = torch.cat([tc[:, :, :a.uniform], torch.gather(tc, 2, near)], 2)
+        if a.clamp < 1:
+            y = y.clamp(-a.clamp, a.clamp)
         losses = (evaluate(xy, CF) - y).abs().mean((1, 2))
         opt.zero_grad()
         losses.sum().backward()
@@ -241,6 +265,8 @@ def main():
                 "tf32": False, "recipe": "train.py: Adam 0.002 cosine; 1024 candidates, first 128 and nearest 128 "
                                          "per character per step; L1 on the clamped field over tau",
                 "seconds": round(time.monotonic() - started, 1), "log": log}
+    if not default_sampling:
+        identity["sampling"] = {"candidates": a.candidates, "uniform": a.uniform, "near": a.near, "clamp": a.clamp}
     (a.out / f"{name}.identity.json").write_text(json.dumps(identity, indent=1) + "\n")
     hex_masks = [f"0x{m:06X}" for m in masks]
     empty = empty_net(masks)
@@ -255,7 +281,10 @@ def main():
                             "seed": s, "unlabelled_weight": 0.0,
                             "face_parts": {"name": name, "group": g, "groups": len(parts),
                                            "band": [y0, y1] if a.band else None,
-                                           "final_loss": log[-1]["losses"][k]}},
+                                           "final_loss": log[-1]["losses"][k],
+                                           **({} if default_sampling else {"sampling": {
+                                               "candidates": a.candidates, "uniform": a.uniform,
+                                               "near": a.near, "clamp": a.clamp}})}},
                "layers": {nm: {"rows": int(w.shape[1]), "cols": int(w.shape[2]),
                                "weight": [float(x) for x in w[k].detach().cpu().numpy().astype(np.float32).ravel()],
                                "bias": [float(x) for x in b[k].detach().cpu().numpy().astype(np.float32).ravel()]}

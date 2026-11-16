@@ -5,7 +5,7 @@ UTF-8. The net writes that character's pixels into a buffer the caller
 owns. No font file, glyph table or bitmap atlas is consulted. The
 weights are the font.
 
-This is version 0.1.3. [CHANGES.md](CHANGES.md) lists what is new since
+This is version 0.1.4. [CHANGES.md](CHANGES.md) lists what is new since
 0.1.1.
 
 Version-1 distance models accept any integer hidden width from 1 to
@@ -58,6 +58,9 @@ letter. Desktop adapters fall back for unsupported strings and styles.
 | `neuronte-ui22-italic-v0`, `neuronte-ui26-italic-v0` | the italic at 22 and 26 pixels | printable ASCII and the ellipsis, 96, with their advances | 256 | 155,137 | 621,584 bytes each |
 | `neuronte-ui24-italic-v0`, `neuronte-ui30-italic-v0` | the italic at 24 and 30 pixels | printable ASCII and the ellipsis, 96, with their advances | 384 | 331,009 | 1,325,072 bytes each |
 | `neuronte-ui-large-v0` | the desktop face at every em from 33 pixels up, drawn blended | printable ASCII and the ellipsis, 96, with their advances | 384 | 331,009 | 1,325,072 bytes |
+| `neuronte-ui-scaled-v0` | the desktop face at every em from 17 to 32 pixels from one file, chosen by the owner in place of the hand faces there (1 to 16 px stay hand faces): the ui-large strokes scaled to the em by a bundle of 16 small nets, its stems snapped to whole pixels by a letter edge table, which a library older than the table refuses; a different face from the hand-drawn ones, not a copy of them; italic by the library's draw-time italic with the advances in `neuronte-ui-scaled-italic-advances-v0`; `neuronte-ui-scaled-latin1-v0` adds the Latin-1 letters; no default changes; [recipe, quality and speed](weights/neuronte-ui-scaled-v0.md) | printable ASCII and the ellipsis, 96, with advances fitted to the hand faces from 17 to 32 px | 96 | 439,312 | 1,774,948 bytes |
+| `neuronte-ui-large-v1` | the same face as `neuronte-ui-large-v0` from 33 px up, with its advances, from a bundle of 4 nets 192 wide: whole-face first use about 12 times faster; negative under its declared overlap gate (32 px, and the minimum at 48 and 96 px) and shipped by the owner's decision; `neuronte-ui-large-latin1-v1` adds the Latin-1 letters; v0 is unchanged and still the default; [gate, speed and recipe](weights/neuronte-ui-large-v1.md) | printable ASCII and the ellipsis, 96, with their advances | 192 | 367,108 | 1,473,000 bytes |
+| `neuronte-ui-scaled-latin1-v0`, `neuronte-ui-large-latin1-v1` | `neuronte-ui-scaled-v0` and `neuronte-ui-large-v1` with the 58 Latin-1 letters ui-large composes from its letters and `font/marks.txt`, drawn by two more nets 192 wide (`neuronte-ui-latin1-v0-gG.json`); the ASCII letters draw byte for byte as in the ASCII-only files; italic advances in `neuronte-ui-scaled-latin1-italic-advances-v0`; [Latin-1](weights/neuronte-ui-scaled-v0.md#latin-1-neuronte-ui-scaled-latin1-v0) | printable ASCII, the ellipsis and the Latin-1 letters, 154, with their advances | 96 and 192; 192 | 622,866; 550,662 | 2,512,896; 2,209,684 bytes |
 | `neuronte-ui24-v1`, `neuronte-ui24-italic-v1`, `neuronte-ui27-v1`, `neuronte-ui28-v1`, `neuronte-ui28-italic-v1`, `neuronte-ui29-v1`, `neuronte-ui29-italic-v1`, `neuronte-ui30-v1`, `neuronte-ui30-italic-v1` | the same faces as their v0, every character exactly the same pixels, drawn 12 to 30 times faster: each a drawing file of one bundle of 16 (8 for ui30-italic) small nets, each drawing only the em rows of its own characters (`weights/neuronte-ui-v1.md`) | printable ASCII and the ellipsis, 96, with their advances | 48 (64 for ui28-italic and ui30, 96 for ui30-italic) per net | 145,936 to 227,344 | 599,400 to 925,032 bytes |
 | `neuronte-flame-v0` | the Kilix flame, for the Start button at 16 px and the desktop icon at 32: a colour net, version 3, of three layers | one mark, at U+100000; the printable ASCII and U+FFFD draw nothing | 64 | 16,914 | 68,124 bytes |
 | `neuronte-flame-v1` | the flame of `neuronte-flame-v0`, narrower and faster, drawn the same way; see its card | one mark, at U+100000; the printable ASCII and U+FFFD draw nothing | 56 | 14,226 | 57,372 bytes |
@@ -240,6 +243,8 @@ a letter and a mark, such as ß æ œ ð þ ø ł đ ħ ŋ ĳ, are drawn in
 | `font/letters.txt` | The Latin letters beyond ASCII that are not a letter plus a mark, and the Greek and Russian Cyrillic letters. The 49 Greek and 66 Russian Cyrillic letters are trained in RC9 accent-v2 and explicit split-v5 |
 | `font/ui-1.txt` to `font/ui-128.txt` | A proportional face for binary desktop text, printable ASCII and the ellipsis, drawn as pixels for every em from 1 to 128 except 44, each character with its advance in pixels. Stems are one pixel wide through 16, two from 17 through 26, and three from 27. Written for this project. `train/train.py --set ui10` and so on train one net each, and score it pixel by pixel at its size. `train/pack.py --advances` packs a file's advances, bold one pixel more. The nets so far are `neuronte-ui1-v0` through `neuronte-ui39-v0`, one for every em, and `neuronte-ui43-v0`. `font/ui-EM-italic.txt` is that face sheared on the grid so the top sits to the right of the bottom, trained as `uiEMi`. The packed `neuronte-uiEM-italic-v0` nets now cover every integer em from 3 through 32; [paired validation and small-grid limits](weights/neuronte-italic-v0.md) accompany the additional 17 faces |
 | `font/ui-large.txt`, `font/ui-large-advances.txt` | The same face above 32 pixels: the first-pass strokes the pixel faces were fitted to, drawn once for every em with a pen 3/32 em wide, the 32 px drawing's three-pixel stem, and blended. The advances are the 32 px drawing's in em, bold 0.2 design units (0.02 em) more. `train/train.py --set uilarge` trains the net and scores it by overlap at 32, 48, 64 and 96 pixels. The net is `neuronte-ui-large-v0` |
+| `font/ui-scaled-advances.txt`, `font/ui-scaled-italic-advances.txt` | The advances of `neuronte-ui-scaled-v0` and of its italic: per character and weight, the step in hundredths of an em with the least summed pixel error against the hand faces (`font/ui-EM.txt`, `font/ui-EM-italic.txt`) from 17 to 32 px, by `train/fit_advances.py 17 32`. One table cannot match whole-pixel advances that do not grow in step with the em, so some are a pixel or two off; the card lists them per em |
+| `font/ui-scaled-latin1-advances.txt`, `font/ui-scaled-latin1-italic-advances.txt`, `font/ui-large-latin1-advances.txt` | The same tables with the Latin-1 letters that ui-large composes, each at its base letter's advance (`train/fit_advances.py --extend`) |
 | `font/icons.txt` | The icons, as colour layers back to front, each naming a palette entry. Powerline and progress are made in `train/glyphs.py` and are not listed in the file. Trained in `neuronte-icon-v1` |
 | `font/palette.txt` | The palette for colour glyphs: entry 0 is the cell's foreground, 1 is clear, the rest have a dark-theme and a light-theme colour |
 | `font/flame.txt`, `font/flame-palette.txt` | The Kilix flame, three colour layers in the syntax of `font/icons.txt`, with its own palette of the desktop's red, yellow and white. Drawn in the middle square of the cell. `font/flame.md` says how it was drawn and trained. The net is `neuronte-flame-v0` |
@@ -343,6 +348,12 @@ optional in-process video decoder, which links FFmpeg's libraries, has
   tiled wrapper is bit for bit the net it wraps. The loader refuses
   every truncation and 35 other malformed tiled files, and the packer
   refuses 21 malformed tiled JSON files;
+- a letter edge table (version 7) snaps exactly the letters it lists:
+  each agrees with a float64 numpy evaluation at the warped samples to
+  1e-3, while every letter without a record, every em at or above the
+  table's width, and every em with snapping off is byte for byte the
+  file without the table, and nine damaged or misplaced tables are
+  refused (`tests/check_letter_snap.py`);
 - the C library agrees with an independent float64 numpy evaluation of
   the JSON weights to 1e-3 in coverage, and the packed file is exactly
   what `train/pack.py` makes from the JSON. For the bundle, the C router
@@ -500,8 +511,15 @@ and its palette index. The two draw calls composite the layers back to
 front: entry 1 clears, entry 0 uses the colour of the call, and any
 other entry uses the theme's palette. The call's alpha then scales the
 whole glyph. A pixel the glyph left clear is left as it was. Snapping
-applies to a colour glyph that has an edge record. Letters and box
-drawing have none, so a horizontal line still meets a vertical one.
+applies to a colour glyph that has an edge record. Box drawing has none,
+so a horizontal line still meets a vertical one. Letters have none
+either, unless their drawing file carries a letter edge table (a
+version 7 member, only inside a drawing file, at most one): then the
+letters it lists are snapped the same way below the table's own width,
+and `neuronte_set_snap()` works on them too. A library older than the
+table refuses such a file whole (`NEURONTE_ERR_FORMAT`), and a file
+without one draws exactly as before. `train/pack.py --drawing-bundle
+... --letter-edges SET --snap-below PX` writes it.
 
 `neuronte-icon-v1` is the 167-icon net: form A, 256 wide, K = 6, trained
 for 40,000 steps on the original drawings. A uniform distance offset of

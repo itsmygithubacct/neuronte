@@ -55,12 +55,13 @@ def _edges_1d(sd):
     return merged
 
 
-def probe(layers):
-    """Edges of each layer, back to front: [(xs, ys)], each a list of (pos, rising)."""
+def probe(layers, pen=PEN):
+    """Edges of each layer, back to front: [(xs, ys)], each a list of (pos, rising).
+    pen is the stroke pen in cell widths; letters pass their set's own."""
     P = glyphs.nodes(N)
     out = []
     for _, shapes in layers:
-        sd = glyphs.signed_distance(shapes, P, PEN).reshape(2 * N + 1, N + 1)
+        sd = glyphs.signed_distance(shapes, P, pen).reshape(2 * N + 1, N + 1)
         out.append((_edges_1d(sd), _edges_1d(sd.T)))
     return out
 

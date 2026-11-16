@@ -461,6 +461,13 @@ drawing it. `neuronte_open()` takes the weights from memory instead of a
 file. The draw calls keep up to 1,024 cells, dropping the least recently
 used, so a handle should not be shared between threads without a lock.
 
+A bundle draws a scalar its nets were never trained on with whichever
+net its router picks, and that net invents a shape. `neuronte_untrained()`
+says whether a scalar is outside the bundle's trained table, and
+`neuronte_set_untrained(font, 1)` draws such a scalar as a hollow box with
+a small square inside, made by code, instead. The default, 0, draws as
+before, and a trained scalar draws the same either way.
+
 A colour weight file is version 3. It holds K layers that share one
 hidden vector, a palette head that runs once per glyph, and the straight
 edges of the drawings. `neuronte_layers()` is that K (a distance file

@@ -143,6 +143,27 @@ int neuronte_palette(const neuronte *n, int theme, uint8_t *rgb);
  * neuronte_coverage() is not changed by it. */
 int neuronte_set_binary(neuronte *n, int on);
 
+/* Characters a bundle was not trained on. A bundle's router has a table of
+ * the scalars its nets were trained on; a scalar outside it is drawn by the
+ * net its gate (or its fallback) picks, which never saw it and so draws
+ * some other shape. neuronte_untrained() is 1 when the file has such a
+ * table and the scalar, after the U+FFFD replacement the draw calls make,
+ * is outside it; 0 when it is in the table or the file has no table (one
+ * net, a colour net, a drawing file without a bundle); NEURONTE_ERR_ARG
+ * for NULL or a handle with no nets.
+ *
+ * neuronte_set_untrained() chooses what such a scalar looks like. 0, the
+ * default, draws it with the net the router picks, as before. 1 draws the
+ * untrained mark instead: a hollow rectangle on whole pixels, inset from
+ * the cell, with a small square in its middle when one fits, coverage 0 or
+ * 1. Mode 1 applies to the coverage, coverage-layers, styled, scalar, UTF-8
+ * and text calls, not to the half calls; neuronte_route() still names the
+ * picked net. A scalar in the table is drawn the same in both modes. The
+ * draw cache keeps marked cells apart, so the mode can change at any time.
+ * Other modes are NEURONTE_ERR_ARG. */
+int neuronte_untrained(const neuronte *n, uint32_t scalar);
+int neuronte_set_untrained(neuronte *n, int mode);
+
 /* Coverage of one character's cell, cell_w * cell_h floats in 0..1,
  * row-major. samples_per_axis 0 is automatic as above. A surrogate or a
  * value above U+10FFFF is drawn as U+FFFD. The cell is the net's 1 x 2

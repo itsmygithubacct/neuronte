@@ -106,7 +106,7 @@ struct entry {
     float *cov;   /* layers masks, each w * h, layer 0 first */
     uint8_t *ent; /* one palette index per layer */
     uint32_t scalar;
-    int w, h, ss, snap;
+    int w, h, ss, snap; /* snap 2: the untrained mark, not a net */
     unsigned long used;
 };
 
@@ -200,6 +200,7 @@ struct neuronte {
     int snap_file;  /* the number -1 restores */
     int layers;     /* the largest K in the file, at least 1 */
     int binary;     /* distance-net draw calls cut coverage at one half */
+    int untrained;  /* 1: draw the untrained mark for scalars outside the table */
     uint8_t dark[96], light[96];
     unsigned long tick;
     struct entry cache[SETS][WAYS];
@@ -1291,6 +1292,63 @@ static uint32_t normalize(uint32_t s)
     return (s > 0x10FFFF || (s >= 0xD800 && s <= 0xDFFF)) ? NEURONTE_REPLACEMENT : s;
 }
 
+/* 1 if the file has a range table and s is outside it. */
+static int outside_table(const neuronte *n, uint32_t s)
+{
+    size_t lo = 0, hi = n->nranges;
+    if (!n->nranges)
+        return 0;
+    while (lo < hi) {
+        size_t mid = lo + (hi - lo) / 2;
+        if (n->ranges[mid].last < s)
+            lo = mid + 1;
+        else
+            hi = mid;
+    }
+    return !(lo < n->nranges && n->ranges[lo].first <= s);
+}
+
+/* 1 if a plain (not half) call draws the untrained mark for s. */
+static int marked(const neuronte *n, uint32_t s, int plain)
+{
+    return plain && n->untrained && s <= 0x10FFFF && outside_table(n, s);
+}
+
+/* The untrained mark: a hollow rectangle on whole pixels, inset from the
+ * cell, with a small square in its middle when one fits. Coverage 0 or 1. */
+static void mark_cell(float *cov, int w, int h)
+{
+    int t = (w + 6) / 12, left = (w * 12 + 50) / 100, top = (h * 16 + 50) / 100;
+    int right = w - left, bottom = h - top, side = (w + 2) / 5, x, y;
+    int sx = (w - side) / 2, sy = (h - side) / 2;
+    if (t < 1)
+        t = 1;
+    if (side < 1)
+        side = 1;
+    for (y = 0; y < h; y++)
+        for (x = 0; x < w; x++) {
+            int in = x >= left && x < right && y >= top && y < bottom;
+            int edge = in && (x < left + t || x >= right - t || y < top + t || y >= bottom - t);
+            int dot = x >= sx && x < sx + side && y >= sy && y < sy + side &&
+                      sx >= left + t + 1 && sx + side <= right - t - 1 &&
+                      sy >= top + t + 1 && sy + side <= bottom - t - 1;
+            cov[(size_t)y * w + x] = edge || dot ? 1.0f : 0.0f;
+        }
+}
+
+int neuronte_untrained(const neuronte *n, uint32_t scalar)
+{
+    return n && n->nets ? outside_table(n, normalize(scalar)) : NEURONTE_ERR_ARG;
+}
+
+int neuronte_set_untrained(neuronte *n, int mode)
+{
+    if (!n || mode < 0 || mode > 1)
+        return NEURONTE_ERR_ARG;
+    n->untrained = mode;
+    return NEURONTE_OK;
+}
+
 static int half_code(uint32_t scalar, int half, uint32_t *code)
 {
     if (scalar != normalize(scalar) || half < 0 || half > 1 ||
@@ -2028,7 +2086,7 @@ done:
 }
 
 static int coverage_code(const neuronte *hd, uint32_t scalar, int cell_w, int cell_h,
-                          int samples_per_axis, float *coverage)
+                          int samples_per_axis, float *coverage, int plain)
 {
     const struct net *n;
     float *mem, *c, *scratch, *xp, *yp, slope;
@@ -2040,6 +2098,10 @@ static int coverage_code(const neuronte *hd, uint32_t scalar, int cell_w, int ce
         return NEURONTE_ERR_ARG;
     if (ss == 0)
         ss = auto_samples(cell_w);
+    if (marked(hd, scalar, plain)) {
+        mark_cell(coverage, cell_w, cell_h);
+        return NEURONTE_OK;
+    }
     n = hd->net[route(hd, scalar)];
     if (n->tl)
         return tiled_coverage(n->tl, scalar, cell_w, cell_h, ss, coverage);
@@ -2092,7 +2154,7 @@ static int coverage_code(const neuronte *hd, uint32_t scalar, int cell_w, int ce
 int neuronte_coverage(const neuronte *hd, uint32_t scalar, int cell_w, int cell_h,
                       int samples_per_axis, float *coverage)
 {
-    return coverage_code(hd, normalize(scalar), cell_w, cell_h, samples_per_axis, coverage);
+    return coverage_code(hd, normalize(scalar), cell_w, cell_h, samples_per_axis, coverage, 1);
 }
 
 int neuronte_coverage_half(const neuronte *hd, uint32_t scalar, int half, int cell_w, int cell_h,
@@ -2101,11 +2163,11 @@ int neuronte_coverage_half(const neuronte *hd, uint32_t scalar, int half, int ce
     uint32_t code;
     if (half_code(scalar, half, &code) != NEURONTE_OK)
         return NEURONTE_ERR_ARG;
-    return coverage_code(hd, code, cell_w, cell_h, samples_per_axis, coverage);
+    return coverage_code(hd, code, cell_w, cell_h, samples_per_axis, coverage, 0);
 }
 
 static int coverage_layers_code(const neuronte *hd, uint32_t scalar, int cell_w, int cell_h,
-                                 int samples_per_axis, float *masks, uint8_t *entries)
+                                 int samples_per_axis, float *masks, uint8_t *entries, int plain)
 {
     const struct net *n;
     int ss = samples_per_axis, layers, rc;
@@ -2121,8 +2183,8 @@ static int coverage_layers_code(const neuronte *hd, uint32_t scalar, int cell_w,
     plane = (size_t)cell_w * cell_h;
     memset(entries, 0, (size_t)layers);
     memset(masks, 0, plane * (size_t)layers * sizeof *masks);
-    if (!n->col)
-        return coverage_code(hd, scalar, cell_w, cell_h, ss, masks);
+    if (!n->col || marked(hd, scalar, plain))
+        return coverage_code(hd, scalar, cell_w, cell_h, ss, masks, plain);
     rc = eval_colour(hd, n, scalar, cell_w, cell_h, ss, masks, entries);
     return rc;
 }
@@ -2130,7 +2192,7 @@ static int coverage_layers_code(const neuronte *hd, uint32_t scalar, int cell_w,
 int neuronte_coverage_layers(const neuronte *hd, uint32_t scalar, int cell_w, int cell_h,
                              int samples_per_axis, float *masks, uint8_t *entries)
 {
-    return coverage_layers_code(hd, normalize(scalar), cell_w, cell_h, samples_per_axis, masks, entries);
+    return coverage_layers_code(hd, normalize(scalar), cell_w, cell_h, samples_per_axis, masks, entries, 1);
 }
 
 int neuronte_coverage_layers_half(const neuronte *hd, uint32_t scalar, int half, int cell_w, int cell_h,
@@ -2139,13 +2201,14 @@ int neuronte_coverage_layers_half(const neuronte *hd, uint32_t scalar, int half,
     uint32_t code;
     if (half_code(scalar, half, &code) != NEURONTE_OK)
         return NEURONTE_ERR_ARG;
-    return coverage_layers_code(hd, code, cell_w, cell_h, samples_per_axis, masks, entries);
+    return coverage_layers_code(hd, code, cell_w, cell_h, samples_per_axis, masks, entries, 0);
 }
 
-static const struct entry *cached(neuronte *n, uint32_t s, int w, int h, int ss, int *rc)
+static const struct entry *cached(neuronte *n, uint32_t s, int w, int h, int ss, int plain, int *rc)
 {
     const struct net *net = n->net[route(n, s)];
-    int snap = snap_on(n, net, s, w);
+    int mark = marked(n, s, plain);
+    int snap = mark ? 2 : snap_on(n, net, s, w);
     uint32_t key = s * 2654435761u ^ (uint32_t)w * 40503u ^ (uint32_t)h * 9973u ^ (uint32_t)ss;
     struct entry *set, *e;
     float *cov;
@@ -2153,7 +2216,7 @@ static const struct entry *cached(neuronte *n, uint32_t s, int w, int h, int ss,
     int i;
 
     if (snap)
-        key ^= 0x9E3779B9u;
+        key ^= snap == 2 ? 0x5BD1E995u : 0x9E3779B9u;
     set = n->cache[(key >> 8) % SETS];
     e = set;
     for (i = 0; i < WAYS; i++) {
@@ -2173,8 +2236,8 @@ static const struct entry *cached(neuronte *n, uint32_t s, int w, int h, int ss,
         *rc = NEURONTE_ERR_NOMEM;
         return NULL;
     }
-    if (!net->col)
-        *rc = coverage_code(n, s, w, h, ss, cov);
+    if (mark || !net->col)
+        *rc = coverage_code(n, s, w, h, ss, cov, plain);
     else
         *rc = eval_colour(n, net, s, w, h, ss, cov, ent);
     if (*rc != NEURONTE_OK) {
@@ -2295,12 +2358,12 @@ int neuronte_coverage_styled(const neuronte *n, uint32_t scalar, int cell_w, int
         samples_per_axis < 0 || samples_per_axis > NEURONTE_MAX_SAMPLES)
         return NEURONTE_ERR_ARG;
     scalar = normalize(scalar);
-    if (!style || n->net[route(n, scalar)]->col)
-        return coverage_code(n, scalar, cell_w, cell_h, samples_per_axis, coverage);
+    if (!style || (!marked(n, scalar, 1) && n->net[route(n, scalar)]->col))
+        return coverage_code(n, scalar, cell_w, cell_h, samples_per_axis, coverage, 1);
     base = malloc((size_t)cell_w * cell_h * sizeof *base);
     if (!base)
         return NEURONTE_ERR_NOMEM;
-    rc = coverage_code(n, scalar, cell_w, cell_h, samples_per_axis, base);
+    rc = coverage_code(n, scalar, cell_w, cell_h, samples_per_axis, base, 1);
     if (rc == NEURONTE_OK) {
         stroke = style & NEURONTE_STYLE_BOLD ? (cell_w + 16) / 32 : 0;
         if ((style & NEURONTE_STYLE_BOLD) && stroke == 0)
@@ -2318,7 +2381,7 @@ int neuronte_coverage_styled(const neuronte *n, uint32_t scalar, int cell_w, int
 
 static int draw_code(neuronte *n, uint32_t *pixels, int stride, int width, int height,
                       int x, int y, int cell_w, int cell_h, uint32_t scalar,
-                      uint32_t color, unsigned style)
+                      uint32_t color, unsigned style, int plain)
 {
     const struct entry *cell;
     const struct net *net;
@@ -2335,11 +2398,11 @@ static int draw_code(neuronte *n, uint32_t *pixels, int stride, int width, int h
         (int64_t)x + cell_w <= 0 || (int64_t)y + cell_h <= 0)
         return NEURONTE_OK;
     ss = n->samples ? n->samples : auto_samples(cell_w);
-    cell = cached(n, scalar, cell_w, cell_h, ss, &rc);
+    cell = cached(n, scalar, cell_w, cell_h, ss, plain, &rc);
     if (!cell)
         return rc;
     net = n->net[route(n, scalar)];
-    if (!net->col) {
+    if (!net->col || cell->snap == 2) {
         int stroke = style & NEURONTE_STYLE_BOLD ? (cell_w + 16) / 32 : 0;
         if ((style & NEURONTE_STYLE_BOLD) && stroke == 0)
             stroke = 1;
@@ -2386,7 +2449,7 @@ int neuronte_draw_scalar_styled(neuronte *n, uint32_t *pixels, int stride, int w
                                 uint32_t color, unsigned style)
 {
     return draw_code(n, pixels, stride, width, height, x, y, cell_w, cell_h,
-                     normalize(scalar), color, style);
+                     normalize(scalar), color, style, 1);
 }
 
 int neuronte_draw_half(neuronte *n, uint32_t *pixels, int stride, int width, int height,
@@ -2396,7 +2459,7 @@ int neuronte_draw_half(neuronte *n, uint32_t *pixels, int stride, int width, int
     uint32_t code;
     if (half_code(scalar, half, &code) != NEURONTE_OK)
         return NEURONTE_ERR_ARG;
-    return draw_code(n, pixels, stride, width, height, x, y, cell_w, cell_h, code, color, 0);
+    return draw_code(n, pixels, stride, width, height, x, y, cell_w, cell_h, code, color, 0, 0);
 }
 
 int neuronte_draw_scalar(neuronte *n, uint32_t *pixels, int stride, int width, int height,
@@ -2553,10 +2616,10 @@ static int draw_text(neuronte *n, uint32_t *pixels, int stride, int width, int h
         ix = pen > INT_MAX ? INT_MAX : (int)pen;
         if (pen <= INT_MAX && (int64_t)ix < width && (int64_t)y < height &&
             pen + (int64_t)cw + stroke > 0 && (int64_t)y + ch > 0) {
-            cell = cached(n, a->scalar, cw, ch, ss, &rc);
+            cell = cached(n, a->scalar, cw, ch, ss, 1, &rc);
             if (!cell)
                 return rc;
-            if (n->net[route(n, a->scalar)]->col)
+            if (cell->snap != 2 && n->net[route(n, a->scalar)]->col)
                 return NEURONTE_ERR_ARG;
             cov = cell->cov;
             for (py = y < 0 ? (int)(-(int64_t)y) : 0; py < ch && (int64_t)y + py < height; py++)

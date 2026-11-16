@@ -30,6 +30,7 @@ letter. Desktop adapters fall back for unsupported strings and styles.
 | `neuronte-split-v7` | split-v6 with the ASCII character groups added: tiled Braille and `neuronte-ascii-groups-v1`; not a default; [recipe and checks](weights/neuronte-split-v7.md) | 1,176, over ten nets and a router | 6, 64, 128, 192 and 256 | 441,068 | 1,768,128 bytes |
 | `neuronte-split-v7-symbol-v1` | split-v7 with the symbol character groups added: tiled Braille, `neuronte-ascii-groups-v1` and `neuronte-symbol-v1`; not a default; [recipe and checks](weights/neuronte-split-v7-symbol-v1.md) | 1,176, over fourteen nets and a router | 6, 32, 64, 128, 192 and 256 | 461,296 | 1,850,412 bytes |
 | `neuronte-split-v8` | split-v7 with the symbol, pixel and accent character groups added: tiled Braille, `neuronte-ascii-groups-v1`, `neuronte-symbol-v1`, `neuronte-pixel-groups-v1` and `neuronte-accent-groups-v1`; the pixel and accent groups failed their declared strict gates and were chosen by visual review; not a default; [recipe, checks and speed](weights/neuronte-split-v8.md) | 1,176, over twenty-one nets and a router | 6, 32, 64, 128, 192 and 256 | 699,511 | 2,805,688 bytes |
+| `neuronte-split-v9` | split-v8 with 165 terminal characters added on fourteen group nets: 113 symbols (✓ ✗, arrows, ± ≤ ≥ ≠, € £ ¥ ₽ ₴, super- and subscripts, maths and keyboard signs) in `neuronte-tsymbol-v1`, 20 Greek letters with tonos in `neuronte-tgreek-v1`, 32 Cyrillic letters beyond Russian in `neuronte-tcyrillic-v1`; every group failed its declared gates and was chosen by visual review; not a default; [recipe, checks and speed](weights/neuronte-split-v9.md) | 1,341, over thirty-five nets and a router | 6, 32, 64, 128, 192 and 256 | 898,437 | 3,607,088 bytes |
 | `neuronte-split-v4` | the default before Greek and Russian, kept; most measurements below were made on it | 1,061, over six nets and a router | 48, 128 and 192 | 329,356 | 1,319,616 bytes |
 | `neuronte-full-v3` | explicit RC9 monolithic font; [quality and baseline comparison](weights/neuronte-full-v3.md) | 878, including the Greek and Russian additions | 384 | 331,009 | 1,324,240 bytes |
 | `neuronte-full-v2` | the baseline `split` is measured against | 763 of them in one net, all but the sextants and octants | 320 | 234,881 | 939,728 bytes |
@@ -125,6 +126,24 @@ uncached symbols about 5.5 times as fast as split-v7, pixel characters 2.1
 times and accent characters 1.95 times; ASCII and Braille cost the same, and
 it takes about 1 ms longer to open. It is not a default. Rebuild it with
 `make pack-split-v8`; see [its recipe, checks and speed](weights/neuronte-split-v8.md).
+
+`neuronte-split-v9.nrt` is split-v8 with 165 characters that terminals print
+often and no earlier bundle was trained on: check and cross marks, arrows,
+shapes, comparison and currency signs, super- and subscripts, fractions,
+punctuation, maths and keyboard symbols, Greek letters with tonos, and the
+Cyrillic letters of Ukrainian, Belarusian, Serbian, Macedonian and
+Bulgarian. split-v8 sent them through its gate to nets that had never seen
+them, so ✓ came out as a small arrow. Each now has a table row to a net trained
+on it (`train/known_bundle.py`'s `add_known`); split-v8's members, rows and
+gate are kept, so its 1,176 characters and every untrained character draw
+exactly as before. Every group failed its declared gates, mostly on mean
+error at 8×16, binary IoU and identity in the smallest cells, and was chosen
+after a side-by-side review; the card lists the failures and the small-cell
+limits. On two x86 CPUs it draws the added characters about 4.6 times as fast
+as split-v8, and takes about 0.5 to 0.9 ms longer to open. It is not a
+default; to use it, load it instead of split-v8 or split-v5, and nothing else
+changes. Rebuild it with `make pack-split-v9`; see
+[its recipe, checks and speed](weights/neuronte-split-v9.md).
 
 RC9 also ships the separate `neuronte-emoji-v0.nrt` colour bundle: 300 original
 single-scalar emoji, 600 left/right half labels, three experts, and up to six

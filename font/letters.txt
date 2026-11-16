@@ -172,7 +172,7 @@ U+044E P 1.5,8 1.5,15 | P 1.5,11.5 3.8,11.5 | E 6.2,11.5 2.4,3.5 0 360
 U+044F P 8,15 8,8 5,8 | E 5,9.8 2.8,1.8 270 90 | P 5,11.6 8,11.6 | P 5,11.6 2,15
 U+0451 P 2,11.5 8,11.5 | E 5,11.5 3,3.5 0 -310 | P 3.3,4.2 3.3,4.8 | P 6.7,4.2 6.7,4.8
 #
-# Cyrillic beyond Russian, for split-v9 (train/glyphs.py tier tletter).
+# Cyrillic beyond Russian, for split-v9 (train/glyphs.py tier tcyrillic).
 # Written for this project; no font was read. The accent tier above leaves
 # these out. Letters with a mark (U+0400, U+0403, U+0407, U+040C, U+040D,
 # U+040E and their smalls) are made by glyphs.py from these and marks.txt.

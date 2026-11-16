@@ -27,8 +27,8 @@ Tiers:
              in font/symbols.txt below its terminal heading, and the
              superscript and subscript digits, two fractions and two
              ordinals made here from strokes.txt's digits and letters.
-    tletter  the letters split-v9 adds (TERMINAL_LETTERS): Greek with tonos
-             and dialytika and Cyrillic beyond Russian, made like the
+    tgreek   the letters split-v9 adds (TERMINAL_LETTERS): Greek with tonos
+    tcyrillic and dialytika, and Cyrillic beyond Russian, made like the
              accent tier from a letter and a mark, or taken from
              font/letters.txt. The symbol and accent tiers leave both
              lists out, so every set trained before is unchanged.
@@ -47,8 +47,8 @@ Tiers:
              a pen 3/32 em wide, the 32 px drawing's three-pixel stem.
 
 Sets, each a list of tiers: ascii; draw (box, block, shade, braille);
-symbol; accent; full, which is all of those; tsymbol, tletter and
-terminal (both); and three sets for choosing
+symbol; accent; full, which is all of those; tsymbol, tgreek,
+tcyrillic, tletter (the two scripts) and terminal (all three); and three sets for choosing
 how the mosaics join the bundle: pixel (block, mosaic), pixelbraille
 (block, mosaic, braille) and boxshade (box, shade). The sets ui1 to
 ui128, except ui44, the italic sets ui3i to ui32i, and uilarge, are each their
@@ -623,7 +623,7 @@ def accents():
 
 
 # The terminal characters split-v9 adds, in code point order. The symbol and
-# accent tiers leave them out; tsymbol and tletter are made of exactly these.
+# accent tiers leave them out; tsymbol, tgreek and tcyrillic are made of exactly these.
 TERMINAL_SYMBOLS = tuple(sorted(
     [0x2713, 0x2715, 0x2716, 0x2717, 0x2718, 0x2611] +
     [0x2194, 0x2195, 0x2196, 0x2198, 0x2199, 0x21A9, 0x21AA, 0x21B5, 0x21D0, 0x21D1, 0x21D2, 0x21D3, 0x21D4,
@@ -641,6 +641,8 @@ TERMINAL_LETTERS = tuple(sorted(
      0x3AC, 0x3AD, 0x3AE, 0x3AF, 0x3B0, 0x3CA, 0x3CB, 0x3CC, 0x3CD, 0x3CE] +
     [0x400] + list(range(0x402, 0x410)) + [0x450] + list(range(0x452, 0x460)) + [0x490, 0x491]))
 TERMINAL = frozenset(TERMINAL_SYMBOLS + TERMINAL_LETTERS)
+TERMINAL_GREEK = tuple(c for c in TERMINAL_LETTERS if c < 0x400)
+TERMINAL_CYRILLIC = tuple(c for c in TERMINAL_LETTERS if c >= 0x400)
 
 # Scaled digits and letters. Strokes.txt's digits fill x 0.2..0.8 and y
 # 0.4..1.5; each copy keeps the pen, so it is a little bolder for its size.
@@ -687,7 +689,7 @@ def terminal_symbols():
 
 
 def terminal_letters():
-    """{char: shapes} for the tletter tier."""
+    """{char: shapes} for the tgreek and tcyrillic tiers."""
     base = strokes.parse(strokes.STROKES)
     letters = strokes.parse(LETTERS)
     base.update(letters)
@@ -970,8 +972,10 @@ SETS = {
     "boxshade": ["box", "shade"],
     "braille": ["braille"],
     "tsymbol": ["tsymbol"],
-    "tletter": ["tletter"],
-    "terminal": ["tsymbol", "tletter"],
+    "tgreek": ["tgreek"],
+    "tcyrillic": ["tcyrillic"],
+    "tletter": ["tgreek", "tcyrillic"],
+    "terminal": ["tsymbol", "tgreek", "tcyrillic"],
     **{f"ui{em}": [f"ui{em}"] for em in UI_TOP},
     **{f"ui{em}i": [f"ui{em}i"] for em in UI_ITALIC},
     "uilarge": ["uilarge"],
@@ -1005,9 +1009,10 @@ def tier(name):
     if name == "accent":
         acc = accents()
         return [(c, acc[c]) for c in sorted(acc)]
-    if name in ("tsymbol", "tletter"):
+    if name in ("tsymbol", "tgreek", "tcyrillic"):
         made = terminal_symbols() if name == "tsymbol" else terminal_letters()
-        want = TERMINAL_SYMBOLS if name == "tsymbol" else TERMINAL_LETTERS
+        want = {"tsymbol": TERMINAL_SYMBOLS, "tgreek": TERMINAL_GREEK, "tcyrillic": TERMINAL_CYRILLIC}[name]
+        made = {c: g for c, g in made.items() if ord(c) in want}
         if sorted(map(ord, made)) != list(want):
             missing = sorted(set(want) - set(map(ord, made)))
             raise ValueError(f"{name}: the drawings and the list differ; missing "
@@ -1125,10 +1130,10 @@ def layer_seams(layers, n=160, delta=0.02, pen=0.075, allow=4):
 def sources(name):
     """The files the set is made from, for the weights' record."""
     tiers = SETS[name]
-    files = ["font/strokes.txt"] if {"ascii", "accent", "tsymbol", "tletter"} & set(tiers) else []
+    files = ["font/strokes.txt"] if {"ascii", "accent", "tsymbol", "tgreek", "tcyrillic"} & set(tiers) else []
     if "symbol" in tiers or "tsymbol" in tiers:
         files.append("font/symbols.txt")
-    if "accent" in tiers or "tletter" in tiers:
+    if {"accent", "tgreek", "tcyrillic"} & set(tiers):
         files += ["font/letters.txt", "font/marks.txt"]
     if "mosaic" in tiers:
         files.append("font/octants.txt")

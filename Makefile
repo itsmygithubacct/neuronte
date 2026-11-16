@@ -524,6 +524,12 @@ test-known-bundle: build/libneuronte.so
 
 .PHONY: test-known-bundle
 
+# The opt-in untrained mark: neuronte_untrained() and neuronte_set_untrained().
+test-untrained: build/libneuronte.so
+	$(PYTHON) tests/check_untrained.py build/libneuronte.so
+
+.PHONY: test-untrained
+
 test-ascii-next: build/libneuronte.so build/test_api
 	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_ascii_next.py build/libneuronte.so
 	./build/test_api weights/neuronte-split-ascii-groups-v1.nrt --full --accent --pixel
@@ -560,6 +566,23 @@ pack-split-v8:
 	$(PYTHON) train/build_split_v8.py
 
 .PHONY: test-split-v8 pack-split-v8
+
+# split-v9: split-v8 with the terminal symbol, Greek and Cyrillic group nets.
+TERMINAL_V1 = $(foreach g,0 1 2 3 4 5 6 7 8,weights/neuronte-tsymbol-v1-g$(g)) \
+	$(foreach g,0 1,weights/neuronte-tgreek-v1-g$(g)) $(foreach g,0 1 2,weights/neuronte-tcyrillic-v1-g$(g))
+
+test-split-v9: build/libneuronte.so build/test_api
+	@set -e; for n in $(TERMINAL_V1); do \
+		$(PYTHON) train/pack.py $$n.json build/$$(basename $$n).nrt; \
+		$(PYTHON) tests/check_reference.py build/libneuronte.so $$n.json build/$$(basename $$n).nrt; \
+	done
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_split_v9.py build/libneuronte.so
+	./build/test_api weights/neuronte-split-v9.nrt --full --accent --pixel
+
+pack-split-v9:
+	$(PYTHON) train/build_split_v9.py
+
+.PHONY: test-split-v9 pack-split-v9
 
 test-symbol-v1: build/libneuronte.so build/test_api
 	@set -e; for g in 0 1 2 3; do \
@@ -598,7 +621,7 @@ test-bits: build/libneuronte.so
 	$(PYTHON) tests/check_bits.py build/libneuronte.so
 .PHONY: test-bits
 
-test: all $(TESTS) test-bits test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7 test-face-bundle test-symbol-v1 test-split-v7-symbol test-split-v8 test-faces-v1 test-faces-v1-192-256 test-known-bundle test-faces-wide-v1 test-faces-v1-h512 test-colour-marks test-faces-v1-small test-emoji-v1
+test: all $(TESTS) test-bits test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7 test-face-bundle test-symbol-v1 test-split-v7-symbol test-split-v8 test-split-v9 test-faces-v1 test-faces-v1-192-256 test-known-bundle test-untrained test-faces-wide-v1 test-faces-v1-h512 test-colour-marks test-faces-v1-small test-emoji-v1
 	cd weights && sha256sum -c --quiet SHA256SUMS
 	# The pointer net keeps its own list, with paths from the top of the tree.
 	sha256sum -c --quiet weights/neuronte-pointer-v0.sha256

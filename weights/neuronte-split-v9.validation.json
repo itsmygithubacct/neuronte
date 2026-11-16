@@ -1,0 +1,1738 @@
+{
+ "schema": "neuronte.split-v9-validation/v1",
+ "bundle": "neuronte-split-v9.nrt",
+ "bundle_sha256": "0a92f223d47f1680929b2c5d7512d1a1728d4871e6653b33cbaad060e6bb90c0",
+ "base": "neuronte-split-v8.nrt",
+ "base_sha256": "445b53caa40c6cd02a1b324458bf5ae549b1ab304043ac0eeb3d4871e6461168",
+ "original_quality_gates_passed": false,
+ "selection": "seed 0 of every group, chosen by the owner after a side-by-side review of the teacher, split-v8 and both seeds at 4x8, 6x12, 8x16, 12x24 and 16x32 (\"go with seed 0 on all of them and ship it\"); every group failed its declared gates with both seeds, and no gate was changed",
+ "selected_seed": 0,
+ "gates_sha256": "ba7038e5f85d39d99bfaf100ce9456d35343db4fbe61d2f4f164917972a298f4",
+ "gates": {
+  "schema": "terminal-symbols.gates/v1",
+  "established": [
+   "8x16",
+   "16x32",
+   "48x96"
+  ],
+  "kinds": {
+   "S": {
+    "reference": "symbol-v0 = split-v5 expert 2 on charset(\"symbol\"), automatic sampling",
+    "established": {
+     "8x16": {
+      "mae_max": 0.005569524817168712,
+      "p99_max": 0.07046976730227471,
+      "firm_fraction_max": 0.0005,
+      "glyph_mae_max": 0.024429247938096525,
+      "margin_min": 0.18610315024852753,
+      "nearest_all": true,
+      "no_vanished": true
+     },
+     "16x32": {
+      "mae_max": 0.0036030805073678494,
+      "p99_max": 0.06656022042036057,
+      "firm_fraction_max": 0.0005,
+      "glyph_mae_max": 0.01786937586963177,
+      "margin_min": 0.9485758952796459,
+      "nearest_all": true,
+      "no_vanished": true
+     },
+     "48x96": {
+      "mae_max": 0.0028799223816022277,
+      "p99_max": 0.066875,
+      "firm_fraction_max": 0.0005708616780045352,
+      "glyph_mae_max": 0.014684018902480602,
+      "margin_min": 0.7482046633958817,
+      "nearest_all": true,
+      "no_vanished": true
+     }
+    },
+    "geometry": {
+     "1x2": {
+      "mae_max": 0.25863978266716003,
+      "firm_fraction_max": 0.0005,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "2x4": {
+      "mae_max": 0.025955130346119404,
+      "firm_fraction_max": 0.0005,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "3x6": {
+      "mae_max": 0.018194052390754223,
+      "firm_fraction_max": 0.003901360544217687,
+      "nearest_fraction_min": 0.9591836734693877,
+      "vanished_fraction_max": 0.14285714285714285
+     },
+     "4x8": {
+      "mae_max": 0.01421974366530776,
+      "firm_fraction_max": 0.0011377551020408162,
+      "nearest_fraction_min": 0.9591836734693877,
+      "vanished_fraction_max": 0.02040816326530612
+     },
+     "5x9": {
+      "mae_max": 0.009968793718144298,
+      "firm_fraction_max": 0.0009535147392290249,
+      "nearest_fraction_min": 0.9795918367346939,
+      "vanished_fraction_max": 0.0
+     },
+     "6x12": {
+      "mae_max": 0.00883564492687583,
+      "firm_fraction_max": 0.0005,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "7x13": {
+      "mae_max": 0.007793688448145986,
+      "firm_fraction_max": 0.0005,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "7x14": {
+      "mae_max": 0.0073584155179560184,
+      "firm_fraction_max": 0.0005,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "9x18": {
+      "mae_max": 0.005815125536173582,
+      "firm_fraction_max": 0.0005,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "10x20": {
+      "mae_max": 0.003930644119158387,
+      "firm_fraction_max": 0.0005,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "11x21": {
+      "mae_max": 0.004694647737778723,
+      "firm_fraction_max": 0.0005,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "12x24": {
+      "mae_max": 0.00426304199360311,
+      "firm_fraction_max": 0.0005,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "13x27": {
+      "mae_max": 0.003970792271196842,
+      "firm_fraction_max": 0.0005,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "15x30": {
+      "mae_max": 0.002983438885770738,
+      "firm_fraction_max": 0.0005,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "17x35": {
+      "mae_max": 0.00353699991106987,
+      "firm_fraction_max": 0.0005,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "20x40": {
+      "mae_max": 0.002726410735398531,
+      "firm_fraction_max": 0.0005,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "23x46": {
+      "mae_max": 0.0029227128122001887,
+      "firm_fraction_max": 0.0005192893792677752,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "23x47": {
+      "mae_max": 0.00303261236846447,
+      "firm_fraction_max": 0.0005188789669429289,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "24x48": {
+      "mae_max": 0.0039090597871690985,
+      "firm_fraction_max": 0.0006240079365079365,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "25x49": {
+      "mae_max": 0.0035829527638852597,
+      "firm_fraction_max": 0.0005666389004581425,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "25x50": {
+      "mae_max": 0.0032924605635926128,
+      "firm_fraction_max": 0.0005653061224489796,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "31x62": {
+      "mae_max": 0.003414626802317798,
+      "firm_fraction_max": 0.0005743273375947674,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "33x61": {
+      "mae_max": 0.0033164452631026507,
+      "firm_fraction_max": 0.0005506909172014559,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "16x48": {
+      "mae_max": 0.0038615676909685135,
+      "firm_fraction_max": 0.0005531462585034013,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "40x80": {
+      "mae_max": 0.0028731324579566717,
+      "firm_fraction_max": 0.000538265306122449,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "64x128": {
+      "mae_max": 0.002736232346855104,
+      "firm_fraction_max": 0.0006245615433673469,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     }
+    }
+   },
+   "L-greek": {
+    "reference": "split-v5 accent expert (H256) on its 49 greek letters",
+    "established": {
+     "8x16": {
+      "mae_max": 0.0075327006503939625,
+      "p99_max": 0.0747066405415535,
+      "firm_fraction_max": 0.0005,
+      "iou_mean_min": 0.9714764444123362,
+      "glyph_mae_max": 0.020776575654745104,
+      "glyph_iou_min": 0.7681818181818182,
+      "nearest_all": true,
+      "no_vanished": true
+     },
+     "16x32": {
+      "mae_max": 0.00477708339318633,
+      "p99_max": 0.07303914844989777,
+      "firm_fraction_max": 0.0005398596938775511,
+      "iou_mean_min": 0.9815874673939876,
+      "glyph_mae_max": 0.01595548562705517,
+      "glyph_iou_min": 0.8556603773584905,
+      "nearest_all": true,
+      "no_vanished": true
+     },
+     "48x96": {
+      "mae_max": 0.0038695442359894514,
+      "p99_max": 0.08912574917078019,
+      "firm_fraction_max": 0.0008587372448979592,
+      "iou_mean_min": 0.9862893861062135,
+      "glyph_mae_max": 0.013735457081347704,
+      "glyph_iou_min": 0.9255434782608695,
+      "nearest_all": true,
+      "no_vanished": true
+     }
+    },
+    "geometry": {
+     "1x2": {
+      "mae_max": 0.22991010546684265,
+      "p99_max": 0.3118692231178284,
+      "firm_fraction_max": 0.0005,
+      "iou_mean_min": 0.995,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "2x4": {
+      "mae_max": 0.03299620561301708,
+      "p99_max": 0.09666341960430146,
+      "firm_fraction_max": 0.0005,
+      "iou_mean_min": 0.995,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "3x6": {
+      "mae_max": 0.026074851863086224,
+      "p99_max": 0.14136121839284896,
+      "firm_fraction_max": 0.0016337868480725624,
+      "iou_mean_min": 0.7385374149659865,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.08163265306122448
+     },
+     "4x8": {
+      "mae_max": 0.01859257696196437,
+      "p99_max": 0.08692301481962204,
+      "firm_fraction_max": 0.0005,
+      "iou_mean_min": 0.8464091350826045,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "5x9": {
+      "mae_max": 0.011801613494753838,
+      "p99_max": 0.08033812835812569,
+      "firm_fraction_max": 0.0005,
+      "iou_mean_min": 0.8493120711488059,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "6x12": {
+      "mae_max": 0.011505744885653257,
+      "p99_max": 0.07771835148334504,
+      "firm_fraction_max": 0.0005,
+      "iou_mean_min": 0.9580653360245196,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "7x13": {
+      "mae_max": 0.010636284481734037,
+      "p99_max": 0.08029555574059487,
+      "firm_fraction_max": 0.0005,
+      "iou_mean_min": 0.9869312949558801,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "7x14": {
+      "mae_max": 0.0097939632833004,
+      "p99_max": 0.07781419947743416,
+      "firm_fraction_max": 0.0005,
+      "iou_mean_min": 0.9791678926417169,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "9x18": {
+      "mae_max": 0.0075238170102238655,
+      "p99_max": 0.07246651917696,
+      "firm_fraction_max": 0.0005,
+      "iou_mean_min": 0.978991919945875,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "10x20": {
+      "mae_max": 0.004523770068772137,
+      "p99_max": 0.058439407944679264,
+      "firm_fraction_max": 0.0005,
+      "iou_mean_min": 0.9785878086361897,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "11x21": {
+      "mae_max": 0.00643989653326571,
+      "p99_max": 0.07465812981128693,
+      "firm_fraction_max": 0.0005,
+      "iou_mean_min": 0.953124483495536,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "12x24": {
+      "mae_max": 0.006021849811077118,
+      "p99_max": 0.0725347962975502,
+      "firm_fraction_max": 0.0005,
+      "iou_mean_min": 0.9342153586849695,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "13x27": {
+      "mae_max": 0.005234267679043114,
+      "p99_max": 0.07320695787668229,
+      "firm_fraction_max": 0.0005,
+      "iou_mean_min": 0.9745505406088804,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "15x30": {
+      "mae_max": 0.0035041847601532936,
+      "p99_max": 0.049567167162895207,
+      "firm_fraction_max": 0.0005,
+      "iou_mean_min": 0.9885440295232102,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "17x35": {
+      "mae_max": 0.005363499163649976,
+      "p99_max": 0.08277519464492798,
+      "firm_fraction_max": 0.0005,
+      "iou_mean_min": 0.9642063642165083,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "20x40": {
+      "mae_max": 0.0032739031463861466,
+      "p99_max": 0.052088477164506916,
+      "firm_fraction_max": 0.0005,
+      "iou_mean_min": 0.8870070995098758,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "23x46": {
+      "mae_max": 0.0039707675911486145,
+      "p99_max": 0.07057137832045556,
+      "firm_fraction_max": 0.0005192893792677752,
+      "iou_mean_min": 0.9705727088997806,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "23x47": {
+      "mae_max": 0.003954439643770456,
+      "p99_max": 0.06996716976165772,
+      "firm_fraction_max": 0.0005,
+      "iou_mean_min": 0.9763694758134815,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "24x48": {
+      "mae_max": 0.005157678737305105,
+      "p99_max": 0.08479724496603012,
+      "firm_fraction_max": 0.0005531462585034013,
+      "iou_mean_min": 0.9889638460945795,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "25x49": {
+      "mae_max": 0.004644121276214719,
+      "p99_max": 0.08212379410862923,
+      "firm_fraction_max": 0.0005499791753436068,
+      "iou_mean_min": 0.9770797685455677,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "25x50": {
+      "mae_max": 0.004381205175071954,
+      "p99_max": 0.07822344869375229,
+      "firm_fraction_max": 0.0005816326530612245,
+      "iou_mean_min": 0.9874971229311655,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "31x62": {
+      "mae_max": 0.00448482971265912,
+      "p99_max": 0.08663169711828232,
+      "firm_fraction_max": 0.0005424727643398671,
+      "iou_mean_min": 0.9614786379475296,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "33x61": {
+      "mae_max": 0.004422451123595237,
+      "p99_max": 0.08869527697563172,
+      "firm_fraction_max": 0.0005811054675223294,
+      "iou_mean_min": 0.9779476056480247,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "16x48": {
+      "mae_max": 0.005078531918115914,
+      "p99_max": 0.07460351333022118,
+      "firm_fraction_max": 0.0005265731292517007,
+      "iou_mean_min": 0.9856393537149717,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "40x80": {
+      "mae_max": 0.0038526251316070557,
+      "p99_max": 0.0825,
+      "firm_fraction_max": 0.0005701530612244898,
+      "iou_mean_min": 0.9881880169596894,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "64x128": {
+      "mae_max": 0.00371189740113914,
+      "p99_max": 0.09345040142536164,
+      "firm_fraction_max": 0.0009434390943877551,
+      "iou_mean_min": 0.9856134428929307,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     }
+    },
+    "s1": {
+     "8x16": {
+      "mae_max": 0.014486786663532257,
+      "p99_max": 0.1465723258256912,
+      "firm_fraction_max": 0.000659438775510204,
+      "iou_mean_min": 0.9492191864139397
+     },
+     "16x32": {
+      "mae_max": 0.0067150269038975235,
+      "p99_max": 0.09188165187835694,
+      "firm_fraction_max": 0.0008985969387755102,
+      "iou_mean_min": 0.9719678906357522
+     },
+     "48x96": {
+      "mae_max": 0.0038695442359894514,
+      "p99_max": 0.08912574917078019,
+      "firm_fraction_max": 0.0008587372448979592,
+      "iou_mean_min": 0.9862893861062135
+     }
+    }
+   },
+   "L-cyrillic": {
+    "reference": "split-v5 accent expert (H256) on its 66 cyrillic letters",
+    "established": {
+     "8x16": {
+      "mae_max": 0.008846933241933584,
+      "p99_max": 0.08080938875675202,
+      "firm_fraction_max": 0.0005,
+      "iou_mean_min": 0.9403669428922312,
+      "glyph_mae_max": 0.02718239486217499,
+      "glyph_iou_min": 0.6590909090909091,
+      "nearest_all": true,
+      "no_vanished": true
+     },
+     "16x32": {
+      "mae_max": 0.005168077755719423,
+      "p99_max": 0.07487731844186783,
+      "firm_fraction_max": 0.0005,
+      "iou_mean_min": 0.9833169521377108,
+      "glyph_mae_max": 0.020468130931258204,
+      "glyph_iou_min": 0.8779279279279278,
+      "nearest_all": true,
+      "no_vanished": true
+     },
+     "48x96": {
+      "mae_max": 0.004071772551164031,
+      "p99_max": 0.09300522178411484,
+      "firm_fraction_max": 0.0008748421717171718,
+      "iou_mean_min": 0.9863132214935806,
+      "glyph_mae_max": 0.01432661734521389,
+      "glyph_iou_min": 0.9284845650140318,
+      "nearest_all": true,
+      "no_vanished": true
+     }
+    },
+    "geometry": {
+     "1x2": {
+      "mae_max": 0.2304566279053688,
+      "p99_max": 0.3112554144859314,
+      "firm_fraction_max": 0.008075757575757576,
+      "iou_mean_min": 0.9798484848484849,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "2x4": {
+      "mae_max": 0.040436298586428165,
+      "p99_max": 0.13888162791728972,
+      "firm_fraction_max": 0.0005,
+      "iou_mean_min": 0.8662121212121212,
+      "nearest_fraction_min": 0.9848484848484849,
+      "vanished_fraction_max": 0.06060606060606061
+     },
+     "3x6": {
+      "mae_max": 0.029891565442085266,
+      "p99_max": 0.13526817083358764,
+      "firm_fraction_max": 0.0021835016835016832,
+      "iou_mean_min": 0.5369191919191919,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.30303030303030304
+     },
+     "4x8": {
+      "mae_max": 0.021051190327852964,
+      "p99_max": 0.10228559046983719,
+      "firm_fraction_max": 0.0005,
+      "iou_mean_min": 0.8123635707726616,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "5x9": {
+      "mae_max": 0.014929868280887604,
+      "p99_max": 0.09070203870534897,
+      "firm_fraction_max": 0.0005,
+      "iou_mean_min": 0.8871097841552388,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "6x12": {
+      "mae_max": 0.013477453496307135,
+      "p99_max": 0.08227225437760353,
+      "firm_fraction_max": 0.0005,
+      "iou_mean_min": 0.9225469299359093,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "7x13": {
+      "mae_max": 0.01242654025554657,
+      "p99_max": 0.08182704493403435,
+      "firm_fraction_max": 0.0005,
+      "iou_mean_min": 0.9762053078500448,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "7x14": {
+      "mae_max": 0.011790675111114979,
+      "p99_max": 0.08121122092008591,
+      "firm_fraction_max": 0.0005,
+      "iou_mean_min": 0.9709140060276423,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "9x18": {
+      "mae_max": 0.008644800167530775,
+      "p99_max": 0.07454397201538086,
+      "firm_fraction_max": 0.0005,
+      "iou_mean_min": 0.9774040183242425,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "10x20": {
+      "mae_max": 0.005288147600367665,
+      "p99_max": 0.06353439807891846,
+      "firm_fraction_max": 0.0005,
+      "iou_mean_min": 0.9623080391122495,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "11x21": {
+      "mae_max": 0.007570501416921616,
+      "p99_max": 0.0792804178595543,
+      "firm_fraction_max": 0.0005,
+      "iou_mean_min": 0.9441222328617551,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "12x24": {
+      "mae_max": 0.007002678466960788,
+      "p99_max": 0.07527458339929581,
+      "firm_fraction_max": 0.0005,
+      "iou_mean_min": 0.9239595964102606,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "13x27": {
+      "mae_max": 0.006258600857108831,
+      "p99_max": 0.07537241697311402,
+      "firm_fraction_max": 0.0005,
+      "iou_mean_min": 0.9666247187486692,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "15x30": {
+      "mae_max": 0.003924197038635611,
+      "p99_max": 0.05886102885007859,
+      "firm_fraction_max": 0.0005,
+      "iou_mean_min": 0.9816176495331903,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "17x35": {
+      "mae_max": 0.006227756850421429,
+      "p99_max": 0.08598994135856629,
+      "firm_fraction_max": 0.0005,
+      "iou_mean_min": 0.9593371530199875,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "20x40": {
+      "mae_max": 0.0036678898483514786,
+      "p99_max": 0.06282351955771447,
+      "firm_fraction_max": 0.000518939393939394,
+      "iou_mean_min": 0.8752331234555905,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "23x46": {
+      "mae_max": 0.004347925061360001,
+      "p99_max": 0.07436573550105095,
+      "firm_fraction_max": 0.0005429627083691356,
+      "iou_mean_min": 0.9773710115013702,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "23x47": {
+      "mae_max": 0.0042933910023421045,
+      "p99_max": 0.07471040681004525,
+      "firm_fraction_max": 0.0005420486081910688,
+      "iou_mean_min": 0.9740204864856901,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "24x48": {
+      "mae_max": 0.005903382785618305,
+      "p99_max": 0.09217034697532654,
+      "firm_fraction_max": 0.0005526094276094276,
+      "iou_mean_min": 0.9832578477248648,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "25x49": {
+      "mae_max": 0.00494797364808619,
+      "p99_max": 0.08414127349853516,
+      "firm_fraction_max": 0.000611317254174397,
+      "iou_mean_min": 0.9797119222436017,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "25x50": {
+      "mae_max": 0.004520124290138483,
+      "p99_max": 0.0796948117017746,
+      "firm_fraction_max": 0.0007545454545454546,
+      "iou_mean_min": 0.9887773788879267,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "31x62": {
+      "mae_max": 0.004849927732720971,
+      "p99_max": 0.09103271037340165,
+      "firm_fraction_max": 0.0005867152271938952,
+      "iou_mean_min": 0.9526121917342916,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "33x61": {
+      "mae_max": 0.004689655266702175,
+      "p99_max": 0.09114993780851365,
+      "firm_fraction_max": 0.0006204293305634588,
+      "iou_mean_min": 0.9685112316340652,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "16x48": {
+      "mae_max": 0.005687518045306206,
+      "p99_max": 0.07670281499624253,
+      "firm_fraction_max": 0.0005197285353535354,
+      "iou_mean_min": 0.9886362405842225,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "40x80": {
+      "mae_max": 0.004102002117782831,
+      "p99_max": 0.08553936004638672,
+      "firm_fraction_max": 0.000675189393939394,
+      "iou_mean_min": 0.9895123884049455,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     },
+     "64x128": {
+      "mae_max": 0.0039051424115896225,
+      "p99_max": 0.09787099480628968,
+      "firm_fraction_max": 0.0010715110085227273,
+      "iou_mean_min": 0.9853114669458298,
+      "nearest_fraction_min": 1.0,
+      "vanished_fraction_max": 0.0
+     }
+    },
+    "s1": {
+     "8x16": {
+      "mae_max": 0.016669232152402402,
+      "p99_max": 0.17865202248096465,
+      "firm_fraction_max": 0.0022755681818181816,
+      "iou_mean_min": 0.9123898300202072
+     },
+     "16x32": {
+      "mae_max": 0.007350131623446941,
+      "p99_max": 0.10081932365894318,
+      "firm_fraction_max": 0.0009438920454545455,
+      "iou_mean_min": 0.9774166424405926
+     },
+     "48x96": {
+      "mae_max": 0.004071772551164031,
+      "p99_max": 0.09300522178411484,
+      "firm_fraction_max": 0.0008748421717171718,
+      "iou_mean_min": 0.9863132214935806
+     }
+    }
+   }
+  }
+ },
+ "evaluator": "native library coverage, automatic sampling (and S1 for the letters), against the training teacher; metrics MAE, p99, firm-wrong fraction (teacher >= 0.1 from 1/2), binary IoU, nearest-teacher identity (twin rule < 0.5 px), identity margin, vanished; 8x16, 16x32, 48x96 and 26 geometry sizes 1x2..64x128",
+ "trainer": "train/split_expert.py at the commit that added the tsymbol, tgreek and tcyrillic sets; repertoire groups, contiguous partition, seeds 0 and 1, Adam 0.002 cosine, teacher grid 256, tau .15, pen .075",
+ "parts": [
+  {
+   "part": "symbol",
+   "gate_kind": "S",
+   "recipe": {
+    "parts": 9,
+    "width": 64,
+    "budget": 576,
+    "steps": 120000,
+    "recipe": 2
+   },
+   "training_hardware": "RTX 3090 (rented); resumed from the step-38k checkpoint on a second RTX 3090",
+   "groups": [
+    {
+     "group": 0,
+     "scalars": [
+      "U+00A1",
+      "U+00A2",
+      "U+00A3",
+      "U+00A5",
+      "U+00A6",
+      "U+00A7",
+      "U+00AA",
+      "U+00AB",
+      "U+00AC",
+      "U+00AE",
+      "U+00B1",
+      "U+00B2"
+     ],
+     "both_seeds_pass": false,
+     "selected_seed": 0,
+     "seeds": {
+      "0": {
+       "file": "neuronte-tsymbol-v1-g0.json",
+       "sha256": "0fd4518265f32a39142d8af968d50c6ca4086472a1a797785f45a98db96e929d",
+       "reference_check_passed": true,
+       "established_mae": {
+        "8x16": 0.00603069089508305,
+        "16x32": 0.0027313677661974602,
+        "48x96": 0.001490862836362794
+       },
+       "gates_passed": false,
+       "failures": [
+        "8x16 mae",
+        "geometry 2x4 mae",
+        "geometry 2x4 nearest",
+        "geometry 6x12 mae",
+        "geometry 10x20 mae",
+        "geometry 25x50 firm"
+       ]
+      },
+      "1": {
+       "file": "neuronte-tsymbol-v1-g0.seed1.json",
+       "sha256": "776f0b78c7ac55fd93a5643c4af3f1efe1ec96f4465aa5c1a0eab72509057064",
+       "reference_check_passed": true,
+       "established_mae": {
+        "8x16": 0.006122276807824771,
+        "16x32": 0.002759003002817432,
+        "48x96": 0.0014336207629336666
+       },
+       "gates_passed": false,
+       "failures": [
+        "8x16 mae",
+        "geometry 2x4 mae",
+        "geometry 2x4 nearest",
+        "geometry 3x6 mae",
+        "geometry 6x12 mae",
+        "geometry 10x20 mae",
+        "geometry 25x50 firm"
+       ]
+      }
+     }
+    },
+    {
+     "group": 1,
+     "scalars": [
+      "U+00B3",
+      "U+00B5",
+      "U+00B6",
+      "U+00B9",
+      "U+00BA",
+      "U+00BB",
+      "U+00BC",
+      "U+00BE",
+      "U+00BF",
+      "U+201E",
+      "U+2020",
+      "U+2021",
+      "U+2023"
+     ],
+     "both_seeds_pass": false,
+     "selected_seed": 0,
+     "seeds": {
+      "0": {
+       "file": "neuronte-tsymbol-v1-g1.json",
+       "sha256": "82c56caf116271ac30ba0f4d1f701d2c4a251954a4d187a0e12fdff700804af1",
+       "reference_check_passed": true,
+       "established_mae": {
+        "8x16": 0.005717536443486237,
+        "16x32": 0.003053964232094586,
+        "48x96": 0.0015613384401568999
+       },
+       "gates_passed": false,
+       "failures": [
+        "8x16 mae",
+        "geometry 3x6 firm",
+        "geometry 11x21 mae"
+       ]
+      },
+      "1": {
+       "file": "neuronte-tsymbol-v1-g1.seed1.json",
+       "sha256": "10f9c5997fd922a83ecc9ee722dac31d1d507147b847d2fb43aae57b337fa3b9",
+       "reference_check_passed": true,
+       "established_mae": {
+        "8x16": 0.005549697769590869,
+        "16x32": 0.0029997479152650787,
+        "48x96": 0.001467970222270546
+       },
+       "gates_passed": false,
+       "failures": [
+        "geometry 3x6 firm",
+        "geometry 11x21 mae"
+       ]
+      }
+     }
+    },
+    {
+     "group": 2,
+     "scalars": [
+      "U+2039",
+      "U+2070",
+      "U+2074",
+      "U+2075",
+      "U+2076",
+      "U+2077",
+      "U+2078",
+      "U+2079",
+      "U+2080",
+      "U+2081",
+      "U+2082",
+      "U+2083"
+     ],
+     "both_seeds_pass": false,
+     "selected_seed": 0,
+     "seeds": {
+      "0": {
+       "file": "neuronte-tsymbol-v1-g2.json",
+       "sha256": "102e5d9bd04dc6ba849228e30e6a25e56f07922a012b9082c8021e951b0fa5d3",
+       "reference_check_passed": true,
+       "established_mae": {
+        "8x16": 0.0033366257848683745,
+        "16x32": 0.001530181315805142,
+        "48x96": 0.0009269638442977642
+       },
+       "gates_passed": false,
+       "failures": [
+        "geometry 3x6 nearest",
+        "geometry 4x8 nearest"
+       ]
+      },
+      "1": {
+       "file": "neuronte-tsymbol-v1-g2.seed1.json",
+       "sha256": "e7e2c7494e60b36ca8ab68ee1971a6e2e527ed252e9cba70848e6d49b1dc3ec6",
+       "reference_check_passed": true,
+       "established_mae": {
+        "8x16": 0.0032961138155466565,
+        "16x32": 0.0014863544881033401,
+        "48x96": 0.0008364274738899743
+       },
+       "gates_passed": false,
+       "failures": [
+        "geometry 3x6 nearest",
+        "geometry 4x8 nearest"
+       ]
+      }
+     }
+    },
+    {
+     "group": 3,
+     "scalars": [
+      "U+2084",
+      "U+2085",
+      "U+2086",
+      "U+2087",
+      "U+2088",
+      "U+2089",
+      "U+20AC",
+      "U+20B4",
+      "U+20BD",
+      "U+2116",
+      "U+2122",
+      "U+2194",
+      "U+2195"
+     ],
+     "both_seeds_pass": false,
+     "selected_seed": 0,
+     "seeds": {
+      "0": {
+       "file": "neuronte-tsymbol-v1-g3.json",
+       "sha256": "3472add082d06e475992dff18cd60ef3f1ebeb630f0498f8709644e10f7861b1",
+       "reference_check_passed": true,
+       "established_mae": {
+        "8x16": 0.006641627916206534,
+        "16x32": 0.002927192298767085,
+        "48x96": 0.0016526634437748445
+       },
+       "gates_passed": false,
+       "failures": [
+        "8x16 mae",
+        "geometry 3x6 nearest",
+        "geometry 5x9 mae",
+        "geometry 6x12 mae",
+        "geometry 10x20 mae"
+       ]
+      },
+      "1": {
+       "file": "neuronte-tsymbol-v1-g3.seed1.json",
+       "sha256": "55c7f2fdb6c12497429d73c0d75da6e9635f29d0acabf4200c4166474f98fcbe",
+       "reference_check_passed": true,
+       "established_mae": {
+        "8x16": 0.006559858456827127,
+        "16x32": 0.0028994485485152556,
+        "48x96": 0.0016751065402506636
+       },
+       "gates_passed": false,
+       "failures": [
+        "8x16 mae",
+        "geometry 3x6 nearest",
+        "geometry 5x9 mae",
+        "geometry 6x12 mae",
+        "geometry 6x12 firm",
+        "geometry 10x20 mae"
+       ]
+      }
+     }
+    },
+    {
+     "group": 4,
+     "scalars": [
+      "U+2196",
+      "U+2198",
+      "U+2199",
+      "U+21A9",
+      "U+21AA",
+      "U+21B5",
+      "U+21D0",
+      "U+21D1",
+      "U+21D2",
+      "U+21D3",
+      "U+21D4",
+      "U+21E7"
+     ],
+     "both_seeds_pass": false,
+     "selected_seed": 0,
+     "seeds": {
+      "0": {
+       "file": "neuronte-tsymbol-v1-g4.json",
+       "sha256": "6225ba9e8985b50972cb5d896193fd4bd752881941730e74f8b354a0749d76a9",
+       "reference_check_passed": true,
+       "established_mae": {
+        "8x16": 0.008573153521865606,
+        "16x32": 0.0033795707082996764,
+        "48x96": 0.0017333936217861872
+       },
+       "gates_passed": false,
+       "failures": [
+        "8x16 mae",
+        "geometry 2x4 mae",
+        "geometry 2x4 nearest",
+        "geometry 2x4 vanished",
+        "geometry 3x6 mae",
+        "geometry 3x6 firm",
+        "geometry 3x6 vanished",
+        "geometry 6x12 mae",
+        "geometry 7x13 mae",
+        "geometry 7x14 mae",
+        "geometry 9x18 mae",
+        "geometry 11x21 mae",
+        "geometry 12x24 mae",
+        "geometry 13x27 mae"
+       ]
+      },
+      "1": {
+       "file": "neuronte-tsymbol-v1-g4.seed1.json",
+       "sha256": "8ee3bc692498d95265e23c5afd19876a181070a47a78f973dff97696412a2072",
+       "reference_check_passed": true,
+       "established_mae": {
+        "8x16": 0.008562124295470616,
+        "16x32": 0.003430512830770264,
+        "48x96": 0.0017813353042583913
+       },
+       "gates_passed": false,
+       "failures": [
+        "8x16 mae",
+        "geometry 2x4 mae",
+        "geometry 2x4 vanished",
+        "geometry 3x6 mae",
+        "geometry 3x6 firm",
+        "geometry 3x6 vanished",
+        "geometry 6x12 mae",
+        "geometry 7x13 mae",
+        "geometry 7x14 mae",
+        "geometry 9x18 mae",
+        "geometry 11x21 mae",
+        "geometry 12x24 mae",
+        "geometry 13x27 mae"
+       ]
+      }
+     }
+    },
+    {
+     "group": 5,
+     "scalars": [
+      "U+2202",
+      "U+2206",
+      "U+2207",
+      "U+2208",
+      "U+2209",
+      "U+220F",
+      "U+2211",
+      "U+2212",
+      "U+221A",
+      "U+221E",
+      "U+2227",
+      "U+2228",
+      "U+2229"
+     ],
+     "both_seeds_pass": false,
+     "selected_seed": 0,
+     "seeds": {
+      "0": {
+       "file": "neuronte-tsymbol-v1-g5.json",
+       "sha256": "2b9b48fd28e992ac80d07829cb6594f34cd86c67bf2f6b2057d5757763b3551a",
+       "reference_check_passed": true,
+       "established_mae": {
+        "8x16": 0.005142325929437692,
+        "16x32": 0.002632449501946282,
+        "48x96": 0.00145600532190516
+       },
+       "gates_passed": false,
+       "failures": [
+        "geometry 1x2 firm",
+        "geometry 1x2 nearest",
+        "geometry 2x4 vanished"
+       ]
+      },
+      "1": {
+       "file": "neuronte-tsymbol-v1-g5.seed1.json",
+       "sha256": "b12295001ae8f81ace0060e9089fd702db776c185172212538042ebc99889ef2",
+       "reference_check_passed": true,
+       "established_mae": {
+        "8x16": 0.005051303511628738,
+        "16x32": 0.0027137783248550617,
+        "48x96": 0.0014195040119095491
+       },
+       "gates_passed": false,
+       "failures": [
+        "geometry 1x2 firm",
+        "geometry 1x2 nearest",
+        "geometry 2x4 vanished"
+       ]
+      }
+     }
+    },
+    {
+     "group": 6,
+     "scalars": [
+      "U+222A",
+      "U+222B",
+      "U+2260",
+      "U+2264",
+      "U+2265",
+      "U+2282",
+      "U+2283",
+      "U+2286",
+      "U+2287",
+      "U+2303",
+      "U+2318",
+      "U+2325"
+     ],
+     "both_seeds_pass": false,
+     "selected_seed": 0,
+     "seeds": {
+      "0": {
+       "file": "neuronte-tsymbol-v1-g6.json",
+       "sha256": "c6729b41c0a58be618bcaa4dd239688ff2a1991cc670c794aac2428bc60a931a",
+       "reference_check_passed": true,
+       "established_mae": {
+        "8x16": 0.005248185227780293,
+        "16x32": 0.0027556213026400656,
+        "48x96": 0.0013913746467248227
+       },
+       "gates_passed": false,
+       "failures": [
+        "geometry 1x2 nearest"
+       ]
+      },
+      "1": {
+       "file": "neuronte-tsymbol-v1-g6.seed1.json",
+       "sha256": "ca9b150c1eb14ea2c698603fbcc183dc3f8a76b73d914c1f2448dc030bc95801",
+       "reference_check_passed": true,
+       "established_mae": {
+        "8x16": 0.005185945037131508,
+        "16x32": 0.00273758729842181,
+        "48x96": 0.0013727920304518193
+       },
+       "gates_passed": false,
+       "failures": [
+        "geometry 1x2 nearest",
+        "geometry 5x9 firm"
+       ]
+      }
+     }
+    },
+    {
+     "group": 7,
+     "scalars": [
+      "U+2387",
+      "U+23CE",
+      "U+23F1",
+      "U+25A0",
+      "U+25A1",
+      "U+25AA",
+      "U+25AB",
+      "U+25B4",
+      "U+25B6",
+      "U+25C0",
+      "U+25C2",
+      "U+25C7",
+      "U+25CB"
+     ],
+     "both_seeds_pass": false,
+     "selected_seed": 0,
+     "seeds": {
+      "0": {
+       "file": "neuronte-tsymbol-v1-g7.json",
+       "sha256": "de5ba62b6437d8565032cf1e873f4969073536f37620fc252efa962d718adf5e",
+       "reference_check_passed": true,
+       "established_mae": {
+        "8x16": 0.004645010613155766,
+        "16x32": 0.0023301138605277697,
+        "48x96": 0.0011572270260120814
+       },
+       "gates_passed": false,
+       "failures": [
+        "geometry 1x2 nearest"
+       ]
+      },
+      "1": {
+       "file": "neuronte-tsymbol-v1-g7.seed1.json",
+       "sha256": "e664540deea03287bd58655a85674e9ae667e3f3e615d8579a40da3a05ab9dc9",
+       "reference_check_passed": true,
+       "established_mae": {
+        "8x16": 0.004610436113300518,
+        "16x32": 0.0023337518348573493,
+        "48x96": 0.0011134734466815223
+       },
+       "gates_passed": false,
+       "failures": [
+        "geometry 1x2 nearest"
+       ]
+      }
+     }
+    },
+    {
+     "group": 8,
+     "scalars": [
+      "U+25E6",
+      "U+2605",
+      "U+2606",
+      "U+2611",
+      "U+2630",
+      "U+26A0",
+      "U+2713",
+      "U+2715",
+      "U+2716",
+      "U+2717",
+      "U+2718",
+      "U+279C",
+      "U+27A4"
+     ],
+     "both_seeds_pass": false,
+     "selected_seed": 0,
+     "seeds": {
+      "0": {
+       "file": "neuronte-tsymbol-v1-g8.json",
+       "sha256": "f40274fd9232ca8c78a2503bbc8a21d82da1047def085e031c4f020f4c924526",
+       "reference_check_passed": true,
+       "established_mae": {
+        "8x16": 0.005702494661538647,
+        "16x32": 0.002415982397416463,
+        "48x96": 0.0015728678419971122
+       },
+       "gates_passed": false,
+       "failures": [
+        "8x16 mae",
+        "geometry 1x2 nearest",
+        "geometry 2x4 vanished"
+       ]
+      },
+      "1": {
+       "file": "neuronte-tsymbol-v1-g8.seed1.json",
+       "sha256": "410bf36d32e13f641c3c81196c2957128e168fe128956306bb4a09aa4878786a",
+       "reference_check_passed": true,
+       "established_mae": {
+        "8x16": 0.005651003215461969,
+        "16x32": 0.0023758381766338763,
+        "48x96": 0.0016138633319105094
+       },
+       "gates_passed": false,
+       "failures": [
+        "8x16 mae",
+        "geometry 1x2 nearest",
+        "geometry 2x4 vanished"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "part": "greek",
+   "gate_kind": "L-greek",
+   "recipe": {
+    "parts": 2,
+    "width": 64,
+    "budget": 128,
+    "steps": 120000
+   },
+   "training_hardware": "RTX 3090 (rented)",
+   "groups": [
+    {
+     "group": 0,
+     "scalars": [
+      "U+0386",
+      "U+0388",
+      "U+0389",
+      "U+038A",
+      "U+038C",
+      "U+038E",
+      "U+038F",
+      "U+0390",
+      "U+03AA",
+      "U+03AB"
+     ],
+     "both_seeds_pass": false,
+     "selected_seed": 0,
+     "seeds": {
+      "0": {
+       "file": "neuronte-tgreek-v1-g0.json",
+       "sha256": "edd296605e902fbc9d8fbb8134626183609c6345c6332d5de9465529b4493195",
+       "reference_check_passed": true,
+       "established_mae": {
+        "8x16": 0.006277458812110126,
+        "16x32": 0.00358859202824533,
+        "48x96": 0.0017490978818386794
+       },
+       "gates_passed": false,
+       "failures": [
+        "8x16 iou_mean",
+        "8x16 glyph_iou U+038A 0.680",
+        "16x32 iou_mean",
+        "16x32 glyph_iou U+0388 0.843",
+        "geometry 1x2 firm",
+        "geometry 1x2 iou_mean",
+        "geometry 2x4 mae",
+        "geometry 2x4 nearest",
+        "geometry 2x4 vanished",
+        "geometry 2x4 iou_mean",
+        "geometry 2x4 p99",
+        "geometry 3x6 firm",
+        "geometry 3x6 vanished",
+        "geometry 3x6 iou_mean",
+        "geometry 6x12 iou_mean",
+        "geometry 6x12 p99",
+        "geometry 7x13 iou_mean",
+        "geometry 7x14 iou_mean",
+        "geometry 9x18 iou_mean",
+        "geometry 10x20 mae",
+        "geometry 10x20 iou_mean",
+        "geometry 10x20 p99",
+        "geometry 11x21 iou_mean",
+        "geometry 17x35 iou_mean",
+        "geometry 20x40 p99",
+        "geometry 16x48 iou_mean",
+        "s1 8x16 firm",
+        "s1 8x16 iou_mean",
+        "s1 16x32 iou_mean"
+       ]
+      },
+      "1": {
+       "file": "neuronte-tgreek-v1-g0.seed1.json",
+       "sha256": "06a47a71fc03088e4ace1a31bebb750862dd46637a53383e4340b20226ff20a1",
+       "reference_check_passed": true,
+       "established_mae": {
+        "8x16": 0.006387274456210434,
+        "16x32": 0.003575596120208502,
+        "48x96": 0.0017085218103602528
+       },
+       "gates_passed": false,
+       "failures": [
+        "8x16 iou_mean",
+        "8x16 glyph_iou U+038A 0.680",
+        "16x32 iou_mean",
+        "16x32 glyph_iou U+0388 0.843",
+        "geometry 1x2 firm",
+        "geometry 1x2 iou_mean",
+        "geometry 2x4 mae",
+        "geometry 2x4 nearest",
+        "geometry 2x4 vanished",
+        "geometry 2x4 iou_mean",
+        "geometry 2x4 p99",
+        "geometry 3x6 firm",
+        "geometry 3x6 vanished",
+        "geometry 3x6 iou_mean",
+        "geometry 6x12 iou_mean",
+        "geometry 6x12 p99",
+        "geometry 7x13 iou_mean",
+        "geometry 7x14 iou_mean",
+        "geometry 9x18 iou_mean",
+        "geometry 10x20 mae",
+        "geometry 10x20 iou_mean",
+        "geometry 10x20 p99",
+        "geometry 11x21 iou_mean",
+        "geometry 15x30 iou_mean",
+        "geometry 17x35 iou_mean",
+        "geometry 20x40 p99",
+        "geometry 16x48 iou_mean",
+        "s1 8x16 firm",
+        "s1 8x16 iou_mean",
+        "s1 16x32 iou_mean"
+       ]
+      }
+     }
+    },
+    {
+     "group": 1,
+     "scalars": [
+      "U+03AC",
+      "U+03AD",
+      "U+03AE",
+      "U+03AF",
+      "U+03B0",
+      "U+03CA",
+      "U+03CB",
+      "U+03CC",
+      "U+03CD",
+      "U+03CE"
+     ],
+     "both_seeds_pass": false,
+     "selected_seed": 0,
+     "seeds": {
+      "0": {
+       "file": "neuronte-tgreek-v1-g1.json",
+       "sha256": "76b72dcd3f4f88b536a576563594e08accbeb396cc237fdfdeda9d199cac242e",
+       "reference_check_passed": true,
+       "established_mae": {
+        "8x16": 0.00543987825512886,
+        "16x32": 0.0025742214871570467,
+        "48x96": 0.0015002370346337557
+       },
+       "gates_passed": false,
+       "failures": [
+        "geometry 3x6 iou_mean",
+        "geometry 4x8 iou_mean",
+        "geometry 6x12 iou_mean",
+        "geometry 10x20 iou_mean",
+        "geometry 13x27 iou_mean",
+        "geometry 15x30 iou_mean",
+        "geometry 25x49 iou_mean",
+        "geometry 31x62 iou_mean",
+        "s1 8x16 iou_mean"
+       ]
+      },
+      "1": {
+       "file": "neuronte-tgreek-v1-g1.seed1.json",
+       "sha256": "2c95587540a93b6adab97fdd1261ab277125b3d80b161a37f50e73ce3837cc5f",
+       "reference_check_passed": true,
+       "established_mae": {
+        "8x16": 0.0053680919809266925,
+        "16x32": 0.0025843675481155514,
+        "48x96": 0.0015067354193888604
+       },
+       "gates_passed": false,
+       "failures": [
+        "geometry 3x6 iou_mean",
+        "geometry 4x8 iou_mean",
+        "geometry 6x12 iou_mean",
+        "geometry 10x20 iou_mean",
+        "geometry 13x27 iou_mean",
+        "geometry 15x30 iou_mean",
+        "s1 8x16 iou_mean"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "part": "cyrillic",
+   "gate_kind": "L-cyrillic",
+   "recipe": {
+    "parts": 3,
+    "width": 64,
+    "budget": 192,
+    "steps": 120000
+   },
+   "training_hardware": "RTX 3090 (rented); resumed from the step-54k checkpoint on a second RTX 3090",
+   "groups": [
+    {
+     "group": 0,
+     "scalars": [
+      "U+0400",
+      "U+0402",
+      "U+0403",
+      "U+0404",
+      "U+0405",
+      "U+0406",
+      "U+0407",
+      "U+0408",
+      "U+0409",
+      "U+040A"
+     ],
+     "both_seeds_pass": false,
+     "selected_seed": 0,
+     "seeds": {
+      "0": {
+       "file": "neuronte-tcyrillic-v1-g0.json",
+       "sha256": "4e21a2ac6ca0ef95da4871e9b968f1ac76581ad6859fd1acef1f97c2c0f0bc68",
+       "reference_check_passed": true,
+       "established_mae": {
+        "8x16": 0.007882255036383868,
+        "16x32": 0.004001163877546787,
+        "48x96": 0.0018261957564391195
+       },
+       "gates_passed": false,
+       "failures": [
+        "16x32 iou_mean",
+        "geometry 3x6 firm",
+        "geometry 6x12 iou_mean",
+        "geometry 10x20 iou_mean",
+        "geometry 11x21 iou_mean",
+        "geometry 17x35 iou_mean",
+        "geometry 16x48 iou_mean",
+        "s1 16x32 iou_mean"
+       ]
+      },
+      "1": {
+       "file": "neuronte-tcyrillic-v1-g0.seed1.json",
+       "sha256": "570ad4f97559255fe2cb083cce8c1a96313aaf5b6388821140da12de8d374e06",
+       "reference_check_passed": true,
+       "established_mae": {
+        "8x16": 0.007837583357468248,
+        "16x32": 0.003979095933027565,
+        "48x96": 0.0018095919047482311
+       },
+       "gates_passed": false,
+       "failures": [
+        "16x32 iou_mean",
+        "geometry 3x6 firm",
+        "geometry 3x6 iou_mean",
+        "geometry 6x12 iou_mean",
+        "geometry 10x20 iou_mean",
+        "geometry 11x21 iou_mean",
+        "geometry 17x35 iou_mean",
+        "geometry 20x40 iou_mean",
+        "geometry 16x48 iou_mean",
+        "s1 16x32 iou_mean"
+       ]
+      }
+     }
+    },
+    {
+     "group": 1,
+     "scalars": [
+      "U+040B",
+      "U+040C",
+      "U+040D",
+      "U+040E",
+      "U+040F",
+      "U+0450",
+      "U+0452",
+      "U+0453",
+      "U+0454",
+      "U+0455",
+      "U+0456"
+     ],
+     "both_seeds_pass": false,
+     "selected_seed": 0,
+     "seeds": {
+      "0": {
+       "file": "neuronte-tcyrillic-v1-g1.json",
+       "sha256": "34d0d5632fde51ffa47319dda62cbc855c836902f313eb5f154e771a922ec4c6",
+       "reference_check_passed": true,
+       "established_mae": {
+        "8x16": 0.006436190059916539,
+        "16x32": 0.002940417267382145,
+        "48x96": 0.0016856367636302655
+       },
+       "gates_passed": false,
+       "failures": [
+        "geometry 1x2 firm",
+        "geometry 1x2 iou_mean",
+        "geometry 2x4 vanished",
+        "geometry 2x4 iou_mean",
+        "geometry 3x6 firm",
+        "geometry 3x6 vanished",
+        "geometry 3x6 iou_mean",
+        "geometry 4x8 iou_mean",
+        "geometry 11x21 iou_mean",
+        "geometry 17x35 iou_mean",
+        "geometry 20x40 iou_mean",
+        "s1 8x16 firm",
+        "s1 8x16 iou_mean"
+       ]
+      },
+      "1": {
+       "file": "neuronte-tcyrillic-v1-g1.seed1.json",
+       "sha256": "2a4a41f3202811b8167cd6e0a906701852229ebdd5fa2a16d583cd414cdb3676",
+       "reference_check_passed": true,
+       "established_mae": {
+        "8x16": 0.006589212708852508,
+        "16x32": 0.0029604529157619586,
+        "48x96": 0.0017462566346776757
+       },
+       "gates_passed": false,
+       "failures": [
+        "geometry 1x2 firm",
+        "geometry 1x2 iou_mean",
+        "geometry 2x4 vanished",
+        "geometry 2x4 iou_mean",
+        "geometry 3x6 firm",
+        "geometry 3x6 vanished",
+        "geometry 3x6 iou_mean",
+        "geometry 4x8 iou_mean",
+        "geometry 17x35 iou_mean",
+        "geometry 20x40 iou_mean",
+        "s1 8x16 firm",
+        "s1 8x16 iou_mean"
+       ]
+      }
+     }
+    },
+    {
+     "group": 2,
+     "scalars": [
+      "U+0457",
+      "U+0458",
+      "U+0459",
+      "U+045A",
+      "U+045B",
+      "U+045C",
+      "U+045D",
+      "U+045E",
+      "U+045F",
+      "U+0490",
+      "U+0491"
+     ],
+     "both_seeds_pass": false,
+     "selected_seed": 0,
+     "seeds": {
+      "0": {
+       "file": "neuronte-tcyrillic-v1-g2.json",
+       "sha256": "f0ef4c1040b50ae91ce3c70987750b796518e146c4f8dc282b9e432d47ea80f5",
+       "reference_check_passed": true,
+       "established_mae": {
+        "8x16": 0.006837010002610358,
+        "16x32": 0.002993174426426942,
+        "48x96": 0.0016135013905692506
+       },
+       "gates_passed": false,
+       "failures": [
+        "16x32 iou_mean",
+        "geometry 3x6 firm",
+        "geometry 4x8 iou_mean",
+        "geometry 9x18 iou_mean",
+        "geometry 12x24 iou_mean",
+        "geometry 13x27 iou_mean",
+        "geometry 17x35 iou_mean",
+        "geometry 20x40 iou_mean",
+        "geometry 23x47 iou_mean",
+        "geometry 31x62 iou_mean",
+        "geometry 16x48 iou_mean",
+        "s1 16x32 iou_mean"
+       ]
+      },
+      "1": {
+       "file": "neuronte-tcyrillic-v1-g2.seed1.json",
+       "sha256": "f64812ee10d0caadd13c3ef8ef9b59bb45d0052b3863045380a6a7247bc46566",
+       "reference_check_passed": true,
+       "established_mae": {
+        "8x16": 0.006567336640066721,
+        "16x32": 0.002983360043303533,
+        "48x96": 0.0015783833752555604
+       },
+       "gates_passed": false,
+       "failures": [
+        "16x32 iou_mean",
+        "geometry 3x6 firm",
+        "geometry 3x6 iou_mean",
+        "geometry 4x8 iou_mean",
+        "geometry 9x18 iou_mean",
+        "geometry 13x27 iou_mean",
+        "geometry 17x35 iou_mean",
+        "geometry 20x40 iou_mean",
+        "geometry 23x47 iou_mean",
+        "geometry 31x62 iou_mean",
+        "geometry 16x48 iou_mean",
+        "s1 16x32 iou_mean"
+       ]
+      }
+     }
+    }
+   ]
+  }
+ ],
+ "rejected_recipes": [
+  {
+   "part": "symbol",
+   "recipe": {
+    "parts": 9,
+    "width": 32,
+    "budget": 288,
+    "steps": 80000,
+    "recipe": 1
+   },
+   "training_hardware": "RTX 3070",
+   "note": "all nine groups failed with both seeds; recipe 2 was declared before it was trained",
+   "groups": [
+    {
+     "group": 0,
+     "failures": {
+      "0": 24,
+      "1": 22
+     }
+    },
+    {
+     "group": 1,
+     "failures": {
+      "0": 24,
+      "1": 14
+     }
+    },
+    {
+     "group": 2,
+     "failures": {
+      "0": 2,
+      "1": 2
+     }
+    },
+    {
+     "group": 3,
+     "failures": {
+      "0": 38,
+      "1": 32
+     }
+    },
+    {
+     "group": 4,
+     "failures": {
+      "0": 30,
+      "1": 30
+     }
+    },
+    {
+     "group": 5,
+     "failures": {
+      "0": 9,
+      "1": 7
+     }
+    },
+    {
+     "group": 6,
+     "failures": {
+      "0": 6,
+      "1": 2
+     }
+    },
+    {
+     "group": 7,
+     "failures": {
+      "0": 1,
+      "1": 1
+     }
+    },
+    {
+     "group": 8,
+     "failures": {
+      "0": 32,
+      "1": 26
+     }
+    }
+   ]
+  }
+ ]
+}

@@ -10,6 +10,8 @@ usage: python3 train/pack.py WEIGHTS.json OUT.nrt
        python3 train/pack.py --drawing-bundle OUT.nrt ADVANCES NET.json...
                              [--gate GATE.json] [--fallback I]
                              [--fallback-char U+003F] [--bold-add UNITS]
+                             [--letter-edges SET --snap-below PX [--edge-pen R]
+                              [--edge-extremes on|off]]
 
 The first form packs one net. The second packs a bundle of nets with a
 router: each scalar a net was trained on is drawn by that net, so no two
@@ -27,7 +29,14 @@ to one of its nets.
 
 The fifth packs a face cut into nets: a drawing file of a bundle of the
 nets, made as the second form makes it, then the advance table of
-ADVANCES, made as the fourth form makes it.
+ADVANCES, made as the fourth form makes it. With --letter-edges it adds a
+letter edge table (version 7) of the straight edges of SET's drawings,
+probed as a colour net's edges are (train/snap.py) with SET's pen or
+--edge-pen R (cell widths), and the library snaps those letters' stems to
+whole pixels in cells narrower than --snap-below PX. --edge-extremes on
+adds each letter's outermost ink columns and rows as edges where no
+straight edge lies within one probe step, so round letters snap to the
+same rows as straight ones.
 
 An advances file has one character per line, as the stroke files do: the
 character (or U+XXXX), a space, then its regular and its bold advance in
@@ -143,9 +152,29 @@ A drawing file, version 5:
     16  M x 2 u32 each member's offset from the start of the file, and
                   its length
         the M members, in that order with nothing between them, each a
-                  whole version 1, 2, 3, 4 or 6 file; at most one is
-                  version 4, at most one is version 2, and a version 2
-                  member is the only one of version 1, 2, 3 or 6
+                  whole version 1, 2, 3, 4, 6 or 7 file; at most one is
+                  version 4, at most one is version 7, at most one is
+                  version 2, and a version 2 member is the only one of
+                  version 1, 2, 3 or 6
+
+A letter edge table, version 7, only as a drawing file's member (a
+library older than it refuses the drawing file whole). It carries one
+layer's edge record per letter, as a colour net carries its own; a
+letter whose record is here is snapped like a colour glyph in cells
+narrower than the threshold, and every other letter, and every cell at
+or above it, is drawn as without the table:
+
+    0   8 bytes   "NEURONTE"
+    8   u32       format version, 7
+    12  u32       snap when the cell is narrower than this many pixels,
+                  1 to 65535 (one threshold per file: colour members must
+                  carry the same)
+    16  u32       records N, 1 to 65536
+    20            N records, sorted by scalar, none repeated: the scalar
+                  as u32, an x-edge count and a y-edge count as u16, then
+                  that many x edges and y edges, each an f32 position in
+                  design-cell widths (x 0 to 1, y 0 to 2) and a u32 side,
+                  1 rising, 0 falling
 
 A tiled net, version 6, packed from a neuronte-tiled-weights JSON. The
 design cell is cut by C + 1 column edges (0 to 1) and R + 1 row edges
@@ -916,10 +945,12 @@ def drawing_images(members, names=None):
         raise SystemExit(f"a drawing file holds 1 to {MEMBERS} members")
     if sum(v == 4 for v, _ in members) > 1:
         raise SystemExit("a drawing file holds at most one advance table")
+    if sum(v == 7 for v, _ in members) > 1:
+        raise SystemExit("a drawing file holds at most one letter edge table")
     if any(v == 2 for v, _ in members) and sum(v in (1, 2, 3, 6) for v, _ in members) > 1:
         raise SystemExit("a bundle in a drawing file must be its only member with nets")
     for p, (v, im) in zip(names, members):
-        cap = MAX_MEMBER if v in (2, 6) else length(1024)
+        cap = MAX_MEMBER if v in (2, 6, 7) else length(1024)
         if len(im) > cap:
             raise SystemExit(f"{p}: {len(im)} bytes is more than a member may be, {cap}")
     out = bytearray(b"NEURONTE")
@@ -934,12 +965,58 @@ def drawing_images(members, names=None):
     return bytes(out), [v for v, _ in members]
 
 
-def face_bundle(face, nets, gate=None, fallback=0, fallback_char=0x3F, bold_add=None):
+def ink_extremes(shapes, pen):
+    """(xs, ys) edges at the ink's outermost columns and rows, from the probe's
+    grid: a rising edge at the first, a falling one past the last."""
+    n = snap.N
+    sd = glyphs.signed_distance(shapes, glyphs.nodes(n), pen).reshape(2 * n + 1, n + 1)
+    ink = sd > 0
+    if not ink.any():
+        return [], []
+    out = []
+    for line in (sd.max(0), sd.max(1)):  # per column, then per row: the most inside value
+        idx = np.nonzero(line > 0)[0]
+        a, b = idx[0], idx[-1]
+        # the crossing between the last clear node and the first inked one, linearly
+        lo = a - 1 + (0 - line[a - 1]) / (line[a] - line[a - 1]) if a > 0 else 0.0
+        hi = b + (0 - line[b]) / (line[b + 1] - line[b]) if b + 1 < len(line) else float(b)
+        out.append([(float(lo) / n, True), (float(hi) / n, False)])
+    return out[0], out[1]
+
+
+def letter_edges(set_name, snap_below, pen=None, extremes=False):
+    """The version 7 image: the straight edges of each of set_name's drawings
+    that has any, probed with its pen (or pen), to snap below snap_below px.
+    With extremes, each letter's outermost ink columns and rows are edges
+    too where no straight edge lies within one probe step of them, so round
+    letters keep the snapped letters' heights."""
+    if not 1 <= snap_below <= 65535:
+        raise SystemExit("--snap-below is 1 to 65535 pixels")
+    pen = glyphs.PENS.get(set_name, glyphs.PEN) if pen is None else pen
+    recs = []
+    for c, _, shapes in sorted(glyphs.charset(set_name), key=lambda r: ord(r[0])):
+        xs, ys = snap.probe([("ink", shapes)], pen)[0]
+        if extremes:
+            ex, ey = ink_extremes(shapes, pen)
+            xs = sorted(xs + [e for e in ex if all(abs(e[0] - q[0]) > 1 / snap.N for q in xs)])
+            ys = sorted(ys + [e for e in ey if all(abs(e[0] - q[0]) > 1 / snap.N for q in ys)])
+        if xs or ys:
+            recs.append((ord(c), [(xs, ys)]))
+    if not recs:
+        raise SystemExit(f"{set_name}: no straight edges to snap")
+    return b"NEURONTE" + struct.pack("<3I", 7, snap_below, len(recs)) + pack_edges(recs), recs
+
+
+def face_bundle(face, nets, gate=None, fallback=0, fallback_char=0x3F, bold_add=None, edges=None):
     """(version 5 image, ranges) of a face cut into nets: their bundle,
-    then the advance table of face."""
+    then the advance table of face, then edges (a version 7 image) if given."""
     image, ranges = bundle(nets, gate, fallback)
     table = advances(read_table(face, bold_add), fallback_char)
-    return drawing_images([(2, image), (4, table)], ["bundle", face])[0], ranges
+    members, names = [(2, image), (4, table)], ["bundle", face]
+    if edges is not None:
+        members.append((7, edges))
+        names.append("letter edges")
+    return drawing_images(members, names)[0], ranges
 
 
 def _options(args, keep=()):
@@ -989,25 +1066,41 @@ if __name__ == "__main__":
         kind = {1: "net", 2: "bundle", 3: "colour net", 4: "advance table", 6: "tiled net"}
         print(out, len(data), "bytes, members:", ", ".join(kind[v] for v in versions))
     elif args[:1] == ["--drawing-bundle"]:
-        rest, fallback_char, bold_add = _options(args[1:], keep=("--gate", "--fallback"))
+        keep = ("--gate", "--fallback", "--letter-edges", "--snap-below", "--edge-pen", "--edge-extremes")
+        rest, fallback_char, bold_add = _options(args[1:], keep=keep)
         gate, fallback, nets, it = None, 0, [], iter(rest)
+        edge_set, snap_below, edge_pen, extremes = None, None, None, False
         for a in it:
-            if a in ("--gate", "--fallback"):
+            if a in keep:
                 value = next(it, None)
                 if value is None:
                     raise SystemExit(f"{a} needs a value")
                 if a == "--gate":
                     gate = value
-                else:
+                elif a == "--fallback":
                     fallback = int(value)
+                elif a == "--letter-edges":
+                    if value not in glyphs.SETS:
+                        raise SystemExit(f"--letter-edges {value!r} is not a set")
+                    edge_set = value
+                elif a == "--snap-below":
+                    snap_below = int(value)
+                elif a == "--edge-extremes":
+                    if value not in ("on", "off"):
+                        raise SystemExit("--edge-extremes is on or off")
+                    extremes = value == "on"
+                else:
+                    edge_pen = float(value)
             else:
                 nets.append(a)
-        if len(nets) < 3:
+        if len(nets) < 3 or (edge_set is None) != (snap_below is None) or (edge_pen and not edge_set):
             raise SystemExit(__doc__)
         out, face, nets = nets[0], nets[1], nets[2:]
-        data, ranges = face_bundle(face, nets, gate, fallback, fallback_char, bold_add)
+        edges = letter_edges(edge_set, snap_below, edge_pen, extremes)[0] if edge_set else None
+        data, ranges = face_bundle(face, nets, gate, fallback, fallback_char, bold_add, edges)
         print(out, len(data), "bytes, a bundle of", len(nets), "nets,", len(ranges), "ranges,",
-              "a gate" if gate else f"fallback net {fallback}", "and an advance table")
+              "a gate" if gate else f"fallback net {fallback}", "and an advance table",
+              f"and letter edges snapping below {snap_below} px" if edges else "")
     elif args[:1] == ["--bundle"] and len(args) >= 3:
         gate, fallback, nets = None, 0, []
         it = iter(args[2:])

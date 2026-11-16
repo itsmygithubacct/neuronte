@@ -63,7 +63,14 @@ enum {
  * smaller ones, each drawing a rectangle of the cell from chosen bits of
  * the scalar. It opens alone, as a bundle member or in a drawing file,
  * and every call below treats it as one net: one coverage or draw call
- * per glyph, cached whole. */
+ * per glyph, cached whole.
+ *
+ * A drawing file may also hold one letter edge table (format version 7):
+ * the straight edges of some letters and the cell width below which they
+ * are snapped to whole pixels, as neuronte_set_snap describes. It opens
+ * only inside a drawing file. A file without one draws exactly as
+ * before; a library older than the table refuses the whole file with
+ * NEURONTE_ERR_FORMAT. */
 int neuronte_open(const void *data, size_t len, neuronte **out);
 int neuronte_open_file(const char *path, neuronte **out);
 void neuronte_close(neuronte *n);
@@ -128,7 +135,9 @@ int neuronte_set_theme(neuronte *n, int theme);
  * than below_px pixels. 0 turns snapping off. -1 restores the number
  * stored in the file, which is off for a file with no colour net. A
  * positive value replaces the threshold. The test is cell_w < threshold.
- * Letters and box drawing have no edge record, so they are not snapped. */
+ * Letters are snapped the same way only when the drawing file carries a
+ * letter edge table, and only the letters it lists; its threshold is the
+ * file's number. Box drawing is never snapped. */
 int neuronte_set_snap(neuronte *n, int below_px);
 
 /* Copy one theme's palette into rgb, 32 entries of R, G, B. Entry 0 and

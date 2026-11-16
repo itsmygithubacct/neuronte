@@ -324,6 +324,12 @@ optional in-process video decoder, which links FFmpeg's libraries, has
   tiled wrapper is bit for bit the net it wraps. The loader refuses
   every truncation and 35 other malformed tiled files, and the packer
   refuses 21 malformed tiled JSON files;
+- a letter edge table (version 7) snaps exactly the letters it lists:
+  each agrees with a float64 numpy evaluation at the warped samples to
+  1e-3, while every letter without a record, every em at or above the
+  table's width, and every em with snapping off is byte for byte the
+  file without the table, and nine damaged or misplaced tables are
+  refused (`tests/check_letter_snap.py`);
 - the C library agrees with an independent float64 numpy evaluation of
   the JSON weights to 1e-3 in coverage, and the packed file is exactly
   what `train/pack.py` makes from the JSON. For the bundle, the C router
@@ -474,8 +480,15 @@ and its palette index. The two draw calls composite the layers back to
 front: entry 1 clears, entry 0 uses the colour of the call, and any
 other entry uses the theme's palette. The call's alpha then scales the
 whole glyph. A pixel the glyph left clear is left as it was. Snapping
-applies to a colour glyph that has an edge record. Letters and box
-drawing have none, so a horizontal line still meets a vertical one.
+applies to a colour glyph that has an edge record. Box drawing has none,
+so a horizontal line still meets a vertical one. Letters have none
+either, unless their drawing file carries a letter edge table (a
+version 7 member, only inside a drawing file, at most one): then the
+letters it lists are snapped the same way below the table's own width,
+and `neuronte_set_snap()` works on them too. A library older than the
+table refuses such a file whole (`NEURONTE_ERR_FORMAT`), and a file
+without one draws exactly as before. `train/pack.py --drawing-bundle
+... --letter-edges SET --snap-below PX` writes it.
 
 `neuronte-icon-v1` is the 167-icon net: form A, 256 wide, K = 6, trained
 for 40,000 steps on the original drawings. A uniform distance offset of

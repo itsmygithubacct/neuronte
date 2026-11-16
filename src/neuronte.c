@@ -79,6 +79,7 @@
 #define MAX_E 65536
 #define MAX_MEMBER (32u * 1024u * 1024u) /* a wide colour net, plus its edge table */
 #define TILED_HEAD 32
+#define LETTERS_HEAD 20
 #define MAX_TILE_AXIS 16 /* columns, and rows, of a tiled net */
 #define MAX_TILE_NETS 64
 /* A tiled glyph keeps the samples of each distinct tile it evaluates when
@@ -136,6 +137,15 @@ struct colour {
     struct layer_edges *layers;
     struct one_edge *pool;
     int nrecs;
+};
+
+/* The edge records of a drawing file's letters (a version 7 member): one
+ * layer per record, and the cell width below which they snap. */
+struct letters {
+    int snap_px, nrecs;
+    struct glyph_rec *recs;
+    struct layer_edges *layers;
+    struct one_edge *pool;
 };
 
 struct tiled;
@@ -200,6 +210,7 @@ struct neuronte {
     int snap_file;  /* the number -1 restores */
     int layers;     /* the largest K in the file, at least 1 */
     int binary;     /* distance-net draw calls cut coverage at one half */
+    struct letters *let; /* a drawing file's letter edges, or NULL */
     uint8_t dark[96], light[96];
     unsigned long tick;
     struct entry cache[SETS][WAYS];
@@ -401,6 +412,12 @@ static void free_handle(neuronte *n)
     free(n->ranges);
     free(n->gate);
     free(n->adv);
+    if (n->let) {
+        free(n->let->recs);
+        free(n->let->layers);
+        free(n->let->pool);
+        free(n->let);
+    }
     free(n);
 }
 
@@ -849,6 +866,13 @@ static int adopt(neuronte *n)
         if (c->k > n->layers)
             n->layers = c->k;
     }
+    if (n->let) {
+        /* One threshold per file: colour glyphs and letters share it. */
+        if (seen && n->let->snap_px != n->snap_file)
+            return NEURONTE_ERR_FORMAT;
+        n->snap_file = n->let->snap_px;
+        n->snap_below = n->let->snap_px;
+    }
     return NEURONTE_OK;
 }
 
@@ -896,6 +920,80 @@ static int adv_open(const unsigned char *p, size_t len, neuronte *n)
     return found ? NEURONTE_OK : NEURONTE_ERR_FORMAT;
 }
 
+/* A letter edge table (version 7), only inside a drawing file: the snap
+ * threshold in pixels (1 to 65535), the record count (1 to MAX_E), then
+ * for each record, scalars rising: the scalar, the x and y edge counts as
+ * two 16-bit words, and each edge as a float position (cell widths: x 0 to
+ * 1 left to right, y 0 to 2 top to bottom) and a word, 1 where ink starts
+ * along the axis and 0 where it ends. The records are those a colour net
+ * carries for one layer; a letter with no record is never snapped. */
+static int letters_open(const unsigned char *p, size_t len, neuronte *n)
+{
+    struct letters *l;
+    uint32_t snap, count, e, prev = 0;
+    size_t at, edges = 0, used = 0;
+
+    if (n->let || len < LETTERS_HEAD || memcmp(p, "NEURONTE", 8) != 0 || rd32(p + 8) != 7)
+        return NEURONTE_ERR_FORMAT;
+    snap = rd32(p + 12);
+    count = rd32(p + 16);
+    if (snap < 1 || snap > 65535 || count < 1 || count > MAX_E)
+        return NEURONTE_ERR_FORMAT;
+    for (e = 0, at = LETTERS_HEAD; e < count; e++) {
+        uint32_t scalar, nx, ny, t;
+        if (at + 8 > len)
+            return NEURONTE_ERR_FORMAT;
+        scalar = rd32(p + at);
+        if (scalar > 0x10FFFF || (e > 0 && scalar <= prev))
+            return NEURONTE_ERR_FORMAT;
+        prev = scalar;
+        nx = rd16(p + at + 4);
+        ny = rd16(p + at + 6);
+        at += 8;
+        if ((size_t)(nx + ny) * 8 > len - at)
+            return NEURONTE_ERR_FORMAT;
+        for (t = 0; t < nx + ny; t++, at += 8) {
+            float pos = rdf(p + at);
+            if (!isfinite(pos) || pos < 0.0f || pos > (t < nx ? 1.0f : 2.0f) || rd32(p + at + 4) > 1)
+                return NEURONTE_ERR_FORMAT;
+        }
+        edges += (size_t)nx + ny;
+    }
+    if (at != len)
+        return NEURONTE_ERR_FORMAT;
+    l = calloc(1, sizeof *l);
+    if (!l)
+        return NEURONTE_ERR_NOMEM;
+    n->let = l;
+    l->snap_px = (int)snap;
+    l->nrecs = (int)count;
+    l->recs = calloc(count, sizeof *l->recs);
+    l->layers = calloc(count, sizeof *l->layers);
+    l->pool = calloc(edges ? edges : 1, sizeof *l->pool);
+    if (!l->recs || !l->layers || !l->pool)
+        return NEURONTE_ERR_NOMEM;
+    for (e = 0, at = LETTERS_HEAD; e < count; e++) {
+        struct layer_edges *le = &l->layers[e];
+        int t;
+        l->recs[e].scalar = rd32(p + at);
+        l->recs[e].layer = le;
+        le->nx = (int)rd16(p + at + 4);
+        le->ny = (int)rd16(p + at + 6);
+        at += 8;
+        le->x = l->pool + used;
+        for (t = 0; t < le->nx; t++, at += 8, used++) {
+            l->pool[used].pos = rdf(p + at);
+            l->pool[used].rising = (int)rd32(p + at + 4);
+        }
+        le->y = l->pool + used;
+        for (t = 0; t < le->ny; t++, at += 8, used++) {
+            l->pool[used].pos = rdf(p + at);
+            l->pool[used].rising = (int)rd32(p + at + 4);
+        }
+    }
+    return NEURONTE_OK;
+}
+
 /* The bytes a drawing file needs before its members, or 0 if the header is bad. */
 static size_t drawing_prefix(const unsigned char *p)
 {
@@ -935,7 +1033,7 @@ static int drawing_open(const unsigned char *p, size_t len, neuronte *n)
         if (memcmp(m, "NEURONTE", 8) != 0)
             return NEURONTE_ERR_FORMAT;
         ver = rd32(m + 8);
-        if (bundled && ver != 4)
+        if (bundled && ver != 4 && ver != 7)
             return NEURONTE_ERR_FORMAT; /* nets beside a bundle's */
         switch (ver) {
         case 1:
@@ -958,6 +1056,9 @@ static int drawing_open(const unsigned char *p, size_t len, neuronte *n)
         case 6:
             rc = tiled_open(m, ml, &n->net[n->nets]);
             n->nets += rc == NEURONTE_OK;
+            break;
+        case 7:
+            rc = letters_open(m, ml, n); /* a second table is refused there */
             break;
         default: /* a drawing file inside one, or a later kind */
             rc = NEURONTE_ERR_FORMAT;
@@ -1669,26 +1770,42 @@ static int axis_samples(const struct glyph_rec *rec, int k, int axis, int n_px, 
     return NEURONTE_OK;
 }
 
-static const struct glyph_rec *find_rec(const struct colour *c, uint32_t s)
+static const struct glyph_rec *find_in(const struct glyph_rec *recs, int nrecs, uint32_t s)
 {
-    int lo = 0, hi = c->nrecs;
+    int lo = 0, hi = nrecs;
     while (lo < hi) {
         int mid = lo + (hi - lo) / 2;
-        if (c->recs[mid].scalar < s)
+        if (recs[mid].scalar < s)
             lo = mid + 1;
         else
             hi = mid;
     }
-    if (lo < c->nrecs && c->recs[lo].scalar == s)
-        return &c->recs[lo];
+    if (lo < nrecs && recs[lo].scalar == s)
+        return &recs[lo];
     return NULL;
 }
 
-/* Snapping is on only for a colour glyph that has an edge record, and only
- * when the cell is narrower than the threshold. */
+static const struct glyph_rec *find_rec(const struct colour *c, uint32_t s)
+{
+    return find_in(c->recs, c->nrecs, s);
+}
+
+/* A letter's edge record in the drawing file's version 7 table, or NULL. */
+static const struct glyph_rec *letter_rec(const neuronte *hd, uint32_t s)
+{
+    return hd->let ? find_in(hd->let->recs, hd->let->nrecs, s) : NULL;
+}
+
+/* Snapping is on only for a glyph that has an edge record (a colour net's
+ * own, or a letter's in the drawing file's letter table), and only when
+ * the cell is narrower than the threshold. */
 static int snap_on(const neuronte *hd, const struct net *net, uint32_t s, int cell_w)
 {
-    return net->col && hd->snap_below > 0 && cell_w < hd->snap_below && find_rec(net->col, s) != NULL;
+    if (hd->snap_below <= 0 || cell_w >= hd->snap_below)
+        return 0;
+    if (net->col)
+        return find_rec(net->col, s) != NULL;
+    return letter_rec(hd, s) != NULL;
 }
 
 static void colour_hidden(const struct net *n, const float *c, const float *xp, const float *yp,
@@ -1863,6 +1980,24 @@ static void tile_axis(const double *edge, int tiles, int n, double scale, int *f
     }
 }
 
+/* tile_axis for samples at given positions g[] (rising, in the axis's own
+ * units), as a snapped glyph's warped samples are. */
+static void tile_axis_at(const double *edge, int tiles, int n, double scale, const double *g, int *first,
+                         double *pos)
+{
+    int k, i = 0;
+    first[0] = 0;
+    for (k = 1; k < tiles; k++) {
+        while (i < n && g[i] < edge[k])
+            i++;
+        first[k] = i;
+    }
+    first[tiles] = n;
+    for (k = 0; k < tiles; k++)
+        for (i = first[k]; i < first[k + 1]; i++)
+            pos[i] = (g[i] - edge[k]) / (edge[k + 1] - edge[k]) * scale;
+}
+
 /* The first tile on the axis, at or before k, whose samples have the same
  * count, width and local positions as tile k's. */
 static int axis_class(const int *first, const double *pos, const double *edge, int k)
@@ -1875,8 +2010,11 @@ static int axis_class(const int *first, const double *pos, const double *edge, i
     return k;
 }
 
+/* gx and gy, when not NULL, are the samples' positions in the cell (x in
+ * cell widths, y 0 to 2), from a snapped glyph's warp; NULL is the even
+ * grid. */
 static int tiled_coverage(const struct tiled *t, uint32_t s, int cell_w, int cell_h, int ss,
-                          float *coverage)
+                          const double *gx, const double *gy, float *coverage)
 {
     int sw = cell_w * ss, sh = cell_h * ss, nt = t->cols * t->rows;
     int cx[MAX_TILE_AXIS + 1], ry[MAX_TILE_AXIS + 1], cc[MAX_TILE_AXIS], rc_[MAX_TILE_AXIS];
@@ -1899,8 +2037,14 @@ static int tiled_coverage(const struct tiled *t, uint32_t s, int cell_w, int cel
     yparts = calloc((size_t)t->nnets * t->rows, sizeof *yparts);
     if (!xpos || !ypos || !col_of || !row_of || !xparts || !yparts)
         goto done;
-    tile_axis(t->xe, t->cols, sw, 1.0, cx, xpos);
-    tile_axis(t->ye, t->rows, sh, 2.0, ry, ypos);
+    if (gx)
+        tile_axis_at(t->xe, t->cols, sw, 1.0, gx, cx, xpos);
+    else
+        tile_axis(t->xe, t->cols, sw, 1.0, cx, xpos);
+    if (gy)
+        tile_axis_at(t->ye, t->rows, sh, 2.0, gy, ry, ypos);
+    else
+        tile_axis(t->ye, t->rows, sh, 2.0, ry, ypos);
     for (c = 0; c < t->cols; c++) {
         cc[c] = axis_class(cx, xpos, t->xe, c);
         for (i = cx[c]; i < cx[c + 1]; i++)
@@ -2027,6 +2171,62 @@ done:
     return rc;
 }
 
+/* A letter with an edge record, in a cell narrower than the threshold: its
+ * samples are warped as a colour glyph's are (axis_samples, one layer), so
+ * straight stems land on whole pixels, then the net (plain or tiled) is
+ * read at the warped positions with the even grid's coverage ramp. */
+static int snapped_coverage(const neuronte *hd, const struct net *n, uint32_t scalar, int cell_w,
+                            int cell_h, int ss, float *coverage)
+{
+    const struct glyph_rec *rec = letter_rec(hd, scalar);
+    int sw = cell_w * ss, sh = cell_h * ss, i, j, px, py, rc;
+    double *pos = malloc(((size_t)sw + (size_t)sh) * sizeof *pos);
+    float *mem, *c, *scratch, *xp, *yp, slope;
+    size_t h;
+
+    if (!pos)
+        return NEURONTE_ERR_NOMEM;
+    rc = axis_samples(rec, 1, 0, cell_w, ss, cell_w, cell_w, pos);
+    if (rc == NEURONTE_OK)
+        rc = axis_samples(rec, 1, 1, cell_h, ss, (double)cell_h / 2.0, cell_h, pos + sw);
+    if (rc != NEURONTE_OK || n->tl) {
+        if (rc == NEURONTE_OK)
+            rc = tiled_coverage(n->tl, scalar, cell_w, cell_h, ss, pos, pos + sw, coverage);
+        free(pos);
+        return rc;
+    }
+    h = (size_t)n->h;
+    mem = malloc(((size_t)sw + (size_t)sh + 4) * h * sizeof *mem);
+    if (!mem) {
+        free(pos);
+        return NEURONTE_ERR_NOMEM;
+    }
+    c = mem;
+    scratch = c + h;
+    xp = scratch + 3 * h;
+    yp = xp + (size_t)sw * h;
+    char_part(n, scalar, c);
+    for (i = 0; i < sw; i++)
+        axis_part(n, 0, pos[i], xp + (size_t)i * h);
+    for (j = 0; j < sh; j++)
+        axis_part(n, 1, pos[sw + j], yp + (size_t)j * h);
+    slope = n->tau * (float)cell_w * (float)ss;
+    for (py = 0; py < cell_h; py++)
+        for (px = 0; px < cell_w; px++) {
+            float acc = 0.0f;
+            for (j = 0; j < ss; j++)
+                for (i = 0; i < ss; i++) {
+                    float v = 0.5f + slope * field(n, c, xp + (size_t)(px * ss + i) * h,
+                                                   yp + (size_t)(py * ss + j) * h, scratch);
+                    acc += v < 0.0f ? 0.0f : v > 1.0f ? 1.0f : v;
+                }
+            coverage[(size_t)py * cell_w + px] = acc / (float)(ss * ss);
+        }
+    free(mem);
+    free(pos);
+    return NEURONTE_OK;
+}
+
 static int coverage_code(const neuronte *hd, uint32_t scalar, int cell_w, int cell_h,
                           int samples_per_axis, float *coverage)
 {
@@ -2041,8 +2241,10 @@ static int coverage_code(const neuronte *hd, uint32_t scalar, int cell_w, int ce
     if (ss == 0)
         ss = auto_samples(cell_w);
     n = hd->net[route(hd, scalar)];
+    if (!n->col && snap_on(hd, n, scalar, cell_w))
+        return snapped_coverage(hd, n, scalar, cell_w, cell_h, ss, coverage);
     if (n->tl)
-        return tiled_coverage(n->tl, scalar, cell_w, cell_h, ss, coverage);
+        return tiled_coverage(n->tl, scalar, cell_w, cell_h, ss, NULL, NULL, coverage);
     if (n->col) {
         size_t plane = (size_t)cell_w * cell_h;
         int k = n->col->k, rc;

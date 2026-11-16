@@ -41,10 +41,11 @@ In short:
   identity and margin.
 - **Greek and Cyrillic**: mean error and p99 pass at 8×16, 16×32 and 48×96
   in every group (Greek capitals 0.0063 at 8×16 against 0.0075). What fails
-  is mostly binary IoU — coverage cut at one half — at 8×16 or 16×32, with
-  one sample per pixel, and at 6 to 13 of the 26 other cell sizes, plus some
-  firm, vanished and identity rules at 1×2 to 3×6. The
-  misses are pixels the teacher leaves just under one half: at 8×16 Ί inks
+  is mostly binary IoU — coverage cut at one half — at 8×16 or 16×32 (drawn
+  normally, with one sample per pixel, or both) and at 6 to 13 of the 26 other
+  cell sizes. The Greek capitals also miss firm, vanished, identity, p99 and
+  mean-error rules at sizes from 1×2 to 6×12; the other letter groups miss
+  firm or vanished rules at 1×2 to 3×6. Most misses are pixels the teacher leaves just under one half: at 8×16 Ί inks
   25 pixels where the teacher inks 17, in both seeds, with no firm-wrong
   pixel.
 

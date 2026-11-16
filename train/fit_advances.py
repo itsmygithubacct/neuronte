@@ -1,4 +1,11 @@
 """usage: fit_advances.py LO HI OUT.txt OUT.json [--italic]
+       fit_advances.py --extend IN.txt OUT.txt
+
+The second form writes IN's lines and then one line for each Latin-1
+character that uilarge composes (glyphs.large_latin1): the base letter's
+regular and bold advance, the space's for U+00A0 and the grave accent's
+for a spacing mark.
+
 Fit an advance table (steps of 1/100 em; the library draws (steps * em + 50) // 100 pixels) to the
 hand faces' whole-pixel advances over a range of ems: per character and weight, the steps (10..200)
 with the least summed |pixels - hand| over the range, then the fewest mismatches, then nearest the
@@ -8,6 +15,19 @@ import json, os, sys
 from decimal import Decimal
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import glyphs, pack
+if sys.argv[1:2] == ["--extend"]:
+    src, dst = sys.argv[2], sys.argv[3]
+    table = pack.read_table(src)
+    lines = open(src, encoding="utf-8").read().rstrip("\n").split("\n")
+    lines.insert(next(i for i, l in enumerate(lines) if not l.startswith("#")),
+                 "# Then the Latin-1 letters uilarge composes, each at its base letter's advance (train/fit_advances.py --extend).")
+    for c, (_, base) in sorted(glyphs.large_latin1().items()):
+        r, b = table[ord(base)]
+        name = c if c.isprintable() and not c.isspace() else f"U+{ord(c):04X}"
+        lines.append(f"{name} {Decimal(r) / 10} {Decimal(b) / 10}")
+    open(dst, "w", encoding="utf-8").write("\n".join(lines) + "\n")
+    print(dst, len(table), "+", len(glyphs.large_latin1()))
+    sys.exit(0)
 lo, hi, out_txt, out_json = int(sys.argv[1]), int(sys.argv[2]), sys.argv[3], sys.argv[4]
 ems = range(lo, hi + 1)
 ITALIC = "--italic" in sys.argv

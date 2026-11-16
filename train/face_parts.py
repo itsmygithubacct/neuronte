@@ -17,7 +17,8 @@ design cell (0..1 across, 0..2 down) is cut into three row tiles of a
 version 6 tiled net: above the ink, the ink band and below it. For a
 pixel face the band is the em rows from UI_TOP[em]: y from UI_TOP / em to
 (UI_TOP + em) / em, which fall on whole pixel rows at the face's em. For
-uilarge it is BAND_LARGE, chosen to hold all of the ink. The tiles above
+uilarge, and its composed Latin-1 sets uilargex and uilargel1, it is
+BAND_LARGE, chosen to hold all of the ink. The tiles above
 and below are drawn by EMPTY, a width-1 net that is outside the ink
 everywhere: no weights, an output bias of -8.
 
@@ -86,7 +87,7 @@ def band(name):
     em = face_em(name)
     if em is not None:
         return f32(glyphs.UI_TOP[em] / em), f32((glyphs.UI_TOP[em] + em) / em)
-    if name == "uilarge":
+    if name in ("uilarge", "uilargex", "uilargel1"):  # the composed Latin-1 letters keep uilarge's ink rows
         return BAND_LARGE
     raise ValueError(f"no ink band for set {name}")
 

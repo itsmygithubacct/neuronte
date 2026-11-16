@@ -48,6 +48,15 @@ Cached drawing is the same as v0 (about 0.017 ms per character). Of the four rec
 was the slowest (others reached 21x) and the only one whose 64 px minimum passed on both seeds; the
 owner chose it for accuracy.
 
+## Latin-1 (`neuronte-ui-large-latin1-v1`)
+
+The four nets and the two Latin-1 nets of `neuronte-ui-scaled-latin1-v0` (see that card), with
+`font/ui-large-latin1-advances.txt` (v0's advances and each composed letter at its base letter's).
+2,209,684 bytes, 154 characters, the same speed; the 96 ASCII letters draw byte for byte as v1's.
+Wrong pixels per letter against the exact strokes (8 x 8 samples), blended, seed 0 / seed 1:
+ASCII 2.01 / 1.83, 1.33 / 1.20, 2.23 / 2.14 and Latin-1 2.91 / 2.79, 2.83 / 2.67, 2.07 / 1.84 at
+33, 48 and 64 px. `make test-ui-latin1` repacks both seeds and runs the reference check on each.
+
 ## Training
 
 Trained on one RTX 3070, seeds 0 and 1 together:

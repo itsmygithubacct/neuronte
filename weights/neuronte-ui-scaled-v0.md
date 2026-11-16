@@ -17,7 +17,8 @@ default changes and every -v0 and -v1 pixel face is unchanged.
   strokes by `train/snap.py`, snapped in cells narrower than 33 px.
 
 1,774,948 bytes. Printable ASCII and U+2026, regular and bold (bold is the library's one-pixel
-smear, as for every desktop face).
+smear, as for every desktop face). `neuronte-ui-scaled-latin1-v0` is the same face with the Latin-1
+letters added (see below).
 
 ## Why it snaps, and older libraries
 
@@ -81,6 +82,40 @@ seed 0 (seed 1 within 0.1):
 | upright | 30.3 | 22.1 | 15.6 | 19.5 | 21.5 | 42.5 | 28.1 | 27.1 | 29.8 | 23.6 | 72.0 | 69.4 | 52.6 | 71.3 | 89.6 | 74.8 |
 | italic | 33.2 | 33.0 | 29.0 | 36.6 | 38.6 | 57.7 | 45.7 | 46.2 | 52.4 | 49.8 | 73.9 | 74.0 | 69.0 | 84.1 | 105.5 | 100.4 |
 
+## Latin-1 (`neuronte-ui-scaled-latin1-v0`)
+
+The same 16 nets and two more (`neuronte-ui-latin1-v0-g0.json`, `-g1.json`, each 192 x 192 x 192
+wide, 29 characters each, 183,554 parameters together) that draw the 58 Latin-1 letters ui-large
+composes from its letters and `font/marks.txt` (`train/glyphs.py large_latin1`: the marks at 4/7
+size, lowered on capitals, i and j dotless under a mark), each at its base letter's advance
+(`font/ui-scaled-latin1-advances.txt`; italic `neuronte-ui-scaled-latin1-italic-advances-v0.nrt`,
+1,264 bytes). Its letter edge table covers the composed letters too. 2,512,896 bytes, 154
+characters. Its 96 ASCII letters draw byte for byte as `neuronte-ui-scaled-v0`'s.
+
+Wrong pixels per letter against the exact composed strokes (8 x 8 samples per pixel), blended;
+below 33 px snapping moves edges off the strokes by design, so this compares the composed letters
+with the ASCII ones, not with a hand face (there is none):
+
+| em | ASCII mean, seed 0 / 1 | Latin-1 mean, seed 0 / 1 |
+|---|---|---|
+| 17 | 7.31 / 7.32 | 8.86 / 8.81 |
+| 20 | 0.47 / 0.58 | 1.79 / 1.74 |
+| 24 | 2.99 / 2.97 | 5.76 / 5.78 |
+| 28 | 12.24 / 12.17 | 9.72 / 9.79 |
+| 32 | 6.00 / 6.07 | 5.69 / 5.62 |
+
+The marks are drawn with the letters' pen at 4/7 size, so at 17 to 20 px they are small solid
+shapes rather than drawn strokes; a thinner mark pen is a possible later change, not made here.
+
+The X2 nets were trained in 975 seconds on one RTX 3070, seeds 0 and 1 together:
+
+    python3 train/face_parts.py OUT --set uilargel1 --band --groups 2 --width 192 --steps 80000 \
+        --candidates 2048 --near 384 --clamp 0.25 --name X2-bg2w192-80k-n384-c25
+
+then `train/pack.py --drawing-bundle neuronte-ui-scaled-latin1-v0.nrt font/ui-scaled-latin1-advances.txt
+SCALED-MEMBERS... LATIN1-MEMBERS... --letter-edges uilargex --snap-below 33`. `make test-ui-latin1`
+(part of `make test`) repacks both seeds and checks every snapped letter against the float64 reference.
+
 ## Speed
 
 A new handle drawing the 96 letters regular then bold, as a desktop builds its letter cells (ms,
@@ -108,7 +143,7 @@ redraw is the same for all (microseconds, within 5%).
 
 It is faster than the wide hand faces (17, 18, 22, 23, 25, 26, 31, 32 px) and 2 to 7 times slower
 than the small ones (19 to 21, 24, 27 to 30 px). Below 24 px the library samples each pixel 2 x 2,
-which is why 17 to 23 cost more. The download: one
+which is why 17 to 23 cost more. The Latin-1 file is the same speed for ASCII. The download: one
 file of 1,774,948 bytes and an 800-byte italic table in place of 32 files of 17,362,624 bytes (the
 newest upright and italic hand face at each em from 17 to 32).
 

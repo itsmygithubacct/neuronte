@@ -104,6 +104,8 @@ LARGE_FROM = 33             # the least em drawn by uilarge; below it, a pixel f
 LARGE_INK = (0.6, 1.6)      # where uilarge's ink lies in the cell, in em, top to bottom
 LARGE_BASELINE = 1.35       # the centre of uilarge's baseline strokes, in em down the cell
 PENS["uilarge"] = 3 / 64    # 3/32 em wide, three pixels at 32
+PENS["uilargex"] = PENS["uilarge"]  # uilarge and its composed Latin-1 letters
+PENS["uilargel1"] = PENS["uilarge"]  # those letters alone, to train beside uilarge's nets
 PAD = 0.25                  # how far edge lines and blocks run past the cell
 LIGHT, HEAVY = 0.06, 0.12   # half widths of box lines, in cell widths
 DOUBLE = 0.19               # offset of each line of a double line from its centre line
@@ -607,6 +609,88 @@ def accents():
     return out
 
 
+
+# Latin-1 letters for uilarge (set uilargex), composed like the accent tier:
+# a uilarge letter and a mark of font/marks.txt, by the Unicode
+# decomposition. The marks are drawn for strokes.txt's letters, so they are
+# scaled by LARGE_MARK, uilarge's x-height-to-baseline over strokes.txt's,
+# and keep strokes.txt's distance above the x-height. Over a capital a mark
+# is flatter (LARGE_CAP_FLAT) and sits LARGE_CAP_GAP above the capital,
+# which is scaled down onto the baseline from LARGE_SHORT_TOP so that the
+# mark's ink stays inside uilarge's ink rows (LARGE_INK). A cedilla scales
+# about the baseline. i and j lose their dot under a mark above. The
+# spacing marks stand alone at the middle of the grave accent's advance.
+# Characters with no such decomposition are not in the set.
+LARGE_XHEIGHT, LARGE_CAP = 0.95, 0.75
+LARGE_MARK = (LARGE_BASELINE - LARGE_XHEIGHT) / (BASELINE - XHEIGHT)
+LARGE_SHORT_TOP = 0.87
+LARGE_CAP_GAP = 0.14
+LARGE_CAP_FLAT = 0.6
+
+
+def _with_pen(shapes, r):
+    """The shapes with every stroke drawn at radius r instead of the set's pen."""
+    out = []
+    for sh in shapes:
+        if sh[0] == "cut":
+            out.append(("cut", _with_pen([sh[1]], r)[0]))
+        elif sh[0] == "seg":
+            out.append(sh[:5] + (r,))
+        else:
+            out.append(sh)
+    return out
+
+
+def large_latin1(mark_pen=None):
+    """{char: (shapes, advance source)} for the Latin-1 characters that uilarge
+    can compose: the advance source is the character whose advance this one
+    takes (the base letter; space for U+00A0; the grave accent for a
+    spacing mark)."""
+    base = strokes.parse(UI_LARGE)
+    marks = {ord(c): m for c, m in strokes.parse(MARKS).items()}
+    out = {"\u00a0": (base[" "], " ")}
+    for c in range(0xA1, 0x100):
+        ch = chr(c)
+        nfd = unicodedata.normalize("NFD", ch)
+        if c in SPACING:
+            letter, mark = None, SPACING[c]
+        elif len(nfd) == 2 and nfd[0] in base and ord(nfd[1]) in marks:
+            letter, mark = nfd[0], ord(nfd[1])
+        else:
+            continue
+        shapes = [] if letter is None else base[letter]
+        k = LARGE_MARK
+        if mark in ABOVE:
+            if letter in DOTLESS:  # the dot is the stroke above the x-height
+                shapes = [sh for sh in shapes if max(y for _, y in points([sh])) > LARGE_XHEIGHT - 0.01]
+            capital = letter is not None and letter.isupper()
+            xs = [x for x, _ in points(shapes)] or [0.0]
+            cx = (min(xs) + max(xs)) / 2
+            if capital:
+                f = (LARGE_BASELINE - LARGE_SHORT_TOP) / (LARGE_BASELINE - LARGE_CAP)
+                shapes = moved(shapes, lambda x, y: (x, LARGE_BASELINE - (LARGE_BASELINE - y) * f))
+                low = max(y for _, y in points(marks[mark]))
+                top = LARGE_SHORT_TOP - LARGE_CAP_GAP
+                fy = lambda y: top - (low - y) * k * LARGE_CAP_FLAT
+            else:
+                fy = lambda y: LARGE_XHEIGHT - (XHEIGHT - y) * k
+        elif mark in BELOW:
+            cx = 0.0 if letter is None else bottom_x(shapes)
+            fy = lambda y: LARGE_BASELINE + (y - BASELINE) * k
+        else:
+            continue
+        if letter is None:
+            cx = LARGE_SPACING_X
+        drawn = moved(marks[mark], lambda x, y: (cx + (x - 0.5) * k, fy(y)))
+        if mark_pen is not None:
+            drawn = _with_pen(drawn, mark_pen)
+        out[ch] = (shapes + drawn, letter or "`")
+    return out
+
+
+LARGE_SPACING_X = 0.235  # the middle of the grave accent's advance, 4.7 / 10 em
+
+
 # Powerline and progress. One foreground layer each. Straight edges sit on
 # 1/16 of the cell, one pixel when the cell is 16 wide. R is that stroke
 # radius. Separators and the progress bar run PAD past an edge they join.
@@ -857,6 +941,8 @@ SETS = {
     **{f"ui{em}": [f"ui{em}"] for em in UI_TOP},
     **{f"ui{em}i": [f"ui{em}i"] for em in UI_ITALIC},
     "uilarge": ["uilarge"],
+    "uilargex": ["uilarge", "uilargelatin1"],
+    "uilargel1": ["uilargelatin1"],
 }
 
 
@@ -887,6 +973,9 @@ def tier(name):
     if name == "accent":
         acc = accents()
         return [(c, acc[c]) for c in sorted(acc)]
+    if name == "uilargelatin1":
+        g = large_latin1()
+        return [(c, g[c][0]) for c in sorted(g)]
     if name == "uilarge":
         g = strokes.parse(UI_LARGE)
         if sorted(g) != [chr(c) for c in range(32, 127)] + ["\u2026"]:

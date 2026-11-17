@@ -1,0 +1,1105 @@
+{
+  "schema": "neuronte.term-symbols/v1",
+  "name": "neuronte-term-math-v1",
+  "tier": "tmath",
+  "sha256": "cf30e22efe80b233c73ca2f0c78490c153e172995187cdc1798206db647b1f77",
+  "bytes": 2686120,
+  "groups": [
+    [
+      "tmath12",
+      18
+    ],
+    [
+      "tmath10",
+      12
+    ],
+    [
+      "tmath8",
+      17
+    ]
+  ],
+  "left_out": [],
+  "owner_chosen": [
+    {
+      "set": "tmath10",
+      "group": 0,
+      "seed": 1
+    },
+    {
+      "set": "tmath10",
+      "group": 1,
+      "seed": 1
+    },
+    {
+      "set": "tmath10",
+      "group": 3,
+      "seed": 1
+    },
+    {
+      "set": "tmath10",
+      "group": 4,
+      "seed": 0
+    },
+    {
+      "set": "tmath10",
+      "group": 8,
+      "seed": 0
+    },
+    {
+      "set": "tmath10",
+      "group": 9,
+      "seed": 1
+    },
+    {
+      "set": "tmath10",
+      "group": 10,
+      "seed": 1
+    },
+    {
+      "set": "tmath10",
+      "group": 11,
+      "seed": 1
+    },
+    {
+      "set": "tmath12",
+      "group": 0,
+      "seed": 1
+    },
+    {
+      "set": "tmath12",
+      "group": 3,
+      "seed": 1
+    },
+    {
+      "set": "tmath12",
+      "group": 4,
+      "seed": 1
+    },
+    {
+      "set": "tmath12",
+      "group": 5,
+      "seed": 0
+    },
+    {
+      "set": "tmath12",
+      "group": 6,
+      "seed": 1
+    },
+    {
+      "set": "tmath12",
+      "group": 9,
+      "seed": 1
+    },
+    {
+      "set": "tmath8",
+      "group": 0,
+      "seed": 1
+    },
+    {
+      "set": "tmath8",
+      "group": 1,
+      "seed": 1
+    },
+    {
+      "set": "tmath8",
+      "group": 2,
+      "seed": 0
+    },
+    {
+      "set": "tmath8",
+      "group": 3,
+      "seed": 0
+    },
+    {
+      "set": "tmath8",
+      "group": 4,
+      "seed": 0
+    },
+    {
+      "set": "tmath8",
+      "group": 5,
+      "seed": 1
+    },
+    {
+      "set": "tmath8",
+      "group": 6,
+      "seed": 1
+    },
+    {
+      "set": "tmath8",
+      "group": 7,
+      "seed": 0
+    },
+    {
+      "set": "tmath8",
+      "group": 8,
+      "seed": 1
+    }
+  ],
+  "record": {
+    "schema": "neuronte.standalone-bundle/v1",
+    "sha256": "cf30e22efe80b233c73ca2f0c78490c153e172995187cdc1798206db647b1f77",
+    "bytes": 2686120,
+    "members": 48,
+    "group_nets": 47,
+    "ranges": 369,
+    "gate": null,
+    "trained_scalars": 465,
+    "fallback": {
+      "member": 47,
+      "kind": "blank",
+      "hidden_width": 1,
+      "distance": -8.0,
+      "image_sha256": "42d4790165297c3af39d178e1396f575991d6fe4d2e3c947762ef5eaedd05bf6",
+      "bytes": 592
+    },
+    "apart_from": [
+      {
+        "file": "neuronte-split-v9.nrt",
+        "sha256": "0a92f223d47f1680929b2c5d7512d1a1728d4871e6653b33cbaad060e6bb90c0",
+        "table_scalars": 1341
+      }
+    ],
+    "nets": [
+      {
+        "member": 0,
+        "json": "neuronte-term-math-v1-tmath12-g0.json",
+        "json_sha256": "3fe5ceb72e2c028f0cae56579c320a316b3cf0e6ddb20b5c78b644b5fe2d8a29",
+        "image_sha256": "0148a3ba62f57c2f8f67c3415ad63f8395ec1039f4d3fadec855bd16104fcde0",
+        "bytes": 57040,
+        "set": "tmath12-repertoire",
+        "scalars": [
+          "U+21A7",
+          "U+21AF",
+          "U+21B1",
+          "U+21B8",
+          "U+21B9",
+          "U+21C0",
+          "U+21DE",
+          "U+21F7",
+          "U+21FF",
+          "U+27FF",
+          "U+2B11"
+        ]
+      },
+      {
+        "member": 1,
+        "json": "neuronte-term-math-v1-tmath12-g1.json",
+        "json_sha256": "16411cc18bc3f0fa31faebf60d814b26396cd670257f5e343b358467542e40fc",
+        "image_sha256": "11fc2f34fc7f8c8d5e4470c6bb5e31b4fbe20e4ded5c39434fef43e19e19b408",
+        "bytes": 57040,
+        "set": "tmath12-repertoire",
+        "scalars": [
+          "U+219A",
+          "U+219C",
+          "U+21A2",
+          "U+21B7",
+          "U+21BA",
+          "U+21C3",
+          "U+21CC",
+          "U+21E2",
+          "U+21F6",
+          "U+21FD",
+          "U+27F3",
+          "U+2940"
+        ]
+      },
+      {
+        "member": 2,
+        "json": "neuronte-term-math-v1-tmath12-g2.json",
+        "json_sha256": "1a6d9fed2aea86e40b8b9533c3301b6f79871ddd33edcac755dcd2c7763b77d0",
+        "image_sha256": "1219bbc0ced3a400b6376dea28da60908d575da52076a939e846b0fb066191e3",
+        "bytes": 57040,
+        "set": "tmath12-repertoire",
+        "scalars": [
+          "U+219B",
+          "U+219D",
+          "U+21A0",
+          "U+21A8",
+          "U+21B4",
+          "U+21BB",
+          "U+21C1",
+          "U+21CB",
+          "U+21DD",
+          "U+21FC",
+          "U+27F2",
+          "U+2B0F"
+        ]
+      },
+      {
+        "member": 3,
+        "json": "neuronte-term-math-v1-tmath12-g3.json",
+        "json_sha256": "f3128451091f753ce3e439ceabce302b6514f494305a2f4fa6cccc4a57e8e95c",
+        "image_sha256": "4fde1ad9d48bc3c43a875e7ca4efb564cdc3003c1169f1e100cb98f623cd769c",
+        "bytes": 57040,
+        "set": "tmath12-repertoire",
+        "scalars": [
+          "U+21A1",
+          "U+21A5",
+          "U+21AC",
+          "U+21B2",
+          "U+21BD",
+          "U+21C5",
+          "U+21E5",
+          "U+21F2",
+          "U+21F9",
+          "U+21FB",
+          "U+2B0E"
+        ]
+      },
+      {
+        "member": 4,
+        "json": "neuronte-term-math-v1-tmath12-g4.json",
+        "json_sha256": "fff94be2f642a714673bf34be13c1d3b5e7daa4c30d22c0a663c7b25b90e5859",
+        "image_sha256": "ff9da0c4a5c9d298c590a88165a9b9c7c0c9610633b83ee30f041ce49b09fa11",
+        "bytes": 57040,
+        "set": "tmath12-repertoire",
+        "scalars": [
+          "U+219E",
+          "U+21A4",
+          "U+21AD",
+          "U+21BE",
+          "U+21C2",
+          "U+21C4",
+          "U+21C9",
+          "U+21DC",
+          "U+21E0",
+          "U+21F4",
+          "U+21F5",
+          "U+21F8"
+        ]
+      },
+      {
+        "member": 5,
+        "json": "neuronte-term-math-v1-tmath12-g5.json",
+        "json_sha256": "5b255d03709f5b43120f1db59adc91ddcaba029439ca9c9010de5202221a86ea",
+        "image_sha256": "2f06b3ca5ab277872a7908220f35e178110dfd541ccb613e46aacb005c413340",
+        "bytes": 57040,
+        "set": "tmath12-repertoire",
+        "scalars": [
+          "U+219F",
+          "U+21A6",
+          "U+21AE",
+          "U+21B3",
+          "U+21B6",
+          "U+21BC",
+          "U+21C7",
+          "U+21CA",
+          "U+21DF",
+          "U+21E1",
+          "U+21FE",
+          "U+27F4"
+        ]
+      },
+      {
+        "member": 6,
+        "json": "neuronte-term-math-v1-tmath12-g6.json",
+        "json_sha256": "c645ccfe0149dbe2af8e7a11a1929eb089865b7da9c70741354d98a58e89d3b9",
+        "image_sha256": "35755cd7e0562729cdada2bf199082f9681a7933754c4b81352c5132794c1319",
+        "bytes": 57040,
+        "set": "tmath12-repertoire",
+        "scalars": [
+          "U+21A3",
+          "U+21AB",
+          "U+21B0",
+          "U+21BF",
+          "U+21C6",
+          "U+21C8",
+          "U+21E4",
+          "U+21F1",
+          "U+21FA",
+          "U+2941",
+          "U+2B0D",
+          "U+2B10"
+        ]
+      },
+      {
+        "member": 7,
+        "json": "neuronte-term-math-v1-tmath12-g7.json",
+        "json_sha256": "5a1e714752a39526487385b1bfda8ac05be3d312b1676a8ab574c478100c8600",
+        "image_sha256": "71f812f0f9d72f1ab77b97179a75a63c18b3f56ce4cf561defff3aef0802b9c3",
+        "bytes": 57040,
+        "set": "tmath12-repertoire",
+        "scalars": [
+          "U+27F5",
+          "U+27F9",
+          "U+27FA",
+          "U+2B05",
+          "U+2B06",
+          "U+2B07",
+          "U+2B08",
+          "U+2B09",
+          "U+2B0A",
+          "U+2B0B",
+          "U+2B0C"
+        ]
+      },
+      {
+        "member": 8,
+        "json": "neuronte-term-math-v1-tmath12-g8.json",
+        "json_sha256": "b2cb61c804d6c39529bd8a169f64e879617d5dbd9e5af6ab1d1702107dd1b0a6",
+        "image_sha256": "4339d9a431c7ec34df9f159327d72efc744279939ff35490a622bd49522f4fdc",
+        "bytes": 57040,
+        "set": "tmath12-repertoire",
+        "scalars": [
+          "U+2235",
+          "U+2236",
+          "U+2239",
+          "U+223A",
+          "U+22F1",
+          "U+27F6",
+          "U+27F7",
+          "U+27F8",
+          "U+27FB",
+          "U+27FC",
+          "U+27FD",
+          "U+27FE"
+        ]
+      },
+      {
+        "member": 9,
+        "json": "neuronte-term-math-v1-tmath12-g9.json",
+        "json_sha256": "2b1a38cfcb7ce19792244d051e6ab9ed0d07fb189cf330cb4341436664f13db8",
+        "image_sha256": "8b191b336c4dc25fa6ae38f84a16f919a3e91facff0bc6daf4bc3a841e613ef3",
+        "bytes": 57040,
+        "set": "tmath12-repertoire",
+        "scalars": [
+          "U+2200",
+          "U+2210",
+          "U+2214",
+          "U+2222",
+          "U+2223",
+          "U+2234",
+          "U+2237",
+          "U+2238",
+          "U+223B",
+          "U+22EE",
+          "U+22EF",
+          "U+22F0"
+        ]
+      },
+      {
+        "member": 10,
+        "json": "neuronte-term-math-v1-tmath12-g10.json",
+        "json_sha256": "61ce54910e8a71e22237e44fb5511f5ac16de770d3da6cc90e3ea5260acc2ee7",
+        "image_sha256": "e3baf9fefe543aa85b82c6950553e2cc73926e6753e2e1db775e67ec639e77b0",
+        "bytes": 57040,
+        "set": "tmath12-repertoire",
+        "scalars": [
+          "U+2201",
+          "U+2205",
+          "U+220A",
+          "U+220B",
+          "U+220C",
+          "U+2215",
+          "U+2217",
+          "U+2219",
+          "U+221F",
+          "U+2220",
+          "U+2226"
+        ]
+      },
+      {
+        "member": 11,
+        "json": "neuronte-term-math-v1-tmath12-g11.json",
+        "json_sha256": "4ee53e03a50418cbd40a4a8f2b5041dd28929f26d8e4a930720c51a4e144ef21",
+        "image_sha256": "79a9f63649941abfa876ecd13c984e9959f410b2a5c770eadb2f628a77f7839b",
+        "bytes": 57040,
+        "set": "tmath12-repertoire",
+        "scalars": [
+          "U+2203",
+          "U+220D",
+          "U+220E",
+          "U+2213",
+          "U+2216",
+          "U+2218",
+          "U+221B",
+          "U+221C",
+          "U+2221",
+          "U+2225",
+          "U+22BE",
+          "U+22BF"
+        ]
+      },
+      {
+        "member": 12,
+        "json": "neuronte-term-math-v1-tmath12-g12.json",
+        "json_sha256": "efb9bf82a74d98e0af7734247e674ff0bbe17cc4c4b5052f036d88efc91be7a6",
+        "image_sha256": "acd302ee6a5614373996e4df722ca080b5d0cc79a9cdd4e780e3f5681c46c976",
+        "bytes": 57040,
+        "set": "tmath12-repertoire",
+        "scalars": [
+          "U+2204",
+          "U+221D",
+          "U+2224",
+          "U+22C4",
+          "U+22C7",
+          "U+22C9",
+          "U+22CB",
+          "U+27E0",
+          "U+29CF",
+          "U+29D3",
+          "U+29D4",
+          "U+29EB"
+        ]
+      },
+      {
+        "member": 13,
+        "json": "neuronte-term-math-v1-tmath12-g13.json",
+        "json_sha256": "89b0685ebe118f8830b67a86c9bc7361e1cb1a7d8cbe4a6ef3f2b3181e6dbb01",
+        "image_sha256": "349e38e8e94ac628967037aaff454254542196b500ba82c4ac3f675524f6b90a",
+        "bytes": 57040,
+        "set": "tmath12-repertoire",
+        "scalars": [
+          "U+22A7",
+          "U+22AA",
+          "U+22C6",
+          "U+22C8",
+          "U+22CA",
+          "U+22CC",
+          "U+22D5",
+          "U+29CE",
+          "U+29D1",
+          "U+29FA",
+          "U+29FB",
+          "U+2A2F"
+        ]
+      },
+      {
+        "member": 14,
+        "json": "neuronte-term-math-v1-tmath12-g14.json",
+        "json_sha256": "168d7afc8f13e3325f7e9228bfd76ae74340208d6c359fe8838ecd1caa61ec11",
+        "image_sha256": "ed7dc30e7423dff5393d969f5fd480f837e0a89cea33786fc6f17b996211d168",
+        "bytes": 57040,
+        "set": "tmath12-repertoire",
+        "scalars": [
+          "U+22A2",
+          "U+22A5",
+          "U+22A6",
+          "U+22A9",
+          "U+22AC",
+          "U+22AF",
+          "U+22B7",
+          "U+22BB",
+          "U+22BC",
+          "U+27C2",
+          "U+27DC"
+        ]
+      },
+      {
+        "member": 15,
+        "json": "neuronte-term-math-v1-tmath12-g15.json",
+        "json_sha256": "740c7dad43d9571d63f600050fd0d6d5aacbe0e3356c453d1a00409c0f241e18",
+        "image_sha256": "82fe7378c51c2e6a70b3c7728fcd30eadc37e2e8e5f99b31ea3c85e15f5412bd",
+        "bytes": 57040,
+        "set": "tmath12-repertoire",
+        "scalars": [
+          "U+224B",
+          "U+22A3",
+          "U+22A4",
+          "U+22A8",
+          "U+22AB",
+          "U+22AD",
+          "U+22AE",
+          "U+22B6",
+          "U+22B8",
+          "U+22B9",
+          "U+22BA",
+          "U+22BD"
+        ]
+      },
+      {
+        "member": 16,
+        "json": "neuronte-term-math-v1-tmath12-g16.json",
+        "json_sha256": "0e7b82e621263f334ea4b05d7b7d9baa234a87403189a8dfd7d9d2af71498c89",
+        "image_sha256": "982f393d38dc51e2153334118eb64570e0c020b6770754afa0fc033cd1e7e2d5",
+        "bytes": 57040,
+        "set": "tmath12-repertoire",
+        "scalars": [
+          "U+223D",
+          "U+223E",
+          "U+223F",
+          "U+2241",
+          "U+2242",
+          "U+2245",
+          "U+2247",
+          "U+224C",
+          "U+224D",
+          "U+226D",
+          "U+2A6A",
+          "U+2AAE"
+        ]
+      },
+      {
+        "member": 17,
+        "json": "neuronte-term-math-v1-tmath12-g17.json",
+        "json_sha256": "807c6b3c4b29a35e1cb09dbd3d69ff2bbcf2faa9b241fa029af982621b88239e",
+        "image_sha256": "bf6eb4fd4015fc92135a05591e9bd919362d6e8cb13b2def9bc6741d50e0f8cf",
+        "bytes": 57040,
+        "set": "tmath12-repertoire",
+        "scalars": [
+          "U+223C",
+          "U+2240",
+          "U+2243",
+          "U+2244",
+          "U+2246",
+          "U+2249",
+          "U+224A",
+          "U+224E",
+          "U+224F",
+          "U+226C",
+          "U+22CD",
+          "U+2A6B"
+        ]
+      },
+      {
+        "member": 18,
+        "json": "neuronte-term-math-v1-tmath10-g0.json",
+        "json_sha256": "0d51abc5c545a7c5c1c7e3194bf06d7bea6e1cba1b042a0cf0b0ab22239dc3f2",
+        "image_sha256": "f659ea0e2bf26f9557c32d1a0d1bfddd496ac88db030359fae81a53fbaa41039",
+        "bytes": 57040,
+        "set": "tmath10-repertoire",
+        "scalars": [
+          "U+27C6",
+          "U+27E7",
+          "U+27E9",
+          "U+27EA",
+          "U+2983",
+          "U+2988",
+          "U+2997",
+          "U+29D2",
+          "U+29D5"
+        ]
+      },
+      {
+        "member": 19,
+        "json": "neuronte-term-math-v1-tmath10-g1.json",
+        "json_sha256": "2cde417c8f1fd0686fa1a1cb681eb5daefdd5e14838f06f4161c3b966ba6dc05",
+        "image_sha256": "7f31d70667be3319e19ec92725b48e6323ad88daed39f63b43e5636a18108203",
+        "bytes": 57040,
+        "set": "tmath10-repertoire",
+        "scalars": [
+          "U+22F6",
+          "U+22FF",
+          "U+27C5",
+          "U+27E6",
+          "U+27E8",
+          "U+27EB",
+          "U+2984",
+          "U+2987",
+          "U+2998",
+          "U+29D0"
+        ]
+      },
+      {
+        "member": 20,
+        "json": "neuronte-term-math-v1-tmath10-g2.json",
+        "json_sha256": "f49de72254cc627bcdaf80dc98e923ef2dc70f232f1be28c39ab68be385e683a",
+        "image_sha256": "b04a25fcc17936a0a9f07a529c5f2448eaaa989a6fece7af9c1c72895f3278d8",
+        "bytes": 57040,
+        "set": "tmath10-repertoire",
+        "scalars": [
+          "U+22F2",
+          "U+22F3",
+          "U+22F4",
+          "U+22F7",
+          "U+22F8",
+          "U+22F9",
+          "U+22FB",
+          "U+22FC",
+          "U+22FE"
+        ]
+      },
+      {
+        "member": 21,
+        "json": "neuronte-term-math-v1-tmath10-g3.json",
+        "json_sha256": "f9d97a7ebd7079d1f12eab7bcf4f83f78f33509ae9356602c7583bb1e65dee08",
+        "image_sha256": "1bdc50947fafeb0e12c6a38b8f388d9432e5e8531e3a69a115424096232946c3",
+        "bytes": 57040,
+        "set": "tmath10-repertoire",
+        "scalars": [
+          "U+2251",
+          "U+2252",
+          "U+2254",
+          "U+2259",
+          "U+225A",
+          "U+225B",
+          "U+225D",
+          "U+22F5",
+          "U+22FA",
+          "U+22FD"
+        ]
+      },
+      {
+        "member": 22,
+        "json": "neuronte-term-math-v1-tmath10-g4.json",
+        "json_sha256": "78221c84873a068610206f4656f5965c66b56e8931a635e4b160dda57bedb4b5",
+        "image_sha256": "793a82d7f796048cd37e7295cfafd0011e16a699bfa8549e5c6c68426b1f70c4",
+        "bytes": 57040,
+        "set": "tmath10-repertoire",
+        "scalars": [
+          "U+2250",
+          "U+2253",
+          "U+2255",
+          "U+2256",
+          "U+2257",
+          "U+2258",
+          "U+225E",
+          "U+2262",
+          "U+2263"
+        ]
+      },
+      {
+        "member": 23,
+        "json": "neuronte-term-math-v1-tmath10-g5.json",
+        "json_sha256": "816e6f289f82ed43c38fb79887ff2f9e491bd74a756b12f5b38248b72be973e7",
+        "image_sha256": "e336fbf43255c6885a14b36fa08d118df8e6846ff3418192d4108d1992eb30bd",
+        "bytes": 57040,
+        "set": "tmath10-repertoire",
+        "scalars": [
+          "U+225C",
+          "U+225F",
+          "U+227A",
+          "U+227D",
+          "U+22B1",
+          "U+22DE",
+          "U+22E9",
+          "U+2AB2",
+          "U+2AB4",
+          "U+2ABA"
+        ]
+      },
+      {
+        "member": 24,
+        "json": "neuronte-term-math-v1-tmath10-g6.json",
+        "json_sha256": "ec19c0c8690e637fd9a8ce3d56e2cecac967bf3fd11bb2f2d356314464281dc7",
+        "image_sha256": "9dccf590796535d063c67dfa62d49eb3b3fb3822c09a931152ecff771d3aabc5",
+        "bytes": 57040,
+        "set": "tmath10-repertoire",
+        "scalars": [
+          "U+227B",
+          "U+227C",
+          "U+227F",
+          "U+2280",
+          "U+22E1",
+          "U+22E8",
+          "U+2AB0",
+          "U+2AB1",
+          "U+2AB6",
+          "U+2AB9"
+        ]
+      },
+      {
+        "member": 25,
+        "json": "neuronte-term-math-v1-tmath10-g7.json",
+        "json_sha256": "303ee600ac28a9b272840ce4c8310a6f8e4ada7d383253c0b61c7b9960852204",
+        "image_sha256": "b0a329f3b6ac4caf6b753298556c2378305f9f04be8146152c4f8d587a9d170b",
+        "bytes": 57040,
+        "set": "tmath10-repertoire",
+        "scalars": [
+          "U+227E",
+          "U+2281",
+          "U+22B0",
+          "U+22DF",
+          "U+22E0",
+          "U+2AAF",
+          "U+2AB3",
+          "U+2AB5",
+          "U+2AB7"
+        ]
+      },
+      {
+        "member": 26,
+        "json": "neuronte-term-math-v1-tmath10-g8.json",
+        "json_sha256": "d46a9fe5b35bade3adc6e95914281fed1e229ee701876f28e77a2663c895b694",
+        "image_sha256": "a67dac6464e6097afb842d7c68f5e828b941932a96811bccb0ab566c5bcce869",
+        "bytes": 57040,
+        "set": "tmath10-repertoire",
+        "scalars": [
+          "U+2284",
+          "U+228C",
+          "U+228F",
+          "U+2290",
+          "U+22C1",
+          "U+22C3",
+          "U+22D2",
+          "U+22D4",
+          "U+22E5",
+          "U+2AB8"
+        ]
+      },
+      {
+        "member": 27,
+        "json": "neuronte-term-math-v1-tmath10-g9.json",
+        "json_sha256": "caf4a6a0fb6e3606ed6b358d1bc8f20d1cd05dff5a5c91c1c73757137b2df199",
+        "image_sha256": "246415833d7ffe295a17887414dc0810fda4e875ad26fc2a92f23eaac3537c01",
+        "bytes": 57040,
+        "set": "tmath10-repertoire",
+        "scalars": [
+          "U+2289",
+          "U+228B",
+          "U+228D",
+          "U+228E",
+          "U+2291",
+          "U+2294",
+          "U+22CF",
+          "U+22D3",
+          "U+22E2"
+        ]
+      },
+      {
+        "member": 28,
+        "json": "neuronte-term-math-v1-tmath10-g10.json",
+        "json_sha256": "3667970868efc9d2af710add0bacf8144d275564b1985c0f4ce3cc2d0466740f",
+        "image_sha256": "da2a579bca3f49c4e3819ce9d855f7a2898469265f71b81a5ed6e3d677485d19",
+        "bytes": 57040,
+        "set": "tmath10-repertoire",
+        "scalars": [
+          "U+2288",
+          "U+228A",
+          "U+2292",
+          "U+2293",
+          "U+22C0",
+          "U+22C2",
+          "U+22CE",
+          "U+22D0",
+          "U+22E3",
+          "U+22E4"
+        ]
+      },
+      {
+        "member": 29,
+        "json": "neuronte-term-math-v1-tmath10-g11.json",
+        "json_sha256": "073f864fcc4b7b0f00156df4ab504ab41f81099830dd6e72afb1415c7c8594ca",
+        "image_sha256": "22448d2188346cc67a117de18a654fdd880f1fcb70b095a711a0e02ebcc7e726",
+        "bytes": 57040,
+        "set": "tmath10-repertoire",
+        "scalars": [
+          "U+2285",
+          "U+22B2",
+          "U+22B3",
+          "U+22B4",
+          "U+22B5",
+          "U+22D1",
+          "U+22EA",
+          "U+22EB",
+          "U+22EC",
+          "U+22ED"
+        ]
+      },
+      {
+        "member": 30,
+        "json": "neuronte-term-math-v1-tmath8-g0.json",
+        "json_sha256": "d6d5b3f1d544eb24739b741fc8afd150b1569a6d1132c7a7a8b44e33052fae7b",
+        "image_sha256": "49217511879b69dc3dc5dd6b39f9d79cee1f2ebfd41a70422f486e6e4598277c",
+        "bytes": 57040,
+        "set": "tmath8-repertoire",
+        "scalars": [
+          "U+21CD",
+          "U+21CF",
+          "U+21D7",
+          "U+21D9",
+          "U+21DA",
+          "U+21DB",
+          "U+27F0",
+          "U+290A"
+        ]
+      },
+      {
+        "member": 31,
+        "json": "neuronte-term-math-v1-tmath8-g1.json",
+        "json_sha256": "47b11ecae6b9d71c95d256b8c4a44fde2dbba2a8d964faa709954d2be319f322",
+        "image_sha256": "f0eea7eb286b0147964043a41d95cfee5b447204eaa9e62d043808993fa52925",
+        "bytes": 57040,
+        "set": "tmath8-repertoire",
+        "scalars": [
+          "U+21CE",
+          "U+21D5",
+          "U+21D6",
+          "U+21D8",
+          "U+27F1",
+          "U+2906",
+          "U+2907",
+          "U+290B"
+        ]
+      },
+      {
+        "member": 32,
+        "json": "neuronte-term-math-v1-tmath8-g2.json",
+        "json_sha256": "69d9f49f045fc9ad5129b808ab81af6bc867261551325b1e0aca7d3919cfb9c8",
+        "image_sha256": "0728c5a2b76777df6463e0dfe5c68a3e463ddcc743641486465e411c38068e5c",
+        "bytes": 57040,
+        "set": "tmath8-repertoire",
+        "scalars": [
+          "U+21E6",
+          "U+21EE",
+          "U+21EF",
+          "U+21F0",
+          "U+21F3",
+          "U+2B00",
+          "U+2B02",
+          "U+2B04"
+        ]
+      },
+      {
+        "member": 33,
+        "json": "neuronte-term-math-v1-tmath8-g3.json",
+        "json_sha256": "e5c7974972bf528a0d9a496f2933b2a2a00537a40f5b33001bcbfeb3a7aab756",
+        "image_sha256": "c52f9da2b57a39faf79e39ff374460933f7eddda02c1eab4221c46f2c73e2cc7",
+        "bytes": 57040,
+        "set": "tmath8-repertoire",
+        "scalars": [
+          "U+21E8",
+          "U+21E9",
+          "U+21EA",
+          "U+21EB",
+          "U+21EC",
+          "U+21ED",
+          "U+2B01",
+          "U+2B03"
+        ]
+      },
+      {
+        "member": 34,
+        "json": "neuronte-term-math-v1-tmath8-g4.json",
+        "json_sha256": "a84f450512cd6d9b4fd211511edfe4ff04316dee61ef727aadf94a4457308cfe",
+        "image_sha256": "e0b25cf2c850150f2684a715dba5aeb65307caed64b746945f2aa465589d5a85",
+        "bytes": 57040,
+        "set": "tmath8-repertoire",
+        "scalars": [
+          "U+2298",
+          "U+2299",
+          "U+229A",
+          "U+229D",
+          "U+229E",
+          "U+22A1",
+          "U+2A00",
+          "U+2A02"
+        ]
+      },
+      {
+        "member": 35,
+        "json": "neuronte-term-math-v1-tmath8-g5.json",
+        "json_sha256": "00ae7cb0750ea14e7404b67808ee2565b7fbb3ba2897d9aa4fa50389ab24c78a",
+        "image_sha256": "d050a1eb72cd5ad1ec0642ae6569dfab61cfb60522f7bcd9d917da05385cab00",
+        "bytes": 57040,
+        "set": "tmath8-repertoire",
+        "scalars": [
+          "U+2295",
+          "U+2296",
+          "U+2297",
+          "U+229B",
+          "U+229C",
+          "U+229F",
+          "U+22A0",
+          "U+2A01",
+          "U+2A0C"
+        ]
+      },
+      {
+        "member": 36,
+        "json": "neuronte-term-math-v1-tmath8-g6.json",
+        "json_sha256": "c669b9e5da1ac723fe51f013d1aeafc9d2c2c74bd81c65ac64328e808b66e937",
+        "image_sha256": "2272f4afd2c6cf3ee8bfd662821a6695c0e41244d7a7253057ed3ac42cba0b19",
+        "bytes": 57040,
+        "set": "tmath8-repertoire",
+        "scalars": [
+          "U+2230",
+          "U+2A0E",
+          "U+2A10",
+          "U+2A11",
+          "U+2A13",
+          "U+2A17",
+          "U+2A19",
+          "U+2A1C"
+        ]
+      },
+      {
+        "member": 37,
+        "json": "neuronte-term-math-v1-tmath8-g7.json",
+        "json_sha256": "b3af508c4e0a208ca9d7a0b756fef1ff90769df30ad9f2f7986d333200ab3980",
+        "image_sha256": "805c3fdd625679191b9abe4ef915e5b1225fa9b7c75cbeae008899977ea9944f",
+        "bytes": 57040,
+        "set": "tmath8-repertoire",
+        "scalars": [
+          "U+222F",
+          "U+2231",
+          "U+2232",
+          "U+2A0D",
+          "U+2A0F",
+          "U+2A12",
+          "U+2A16",
+          "U+2A1A"
+        ]
+      },
+      {
+        "member": 38,
+        "json": "neuronte-term-math-v1-tmath8-g8.json",
+        "json_sha256": "b23564e510093d8aafc3dcbb79f740347246e3a0ba8affe0312a9a030cc3d07e",
+        "image_sha256": "64371dc0309f4bc5cfa3e8ba80350d8a9cee21768a440cadda6c4bc6ab60fb51",
+        "bytes": 57040,
+        "set": "tmath8-repertoire",
+        "scalars": [
+          "U+222C",
+          "U+222D",
+          "U+222E",
+          "U+2233",
+          "U+2A14",
+          "U+2A15",
+          "U+2A18",
+          "U+2A1B"
+        ]
+      },
+      {
+        "member": 39,
+        "json": "neuronte-term-math-v1-tmath8-g9.json",
+        "json_sha256": "c38b269b460e3689b81b6ae91ae35e0e5944b88dbea7cdb97399c2bb3ecded98",
+        "image_sha256": "341b1be25cddf15020d007f6243cb64c31b1326dca1e9695f664c7977e63aa5c",
+        "bytes": 57040,
+        "set": "tmath8-repertoire",
+        "scalars": [
+          "U+226B",
+          "U+2273",
+          "U+22D7",
+          "U+22D8",
+          "U+2A80",
+          "U+2A84",
+          "U+2A99",
+          "U+2AF9"
+        ]
+      },
+      {
+        "member": 40,
+        "json": "neuronte-term-math-v1-tmath8-g10.json",
+        "json_sha256": "a3c0cfacbd2794f01c106ca90d1de6034a86dcd035d6c4d0f4db7489d905b9ec",
+        "image_sha256": "8c602c051f23c9fb49c7c9d47afc33f43de49d990533c7937621b4c448281eae",
+        "bytes": 57040,
+        "set": "tmath8-repertoire",
+        "scalars": [
+          "U+2272",
+          "U+2275",
+          "U+2278",
+          "U+22D6",
+          "U+22D9",
+          "U+22E7",
+          "U+2A7F",
+          "U+2AFA"
+        ]
+      },
+      {
+        "member": 41,
+        "json": "neuronte-term-math-v1-tmath8-g11.json",
+        "json_sha256": "abe520b2d671f60e6be85283e2c69819d35abec41955fd8e98594d8011d07c7b",
+        "image_sha256": "a923ded77cb4fcec5ed293ad845fa8102444ce7e216ccf9e16bec936a5c1e970",
+        "bytes": 57040,
+        "set": "tmath8-repertoire",
+        "scalars": [
+          "U+2266",
+          "U+2270",
+          "U+2276",
+          "U+22DD",
+          "U+2A7D",
+          "U+2A86",
+          "U+2A8E",
+          "U+2A92",
+          "U+2A93"
+        ]
+      },
+      {
+        "member": 42,
+        "json": "neuronte-term-math-v1-tmath8-g12.json",
+        "json_sha256": "e354ea468157bfa2d664a2c4f750ec8331a5a7d41a87bf6075b9520ae0a16bcf",
+        "image_sha256": "ae265507773bf353ea059f1d534ea96f1b565f56801864eb525c2c20f19fbc7b",
+        "bytes": 57040,
+        "set": "tmath8-repertoire",
+        "scalars": [
+          "U+2268",
+          "U+226A",
+          "U+226E",
+          "U+2A82",
+          "U+2A94",
+          "U+2A98",
+          "U+2A9E",
+          "U+2AA0"
+        ]
+      },
+      {
+        "member": 43,
+        "json": "neuronte-term-math-v1-tmath8-g13.json",
+        "json_sha256": "8bfd84d3228c67dd9bd7377e66171504652bfb55c63cfaaa0dd5e76d517f3cd3",
+        "image_sha256": "7c61927b61c620be8f8629d72bab0d968ea1db0b6e4823764a75387c3ae4e3f3",
+        "bytes": 57040,
+        "set": "tmath8-repertoire",
+        "scalars": [
+          "U+2274",
+          "U+22DB",
+          "U+22DC",
+          "U+2A83",
+          "U+2A8A",
+          "U+2A90",
+          "U+2A95",
+          "U+2A9F"
+        ]
+      },
+      {
+        "member": 44,
+        "json": "neuronte-term-math-v1-tmath8-g14.json",
+        "json_sha256": "10d46a080692a15a715e6daa8bae9170683844f0868ac8ba748b57e1dca4f1fb",
+        "image_sha256": "cd946ddb7042d5ea661744815e794af128f6223e46b711df253666a02deac22c",
+        "bytes": 57040,
+        "set": "tmath8-repertoire",
+        "scalars": [
+          "U+2271",
+          "U+2277",
+          "U+22DA",
+          "U+2A81",
+          "U+2A87",
+          "U+2A89",
+          "U+2A8F",
+          "U+2A9C"
+        ]
+      },
+      {
+        "member": 45,
+        "json": "neuronte-term-math-v1-tmath8-g15.json",
+        "json_sha256": "442b956a3f68f744e1dd45a09541ba4bd2df92bc20507bad02bd9c6d1a92e222",
+        "image_sha256": "062e4872e675e7a0181c34d76d1a2e6678a4552028a5520be9ee4f85683765df",
+        "bytes": 57040,
+        "set": "tmath8-repertoire",
+        "scalars": [
+          "U+2267",
+          "U+2269",
+          "U+2279",
+          "U+2A7E",
+          "U+2A8B",
+          "U+2A97",
+          "U+2A9B",
+          "U+2A9D"
+        ]
+      },
+      {
+        "member": 46,
+        "json": "neuronte-term-math-v1-tmath8-g16.json",
+        "json_sha256": "bd3658febddb1e397b0105ddf9965597cf463814daa8591bf9b48c825d959bc6",
+        "image_sha256": "7ff0baf81774dbff78ebd1982b6ee1d55bdfe3a84c3e240188bf447f37522f4a",
+        "bytes": 57040,
+        "set": "tmath8-repertoire",
+        "scalars": [
+          "U+226F",
+          "U+22E6",
+          "U+2A85",
+          "U+2A88",
+          "U+2A8C",
+          "U+2A8D",
+          "U+2A91",
+          "U+2A96",
+          "U+2A9A"
+        ]
+      }
+    ],
+    "list": {
+      "file": "neuronte-term-math-v1.list.txt",
+      "sha256": "0dd409553fd188325a92ee0a33b2064da9f030eca23ed0768fb751fdea226a8a"
+    }
+  }
+}

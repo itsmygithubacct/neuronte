@@ -10,31 +10,40 @@
  "characters_drawn": 168,
  "characters_trained": 168,
  "characters_left_out": [],
- "rules_skipped": 0,
- "rules_skipped_in_shipped_groups": 0,
+ "limits_eased": 0,
+ "limits_eased_in_shipped_groups": 0,
+ "seeds_passing_pixel_exact": 0,
  "drawing_problems": 0,
- "perfect_skip": {
-  "enabled": true,
+ "perfect_margin": {
+  "factor": 1.1,
+  "floor": "shortfall",
+  "rule": "for each group, size, sampling mode and rule (for the worst-character error rule, each character) the limit applied is the looser of the declared limit and the perfect drawing's own score eased by the factor: a ceiling (mae, p99, firm, glyph_mae) at perfect * 1.10; a floor (iou_mean) at 1 - (1 - perfect) * 1.10, the shortfall from 1 grown by the factor, as the gates' own slack treats an overlap; where the perfect score is exactly 0 the declared limit stands",
+  "replaces": "perfect_skip of gates-v2.2: a rule the perfect drawing fails is no longer switched off, it is applied at the perfect score eased by the factor",
   "perfect_drawing": "the exact signed distance d of the drawing (REPO/train/glyphs.py signed_distance, the teacher's pen) at the library's own sample points, as coverage clip(0.5 + d * W * S, 0, 1), S = 2 below 24 pixels wide and 1 from there for automatic sampling, S = 1 for the one-sample rules; measured by the same metric code against the same teacher masks",
   "method_from": "lane term-rest, runs/term-rest-20261117/drawings/ceiling.py",
   "applies_to": "both kinds; every counted size; automatic and one-sample rules",
-  "skipped_when": "the perfect drawing of the group misses the rule's limit at that size: mae, p99, firm, iou_mean for the group; glyph_mae (and glyph_iou where a gates file has it) for the one character",
-  "never_skipped": [
+  "never_eased": [
    "nearest_all",
    "no_vanished"
   ],
-  "recorded": "verdict.json lists every skip per group (\"skipped\") with the perfect value and the limit, and any perfect drawing that fails nearest or vanished (\"drawing_problems\")"
+  "recorded": "verdict.json lists every eased limit per group (\"eased\": rule, declared, perfect, applied) and any perfect drawing that fails nearest or vanished (\"drawing_problems\")"
  },
- "selection": "a group ships when seed 0 and seed 1 both pass the common gates (gates-v2.2.json), the seed with the lower mean of the mean error at 8x16, 16x32 and 48x96; a group that fails is trained once more as two groups of half its characters; a half that still fails is left out and its characters stay untrained. Under gates-v2.2 a rule that the perfect drawing of a group itself fails at a size is not applied there",
- "gates_file": "gates-v2.2.json",
- "gates_sha256": "dd3cc2ea30ccb49d001c28a905bcc6e2a2d11edfcd6a741464fda91162b10e70",
+ "pixel_exact": {
+  "enabled": true,
+  "rule": "a seed passes, whatever its error-amount rules say (mae, p99, firm, iou_mean, glyph_mae), if its net puts every pixel of every character of the group on the same side of one half as the teacher's mask at every counted size with automatic sampling, and for a kind with one-sample rules also at those sizes with one sample; nearest_all and no_vanished still apply and the float64 reference check still applies",
+  "recorded": "the seed's \"verdict\" reads \"pass: pixel-exact\" when the rule decided it, \"waived\" lists the error-amount failures it set aside, and the error numbers are recorded as for any net"
+ },
+ "selection": "a group ships when seed 0 and seed 1 both pass the common gates (gates-v2.3.json), the seed with the lower mean of the mean error at 8x16, 16x32 and 48x96; a group that fails is trained once more as two groups of half its characters; a half that still fails is left out and its characters stay untrained. Under gates-v2.3 no limit is tighter than the perfect drawing's own score for the group eased by 10 per cent, and a seed that puts every pixel on the correct side at every counted size passes",
+ "gates_file": "gates-v2.3.json",
+ "gates_sha256": "2ccff8354eeda45e05525490b9fdee6ab13d4970a2389537c44af1504fc50fc4",
  "gates_kind": "letters",
  "gates_files_issued": {
   "gates-v2.1.json": "214942e398f88110cd7c6044c194f0f274274aeedb07abcbe8e1a18dc2b323c0",
   "gates-v2.2.json": "dd3cc2ea30ccb49d001c28a905bcc6e2a2d11edfcd6a741464fda91162b10e70",
+  "gates-v2.3.json": "2ccff8354eeda45e05525490b9fdee6ab13d4970a2389537c44af1504fc50fc4",
   "gates-v2.json": "5bf1a3f8312c45df2a20b2e69d51ee3c690c58891ec5390cf0e41cbdf9f9b51b"
  },
- "scoring": "gates_v2.py score --kind letters --gates gates-v2.2.json, against the teacher of every character drawn for the bundle",
+ "scoring": "gates_v2.py score --kind letters --gates gates-v2.3.json, against the teacher of every character drawn for the bundle",
  "teacher_sha256": "1b3b86475ac5e782917d4b52edd5b7dfd536280adab6b96355fba61bc22cd8be",
  "teacher_characters": 168,
  "trainer": "train/split_expert.py train --mode repertoire --partition contiguous, width 64, 120000 steps, seeds 0,1, teacher grid 256",
@@ -63,6 +72,9 @@
    "lower_error_seed": 1,
    "seeds": {
     "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "1d8b3ce01583afcf1dbb6425c43135b74a928693c8fd21c704d21408ff5c8f43",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -184,6 +196,9 @@
      }
     },
     "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "18e8a0f787e4ee2501df2f41453c772fc96c0ab205cf64332579df5ab732b130",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -305,12 +320,13 @@
      }
     }
    },
-   "rules_skipped": [],
+   "limits_eased": [],
    "drawing_problems": [],
    "both_seeds_pass_under": {
     "gates-v2.json": true,
     "gates-v2.1.json": true,
-    "gates-v2.2.json": true
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
    },
    "shipped": true,
    "shipped_seed": 1,
@@ -339,6 +355,9 @@
    "lower_error_seed": 1,
    "seeds": {
     "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "6d613fc8d99743b41eae5d5f5c6990756b293ae078150bea08b3a562b9c8155b",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -460,6 +479,9 @@
      }
     },
     "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "fef6e6eaa194b6398f825d28e91bdbf49520cdc8c5ff1a85dd50709b6c969051",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -581,12 +603,13 @@
      }
     }
    },
-   "rules_skipped": [],
+   "limits_eased": [],
    "drawing_problems": [],
    "both_seeds_pass_under": {
     "gates-v2.json": true,
     "gates-v2.1.json": true,
-    "gates-v2.2.json": true
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
    },
    "shipped": true,
    "shipped_seed": 1,
@@ -615,6 +638,9 @@
    "lower_error_seed": 1,
    "seeds": {
     "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "b847d65ef6d0e29323c596551fc0c92964550374f0634bdd3310da4aa79bc011",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -736,6 +762,9 @@
      }
     },
     "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "646595aff628d28091a15ce02b24577e7cec7dd0c255a1f4ea1e0d745de8ab60",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -857,12 +886,13 @@
      }
     }
    },
-   "rules_skipped": [],
+   "limits_eased": [],
    "drawing_problems": [],
    "both_seeds_pass_under": {
     "gates-v2.json": true,
     "gates-v2.1.json": true,
-    "gates-v2.2.json": true
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
    },
    "shipped": true,
    "shipped_seed": 1,
@@ -891,6 +921,9 @@
    "lower_error_seed": 1,
    "seeds": {
     "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "4f77bae30b2e61ed53a9e247c0c25be70d9a05290211562119c5a25bf3384dd1",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -1012,6 +1045,9 @@
      }
     },
     "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "c9fcf44685e909fb3b3a64fb71d7980f909d9abd78e2cebf96acd222d9534eaa",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -1133,12 +1169,13 @@
      }
     }
    },
-   "rules_skipped": [],
+   "limits_eased": [],
    "drawing_problems": [],
    "both_seeds_pass_under": {
     "gates-v2.json": true,
     "gates-v2.1.json": true,
-    "gates-v2.2.json": true
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
    },
    "shipped": true,
    "shipped_seed": 1,
@@ -1167,6 +1204,9 @@
    "lower_error_seed": 1,
    "seeds": {
     "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "eb6b2728d04ffc1aeafe51233f5b9cae2adb9e5a88e5be7f537bab67bada85fb",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -1288,6 +1328,9 @@
      }
     },
     "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "c0f567215f2c3b457dd051c920d2bef7cd42c7e8b569415ecbb37994a03ac2e5",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -1409,12 +1452,13 @@
      }
     }
    },
-   "rules_skipped": [],
+   "limits_eased": [],
    "drawing_problems": [],
    "both_seeds_pass_under": {
     "gates-v2.json": true,
     "gates-v2.1.json": true,
-    "gates-v2.2.json": true
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
    },
    "shipped": true,
    "shipped_seed": 1,
@@ -1443,6 +1487,9 @@
    "lower_error_seed": 1,
    "seeds": {
     "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "d115aadd5fcb731e775d4830a394237ce3689322d7b95a550faa45ab66d88661",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -1564,6 +1611,9 @@
      }
     },
     "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "c282fc4be651b90dd575ef7b2937ed483046642801153529534ac84638f644a5",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -1685,12 +1735,13 @@
      }
     }
    },
-   "rules_skipped": [],
+   "limits_eased": [],
    "drawing_problems": [],
    "both_seeds_pass_under": {
     "gates-v2.json": true,
     "gates-v2.1.json": true,
-    "gates-v2.2.json": true
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
    },
    "shipped": true,
    "shipped_seed": 1,
@@ -1719,6 +1770,9 @@
    "lower_error_seed": 1,
    "seeds": {
     "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "e4a6fda4d6417e1ce9696e78f86a039361bd26be15e8229044f11a354aee8d9f",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -1840,6 +1894,9 @@
      }
     },
     "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "21246e8f934ef90d9b9aa63279e68008f4e776a1c62925f7dd5896fa5dfa13bd",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -1961,12 +2018,13 @@
      }
     }
    },
-   "rules_skipped": [],
+   "limits_eased": [],
    "drawing_problems": [],
    "both_seeds_pass_under": {
     "gates-v2.json": true,
     "gates-v2.1.json": true,
-    "gates-v2.2.json": true
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
    },
    "shipped": true,
    "shipped_seed": 1,
@@ -1995,6 +2053,9 @@
    "lower_error_seed": 0,
    "seeds": {
     "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "3b3de43d6abd5c917aeec3ed9427859cbdb17837554a9c40e58c4a30562805aa",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -2116,6 +2177,9 @@
      }
     },
     "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "90d87f9930ccecc1e5d004fad9aa0424279951889c140048dc296aeca06d430d",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -2237,12 +2301,13 @@
      }
     }
    },
-   "rules_skipped": [],
+   "limits_eased": [],
    "drawing_problems": [],
    "both_seeds_pass_under": {
     "gates-v2.json": true,
     "gates-v2.1.json": true,
-    "gates-v2.2.json": true
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
    },
    "shipped": true,
    "shipped_seed": 0,
@@ -2271,6 +2336,9 @@
    "lower_error_seed": 1,
    "seeds": {
     "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "3d87f77c8aef39efa081a9f20a53bc53424f0c6de6e37193828de46c37a516df",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -2392,6 +2460,9 @@
      }
     },
     "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "d9a13daefa5b1f8fa9e3344aacee6ca8049cdd55f32c3a5782a027a459482e2e",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -2513,12 +2584,13 @@
      }
     }
    },
-   "rules_skipped": [],
+   "limits_eased": [],
    "drawing_problems": [],
    "both_seeds_pass_under": {
     "gates-v2.json": true,
     "gates-v2.1.json": true,
-    "gates-v2.2.json": true
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
    },
    "shipped": true,
    "shipped_seed": 1,
@@ -2547,6 +2619,9 @@
    "lower_error_seed": 0,
    "seeds": {
     "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "3e96a56cacc72d1bea651a6a74536a67e3bf1b9319cd3082eb481682ad62e1ca",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -2668,6 +2743,9 @@
      }
     },
     "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "0d383df10d76d03437f6cbbad89a14e1d8e5ad70b31c22c62adc974a0349dc8a",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -2789,12 +2867,13 @@
      }
     }
    },
-   "rules_skipped": [],
+   "limits_eased": [],
    "drawing_problems": [],
    "both_seeds_pass_under": {
     "gates-v2.json": true,
     "gates-v2.1.json": true,
-    "gates-v2.2.json": true
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
    },
    "shipped": true,
    "shipped_seed": 0,
@@ -2823,6 +2902,9 @@
    "lower_error_seed": 1,
    "seeds": {
     "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "d993f1cbefd24a9016d32d4195f98196bd5455e00c4ef67bc5e33dadd9acd64b",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -2944,6 +3026,9 @@
      }
     },
     "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "072e6f4d04fde27a060f655036acf7fa8a93eddb81e02e1222987e437749ee4b",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -3065,12 +3150,13 @@
      }
     }
    },
-   "rules_skipped": [],
+   "limits_eased": [],
    "drawing_problems": [],
    "both_seeds_pass_under": {
     "gates-v2.json": true,
     "gates-v2.1.json": true,
-    "gates-v2.2.json": true
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
    },
    "shipped": true,
    "shipped_seed": 1,
@@ -3099,6 +3185,9 @@
    "lower_error_seed": 1,
    "seeds": {
     "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "3017b7fe236f962655a041ed445d3728dc2dbd0c89767634226857907f808a83",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -3220,6 +3309,9 @@
      }
     },
     "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "0f550409a9ce9fa686105ba4fa77b5ca9fd807d2a7a39f5cc1faa75906ceb8ca",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -3341,12 +3433,13 @@
      }
     }
    },
-   "rules_skipped": [],
+   "limits_eased": [],
    "drawing_problems": [],
    "both_seeds_pass_under": {
     "gates-v2.json": true,
     "gates-v2.1.json": true,
-    "gates-v2.2.json": true
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
    },
    "shipped": true,
    "shipped_seed": 1,
@@ -3376,6 +3469,9 @@
    "lower_error_seed": 1,
    "seeds": {
     "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "49b1a38d7bd7150a3887e4a6869b6a70e186f015d665b62c69c8f931b85ef220",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -3497,6 +3593,9 @@
      }
     },
     "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "02a0291624b88094c922adde4d53850bad466e5e996632f2f632af03d07a533d",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -3618,12 +3717,13 @@
      }
     }
    },
-   "rules_skipped": [],
+   "limits_eased": [],
    "drawing_problems": [],
    "both_seeds_pass_under": {
     "gates-v2.json": true,
     "gates-v2.1.json": true,
-    "gates-v2.2.json": true
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
    },
    "shipped": true,
    "shipped_seed": 1,
@@ -3653,6 +3753,9 @@
    "lower_error_seed": 1,
    "seeds": {
     "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "14809abe63999e15d8ce6afda9a332ea976e8c484eace2095b01a4ef6d778bbc",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -3774,6 +3877,9 @@
      }
     },
     "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "1b0d968fb42a69039483adf2e3a4f4d5b72b324a68635938a969c2781e75c92e",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -3895,12 +4001,13 @@
      }
     }
    },
-   "rules_skipped": [],
+   "limits_eased": [],
    "drawing_problems": [],
    "both_seeds_pass_under": {
     "gates-v2.json": true,
     "gates-v2.1.json": true,
-    "gates-v2.2.json": true
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
    },
    "shipped": true,
    "shipped_seed": 1,
@@ -3930,6 +4037,9 @@
    "lower_error_seed": 1,
    "seeds": {
     "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "fd95435882bc0d83483d137284e27c64ca6219bcbf5b2a1b765ccdac91f2c1fc",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -4051,6 +4161,9 @@
      }
     },
     "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "b6bc6b32d4090970f5a7e5b73f98cd506bb5ecab4782ee0cc0ddbc25533422e3",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -4172,12 +4285,13 @@
      }
     }
    },
-   "rules_skipped": [],
+   "limits_eased": [],
    "drawing_problems": [],
    "both_seeds_pass_under": {
     "gates-v2.json": false,
     "gates-v2.1.json": true,
-    "gates-v2.2.json": true
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
    },
    "shipped": true,
    "shipped_seed": 1,

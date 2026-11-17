@@ -10,31 +10,40 @@
  "characters_drawn": 48,
  "characters_trained": 48,
  "characters_left_out": [],
- "rules_skipped": 0,
- "rules_skipped_in_shipped_groups": 0,
+ "limits_eased": 0,
+ "limits_eased_in_shipped_groups": 0,
+ "seeds_passing_pixel_exact": 0,
  "drawing_problems": 0,
- "perfect_skip": {
-  "enabled": true,
+ "perfect_margin": {
+  "factor": 1.1,
+  "floor": "shortfall",
+  "rule": "for each group, size, sampling mode and rule (for the worst-character error rule, each character) the limit applied is the looser of the declared limit and the perfect drawing's own score eased by the factor: a ceiling (mae, p99, firm, glyph_mae) at perfect * 1.10; a floor (iou_mean) at 1 - (1 - perfect) * 1.10, the shortfall from 1 grown by the factor, as the gates' own slack treats an overlap; where the perfect score is exactly 0 the declared limit stands",
+  "replaces": "perfect_skip of gates-v2.2: a rule the perfect drawing fails is no longer switched off, it is applied at the perfect score eased by the factor",
   "perfect_drawing": "the exact signed distance d of the drawing (REPO/train/glyphs.py signed_distance, the teacher's pen) at the library's own sample points, as coverage clip(0.5 + d * W * S, 0, 1), S = 2 below 24 pixels wide and 1 from there for automatic sampling, S = 1 for the one-sample rules; measured by the same metric code against the same teacher masks",
   "method_from": "lane term-rest, runs/term-rest-20261117/drawings/ceiling.py",
   "applies_to": "both kinds; every counted size; automatic and one-sample rules",
-  "skipped_when": "the perfect drawing of the group misses the rule's limit at that size: mae, p99, firm, iou_mean for the group; glyph_mae (and glyph_iou where a gates file has it) for the one character",
-  "never_skipped": [
+  "never_eased": [
    "nearest_all",
    "no_vanished"
   ],
-  "recorded": "verdict.json lists every skip per group (\"skipped\") with the perfect value and the limit, and any perfect drawing that fails nearest or vanished (\"drawing_problems\")"
+  "recorded": "verdict.json lists every eased limit per group (\"eased\": rule, declared, perfect, applied) and any perfect drawing that fails nearest or vanished (\"drawing_problems\")"
  },
- "selection": "a group ships when seed 0 and seed 1 both pass the common gates (gates-v2.2.json), the seed with the lower mean of the mean error at 8x16, 16x32 and 48x96; a group that fails is trained once more as two groups of half its characters; a half that still fails is left out and its characters stay untrained. Under gates-v2.2 a rule that the perfect drawing of a group itself fails at a size is not applied there",
- "gates_file": "gates-v2.2.json",
- "gates_sha256": "dd3cc2ea30ccb49d001c28a905bcc6e2a2d11edfcd6a741464fda91162b10e70",
+ "pixel_exact": {
+  "enabled": true,
+  "rule": "a seed passes, whatever its error-amount rules say (mae, p99, firm, iou_mean, glyph_mae), if its net puts every pixel of every character of the group on the same side of one half as the teacher's mask at every counted size with automatic sampling, and for a kind with one-sample rules also at those sizes with one sample; nearest_all and no_vanished still apply and the float64 reference check still applies",
+  "recorded": "the seed's \"verdict\" reads \"pass: pixel-exact\" when the rule decided it, \"waived\" lists the error-amount failures it set aside, and the error numbers are recorded as for any net"
+ },
+ "selection": "a group ships when seed 0 and seed 1 both pass the common gates (gates-v2.3.json), the seed with the lower mean of the mean error at 8x16, 16x32 and 48x96; a group that fails is trained once more as two groups of half its characters; a half that still fails is left out and its characters stay untrained. Under gates-v2.3 no limit is tighter than the perfect drawing's own score for the group eased by 10 per cent, and a seed that puts every pixel on the correct side at every counted size passes",
+ "gates_file": "gates-v2.3.json",
+ "gates_sha256": "2ccff8354eeda45e05525490b9fdee6ab13d4970a2389537c44af1504fc50fc4",
  "gates_kind": "letters",
  "gates_files_issued": {
   "gates-v2.1.json": "214942e398f88110cd7c6044c194f0f274274aeedb07abcbe8e1a18dc2b323c0",
   "gates-v2.2.json": "dd3cc2ea30ccb49d001c28a905bcc6e2a2d11edfcd6a741464fda91162b10e70",
+  "gates-v2.3.json": "2ccff8354eeda45e05525490b9fdee6ab13d4970a2389537c44af1504fc50fc4",
   "gates-v2.json": "5bf1a3f8312c45df2a20b2e69d51ee3c690c58891ec5390cf0e41cbdf9f9b51b"
  },
- "scoring": "gates_v2.py score --kind letters --gates gates-v2.2.json, against the teacher of every character drawn for the bundle",
+ "scoring": "gates_v2.py score --kind letters --gates gates-v2.3.json, against the teacher of every character drawn for the bundle",
  "teacher_sha256": "eb2e26d0705618c0330bc1246efe24970a62e458fb39f62d9af69fb119799396",
  "teacher_characters": 48,
  "trainer": "train/split_expert.py train --mode repertoire --partition contiguous, width 64, 120000 steps, seeds 0,1, teacher grid 256",
@@ -60,6 +69,9 @@
    "lower_error_seed": 0,
    "seeds": {
     "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "c7954b76bd10698e31f51dfa0e75c01eaa6ac9fd54055255892e5bdd7645f1e1",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -181,6 +193,9 @@
      }
     },
     "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "373c6c98b9b80fd34e24f3c588cde237cb3007f1298f556c2674a997a004ff31",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -302,12 +317,13 @@
      }
     }
    },
-   "rules_skipped": [],
+   "limits_eased": [],
    "drawing_problems": [],
    "both_seeds_pass_under": {
     "gates-v2.json": true,
     "gates-v2.1.json": true,
-    "gates-v2.2.json": true
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
    },
    "shipped": true,
    "shipped_seed": 0,
@@ -333,6 +349,9 @@
    "lower_error_seed": 1,
    "seeds": {
     "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "b82123f1ea9369e7a06d0cb213815de3234905c97da31faf7ba518099ecad13c",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -454,6 +473,9 @@
      }
     },
     "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "f746b51b8cab0229c41233a60db06ff840dd31f21d903445a47495fec5ed7f3d",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -575,12 +597,13 @@
      }
     }
    },
-   "rules_skipped": [],
+   "limits_eased": [],
    "drawing_problems": [],
    "both_seeds_pass_under": {
     "gates-v2.json": true,
     "gates-v2.1.json": true,
-    "gates-v2.2.json": true
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
    },
    "shipped": true,
    "shipped_seed": 1,
@@ -606,6 +629,9 @@
    "lower_error_seed": 1,
    "seeds": {
     "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "24f33b50b8f5a544936a18073d9d342752ef2b170d8d78da131b3eae84c02290",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -727,6 +753,9 @@
      }
     },
     "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "fa28b9a4781e89c144aba41de94ec60cdbea378736e76d80d4131eca744860c6",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -848,12 +877,13 @@
      }
     }
    },
-   "rules_skipped": [],
+   "limits_eased": [],
    "drawing_problems": [],
    "both_seeds_pass_under": {
     "gates-v2.json": false,
     "gates-v2.1.json": true,
-    "gates-v2.2.json": true
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
    },
    "shipped": true,
    "shipped_seed": 1,
@@ -879,6 +909,9 @@
    "lower_error_seed": 1,
    "seeds": {
     "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "4318f5817f727477be15d14467ba31dc8c056a36fc66693a0c9a29d90b3aa545",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -1000,6 +1033,9 @@
      }
     },
     "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "3e714a7a86878454e6a0f6dd4c0e1623e97e20c991f1a928f2a8d6acbe6e8d56",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -1121,12 +1157,13 @@
      }
     }
    },
-   "rules_skipped": [],
+   "limits_eased": [],
    "drawing_problems": [],
    "both_seeds_pass_under": {
     "gates-v2.json": true,
     "gates-v2.1.json": true,
-    "gates-v2.2.json": true
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
    },
    "shipped": true,
    "shipped_seed": 1,
@@ -1152,6 +1189,9 @@
    "lower_error_seed": 0,
    "seeds": {
     "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "8b7bf4d670911dcf2237b16724e34651a4e4181f8c6cecfbf1f8b497c761a242",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -1273,6 +1313,9 @@
      }
     },
     "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "41fb421add9aa1181cfbfbd220ba23e7aad07a36726da15dee5efdb92954f2f5",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -1394,12 +1437,13 @@
      }
     }
    },
-   "rules_skipped": [],
+   "limits_eased": [],
    "drawing_problems": [],
    "both_seeds_pass_under": {
     "gates-v2.json": true,
     "gates-v2.1.json": true,
-    "gates-v2.2.json": true
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
    },
    "shipped": true,
    "shipped_seed": 0,
@@ -1425,6 +1469,9 @@
    "lower_error_seed": 0,
    "seeds": {
     "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "ed75326430a618d92d02ba7a89d7504d93fd0d783d2e18464998462f37543869",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -1546,6 +1593,9 @@
      }
     },
     "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "b9eac63c6a0382e6429e1e4589e796cd6db75876a5865b199dbaa9706a6b5642",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -1667,12 +1717,13 @@
      }
     }
    },
-   "rules_skipped": [],
+   "limits_eased": [],
    "drawing_problems": [],
    "both_seeds_pass_under": {
     "gates-v2.json": false,
     "gates-v2.1.json": true,
-    "gates-v2.2.json": true
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
    },
    "shipped": true,
    "shipped_seed": 0,

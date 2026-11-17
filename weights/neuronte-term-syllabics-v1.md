@@ -19,9 +19,13 @@ this work does not do. They stay untrained in every bundle.
 
 The common gates of phases 3 to 6. `gates-v2.json`, sha256 `5bf1a3f8312c45df2a20b2e69d51ee3c690c58891ec5390cf0e41cbdf9f9b51b`, was declared before any of these nets was trained and recorded in this lane's report before training. Its limits are the worst group net the owner had already accepted on a sheet, times 1.10, counted at 6×12, 8×16, 10×20, 12×24, 16×32, 24×48 and 48×96 (mean error, 99th percentile, firm-wrong fraction, the worst character, mean and worst overlap), and with one sample a pixel at 8×16, 16×32 and 48×96; at every counted size each character must be nearer its own drawing than any other drawing of the bundle (or an exact twin of it) and none may vanish. These are scored as letters, against the teacher of all 168 characters drawn for the bundle. Both seeds must pass.
 
-**The gates were amended twice while these nets trained, by the owner, for every lane, and not by this lane.** Another lane showed that some rules are failed by a perfect net: the drawing itself, sampled as the library samples, misses them on thin strokes. `gates-v2.1.json`, sha256 `214942e398f88110cd7c6044c194f0f274274aeedb07abcbe8e1a18dc2b323c0`, dropped the overlap of the worst character for letters. `gates-v2.2.json`, sha256 `dd3cc2ea30ccb49d001c28a905bcc6e2a2d11edfcd6a741464fda91162b10e70`, **gave the verdicts here**: it is 2.1, and for each group and size a rule that the perfect drawing of that group fails is not applied there; every other rule applies with its limit, and nearest-to-itself and none-vanished are never skipped. No limit was changed.
+**The gates were amended three times while these nets trained and were scored, by the owner, for every lane, and not by this lane.** Another lane showed that some rules are failed by a perfect net: the drawing itself, sampled as the library samples, misses them on thin strokes.
 
-Of the 15 groups first trained, 14 passed with both seeds under gates-v2, 15 under 2.1 and 15 under 2.2. **Rules skipped under 2.2 because a perfect net fails them: 0** in the groups of the bundle.
+- `gates-v2.1.json`, sha256 `214942e398f88110cd7c6044c194f0f274274aeedb07abcbe8e1a18dc2b323c0`: the overlap of the worst character is dropped for letters.
+- `gates-v2.2.json`, sha256 `dd3cc2ea30ccb49d001c28a905bcc6e2a2d11edfcd6a741464fda91162b10e70`: 2.1, and a rule the perfect drawing of a group fails at a size is not applied there.
+- `gates-v2.3.json`, sha256 `2ccff8354eeda45e05525490b9fdee6ab13d4970a2389537c44af1504fc50fc4`, **gave the verdicts here**: instead of skipping such a rule, no limit is tighter than the perfect drawing's own score for that group, size and rule eased by 10 per cent (an error ceiling at perfect × 1.10, an overlap floor at 1 − (1 − perfect) × 1.10); and a seed whose net puts every pixel on the correct side at every counted size passes whatever the error-amount rules say. Nearest-to-itself and none-vanished always apply and are never eased.
+
+Of the 15 groups first trained, 14 passed with both seeds under gates-v2, 15 under 2.1, 15 under 2.2 and 15 under 2.3. Seeds passing as pixel-exact: 0. **Limits eased under 2.3 to the perfect drawing's score and 10 per cent: 0** in the groups of the bundle.
 
 The rule is automatic and nobody chose a net. A group whose two seeds pass ships the seed with the lower mean error over 8×16, 16×32 and 48×96. A group that fails is trained once more as two groups of half its characters; a half that still fails is left out.
 
@@ -92,7 +96,39 @@ Mean error against the teacher at 8×16, 16×32 and 48×96 and mean overlap at 6
 
 ## Speed
 
-Not measured yet.
+kilix-bench e21e5cd on two x86 hosts, Intel Core i7-6820HQ and Intel Core i7-10700F, each under the hosts' shared benchmark lock: one pinned core, a fresh process for every job, one warmup and ten measured rounds in shuffled order, medians, every model checked against the float64 reference first (worst difference 2.7e-05). The corpus is this bundle's 168 characters. split-v9 sends each through its gate to another of its nets, which never saw it; term-syllabics-v1 looks it up in its table and runs a small group net.
+
+| µs per character, Intel Core i7-6820HQ | split-v9 | term-syllabics-v1 | split-v9 / term-syllabics-v1 |
+|---|---:|---:|---:|
+| Coverage, uncached, 8×16 | 478.3 | 199.8 | 2.39 |
+| Coverage, uncached, 16×32 | 1867.3 | 768.1 | 2.43 |
+| Coverage, uncached, 48×96 | 4137.7 | 1715.6 | 2.41 |
+| Draw, cold, 8×16 | 484.7 | 203.0 | 2.39 |
+| Draw, cold, 16×32 | 1868.6 | 775.9 | 2.41 |
+| Draw, cold, 48×96 | 4202.5 | 1747.3 | 2.41 |
+| Draw, warm, 8×16 | 3.6 | 0.9 | 3.85 |
+| Draw, warm, 16×32 | 6.1 | 2.8 | 2.16 |
+| Draw, warm, 48×96 | 26.2 | 20.5 | 1.28 |
+
+On the Intel Core i7-6820HQ: a lookup takes 12 ns in this bundle's table against 1225 ns for split-v9's gate; opening the file takes 1.2 ms against 4.8 ms for split-v9 (a program that opens both pays both).
+
+| µs per character, Intel Core i7-10700F | split-v9 | term-syllabics-v1 | split-v9 / term-syllabics-v1 |
+|---|---:|---:|---:|
+| Coverage, uncached, 8×16 | 360.3 | 153.0 | 2.36 |
+| Coverage, uncached, 16×32 | 1415.8 | 586.2 | 2.42 |
+| Coverage, uncached, 48×96 | 3126.6 | 1310.7 | 2.39 |
+| Draw, cold, 8×16 | 362.6 | 153.8 | 2.36 |
+| Draw, cold, 16×32 | 1413.4 | 591.5 | 2.39 |
+| Draw, cold, 48×96 | 3161.4 | 1328.4 | 2.38 |
+| Draw, warm, 8×16 | 2.7 | 0.7 | 3.98 |
+| Draw, warm, 16×32 | 4.4 | 2.0 | 2.18 |
+| Draw, warm, 48×96 | 18.6 | 14.4 | 1.29 |
+
+On the Intel Core i7-10700F: a lookup takes 7 ns in this bundle's table against 899 ns for split-v9's gate; opening the file takes 0.8 ms against 3.7 ms for split-v9 (a program that opens both pays both).
+
+Uncached, term-syllabics-v1 draws these characters 2.4 times as fast as split-v9's fallback does (geometric mean over both hosts and the three cells; per host 2.4 on the Intel Core i7-6820HQ, 2.4 on the Intel Core i7-10700F). Cold draw: 2.4, 2.4; warm draw: 2.20, 2.24. The pixels are identical on both hosts.
+
+A handle caches 1,024 drawn cells. A screen that shows more distinct cells than that redraws some each frame, whichever bundle draws them.
 
 ## Files
 

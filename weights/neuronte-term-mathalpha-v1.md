@@ -2,44 +2,58 @@
 
 `neuronte-term-mathalpha-v1.nrt` is a terminal bundle for 179 characters no earlier bundle was trained on: letters and digits of Mathematical Alphanumeric Symbols: sans-serif (U+1D5A0..U+1D5D3, digits U+1D7E2..U+1D7EB), monospace (U+1D670..U+1D6A3, digits U+1D7F6..U+1D7FF) and double-struck (U+1D538..U+1D56B less the seven capitals that live in Letterlike Symbols, digits U+1D7D8..U+1D7E1). In `neuronte-split-v9` each of them goes to the router's gate and is drawn by a net that never saw it, so it comes out as some other shape.
 
-It is a **standalone** bundle: 18 known-only group nets and one blank net, 1,028,112 bytes, with no copy of split-v9 in it. A program opens it beside split-v9 and asks it first (see "What a consumer changes"). It is not a default and replaces nothing.
+It is a **standalone** bundle: 17 known-only group nets and one blank net, 971,056 bytes, with no copy of split-v9 in it. A program opens it beside split-v9 and asks it first (see "What a consumer changes"). It is not a default and replaces nothing.
 
 | Characters | Training set | Group nets | Common gates |
 |---|---|---|---|
 | 120: sans-serif and monospace letters and the digits 2 to 9, each pair in one net | `tscrmp` | 10×H64 | all 10 passed |
 | 14: sans-serif and monospace 0 and 1, double-struck digits | `tscrmn` | 2×H64 | all 2 passed |
-| 19: double-struck capitals | `tscrmdu` | 2×H64 | 1 of 2 passed |
+| 19: double-struck capitals | `tscrmdu` | 2×H64 | all 2 passed |
 | 26: double-struck smalls | `tscrmdl` | 3×H64 | all 3 passed |
 
 ## The gates
 
 The common gates of phases 3 to 6. `gates-v2.json`, sha256 `5bf1a3f8312c45df2a20b2e69d51ee3c690c58891ec5390cf0e41cbdf9f9b51b`, was declared before any of these nets was trained and recorded in this lane's report before training. Its limits are the worst group net the owner had already accepted on a sheet, times 1.10, counted at 6×12, 8×16, 10×20, 12×24, 16×32, 24×48 and 48×96 (mean error, 99th percentile, firm-wrong fraction, the worst character, mean and worst overlap), and with one sample a pixel at 8×16, 16×32 and 48×96; at every counted size each character must be nearer its own drawing than any other drawing of the bundle (or an exact twin of it) and none may vanish. These are scored as letters, against the teacher of all 179 characters drawn for the bundle. Both seeds must pass.
 
-**The gates were amended twice while these nets trained, by the owner, for every lane, and not by this lane.** Another lane showed that some rules are failed by a perfect net: the drawing itself, sampled as the library samples, misses them on thin strokes. `gates-v2.1.json`, sha256 `214942e398f88110cd7c6044c194f0f274274aeedb07abcbe8e1a18dc2b323c0`, dropped the overlap of the worst character for letters. `gates-v2.2.json`, sha256 `dd3cc2ea30ccb49d001c28a905bcc6e2a2d11edfcd6a741464fda91162b10e70`, **gave the verdicts here**: it is 2.1, and for each group and size a rule that the perfect drawing of that group fails is not applied there; every other rule applies with its limit, and nearest-to-itself and none-vanished are never skipped. No limit was changed.
+**The gates were amended three times while these nets trained and were scored, by the owner, for every lane, and not by this lane.** Another lane showed that some rules are failed by a perfect net: the drawing itself, sampled as the library samples, misses them on thin strokes.
 
-Of the 17 groups first trained, 8 passed with both seeds under gates-v2, 10 under 2.1 and 16 under 2.2. **Rules skipped under 2.2 because a perfect net fails them: 16** in the groups of the bundle:
+- `gates-v2.1.json`, sha256 `214942e398f88110cd7c6044c194f0f274274aeedb07abcbe8e1a18dc2b323c0`: the overlap of the worst character is dropped for letters.
+- `gates-v2.2.json`, sha256 `dd3cc2ea30ccb49d001c28a905bcc6e2a2d11edfcd6a741464fda91162b10e70`: 2.1, and a rule the perfect drawing of a group fails at a size is not applied there.
+- `gates-v2.3.json`, sha256 `2ccff8354eeda45e05525490b9fdee6ab13d4970a2389537c44af1504fc50fc4`, **gave the verdicts here**: instead of skipping such a rule, no limit is tighter than the perfect drawing's own score for that group, size and rule eased by 10 per cent (an error ceiling at perfect × 1.10, an overlap floor at 1 − (1 − perfect) × 1.10); and a seed whose net puts every pixel on the correct side at every counted size passes whatever the error-amount rules say. Nearest-to-itself and none-vanished always apply and are never eased.
 
-- `tscrmn` group 0: s1 8x16 p99 skipped: perfect net fails (0.254444, limit 0.235413)
-- `tscrmn` group 1: s1 8x16 p99 skipped: perfect net fails (0.259375, limit 0.235413)
-- `tscrmdu` group 0: 10x20 mae skipped: perfect net fails (0.0104377, limit 0.00866061)
-- `tscrmdu` group 0: 10x20 iou_mean skipped: perfect net fails (0.777891, limit 0.791706)
-- `tscrxmdu1` group 0: 8x16 iou_mean skipped: perfect net fails (0.686537, limit 0.703503)
-- `tscrxmdu1` group 0: 10x20 mae skipped: perfect net fails (0.0100236, limit 0.00866061)
-- `tscrxmdu1` group 0: 10x20 iou_mean skipped: perfect net fails (0.780417, limit 0.791706)
-- `tscrxmdu1` group 0: 24x48 mae skipped: perfect net fails (0.00584012, limit 0.00571244)
-- `tscrxmdu1` group 0: s1 8x16 p99 skipped: perfect net fails (0.263287, limit 0.235413)
-- `tscrmdl` group 0: 24x48 firm skipped: perfect net fails (0.000976562, limit 0.000635634)
-- `tscrmdl` group 0: s1 8x16 p99 skipped: perfect net fails (0.2475, limit 0.235413)
-- `tscrmdl` group 0: s1 8x16 firm skipped: perfect net fails (0.0126953, limit 0.0107422)
-- `tscrmdl` group 1: 10x20 mae skipped: perfect net fails (0.00913628, limit 0.00866061)
-- `tscrmdl` group 1: 24x48 firm skipped: perfect net fails (0.000675154, limit 0.000635634)
-- `tscrmdl` group 1: 24x48 iou_mean skipped: perfect net fails (0.935441, limit 0.944932)
-- `tscrmdl` group 2: 10x20 iou_mean skipped: perfect net fails (0.744334, limit 0.791706)
+Of the 17 groups first trained, 8 passed with both seeds under gates-v2, 10 under 2.1, 16 under 2.2 and 17 under 2.3. Seeds passing as pixel-exact: 0. **Limits eased under 2.3 to the perfect drawing's score and 10 per cent: 20** in the groups of the bundle (rule: declared limit, perfect drawing, limit applied):
+
+- `tscrmn` group 0: 10x20 iou_mean: 0.7917, 0.8051, 0.7856
+- `tscrmn` group 0: s1 8x16 p99: 0.2354, 0.2544, 0.2799
+- `tscrmn` group 1: 24x48 firm: 0.0006356, 0.00062, 0.000682
+- `tscrmn` group 1: s1 8x16 p99: 0.2354, 0.2594, 0.2853
+- `tscrmdu` group 0: 8x16 mae: 0.01428, 0.01305, 0.01435
+- `tscrmdu` group 0: 10x20 mae: 0.008661, 0.01044, 0.01148
+- `tscrmdu` group 0: 10x20 iou_mean: 0.7917, 0.7779, 0.7557
+- `tscrmdu` group 0: s1 8x16 p99: 0.2354, 0.23, 0.253
+- `tscrmdu` group 1: 10x20 mae: 0.008661, 0.008527, 0.009379
+- `tscrmdu` group 1: s1 8x16 p99: 0.2354, 0.2501, 0.2751
+- `tscrmdl` group 0: 10x20 mae: 0.008661, 0.008446, 0.009291
+- `tscrmdl` group 0: 24x48 firm: 0.0006356, 0.0009766, 0.001074
+- `tscrmdl` group 0: s1 8x16 p99: 0.2354, 0.2475, 0.2723
+- `tscrmdl` group 0: s1 8x16 firm: 0.01074, 0.0127, 0.01396
+- `tscrmdl` group 1: 10x20 mae: 0.008661, 0.009136, 0.01005
+- `tscrmdl` group 1: 10x20 iou_mean: 0.7917, 0.8065, 0.7872
+- `tscrmdl` group 1: 24x48 firm: 0.0006356, 0.0006752, 0.0007427
+- `tscrmdl` group 1: 24x48 iou_mean: 0.9449, 0.9354, 0.929
+- `tscrmdl` group 1: s1 8x16 p99: 0.2354, 0.23, 0.253
+- `tscrmdl` group 2: 10x20 iou_mean: 0.7917, 0.7443, 0.7188
+
+**One group changed hands between amendments.** Under gates-v2.2 the second group of double-struck
+capitals (`tscrmdu` group 1: L M O S T U V W X Y) failed with seed 0 on mean error at 10×20, so it was trained once
+more as two halves of five, and both halves passed. Under gates-v2.3 that limit is the perfect drawing's own score
+and 10 per cent (0.00938 in place of 0.00866) and the group passes as first trained, so the net first trained is
+the one in the bundle and the halves are not; their set line is gone from `font/term-scripts.txt` and their nets
+are kept only with the lane's evidence.
 
 The rule is automatic and nobody chose a net. A group whose two seeds pass ships the seed with the lower mean error over 8×16, 16×32 and 48×96. A group that fails is trained once more as two groups of half its characters; a half that still fails is left out.
 
-- **17 groups trained, 16 passed with both seeds.**
-- **1 failed** and was trained again as 2 halves: 2 halves passed and are in the bundle, 0 failed again.
+- **17 groups trained, 17 passed with both seeds.**
 - **Left out: none.** Every character drawn for the bundle is in it.
 - Every group net in the bundle passes the C-against-float64 check.
 
@@ -56,7 +70,7 @@ neuronte_open_file("neuronte-term-mathalpha-v1.nrt", &more);
 font = neuronte_untrained(more, c) ? base : more;
 ```
 
-`neuronte_untrained(more, c)` is 0 for exactly the 179 characters in `neuronte-term-mathalpha-v1.list.txt` and 1 for every other scalar. A scalar outside the list, drawn through this file anyway, comes out blank, or as the code-made hollow box after `neuronte_set_untrained(more, 1)`. The file needs the current runtime (version 2 bundles, 128-member limit). It has 19 members. Cells are the terminal's 1:2 cell; the nets were trained and measured from 6×12 to 48×96.
+`neuronte_untrained(more, c)` is 0 for exactly the 179 characters in `neuronte-term-mathalpha-v1.list.txt` and 1 for every other scalar. A scalar outside the list, drawn through this file anyway, comes out blank, or as the code-made hollow box after `neuronte_set_untrained(more, 1)`. The file needs the current runtime (version 2 bundles, 128-member limit). It has 18 members. Cells are the terminal's 1:2 cell; the nets were trained and measured from 6×12 to 48×96.
 
 ## Recipe
 
@@ -102,17 +116,47 @@ Mean error against the teacher at 8×16, 16×32 and 48×96 and mean overlap at 6
 | `tscrmn` | 0 | 𝟢 𝟶 𝟘 𝟙 𝟚 𝟛 𝟜 | passed; H64, seed 1 | 0 / 0 | 0.0083 0.0035 0.0021 | 0.913, 0.940 |
 | `tscrmn` | 1 | 𝟣 𝟷 𝟝 𝟞 𝟟 𝟠 𝟡 | passed; H64, seed 1 | 0 / 0 | 0.0060 0.0036 0.0018 | 0.900, 0.973 |
 | `tscrmdu` | 0 | 𝔸 𝔹 𝔻 𝔼 𝔽 𝔾 𝕀 𝕁 𝕂 | passed; H64, seed 1 | 0 / 0 | 0.0129 0.0052 0.0026 | 0.937, 0.796 |
-| `tscrmdu` | 1 | 𝕃 𝕄 𝕆 𝕊 𝕋 𝕌 𝕍 𝕎 𝕏 𝕐 | **failed**; trained again as `tscrxmdu1` | 1 / 0 | 0.0096 0.0041 0.0023 | 0.934, 0.781 |
-| `tscrxmdu1` | 0 | 𝕃 𝕄 𝕆 𝕊 𝕋 | passed; H64, seed 1 (a half) | 0 / 0 | 0.0119 0.0047 0.0022 | 0.899, 0.687 |
-| `tscrxmdu1` | 1 | 𝕌 𝕍 𝕎 𝕏 𝕐 | passed; H64, seed 1 (a half) | 0 / 0 | 0.0077 0.0035 0.0019 | 0.990, 0.883 |
+| `tscrmdu` | 1 | 𝕃 𝕄 𝕆 𝕊 𝕋 𝕌 𝕍 𝕎 𝕏 𝕐 | passed; H64, seed 1 | 0 / 0 | 0.0096 0.0041 0.0023 | 0.934, 0.781 |
 | `tscrmdl` | 0 | 𝕒 𝕓 𝕔 𝕕 𝕖 𝕗 𝕘 𝕙 | passed; H64, seed 1 | 0 / 0 | 0.0078 0.0046 0.0023 | 0.905, 0.977 |
 | `tscrmdl` | 1 | 𝕚 𝕛 𝕜 𝕝 𝕞 𝕟 𝕠 𝕡 𝕢 | passed; H64, seed 1 | 0 / 0 | 0.0072 0.0048 0.0021 | 0.878, 0.820 |
 | `tscrmdl` | 2 | 𝕣 𝕤 𝕥 𝕦 𝕧 𝕨 𝕩 𝕪 𝕫 | passed; H64, seed 1 | 0 / 0 | 0.0072 0.0031 0.0017 | 0.804, 0.983 |
 
 ## Speed
 
-Not measured yet.
+kilix-bench e21e5cd on two x86 hosts, Intel Core i7-6820HQ and Intel Core i7-10700F, each under the hosts' shared benchmark lock: one pinned core, a fresh process for every job, one warmup and ten measured rounds in shuffled order, medians, every model checked against the float64 reference first (worst difference 9.2e-06). The corpus is this bundle's 179 characters. split-v9 sends each through its gate to another of its nets, which never saw it; term-mathalpha-v1 looks it up in its table and runs a small group net.
+
+| µs per character, Intel Core i7-6820HQ | split-v9 | term-mathalpha-v1 | split-v9 / term-mathalpha-v1 |
+|---|---:|---:|---:|
+| Coverage, uncached, 8×16 | 496.0 | 205.7 | 2.41 |
+| Coverage, uncached, 16×32 | 1936.1 | 785.0 | 2.47 |
+| Coverage, uncached, 48×96 | 4325.1 | 1748.7 | 2.47 |
+| Draw, cold, 8×16 | 510.8 | 207.8 | 2.46 |
+| Draw, cold, 16×32 | 1948.7 | 794.3 | 2.45 |
+| Draw, cold, 48×96 | 4359.8 | 1787.5 | 2.44 |
+| Draw, warm, 8×16 | 4.0 | 1.0 | 3.86 |
+| Draw, warm, 16×32 | 6.9 | 3.1 | 2.21 |
+| Draw, warm, 48×96 | 28.3 | 22.6 | 1.25 |
+
+On the Intel Core i7-6820HQ: a lookup takes 13 ns in this bundle's table against 1228 ns for split-v9's gate; opening the file takes 1.4 ms against 4.8 ms for split-v9 (a program that opens both pays both).
+
+| µs per character, Intel Core i7-10700F | split-v9 | term-mathalpha-v1 | split-v9 / term-mathalpha-v1 |
+|---|---:|---:|---:|
+| Coverage, uncached, 8×16 | 375.2 | 155.8 | 2.41 |
+| Coverage, uncached, 16×32 | 1456.5 | 599.5 | 2.43 |
+| Coverage, uncached, 48×96 | 3227.1 | 1332.4 | 2.42 |
+| Draw, cold, 8×16 | 381.6 | 157.3 | 2.43 |
+| Draw, cold, 16×32 | 1465.0 | 607.4 | 2.41 |
+| Draw, cold, 48×96 | 3279.3 | 1356.4 | 2.42 |
+| Draw, warm, 8×16 | 3.0 | 0.7 | 3.99 |
+| Draw, warm, 16×32 | 5.0 | 2.3 | 2.21 |
+| Draw, warm, 48×96 | 20.2 | 16.0 | 1.26 |
+
+On the Intel Core i7-10700F: a lookup takes 7 ns in this bundle's table against 901 ns for split-v9's gate; opening the file takes 0.9 ms against 3.8 ms for split-v9 (a program that opens both pays both).
+
+Uncached, term-mathalpha-v1 draws these characters 2.4 times as fast as split-v9's fallback does (geometric mean over both hosts and the three cells; per host 2.4 on the Intel Core i7-6820HQ, 2.4 on the Intel Core i7-10700F). Cold draw: 2.5, 2.4; warm draw: 2.20, 2.23. The pixels are identical on both hosts.
+
+A handle caches 1,024 drawn cells. A screen that shows more distinct cells than that redraws some each frame, whichever bundle draws them.
 
 ## Files
 
-`neuronte-term-mathalpha-v1.nrt` (1,028,112 bytes, sha256 `87e7a32017884af98d9cb9c506b619079b058ae8dc915c93787d77b0ebd13c52`), `neuronte-term-mathalpha-v1.list.txt`, `neuronte-term-mathalpha-v1.provenance.json`, `neuronte-term-mathalpha-v1.validation.json`, and 18 group nets `neuronte-term-mathalpha-v1-SET-gN.json`. All are in `weights/SHA256SUMS`.
+`neuronte-term-mathalpha-v1.nrt` (971,056 bytes, sha256 `b6bd7d73a1c2116b4383d70c810fe780ca3e36846c32c7178c1e5a2764167c57`), `neuronte-term-mathalpha-v1.list.txt`, `neuronte-term-mathalpha-v1.provenance.json`, `neuronte-term-mathalpha-v1.validation.json`, and 17 group nets `neuronte-term-mathalpha-v1-SET-gN.json`. All are in `weights/SHA256SUMS`.

@@ -1,40 +1,49 @@
 {
  "schema": "neuronte.term-scripts.validation/v1",
  "bundle": "neuronte-term-mathalpha-v1.nrt",
- "bundle_sha256": "87e7a32017884af98d9cb9c506b619079b058ae8dc915c93787d77b0ebd13c52",
- "groups_trained": 19,
- "groups_shipped": 18,
- "groups_failed_first": 1,
- "halves_trained": 2,
+ "bundle_sha256": "b6bd7d73a1c2116b4383d70c810fe780ca3e36846c32c7178c1e5a2764167c57",
+ "groups_trained": 17,
+ "groups_shipped": 17,
+ "groups_failed_first": 0,
+ "halves_trained": 0,
  "halves_left_out": 0,
  "characters_drawn": 179,
  "characters_trained": 179,
  "characters_left_out": [],
- "rules_skipped": 17,
- "rules_skipped_in_shipped_groups": 16,
+ "limits_eased": 20,
+ "limits_eased_in_shipped_groups": 20,
+ "seeds_passing_pixel_exact": 0,
  "drawing_problems": 0,
- "perfect_skip": {
-  "enabled": true,
+ "perfect_margin": {
+  "factor": 1.1,
+  "floor": "shortfall",
+  "rule": "for each group, size, sampling mode and rule (for the worst-character error rule, each character) the limit applied is the looser of the declared limit and the perfect drawing's own score eased by the factor: a ceiling (mae, p99, firm, glyph_mae) at perfect * 1.10; a floor (iou_mean) at 1 - (1 - perfect) * 1.10, the shortfall from 1 grown by the factor, as the gates' own slack treats an overlap; where the perfect score is exactly 0 the declared limit stands",
+  "replaces": "perfect_skip of gates-v2.2: a rule the perfect drawing fails is no longer switched off, it is applied at the perfect score eased by the factor",
   "perfect_drawing": "the exact signed distance d of the drawing (REPO/train/glyphs.py signed_distance, the teacher's pen) at the library's own sample points, as coverage clip(0.5 + d * W * S, 0, 1), S = 2 below 24 pixels wide and 1 from there for automatic sampling, S = 1 for the one-sample rules; measured by the same metric code against the same teacher masks",
   "method_from": "lane term-rest, runs/term-rest-20261117/drawings/ceiling.py",
   "applies_to": "both kinds; every counted size; automatic and one-sample rules",
-  "skipped_when": "the perfect drawing of the group misses the rule's limit at that size: mae, p99, firm, iou_mean for the group; glyph_mae (and glyph_iou where a gates file has it) for the one character",
-  "never_skipped": [
+  "never_eased": [
    "nearest_all",
    "no_vanished"
   ],
-  "recorded": "verdict.json lists every skip per group (\"skipped\") with the perfect value and the limit, and any perfect drawing that fails nearest or vanished (\"drawing_problems\")"
+  "recorded": "verdict.json lists every eased limit per group (\"eased\": rule, declared, perfect, applied) and any perfect drawing that fails nearest or vanished (\"drawing_problems\")"
  },
- "selection": "a group ships when seed 0 and seed 1 both pass the common gates (gates-v2.2.json), the seed with the lower mean of the mean error at 8x16, 16x32 and 48x96; a group that fails is trained once more as two groups of half its characters; a half that still fails is left out and its characters stay untrained. Under gates-v2.2 a rule that the perfect drawing of a group itself fails at a size is not applied there",
- "gates_file": "gates-v2.2.json",
- "gates_sha256": "dd3cc2ea30ccb49d001c28a905bcc6e2a2d11edfcd6a741464fda91162b10e70",
+ "pixel_exact": {
+  "enabled": true,
+  "rule": "a seed passes, whatever its error-amount rules say (mae, p99, firm, iou_mean, glyph_mae), if its net puts every pixel of every character of the group on the same side of one half as the teacher's mask at every counted size with automatic sampling, and for a kind with one-sample rules also at those sizes with one sample; nearest_all and no_vanished still apply and the float64 reference check still applies",
+  "recorded": "the seed's \"verdict\" reads \"pass: pixel-exact\" when the rule decided it, \"waived\" lists the error-amount failures it set aside, and the error numbers are recorded as for any net"
+ },
+ "selection": "a group ships when seed 0 and seed 1 both pass the common gates (gates-v2.3.json), the seed with the lower mean of the mean error at 8x16, 16x32 and 48x96; a group that fails is trained once more as two groups of half its characters; a half that still fails is left out and its characters stay untrained. Under gates-v2.3 no limit is tighter than the perfect drawing's own score for the group eased by 10 per cent, and a seed that puts every pixel on the correct side at every counted size passes",
+ "gates_file": "gates-v2.3.json",
+ "gates_sha256": "2ccff8354eeda45e05525490b9fdee6ab13d4970a2389537c44af1504fc50fc4",
  "gates_kind": "letters",
  "gates_files_issued": {
   "gates-v2.1.json": "214942e398f88110cd7c6044c194f0f274274aeedb07abcbe8e1a18dc2b323c0",
   "gates-v2.2.json": "dd3cc2ea30ccb49d001c28a905bcc6e2a2d11edfcd6a741464fda91162b10e70",
+  "gates-v2.3.json": "2ccff8354eeda45e05525490b9fdee6ab13d4970a2389537c44af1504fc50fc4",
   "gates-v2.json": "5bf1a3f8312c45df2a20b2e69d51ee3c690c58891ec5390cf0e41cbdf9f9b51b"
  },
- "scoring": "gates_v2.py score --kind letters --gates gates-v2.2.json, against the teacher of every character drawn for the bundle",
+ "scoring": "gates_v2.py score --kind letters --gates gates-v2.3.json, against the teacher of every character drawn for the bundle",
  "teacher_sha256": "21aa031e2e9c063329efa2eac6374f50665e772047c3d112ec1d93c006e80de6",
  "teacher_characters": 179,
  "trainer": "train/split_expert.py train --mode repertoire --partition contiguous, width 64, 120000 steps, seeds 0,1, teacher grid 256",
@@ -64,6 +73,9 @@
    "lower_error_seed": 1,
    "seeds": {
     "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "09ec12c51258589fbdfc1b6158b03dc479a5c9428d35fb52651a63f5a327a3a8",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -185,6 +197,9 @@
      }
     },
     "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "952adf50b402809dd80c72b902d9697d2aed49f59b0c1df6ea3e43063d0e57a8",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -306,12 +321,13 @@
      }
     }
    },
-   "rules_skipped": [],
+   "limits_eased": [],
    "drawing_problems": [],
    "both_seeds_pass_under": {
     "gates-v2.json": true,
     "gates-v2.1.json": true,
-    "gates-v2.2.json": true
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
    },
    "shipped": true,
    "shipped_seed": 1,
@@ -341,6 +357,9 @@
    "lower_error_seed": 1,
    "seeds": {
     "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "3444727173ae9c3cad407a0daa25d783a9034e757969e545af8e164ca22bf33d",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -462,6 +481,9 @@
      }
     },
     "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "35112de48874f58c68cf45f1306a70a30e9c41a536683c4d169c02621c52c259",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -583,12 +605,13 @@
      }
     }
    },
-   "rules_skipped": [],
+   "limits_eased": [],
    "drawing_problems": [],
    "both_seeds_pass_under": {
     "gates-v2.json": false,
     "gates-v2.1.json": true,
-    "gates-v2.2.json": true
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
    },
    "shipped": true,
    "shipped_seed": 1,
@@ -618,6 +641,9 @@
    "lower_error_seed": 1,
    "seeds": {
     "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "87698dad5d2f99696791e5e28becc70ae9f1b46dec1124b14d650c0f9899ed3b",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -739,6 +765,9 @@
      }
     },
     "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "d1a70cd6854803bb88ef0ee80e02817059f63adb5fb5864891016e5d7bd3a65e",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -860,12 +889,13 @@
      }
     }
    },
-   "rules_skipped": [],
+   "limits_eased": [],
    "drawing_problems": [],
    "both_seeds_pass_under": {
     "gates-v2.json": true,
     "gates-v2.1.json": true,
-    "gates-v2.2.json": true
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
    },
    "shipped": true,
    "shipped_seed": 1,
@@ -895,6 +925,9 @@
    "lower_error_seed": 1,
    "seeds": {
     "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "1ac640272c998fc85c6f511f500048d0d3a5c5436654a7647449141b8017eb74",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -1016,6 +1049,9 @@
      }
     },
     "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "38e70ecb23c93aa16fd4a54701976ed05460e205a81bb55d545fc2cc0a77deea",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -1137,12 +1173,13 @@
      }
     }
    },
-   "rules_skipped": [],
+   "limits_eased": [],
    "drawing_problems": [],
    "both_seeds_pass_under": {
     "gates-v2.json": true,
     "gates-v2.1.json": true,
-    "gates-v2.2.json": true
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
    },
    "shipped": true,
    "shipped_seed": 1,
@@ -1172,6 +1209,9 @@
    "lower_error_seed": 1,
    "seeds": {
     "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "7301c65eb21ca46393ad4e0b587c396abf8739676f2df8ee240143ce34491509",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -1293,6 +1333,9 @@
      }
     },
     "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "5e0d1d162263912cc936caa07c83f87329ca959ff043cfc97ee23c2cca21fa81",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -1414,12 +1457,13 @@
      }
     }
    },
-   "rules_skipped": [],
+   "limits_eased": [],
    "drawing_problems": [],
    "both_seeds_pass_under": {
     "gates-v2.json": true,
     "gates-v2.1.json": true,
-    "gates-v2.2.json": true
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
    },
    "shipped": true,
    "shipped_seed": 1,
@@ -1449,6 +1493,9 @@
    "lower_error_seed": 0,
    "seeds": {
     "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "d7880ceac10f7930056413bf2ef6ffd8a737f39ac47242ef14c29490c26ae5f8",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -1570,6 +1617,9 @@
      }
     },
     "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "a89bf49da64c5f16e9bd89cc871bda3349cc6f7f460705c3c158503683b62218",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -1691,12 +1741,13 @@
      }
     }
    },
-   "rules_skipped": [],
+   "limits_eased": [],
    "drawing_problems": [],
    "both_seeds_pass_under": {
     "gates-v2.json": true,
     "gates-v2.1.json": true,
-    "gates-v2.2.json": true
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
    },
    "shipped": true,
    "shipped_seed": 0,
@@ -1726,6 +1777,9 @@
    "lower_error_seed": 1,
    "seeds": {
     "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "b43fe9528a29a11162722a2a02628cc0cd048803b747c652c14dbdc02474b366",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -1847,6 +1901,9 @@
      }
     },
     "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "994e0b08c79bee13dfd3bed25953a24c02531de879b85aa6bd541bd52db0e475",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -1968,12 +2025,13 @@
      }
     }
    },
-   "rules_skipped": [],
+   "limits_eased": [],
    "drawing_problems": [],
    "both_seeds_pass_under": {
     "gates-v2.json": false,
     "gates-v2.1.json": true,
-    "gates-v2.2.json": true
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
    },
    "shipped": true,
    "shipped_seed": 1,
@@ -2003,6 +2061,9 @@
    "lower_error_seed": 1,
    "seeds": {
     "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "10bc542641a73bff3f119817d381e88c2a5afcccf1478640dcc726c0478490b3",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -2124,6 +2185,9 @@
      }
     },
     "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "929d201b9d353453defb998210decfe875d591c9fe849e5a9e2ea29614aa3100",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -2245,12 +2309,13 @@
      }
     }
    },
-   "rules_skipped": [],
+   "limits_eased": [],
    "drawing_problems": [],
    "both_seeds_pass_under": {
     "gates-v2.json": true,
     "gates-v2.1.json": true,
-    "gates-v2.2.json": true
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
    },
    "shipped": true,
    "shipped_seed": 1,
@@ -2280,6 +2345,9 @@
    "lower_error_seed": 1,
    "seeds": {
     "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "e80930ca45793250ee06d96693b18ea7c861d07876c8757395ae55f871353a7d",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -2401,6 +2469,9 @@
      }
     },
     "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "f19786b3be1400f009b60ad69d195db991214896e313ebe15c4e2ac6bacd4923",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -2522,12 +2593,13 @@
      }
     }
    },
-   "rules_skipped": [],
+   "limits_eased": [],
    "drawing_problems": [],
    "both_seeds_pass_under": {
     "gates-v2.json": true,
     "gates-v2.1.json": true,
-    "gates-v2.2.json": true
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
    },
    "shipped": true,
    "shipped_seed": 1,
@@ -2557,6 +2629,9 @@
    "lower_error_seed": 0,
    "seeds": {
     "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "21c56344216df3ed2c9087237607f9f45da5120e35c3cd12fc0c11d9df1e0700",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -2678,6 +2753,9 @@
      }
     },
     "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "8feb2bfb19ae6ef2fd2795b88ed0a584173816ac850decdae530a5c49980d2f9",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -2799,12 +2877,13 @@
      }
     }
    },
-   "rules_skipped": [],
+   "limits_eased": [],
    "drawing_problems": [],
    "both_seeds_pass_under": {
     "gates-v2.json": true,
     "gates-v2.1.json": true,
-    "gates-v2.2.json": true
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
    },
    "shipped": true,
    "shipped_seed": 0,
@@ -2829,6 +2908,9 @@
    "lower_error_seed": 1,
    "seeds": {
     "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "9c4b9fdebf4233fc11d44afbb68c0f7b68a6a83e9c490bc4c3514ce4f1e175df",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -2950,6 +3032,9 @@
      }
     },
     "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "6c68ce355d14289ffbfa7d05c188353253b87a9560932385683366e570523ab3",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -3071,14 +3156,26 @@
      }
     }
    },
-   "rules_skipped": [
-    "s1 8x16 p99 skipped: perfect net fails (0.254444, limit 0.235413)"
+   "limits_eased": [
+    {
+     "rule": "10x20 iou_mean",
+     "declared": 0.7917055584426805,
+     "perfect": 0.8050589126012059,
+     "applied": 0.7855648038613264
+    },
+    {
+     "rule": "s1 8x16 p99",
+     "declared": 0.23541254103183748,
+     "perfect": 0.25444427132606506,
+     "applied": 0.2798886984586716
+    }
    ],
    "drawing_problems": [],
    "both_seeds_pass_under": {
     "gates-v2.json": false,
     "gates-v2.1.json": false,
-    "gates-v2.2.json": true
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
    },
    "shipped": true,
    "shipped_seed": 1,
@@ -3103,6 +3200,9 @@
    "lower_error_seed": 1,
    "seeds": {
     "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "d77736ca4ded9ce5f5ad0ed9fa9eccfd8c3a9420d99ea3c0873c1fe48d08f838",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -3224,6 +3324,9 @@
      }
     },
     "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "5f99c797c4bcf69bd742343c2d9c2bd5d5ebe13e8e88dd41367682994dad99ca",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -3345,14 +3448,26 @@
      }
     }
    },
-   "rules_skipped": [
-    "s1 8x16 p99 skipped: perfect net fails (0.259375, limit 0.235413)"
+   "limits_eased": [
+    {
+     "rule": "24x48 firm",
+     "declared": 0.0006356336805555555,
+     "perfect": 0.0006200396825396825,
+     "applied": 0.0006820436507936509
+    },
+    {
+     "rule": "s1 8x16 p99",
+     "declared": 0.23541254103183748,
+     "perfect": 0.2593749761581421,
+     "applied": 0.2853124737739563
+    }
    ],
    "drawing_problems": [],
    "both_seeds_pass_under": {
     "gates-v2.json": false,
     "gates-v2.1.json": false,
-    "gates-v2.2.json": true
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
    },
    "shipped": true,
    "shipped_seed": 1,
@@ -3379,6 +3494,9 @@
    "lower_error_seed": 1,
    "seeds": {
     "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "37e6554adc4bc2da16be5c461d6cd95f348acfb8b08fbfacac6c20262c5fbfb6",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -3500,6 +3618,9 @@
      }
     },
     "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "ad88e4e131c1f713637b9f30fe2ad2d041185106c5513a412542445665a8a9ce",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -3621,15 +3742,38 @@
      }
     }
    },
-   "rules_skipped": [
-    "10x20 mae skipped: perfect net fails (0.0104377, limit 0.00866061)",
-    "10x20 iou_mean skipped: perfect net fails (0.777891, limit 0.791706)"
+   "limits_eased": [
+    {
+     "rule": "8x16 mae",
+     "declared": 0.014284084748942405,
+     "perfect": 0.013048697987364398,
+     "applied": 0.01435356778610084
+    },
+    {
+     "rule": "10x20 mae",
+     "declared": 0.008660606882767753,
+     "perfect": 0.010437715074254407,
+     "applied": 0.011481486581679847
+    },
+    {
+     "rule": "10x20 iou_mean",
+     "declared": 0.7917055584426805,
+     "perfect": 0.7778913620976539,
+     "applied": 0.7556804983074192
+    },
+    {
+     "rule": "s1 8x16 p99",
+     "declared": 0.23541254103183748,
+     "perfect": 0.23000001907348633,
+     "applied": 0.25300002098083496
+    }
    ],
    "drawing_problems": [],
    "both_seeds_pass_under": {
     "gates-v2.json": false,
     "gates-v2.1.json": false,
-    "gates-v2.2.json": true
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
    },
    "shipped": true,
    "shipped_seed": 1,
@@ -3652,17 +3796,18 @@
    ],
    "width": 64,
    "role": "first",
-   "both_seeds_pass": false,
-   "selected_seed": null,
+   "both_seeds_pass": true,
+   "selected_seed": 1,
    "lower_error_seed": 1,
    "seeds": {
     "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "103477690e813672eb1b7fbda8de607aafbad708065ea91e72eadfe473afa17c",
      "reference_check_passed": true,
-     "gates_passed": false,
-     "failures": [
-      "10x20 mae"
-     ],
+     "gates_passed": true,
+     "failures": [],
      "mean_established_mae": 0.005457141615139941,
      "counted_sizes": {
       "6x12": {
@@ -3780,6 +3925,9 @@
      }
     },
     "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "9eeb654215530fd8c0551e5505d642b94d00c5c34bed4864286358dd193a95ef",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -3901,563 +4049,30 @@
      }
     }
    },
-   "rules_skipped": [
-    "s1 8x16 p99 skipped: perfect net fails (0.250055, limit 0.235413)"
+   "limits_eased": [
+    {
+     "rule": "10x20 mae",
+     "declared": 0.008660606882767753,
+     "perfect": 0.008526709000580012,
+     "applied": 0.009379379900638014
+    },
+    {
+     "rule": "s1 8x16 p99",
+     "declared": 0.23541254103183748,
+     "perfect": 0.25005465745925903,
+     "applied": 0.27506012320518497
+    }
    ],
    "drawing_problems": [],
    "both_seeds_pass_under": {
     "gates-v2.json": false,
     "gates-v2.1.json": false,
-    "gates-v2.2.json": false
-   },
-   "shipped": false,
-   "shipped_seed": null,
-   "file": null,
-   "trained_again_as": "tscrxmdu1"
-  },
-  {
-   "set": "tscrxmdu1",
-   "group": 0,
-   "scalars": [
-    "U+1D543",
-    "U+1D544",
-    "U+1D546",
-    "U+1D54A",
-    "U+1D54B"
-   ],
-   "width": 64,
-   "role": "half",
-   "both_seeds_pass": true,
-   "selected_seed": 1,
-   "lower_error_seed": 1,
-   "seeds": {
-    "0": {
-     "sha256": "20c9c1a99036ec0f93a9489ca81cd93359b74aba9d0277a82c12f501efac08ad",
-     "reference_check_passed": true,
-     "gates_passed": true,
-     "failures": [],
-     "mean_established_mae": 0.006285163255718848,
-     "counted_sizes": {
-      "6x12": {
-       "mae": 0.011936586536467075,
-       "p99": 0.07303321361541748,
-       "firm_fraction": 0.0,
-       "iou_mean": 0.898611111111111,
-       "worst_glyph_mae": 0.016205931082367897,
-       "worst_glyph_iou": 0.6666666666666666,
-       "not_nearest": [],
-       "vanished": [],
-       "min_margin": 1.7287853956222534
-      },
-      "8x16": {
-       "mae": 0.012021219171583653,
-       "p99": 0.06660368293523788,
-       "firm_fraction": 0.0,
-       "iou_mean": 0.6865367965367966,
-       "worst_glyph_mae": 0.019844774156808853,
-       "worst_glyph_iou": 0.36363636363636365,
-       "not_nearest": [],
-       "vanished": [],
-       "min_margin": 3.1648082435131073
-      },
-      "10x20": {
-       "mae": 0.010146803967654706,
-       "p99": 0.056419581174850464,
-       "firm_fraction": 0.0,
-       "iou_mean": 0.7804173813607775,
-       "worst_glyph_mae": 0.013802639208734035,
-       "worst_glyph_iou": 0.6363636363636364,
-       "not_nearest": [],
-       "vanished": [],
-       "min_margin": 4.23298442363739
-      },
-      "12x24": {
-       "mae": 0.006814439967274666,
-       "p99": 0.052697207778692245,
-       "firm_fraction": 0.0,
-       "iou_mean": 0.9967741935483871,
-       "worst_glyph_mae": 0.009337588213384151,
-       "worst_glyph_iou": 0.9838709677419355,
-       "not_nearest": [],
-       "vanished": [],
-       "min_margin": 6.548256576061249
-      },
-      "16x32": {
-       "mae": 0.0046304288320243355,
-       "p99": 0.05541040003299713,
-       "firm_fraction": 0.0,
-       "iou_mean": 0.9966942148760332,
-       "worst_glyph_mae": 0.005725017748773098,
-       "worst_glyph_iou": 0.9834710743801653,
-       "not_nearest": [],
-       "vanished": [],
-       "min_margin": 12.016098141670227
-      },
-      "24x48": {
-       "mae": 0.005947278439998626,
-       "p99": 0.06306642293930054,
-       "firm_fraction": 0.00017361111111111112,
-       "iou_mean": 0.9535701025249285,
-       "worst_glyph_mae": 0.00912046805024147,
-       "worst_glyph_iou": 0.7850467289719626,
-       "not_nearest": [],
-       "vanished": [],
-       "min_margin": 27.670147955417633
-      },
-      "48x96": {
-       "mae": 0.002203841763548553,
-       "p99": 0.05029241368174553,
-       "firm_fraction": 8.680555555555556e-05,
-       "iou_mean": 0.996294044019496,
-       "worst_glyph_mae": 0.0027404578868299723,
-       "worst_glyph_iou": 0.9926160337552743,
-       "not_nearest": [],
-       "vanished": [],
-       "min_margin": 109.13876497745514
-      }
-     },
-     "one_sample": {
-      "8x16": {
-       "mae": 0.023327437601983546,
-       "p99": 0.2558722496032715,
-       "firm_fraction": 0.0078125,
-       "iou_mean": 0.6385893416927899,
-       "worst_glyph_mae": 0.03662583976984024,
-       "worst_glyph_iou": 0.36363636363636365,
-       "not_nearest": [],
-       "vanished": [],
-       "min_margin": 2.621993899345398
-      },
-      "16x32": {
-       "mae": 0.007303646113723516,
-       "p99": 0.0822301059961319,
-       "firm_fraction": 0.0015625,
-       "iou_mean": 0.9801564236629172,
-       "worst_glyph_mae": 0.008682908490300179,
-       "worst_glyph_iou": 0.9669421487603306,
-       "not_nearest": [],
-       "vanished": [],
-       "min_margin": 11.664880990982056
-      },
-      "48x96": {
-       "mae": 0.002203841763548553,
-       "p99": 0.05029241368174553,
-       "firm_fraction": 8.680555555555556e-05,
-       "iou_mean": 0.996294044019496,
-       "worst_glyph_mae": 0.0027404578868299723,
-       "worst_glyph_iou": 0.9926160337552743,
-       "not_nearest": [],
-       "vanished": [],
-       "min_margin": 109.13876497745514
-      }
-     }
-    },
-    "1": {
-     "sha256": "d4509a0ecf13928452cdc0b3157a96724d461ec8ebbcb5d6ff2f7f109783f758",
-     "reference_check_passed": true,
-     "gates_passed": true,
-     "failures": [],
-     "mean_established_mae": 0.006249209159674744,
-     "counted_sizes": {
-      "6x12": {
-       "mae": 0.011789007112383842,
-       "p99": 0.0680524930357933,
-       "firm_fraction": 0.0,
-       "iou_mean": 0.898611111111111,
-       "worst_glyph_mae": 0.01601210981607437,
-       "worst_glyph_iou": 0.6666666666666666,
-       "not_nearest": [],
-       "vanished": [],
-       "min_margin": 1.730917975306511
-      },
-      "8x16": {
-       "mae": 0.01187774296849966,
-       "p99": 0.06750907003879547,
-       "firm_fraction": 0.0,
-       "iou_mean": 0.6865367965367966,
-       "worst_glyph_mae": 0.019233889877796173,
-       "worst_glyph_iou": 0.36363636363636365,
-       "not_nearest": [],
-       "vanished": [],
-       "min_margin": 3.1793461441993713
-      },
-      "10x20": {
-       "mae": 0.010108106024563312,
-       "p99": 0.054575394839048386,
-       "firm_fraction": 0.0,
-       "iou_mean": 0.775871926815323,
-       "worst_glyph_mae": 0.013732311315834522,
-       "worst_glyph_iou": 0.6363636363636364,
-       "not_nearest": [],
-       "vanished": [],
-       "min_margin": 4.234178364276886
-      },
-      "12x24": {
-       "mae": 0.006786278355866671,
-       "p99": 0.04874454811215401,
-       "firm_fraction": 0.0,
-       "iou_mean": 1.0,
-       "worst_glyph_mae": 0.009109928272664547,
-       "worst_glyph_iou": 1.0,
-       "not_nearest": [],
-       "vanished": [],
-       "min_margin": 6.567096397280693
-      },
-      "16x32": {
-       "mae": 0.004653190635144711,
-       "p99": 0.05548568069934845,
-       "firm_fraction": 0.0,
-       "iou_mean": 0.9966942148760332,
-       "worst_glyph_mae": 0.005611066706478596,
-       "worst_glyph_iou": 0.9834710743801653,
-       "not_nearest": [],
-       "vanished": [],
-       "min_margin": 12.027313798666
-      },
-      "24x48": {
-       "mae": 0.005892722215503454,
-       "p99": 0.06283990293741226,
-       "firm_fraction": 0.00034722222222222224,
-       "iou_mean": 0.9529275645652474,
-       "worst_glyph_mae": 0.008833574131131172,
-       "worst_glyph_iou": 0.7850467289719626,
-       "not_nearest": [],
-       "vanished": [],
-       "min_margin": 27.618959069252014
-      },
-      "48x96": {
-       "mae": 0.0022166938753798602,
-       "p99": 0.04979126900434494,
-       "firm_fraction": 8.680555555555556e-05,
-       "iou_mean": 0.9972382982629178,
-       "worst_glyph_mae": 0.00282445945776999,
-       "worst_glyph_iou": 0.9926082365364308,
-       "not_nearest": [],
-       "vanished": [],
-       "min_margin": 108.98670768737793
-      }
-     },
-     "one_sample": {
-      "8x16": {
-       "mae": 0.023517615720629693,
-       "p99": 0.25540420413017273,
-       "firm_fraction": 0.0078125,
-       "iou_mean": 0.6385893416927899,
-       "worst_glyph_mae": 0.03682182356715202,
-       "worst_glyph_iou": 0.36363636363636365,
-       "not_nearest": [],
-       "vanished": [],
-       "min_margin": 2.5846563577651978
-      },
-      "16x32": {
-       "mae": 0.007277642283588648,
-       "p99": 0.07937294989824295,
-       "firm_fraction": 0.0015625,
-       "iou_mean": 0.981767993910851,
-       "worst_glyph_mae": 0.008540309965610504,
-       "worst_glyph_iou": 0.9693877551020408,
-       "not_nearest": [],
-       "vanished": [],
-       "min_margin": 11.68748939037323
-      },
-      "48x96": {
-       "mae": 0.0022166938753798602,
-       "p99": 0.04979126900434494,
-       "firm_fraction": 8.680555555555556e-05,
-       "iou_mean": 0.9972382982629178,
-       "worst_glyph_mae": 0.00282445945776999,
-       "worst_glyph_iou": 0.9926082365364308,
-       "not_nearest": [],
-       "vanished": [],
-       "min_margin": 108.98670768737793
-      }
-     }
-    }
-   },
-   "rules_skipped": [
-    "8x16 iou_mean skipped: perfect net fails (0.686537, limit 0.703503)",
-    "10x20 mae skipped: perfect net fails (0.0100236, limit 0.00866061)",
-    "10x20 iou_mean skipped: perfect net fails (0.780417, limit 0.791706)",
-    "24x48 mae skipped: perfect net fails (0.00584012, limit 0.00571244)",
-    "s1 8x16 p99 skipped: perfect net fails (0.263287, limit 0.235413)"
-   ],
-   "drawing_problems": [],
-   "both_seeds_pass_under": {
-    "gates-v2.json": false,
-    "gates-v2.2.json": true
+    "gates-v2.2.json": false,
+    "gates-v2.3.json": true
    },
    "shipped": true,
    "shipped_seed": 1,
-   "file": "neuronte-term-mathalpha-v1-tscrxmdu1-g0.json"
-  },
-  {
-   "set": "tscrxmdu1",
-   "group": 1,
-   "scalars": [
-    "U+1D54C",
-    "U+1D54D",
-    "U+1D54E",
-    "U+1D54F",
-    "U+1D550"
-   ],
-   "width": 64,
-   "role": "half",
-   "both_seeds_pass": true,
-   "selected_seed": 1,
-   "lower_error_seed": 1,
-   "seeds": {
-    "0": {
-     "sha256": "9c30d2ccab04926d97bf52154946a4fae6f281cdb13f5f382a38097c93a777f3",
-     "reference_check_passed": true,
-     "gates_passed": true,
-     "failures": [],
-     "mean_established_mae": 0.004379024224666257,
-     "counted_sizes": {
-      "6x12": {
-       "mae": 0.008678196929395199,
-       "p99": 0.06863954663276672,
-       "firm_fraction": 0.0,
-       "iou_mean": 0.980952380952381,
-       "worst_glyph_mae": 0.013183211907744408,
-       "worst_glyph_iou": 0.9047619047619048,
-       "not_nearest": [],
-       "vanished": [],
-       "min_margin": 3.21225143969059
-      },
-      "8x16": {
-       "mae": 0.007687564752995968,
-       "p99": 0.06133124604821205,
-       "firm_fraction": 0.0,
-       "iou_mean": 0.8828571428571429,
-       "worst_glyph_mae": 0.016138974577188492,
-       "worst_glyph_iou": 0.7,
-       "not_nearest": [],
-       "vanished": [],
-       "min_margin": 7.5181188732385635
-      },
-      "10x20": {
-       "mae": 0.007118803076446056,
-       "p99": 0.05534982681274414,
-       "firm_fraction": 0.0,
-       "iou_mean": 0.9082659846547315,
-       "worst_glyph_mae": 0.011749498546123505,
-       "worst_glyph_iou": 0.8695652173913043,
-       "not_nearest": [],
-       "vanished": [],
-       "min_margin": 13.939089819788933
-      },
-      "12x24": {
-       "mae": 0.004343186318874359,
-       "p99": 0.044643040746450424,
-       "firm_fraction": 0.0,
-       "iou_mean": 0.9891826923076923,
-       "worst_glyph_mae": 0.0069824159145355225,
-       "worst_glyph_iou": 0.9615384615384616,
-       "not_nearest": [],
-       "vanished": [],
-       "min_margin": 20.85007406771183
-      },
-      "16x32": {
-       "mae": 0.0035068373195827006,
-       "p99": 0.05699225515127182,
-       "firm_fraction": 0.0,
-       "iou_mean": 0.9980952380952381,
-       "worst_glyph_mae": 0.006654861383140087,
-       "worst_glyph_iou": 0.9904761904761905,
-       "not_nearest": [],
-       "vanished": [],
-       "min_margin": 38.76897133886814
-      },
-      "24x48": {
-       "mae": 0.003927110880613327,
-       "p99": 0.05724279209971428,
-       "firm_fraction": 0.0,
-       "iou_mean": 0.9728981557913015,
-       "worst_glyph_mae": 0.005154473707079887,
-       "worst_glyph_iou": 0.8990825688073395,
-       "not_nearest": [],
-       "vanished": [],
-       "min_margin": 91.25092685222626
-      },
-      "48x96": {
-       "mae": 0.0019426706014201045,
-       "p99": 0.04666139930486679,
-       "firm_fraction": 8.680555555555556e-05,
-       "iou_mean": 0.9974599890592011,
-       "worst_glyph_mae": 0.002894860692322254,
-       "worst_glyph_iou": 0.9928789420142421,
-       "not_nearest": [],
-       "vanished": [],
-       "min_margin": 368.9193449616432
-      }
-     },
-     "one_sample": {
-      "8x16": {
-       "mae": 0.018568624369800092,
-       "p99": 0.22980773448944092,
-       "firm_fraction": 0.0046875,
-       "iou_mean": 0.8476456876456876,
-       "worst_glyph_mae": 0.024591807276010513,
-       "worst_glyph_iou": 0.6818181818181818,
-       "not_nearest": [],
-       "vanished": [],
-       "min_margin": 7.225748002529144
-      },
-      "16x32": {
-       "mae": 0.006623250618577004,
-       "p99": 0.07639868557453156,
-       "firm_fraction": 0.000390625,
-       "iou_mean": 0.9883191856273985,
-       "worst_glyph_mae": 0.009262233972549438,
-       "worst_glyph_iou": 0.9791666666666666,
-       "not_nearest": [],
-       "vanished": [],
-       "min_margin": 37.41167485713959
-      },
-      "48x96": {
-       "mae": 0.0019426706014201045,
-       "p99": 0.04666139930486679,
-       "firm_fraction": 8.680555555555556e-05,
-       "iou_mean": 0.9974599890592011,
-       "worst_glyph_mae": 0.002894860692322254,
-       "worst_glyph_iou": 0.9928789420142421,
-       "not_nearest": [],
-       "vanished": [],
-       "min_margin": 368.9193449616432
-      }
-     }
-    },
-    "1": {
-     "sha256": "0db07fa224476bfc4377bb784ca655feb56f95be75b8e1dcbe53603558eb3413",
-     "reference_check_passed": true,
-     "gates_passed": true,
-     "failures": [],
-     "mean_established_mae": 0.004367398858691255,
-     "counted_sizes": {
-      "6x12": {
-       "mae": 0.008424464706331491,
-       "p99": 0.06308937072753906,
-       "firm_fraction": 0.0,
-       "iou_mean": 0.99,
-       "worst_glyph_mae": 0.01303135696798563,
-       "worst_glyph_iou": 0.95,
-       "not_nearest": [],
-       "vanished": [],
-       "min_margin": 3.2276153713464737
-      },
-      "8x16": {
-       "mae": 0.007669884245842695,
-       "p99": 0.06049046665430069,
-       "firm_fraction": 0.0,
-       "iou_mean": 0.8828571428571429,
-       "worst_glyph_mae": 0.016132693737745285,
-       "worst_glyph_iou": 0.7,
-       "not_nearest": [],
-       "vanished": [],
-       "min_margin": 7.566629201173782
-      },
-      "10x20": {
-       "mae": 0.007141686696559191,
-       "p99": 0.055179793387651443,
-       "firm_fraction": 0.0,
-       "iou_mean": 0.9037537895327802,
-       "worst_glyph_mae": 0.011682945303618908,
-       "worst_glyph_iou": 0.8695652173913043,
-       "not_nearest": [],
-       "vanished": [],
-       "min_margin": 13.916089504957199
-      },
-      "12x24": {
-       "mae": 0.004281097557395697,
-       "p99": 0.04418152570724487,
-       "firm_fraction": 0.0,
-       "iou_mean": 0.9923076923076923,
-       "worst_glyph_mae": 0.00690672779455781,
-       "worst_glyph_iou": 0.9615384615384616,
-       "not_nearest": [],
-       "vanished": [],
-       "min_margin": 20.851348623633385
-      },
-      "16x32": {
-       "mae": 0.0035101314075291156,
-       "p99": 0.05774432420730591,
-       "firm_fraction": 0.0,
-       "iou_mean": 0.9980952380952381,
-       "worst_glyph_mae": 0.006717377342283726,
-       "worst_glyph_iou": 0.9904761904761905,
-       "not_nearest": [],
-       "vanished": [],
-       "min_margin": 38.78444401919842
-      },
-      "24x48": {
-       "mae": 0.0039015035610646008,
-       "p99": 0.05713533237576485,
-       "firm_fraction": 0.0,
-       "iou_mean": 0.973000585779315,
-       "worst_glyph_mae": 0.005098434630781412,
-       "worst_glyph_iou": 0.8990825688073395,
-       "not_nearest": [],
-       "vanished": [],
-       "min_margin": 91.11464464664459
-      },
-      "48x96": {
-       "mae": 0.0019221809227019549,
-       "p99": 0.046248890459537506,
-       "firm_fraction": 4.340277777777778e-05,
-       "iou_mean": 0.9981960725293326,
-       "worst_glyph_mae": 0.002873755758628249,
-       "worst_glyph_iou": 0.995483288166215,
-       "not_nearest": [],
-       "vanished": [],
-       "min_margin": 368.6973499059677
-      }
-     },
-     "one_sample": {
-      "8x16": {
-       "mae": 0.01796762868762016,
-       "p99": 0.2314848154783249,
-       "firm_fraction": 0.0046875,
-       "iou_mean": 0.8396456876456876,
-       "worst_glyph_mae": 0.023577596992254257,
-       "worst_glyph_iou": 0.6818181818181818,
-       "not_nearest": [],
-       "vanished": [],
-       "min_margin": 7.322758615016937
-      },
-      "16x32": {
-       "mae": 0.006565890181809664,
-       "p99": 0.0763469710946083,
-       "firm_fraction": 0.00078125,
-       "iou_mean": 0.986706282401592,
-       "worst_glyph_mae": 0.009007474407553673,
-       "worst_glyph_iou": 0.9791666666666666,
-       "not_nearest": [],
-       "vanished": [],
-       "min_margin": 37.55847889184952
-      },
-      "48x96": {
-       "mae": 0.0019221809227019549,
-       "p99": 0.046248890459537506,
-       "firm_fraction": 4.340277777777778e-05,
-       "iou_mean": 0.9981960725293326,
-       "worst_glyph_mae": 0.002873755758628249,
-       "worst_glyph_iou": 0.995483288166215,
-       "not_nearest": [],
-       "vanished": [],
-       "min_margin": 368.6973499059677
-      }
-     }
-    }
-   },
-   "rules_skipped": [],
-   "drawing_problems": [],
-   "both_seeds_pass_under": {
-    "gates-v2.json": true,
-    "gates-v2.2.json": true
-   },
-   "shipped": true,
-   "shipped_seed": 1,
-   "file": "neuronte-term-mathalpha-v1-tscrxmdu1-g1.json"
+   "file": "neuronte-term-mathalpha-v1-tscrmdu-g1.json"
   },
   {
    "set": "tscrmdl",
@@ -4479,6 +4094,9 @@
    "lower_error_seed": 1,
    "seeds": {
     "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "4a046ab3ba7676566f0b7f290d7c2f0ae37bf2bcae1e3169fa1289833773bc39",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -4600,6 +4218,9 @@
      }
     },
     "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "eb59fd6d6231370c7529ae2600eee67fe8bf4cf18312b47c86c980f98a54f763",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -4721,16 +4342,38 @@
      }
     }
    },
-   "rules_skipped": [
-    "24x48 firm skipped: perfect net fails (0.000976562, limit 0.000635634)",
-    "s1 8x16 p99 skipped: perfect net fails (0.2475, limit 0.235413)",
-    "s1 8x16 firm skipped: perfect net fails (0.0126953, limit 0.0107422)"
+   "limits_eased": [
+    {
+     "rule": "10x20 mae",
+     "declared": 0.008660606882767753,
+     "perfect": 0.008446059771813452,
+     "applied": 0.009290665748994799
+    },
+    {
+     "rule": "24x48 firm",
+     "declared": 0.0006356336805555555,
+     "perfect": 0.0009765625,
+     "applied": 0.00107421875
+    },
+    {
+     "rule": "s1 8x16 p99",
+     "declared": 0.23541254103183748,
+     "perfect": 0.2475000023841858,
+     "applied": 0.2722500026226044
+    },
+    {
+     "rule": "s1 8x16 firm",
+     "declared": 0.0107421875,
+     "perfect": 0.0126953125,
+     "applied": 0.01396484375
+    }
    ],
    "drawing_problems": [],
    "both_seeds_pass_under": {
     "gates-v2.json": false,
     "gates-v2.1.json": false,
-    "gates-v2.2.json": true
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
    },
    "shipped": true,
    "shipped_seed": 1,
@@ -4757,6 +4400,9 @@
    "lower_error_seed": 1,
    "seeds": {
     "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "4d80c9793ccd0ad892f915cf562b9a50a143c0567cb30c5e9f93dd7d28bfc781",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -4878,6 +4524,9 @@
      }
     },
     "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "164aa80777f9812e1c1c34e5c9ce01800d0c3ad75c0d7627930448887975ca17",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -4999,16 +4648,44 @@
      }
     }
    },
-   "rules_skipped": [
-    "10x20 mae skipped: perfect net fails (0.00913628, limit 0.00866061)",
-    "24x48 firm skipped: perfect net fails (0.000675154, limit 0.000635634)",
-    "24x48 iou_mean skipped: perfect net fails (0.935441, limit 0.944932)"
+   "limits_eased": [
+    {
+     "rule": "10x20 mae",
+     "declared": 0.008660606882767753,
+     "perfect": 0.009136275129599703,
+     "applied": 0.010049902642559675
+    },
+    {
+     "rule": "10x20 iou_mean",
+     "declared": 0.7917055584426805,
+     "perfect": 0.8065190138808584,
+     "applied": 0.7871709152689443
+    },
+    {
+     "rule": "24x48 firm",
+     "declared": 0.0006356336805555555,
+     "perfect": 0.0006751543209876543,
+     "applied": 0.0007426697530864198
+    },
+    {
+     "rule": "24x48 iou_mean",
+     "declared": 0.9449324959405635,
+     "perfect": 0.9354411434254494,
+     "applied": 0.9289852577679943
+    },
+    {
+     "rule": "s1 8x16 p99",
+     "declared": 0.23541254103183748,
+     "perfect": 0.23000001907348633,
+     "applied": 0.25300002098083496
+    }
    ],
    "drawing_problems": [],
    "both_seeds_pass_under": {
     "gates-v2.json": false,
     "gates-v2.1.json": false,
-    "gates-v2.2.json": true
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
    },
    "shipped": true,
    "shipped_seed": 1,
@@ -5035,6 +4712,9 @@
    "lower_error_seed": 1,
    "seeds": {
     "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "885e2b0533e7d7648e4ac49a8564dc6940e616c0c19bb6e619a1773d9d067218",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -5156,6 +4836,9 @@
      }
     },
     "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
      "sha256": "82e5eb546bf594272d5622d01945e277f27c0628483de3089dcb3276e1c4e655",
      "reference_check_passed": true,
      "gates_passed": true,
@@ -5277,14 +4960,20 @@
      }
     }
    },
-   "rules_skipped": [
-    "10x20 iou_mean skipped: perfect net fails (0.744334, limit 0.791706)"
+   "limits_eased": [
+    {
+     "rule": "10x20 iou_mean",
+     "declared": 0.7917055584426805,
+     "perfect": 0.7443344457979914,
+     "applied": 0.7187678903777905
+    }
    ],
    "drawing_problems": [],
    "both_seeds_pass_under": {
     "gates-v2.json": false,
     "gates-v2.1.json": false,
-    "gates-v2.2.json": true
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
    },
    "shipped": true,
    "shipped_seed": 1,

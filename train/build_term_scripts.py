@@ -34,7 +34,7 @@ BESIDE_SHA = '0a92f223d47f1680929b2c5d7512d1a1728d4871e6653b33cbaad060e6bb90c0'
 BUNDLES = {
     'neuronte-term-mathalpha-v1': {
         'groups': (('tscrmp', 10), ('tscrmn', 2), ('tscrmdu', 2), ('tscrmdl', 3)),
-        'again': {('tscrmdu', 1): 'tscrxmdu1'},
+        'again': {},
         'left_out': {},
     },
     'neuronte-term-syllabics-v1': {

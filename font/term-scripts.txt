@@ -403,10 +403,3 @@ held U+2D37 U+2D39 U+2D43 U+2D47 U+2D49 U+2D4A U+2D4E U+2D4F U+2D5C U+2D62 U+2D6
 held U+0555 U+054D U+0548 U+053C U+054F U+0553 U+0554 U+0550 U+0535
 held U+0545 U+0585 U+057D U+0578 U+0570 U+0575 U+0581 U+0566 U+0584
 held U+0580 U+057C U+056B U+0565 U+0582 U+0589 U+055A U+0559 U+055B U+055D
-#
-# ---------------------------------------------------------------------
-# Groups that failed the common gates, listed again: each is trained once
-# more as two halves, the one remedy. tscrxmdu1 is group 1 of tscrmdu, and
-# so on. These sets repeat characters and belong to no bundle of their own.
-# ---------------------------------------------------------------------
-tscrxmdu1 U+1D543 U+1D544 U+1D546 U+1D54A U+1D54B U+1D54C U+1D54D U+1D54E U+1D54F U+1D550

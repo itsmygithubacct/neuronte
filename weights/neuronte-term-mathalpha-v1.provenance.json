@@ -1,8 +1,8 @@
 {
   "schema": "neuronte.term-scripts/v1",
   "name": "neuronte-term-mathalpha-v1",
-  "sha256": "87e7a32017884af98d9cb9c506b619079b058ae8dc915c93787d77b0ebd13c52",
-  "bytes": 1028112,
+  "sha256": "b6bd7d73a1c2116b4383d70c810fe780ca3e36846c32c7178c1e5a2764167c57",
+  "bytes": 971056,
   "groups": [
     [
       "tscrmp",
@@ -21,25 +21,19 @@
       3
     ]
   ],
-  "again": [
-    {
-      "set": "tscrmdu",
-      "group": 1,
-      "as": "tscrxmdu1"
-    }
-  ],
+  "again": [],
   "left_out": [],
   "record": {
     "schema": "neuronte.standalone-bundle/v1",
-    "sha256": "87e7a32017884af98d9cb9c506b619079b058ae8dc915c93787d77b0ebd13c52",
-    "bytes": 1028112,
-    "members": 19,
-    "group_nets": 18,
-    "ranges": 58,
+    "sha256": "b6bd7d73a1c2116b4383d70c810fe780ca3e36846c32c7178c1e5a2764167c57",
+    "bytes": 971056,
+    "members": 18,
+    "group_nets": 17,
+    "ranges": 57,
     "gate": null,
     "trained_scalars": 179,
     "fallback": {
-      "member": 18,
+      "member": 17,
       "kind": "blank",
       "hidden_width": 1,
       "distance": -8.0,
@@ -329,27 +323,17 @@
       },
       {
         "member": 13,
-        "json": "neuronte-term-mathalpha-v1-tscrxmdu1-g0.json",
-        "json_sha256": "d4509a0ecf13928452cdc0b3157a96724d461ec8ebbcb5d6ff2f7f109783f758",
-        "image_sha256": "1b4b2e3bd8a23fca0c74e0c360617f7a240869bc921e44fefc8d9d473a51d434",
+        "json": "neuronte-term-mathalpha-v1-tscrmdu-g1.json",
+        "json_sha256": "9eeb654215530fd8c0551e5505d642b94d00c5c34bed4864286358dd193a95ef",
+        "image_sha256": "21ff331437fc86029ad772e5a8a24efc7f4502bafbfdc1c43a90005eba89532c",
         "bytes": 57040,
-        "set": "tscrxmdu1-repertoire",
+        "set": "tscrmdu-repertoire",
         "scalars": [
           "U+1D543",
           "U+1D544",
           "U+1D546",
           "U+1D54A",
-          "U+1D54B"
-        ]
-      },
-      {
-        "member": 14,
-        "json": "neuronte-term-mathalpha-v1-tscrxmdu1-g1.json",
-        "json_sha256": "0db07fa224476bfc4377bb784ca655feb56f95be75b8e1dcbe53603558eb3413",
-        "image_sha256": "b4a6010f70cdd7397ca87812ee138fed9c68cfefb7dcb05059a331ef3fd577f2",
-        "bytes": 57040,
-        "set": "tscrxmdu1-repertoire",
-        "scalars": [
+          "U+1D54B",
           "U+1D54C",
           "U+1D54D",
           "U+1D54E",
@@ -358,7 +342,7 @@
         ]
       },
       {
-        "member": 15,
+        "member": 14,
         "json": "neuronte-term-mathalpha-v1-tscrmdl-g0.json",
         "json_sha256": "eb59fd6d6231370c7529ae2600eee67fe8bf4cf18312b47c86c980f98a54f763",
         "image_sha256": "92b290be81afb521050fc40b9de59d53ee320d7aa19dfbe2a878adc170cc5a4b",
@@ -376,7 +360,7 @@
         ]
       },
       {
-        "member": 16,
+        "member": 15,
         "json": "neuronte-term-mathalpha-v1-tscrmdl-g1.json",
         "json_sha256": "164aa80777f9812e1c1c34e5c9ce01800d0c3ad75c0d7627930448887975ca17",
         "image_sha256": "741d0e0b5f698a44d6251a9dd374ae966d1ed2ba852546a60570947f0deab2cd",
@@ -395,7 +379,7 @@
         ]
       },
       {
-        "member": 17,
+        "member": 16,
         "json": "neuronte-term-mathalpha-v1-tscrmdl-g2.json",
         "json_sha256": "82e5eb546bf594272d5622d01945e277f27c0628483de3089dcb3276e1c4e655",
         "image_sha256": "8fad00992df209dd970e84c5894f0501a84a5ea22e83911e6eae4e3e2cf3df60",
@@ -416,7 +400,7 @@
     ],
     "list": {
       "file": "neuronte-term-mathalpha-v1.list.txt",
-      "sha256": "58b98f9e038a7a5f8b2ebfdca806b39c1667b0edf36d5abdaf7b2251000cf5be"
+      "sha256": "5b004506be1bb3724a5f8b531ec346bdd0693e006f3a825ae180f27ff361a8c1"
     }
   }
 }

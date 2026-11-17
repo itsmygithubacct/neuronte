@@ -199,9 +199,14 @@ tscrsb U+14CD U+14CE U+1449 U+144A U+1466 U+1483 U+1484 U+14A1 U+14BB U+14BC U+1
 tscrsb U+141F U+1420 U+1421 U+1422 U+1423 U+1424 U+1425 U+1426 U+1427 U+1428 U+1429 U+142A
 #
 # ---------------------------------------------------------------------
-# neuronte-term-scripts-v1: Lisu, Ogham, Old Italic, and the letters of
-# Tifinagh and Armenian whose shapes are known for sure or nearly so.
+# neuronte-term-scripts-v1: Lisu.
 # ---------------------------------------------------------------------
+#
+# Drawn below as well, and held back: Ogham, Old Italic, and the letters
+# of Tifinagh and Armenian whose shapes are known for sure or nearly so.
+# The owner, shown the counts for each script on 2026-11-17, said to train
+# Lisu. The others keep their drawings here on "held" lines: they are in
+# no training set, no list and no bundle. Georgian is not drawn.
 #
 # Lisu (Fraser): the Latin capitals, fifteen of them turned half round,
 # as the alphabet was made. ba pa da ta ga ka ja ca dza tsa ma na la sa
@@ -382,19 +387,19 @@ tscrl U+A4E7 U+A4EA U+A4EB U+A4EC U+A4EE U+A4F0 U+A4F2 U+A4F3
 tscrl U+A4F4 U+A4D2 U+A4D5 U+A4D8 U+A4DB U+A4DE U+A4E4 U+A4E5
 tscrl U+A4E8 U+A4E9 U+A4ED U+A4EF U+A4F1 U+A4F5 U+A4F6 U+A4F7
 tscrl U+A4F8 U+A4F9 U+A4FA U+A4FB U+A4FC U+A4FD U+A4FE U+A4FF
-# tscroo, Ogham: strokes to one side and the feather marks; strokes across,
+# Held back. Ogham: strokes to one side and the feather marks; strokes across,
 # the cross and the lozenge.
-tscroo U+1681 U+1682 U+1683 U+1684 U+1685 U+1686 U+1687 U+1688 U+1689 U+168A U+169B U+169C
-tscroo U+168B U+168C U+168D U+168E U+168F U+1690 U+1691 U+1692 U+1693 U+1694 U+1695 U+1696
-# tscroi, Old Italic: 7 7 7 8.
-tscroi U+10300 U+10301 U+10303 U+10304 U+10305 U+1030A U+10310
-tscroi U+10309 U+10306 U+10315 U+1030B U+10320 U+10323 U+10319
-tscroi U+1030C U+1030D U+10311 U+10314 U+10316 U+10321 U+10317
-tscroi U+10322 U+10302 U+10307 U+10308 U+1030F U+10312 U+10318 U+1031A
-# tscrt, Tifinagh: the round ones, 10; the straight ones, 11.
-tscrt U+2D30 U+2D31 U+2D40 U+2D54 U+2D55 U+2D59 U+2D5A U+2D5B U+2D61 U+2D53
-tscrt U+2D37 U+2D39 U+2D43 U+2D47 U+2D49 U+2D4A U+2D4E U+2D4F U+2D5C U+2D62 U+2D63
-# tscra, Armenian: 9 9 10.
-tscra U+0555 U+054D U+0548 U+053C U+054F U+0553 U+0554 U+0550 U+0535
-tscra U+0545 U+0585 U+057D U+0578 U+0570 U+0575 U+0581 U+0566 U+0584
-tscra U+0580 U+057C U+056B U+0565 U+0582 U+0589 U+055A U+0559 U+055B U+055D
+held U+1681 U+1682 U+1683 U+1684 U+1685 U+1686 U+1687 U+1688 U+1689 U+168A U+169B U+169C
+held U+168B U+168C U+168D U+168E U+168F U+1690 U+1691 U+1692 U+1693 U+1694 U+1695 U+1696
+# Old Italic.
+held U+10300 U+10301 U+10303 U+10304 U+10305 U+1030A U+10310
+held U+10309 U+10306 U+10315 U+1030B U+10320 U+10323 U+10319
+held U+1030C U+1030D U+10311 U+10314 U+10316 U+10321 U+10317
+held U+10322 U+10302 U+10307 U+10308 U+1030F U+10312 U+10318 U+1031A
+# Tifinagh: the round ones; the straight ones.
+held U+2D30 U+2D31 U+2D40 U+2D54 U+2D55 U+2D59 U+2D5A U+2D5B U+2D61 U+2D53
+held U+2D37 U+2D39 U+2D43 U+2D47 U+2D49 U+2D4A U+2D4E U+2D4F U+2D5C U+2D62 U+2D63
+# Armenian.
+held U+0555 U+054D U+0548 U+053C U+054F U+0553 U+0554 U+0550 U+0535
+held U+0545 U+0585 U+057D U+0578 U+0570 U+0575 U+0581 U+0566 U+0584
+held U+0580 U+057C U+056B U+0565 U+0582 U+0589 U+055A U+0559 U+055B U+055D

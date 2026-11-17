@@ -4,8 +4,9 @@ Three standalone bundles to open beside neuronte-split-v9:
 
     neuronte-term-mathalpha-v1   the styled alphabets (sets tscrm...)
     neuronte-term-syllabics-v1   Canadian syllabics (sets tscrs...)
-    neuronte-term-scripts-v1     Armenian, Georgian, Tifinagh, Lisu, Ogham
-                                 and Old Italic (sets tscra... and so on)
+    neuronte-term-scripts-v1     Lisu (set tscrl); Ogham, Old Italic and
+                                 parts of Tifinagh and Armenian are drawn
+                                 and held back
 
 font/term-scripts.txt has four kinds of line:
 
@@ -16,6 +17,8 @@ font/term-scripts.txt has four kinds of line:
     part NAME strokes        a named shape that the code here builds on
     tscrNAME U+XXXX ...      a training set and its characters, in the
                              order the group nets take them
+    held U+XXXX ...          characters that are drawn and held back: in no
+                             training set, no list and no bundle
 
 A character that is listed in a set and has no drawing line is made
 here by rule, from the project's own strokes:
@@ -52,11 +55,12 @@ _cache = {}
 
 def read(path=FILE):
     """(drawn {char: shapes}, parts {name: shapes}, sets {name: [code points]},
-    alias {char: (character of font/strokes.txt, turned, added shapes)})."""
+    alias {char: (character of font/strokes.txt, turned, added shapes)},
+    held [code points])."""
     key = (path, os.path.getmtime(path))
     if key in _cache:
         return _cache[key]
-    drawn, parts, sets, alias = {}, {}, {}, {}
+    drawn, parts, sets, alias, held = {}, {}, {}, {}, []
     with open(path, encoding="utf-8") as fh:
         for num, raw in enumerate(fh, 1):
             line = raw.rstrip("\n")
@@ -83,21 +87,28 @@ def read(path=FILE):
                 if name in parts:
                     raise ValueError(f"{where}: part {name} is given twice")
                 parts[name] = _shapes(rest, name)
+            elif head == "held":
+                cps = rest.split()
+                if not cps or any(not c.startswith("U+") for c in cps):
+                    raise ValueError(f"{where}: a held line is U+XXXX ...")
+                held += [int(c[2:], 16) for c in cps]
             elif head.startswith(PREFIX):
                 cps = rest.split()
                 if not cps or any(not c.startswith("U+") for c in cps):
                     raise ValueError(f"{where}: a set line is a name and its U+XXXX")
                 sets.setdefault(head, []).extend(int(c[2:], 16) for c in cps)
             else:
-                raise ValueError(f"{where}: a line starts with U+XXXX, as, part or {PREFIX}...")
+                raise ValueError(f"{where}: a line starts with U+XXXX, as, part, held or {PREFIX}...")
     for name, cps in sets.items():
         if len(set(cps)) != len(cps):
             raise ValueError(f"{path}: set {name} lists a character twice")
     both = sorted(set(drawn) & set(alias))
     if both:
         raise ValueError(f"{path}: U+{ord(both[0]):04X} is drawn twice")
+    if len(set(held)) != len(held) or set(held) & {c for cps in sets.values() for c in cps}:
+        raise ValueError(f"{path}: a held character is listed twice or is in a training set")
     _cache.clear()
-    _cache[key] = (drawn, parts, sets, alias)
+    _cache[key] = (drawn, parts, sets, alias, held)
     return _cache[key]
 
 
@@ -258,10 +269,10 @@ def syllabic(ch, parts):
     return out
 
 
-def made(path=FILE):
-    """{char: shapes} for every character a set of the file lists."""
-    drawn, parts, listed, alias = read(path)
-    wanted = {c for cps in listed.values() for c in cps}
+def made(path=FILE, held=False):
+    """{char: shapes} for every character a set of the file lists; with held, for the held ones."""
+    drawn, parts, listed, alias, back = read(path)
+    wanted = set(back) if held else {c for cps in listed.values() for c in cps}
     out = {}
     plain = _plain()
     base = strokes.parse(strokes.STROKES)
@@ -280,10 +291,18 @@ def made(path=FILE):
             out[ch] = syllabic(ch, parts)
         else:
             raise ValueError(f"U+{c:04X} is listed in {os.path.basename(path)} and has no drawing and no rule")
-    extra = sorted((set(drawn) | set(alias)) - set(out))
-    if extra:
-        raise ValueError("drawn and in no set: " + " ".join(f"U+{ord(c):04X}" for c in extra))
+    if not held:
+        extra = sorted((set(drawn) | set(alias)) - set(out) - {chr(c) for c in back})
+        if extra:
+            raise ValueError("drawn, in no set and not held: " + " ".join(f"U+{ord(c):04X}" for c in extra))
+        made(path, True)                           # every held character has its drawing
     return out
+
+
+def held(path=FILE):
+    """[(char, shapes)] for the characters drawn and held back, in the file's order."""
+    shapes = made(path, True)
+    return [(chr(c), shapes[chr(c)]) for c in read(path)[4]]
 
 
 def tier(name, path=FILE):
@@ -300,7 +319,7 @@ def bundle_sets(letter, path=FILE):
 # A bundle's characters as one set, to judge a character against every
 # other of its bundle. A set named tscrx... is a failed group's characters
 # again, to train as two halves: it repeats characters and joins no bundle.
-BUNDLES = {"termmathalpha": "m", "termsyllabics": "s", "termscripts": "agtlo"}
+BUNDLES = {"termmathalpha": "m", "termsyllabics": "s", "termscripts": "l"}
 AGAIN = PREFIX + "x"
 
 

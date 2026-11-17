@@ -1,0 +1,109 @@
+# The symbols Kilix prints on its bars, for neuronte-kilix-chrome-v1: the
+# tab's bell mark, the pane title bar's buttons and chips, the top bar's
+# widget symbols and the weather symbols. Written for this project, each
+# from its meaning alone. No font was read, and no glyph that another
+# font has at these code points was looked at: the private-use code
+# points are the numbers Kilix prints and nothing more.
+#
+# The grid and syntax of strokes.txt (see train/strokes.py): x 0..10 across
+# the cell, y 0..20 down it. Each symbol fills the cell's width and sits
+# about the middle of its height (y 10), in one colour, to be read at
+# 10 x 20 pixels, where one grid unit is one pixel.
+#
+# A "# set NAME NETS" line starts a training set: the characters after it,
+# in this order, are cut into NETS equal runs, one group net each. A
+# character line with no strokes is made by train/kilix_chrome.py (the
+# battery from its level or mark, a weather symbol from a sun, a cloud and
+# what falls from it). A "# note U+XXXX text" line says what the symbol
+# means in Kilix; the review sheet prints it.
+
+# Title bar buttons: the four split arrows, maximise, restore, close.
+# set tchra 1
+# note U+F0731 split, new pane to the left: a bold arrow pointing left
+U+F0731 F 0.9,10 5,5.4 5,8.4 9.1,8.4 9.1,11.6 5,11.6 5,14.6
+# note U+F0737 split, new pane above: a bold arrow pointing up
+U+F0737 F 5,4.6 9.2,9.4 6.6,9.4 6.6,15.2 3.4,15.2 3.4,9.4 0.8,9.4
+# note U+F072E split, new pane below: a bold arrow pointing down
+U+F072E F 5,15.4 9.2,10.6 6.6,10.6 6.6,4.8 3.4,4.8 3.4,10.6 0.8,10.6
+# note U+F0734 split, new pane to the right: a bold arrow pointing right
+U+F0734 F 9.1,10 5,5.4 5,8.4 0.9,8.4 0.9,11.6 5,11.6 5,14.6
+# note U+EAB9 maximise this pane: a small square outline
+U+EAB9 P@0.55 2,7 8,7 8,13 2,13 2,7
+# note U+F0293 restore this pane: the four corner brackets of a full-screen frame
+U+F0293 P@0.55 1.4,8.6 1.4,6.2 3.8,6.2 | P@0.55 6.2,6.2 8.6,6.2 8.6,8.6 | P@0.55 8.6,11.4 8.6,13.8 6.2,13.8 | P@0.55 3.8,13.8 1.4,13.8 1.4,11.4
+# note U+F0156 close this pane: a diagonal cross
+U+F0156 P@0.6 2,6.9 8,13.1 | P@0.6 8,6.9 2,13.1
+
+# The bell, the title bar's chips and the top bar's widget symbols.
+# set tchrb 2
+# note U+1F56D the bell rang in this tab: a ringing bell, a flared body with its clapper and marks of sound at both sides; not round
+U+1F56D F 4.2,5.8 5.8,5.8 6.8,7 7.1,10.6 8.2,12.6 1.8,12.6 2.9,10.6 3.2,7 | O 5,5.2 0.75,0.75 | O 5,13.7 1.05,0.95 | P@0.4 0.7,6.6 1.7,7.4 | P@0.4 0.6,9.4 1.6,9.4 | P@0.4 9.3,6.6 8.3,7.4 | P@0.4 9.4,9.4 8.4,9.4
+# note U+F0219 open this pane's saved log: a sheet of paper with a folded corner and lines of text
+U+F0219 P@0.5 1.6,4.8 6.2,4.8 8.4,7 8.4,15 1.6,15 1.6,4.8 | P@0.4 6.2,4.8 6.2,7 8.4,7 | P@0.4 3.3,9 6.7,9 | P@0.4 3.3,11 6.7,11 | P@0.4 3.3,13 6.7,13
+# note U+F030C type into several panes at once: a keyboard, three keys over a space bar
+U+F030C P@0.5 0.9,6.8 9.1,6.8 9.1,13.2 0.9,13.2 0.9,6.8 | O 2.9,8.9 0.6,0.6 | O 5,8.9 0.6,0.6 | O 7.1,8.9 0.6,0.6 | P@0.5 3,11.3 7,11.3
+# note U+F035B memory used: a chip, a square body with a die in it and three pins on every side
+U+F035B P@0.5 2.6,7.4 7.4,7.4 7.4,12.6 2.6,12.6 2.6,7.4 | F 4.1,8.9 5.9,8.9 5.9,11.1 4.1,11.1 | P@0.35 3.4,5.4 3.4,6.9 | P@0.35 5,5.4 5,6.9 | P@0.35 6.6,5.4 6.6,6.9 | P@0.35 3.4,13.1 3.4,14.6 | P@0.35 5,13.1 5,14.6 | P@0.35 6.6,13.1 6.6,14.6 | P@0.35 0.6,8.4 2.1,8.4 | P@0.35 0.6,10 2.1,10 | P@0.35 0.6,11.6 2.1,11.6 | P@0.35 7.9,8.4 9.4,8.4 | P@0.35 7.9,10 9.4,10 | P@0.35 7.9,11.6 9.4,11.6
+# note U+F08AE graphics card use: an expansion card, a board with a fan, its bracket at the left and an edge connector below
+U+F08AE P@0.5 1.2,4.8 1.2,15.2 | P@0.5 1.2,6.6 9.1,6.6 9.1,12.2 1.2,12.2 | E@0.45 5.7,9.4 1.5,1.5 0 360 | F 3.2,12.2 7.6,12.2 7.6,14.2 3.2,14.2
+# note U+F073 date: a calendar page, two rings, a dark head and six days
+U+F073 P@0.5 1.4,6.2 8.6,6.2 8.6,14.6 1.4,14.6 1.4,6.2 | F 1.4,6.2 8.6,6.2 8.6,8.4 1.4,8.4 | P@0.5 3.2,4.9 3.2,6.2 | P@0.5 6.8,4.9 6.8,6.2 | O 3.2,10.5 0.55,0.55 | O 5,10.5 0.55,0.55 | O 6.8,10.5 0.55,0.55 | O 3.2,12.6 0.55,0.55 | O 5,12.6 0.55,0.55 | O 6.8,12.6 0.55,0.55
+# note U+F2C9 temperature: a thermometer, a tube with a filled bulb and three marks beside it
+U+F2C9 P@0.4 2.6,11.6 2.6,5.8 | E@0.4 3.8,5.8 1.2,1.2 180 360 | P@0.4 5,5.8 5,11.6 | P@0.45 3.8,8.4 3.8,12 | O 3.8,13.2 2,2 | P@0.4 6.8,6.2 8.8,6.2 | P@0.4 6.8,8.4 8.8,8.4 | P@0.4 6.8,10.6 8.8,10.6
+# note U+F028 volume: a loudspeaker with two waves of sound
+U+F028 F 0.8,8.6 2.6,8.6 5,6.2 5,13.8 2.6,11.4 0.8,11.4 | E@0.45 5.4,10 1.7,2.3 -55 55 | E@0.45 5.4,10 3.5,4.4 -55 55
+# note U+F05CB read the pane aloud: a head and shoulders, with two waves of sound from the mouth
+U+F05CB O 3.2,7.6 2.2,2.3 | S 3.2,15 2.9,4.2 180 360 | E@0.45 5.6,8.4 1.5,2 -50 50 | E@0.45 5.6,8.4 3.2,3.8 -50 50
+# note U+F036C dictation on: a microphone in its cradle, on a stand
+U+F036C P@1.5 5,6.4 5,9.4 | E@0.45 5,9.4 2.9,3 0 180 | P@0.45 5,12.4 5,14.8 | P@0.45 3,14.8 7,14.8
+# note U+F036D dictation off: the microphone struck through
+U+F036D P@1.5 5,6.4 5,9.4 | E@0.45 5,9.4 2.9,3 0 180 | P@0.45 5,12.4 5,14.8 | P@0.45 3,14.8 7,14.8 | P@0.55 1.2,4.8 8.8,15.2
+# note U+F1EB network: three arcs of a wireless signal over a dot
+U+F1EB O 5,13.6 0.95,0.95 | E@0.5 5,13.6 2.4,2.4 228 312 | E@0.5 5,13.6 4.3,4.3 228 312 | E@0.5 5,13.6 6.2,6.2 233 307
+# note U+F0E7 charging: a lightning bolt
+U+F0E7 F 6.6,4.6 2,10.8 4.6,10.8 3.4,15.4 8,9.2 5.4,9.2
+
+# The battery: one upright outline with a cap, filled from the bottom in
+# ten levels, and two with a mark inside.
+# set tchrp 2
+# note U+F007A battery 10 percent
+U+F007A
+# note U+F007B battery 20 percent
+U+F007B
+# note U+F007C battery 30 percent
+U+F007C
+# note U+F007D battery 40 percent
+U+F007D
+# note U+F007E battery 50 percent
+U+F007E
+# note U+F007F battery 60 percent
+U+F007F
+# note U+F0080 battery 70 percent
+U+F0080
+# note U+F0081 battery 80 percent
+U+F0081
+# note U+F0082 battery 90 percent
+U+F0082
+# note U+F0079 battery full
+U+F0079
+# note U+F0083 battery needs attention: the outline with an exclamation mark in it
+U+F0083
+# note U+F0091 battery state unknown: the outline with a question mark in it
+U+F0091
+
+# Weather: a sun, a cloud, and what falls from it.
+# set tchrx 1
+# note U+1F324 mostly clear: a sun with a small cloud before its lower right
+U+1F324
+# note U+26C5 partly cloudy: a sun behind a cloud
+U+26C5
+# note U+1F32B fog: four bars of mist, set off from one another
+U+1F32B P@0.5 1.2,6.9 7.2,6.9 | P@0.5 2.8,9 8.8,9 | P@0.5 1.2,11.1 7.2,11.1 | P@0.5 2.8,13.2 8.8,13.2
+# note U+1F326 showers: a sun behind a cloud with rain
+U+1F326
+# note U+1F327 rain: a cloud with three strokes of rain
+U+1F327
+# note U+1F328 snow: a cloud with five flakes, drawn as dots
+U+1F328
+# note U+26C8 thunderstorm: a cloud with a lightning bolt and rain at both sides
+U+26C8

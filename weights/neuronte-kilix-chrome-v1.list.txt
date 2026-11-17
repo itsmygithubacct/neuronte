@@ -1,0 +1,15 @@
+# The characters neuronte-kilix-chrome-v1.nrt was trained on, in the order of
+# font/kilix-chrome.txt, one line group for each group net. A bundle's table
+# must be exactly its list (tests/check_bundle_lists.py).
+# tchra g0
+U+F0731 U+F0737 U+F072E U+F0734 U+EAB9 U+F0293 U+F0156
+# tchrb g0
+U+1F56D U+F0219 U+F030C U+F035B U+F08AE U+F073
+# tchrb g1
+U+F2C9 U+F028 U+F05CB U+F036C U+F036D U+F1EB U+F0E7
+# tchrp g0
+U+F007A U+F007B U+F007C U+F007D U+F007E U+F007F
+# tchrp g1
+U+F0080 U+F0081 U+F0082 U+F0079 U+F0083 U+F0091
+# tchrx g0
+U+1F324 U+26C5 U+1F32B U+1F326 U+1F327 U+1F328 U+26C8

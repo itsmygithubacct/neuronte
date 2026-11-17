@@ -1,0 +1,531 @@
+{
+  "schema": "neuronte.term-rest/v1",
+  "name": "neuronte-term-rest-v1",
+  "sha256": "9a92c86c183fa9b435d89663780c643a2031f853e0096bd233e7bfdf431a4b6d",
+  "bytes": 1484956,
+  "sets": [
+    [
+      "trsth",
+      4
+    ],
+    [
+      "trstw",
+      2
+    ],
+    [
+      "trstd",
+      4
+    ],
+    [
+      "trstl",
+      5
+    ],
+    [
+      "trstf",
+      7
+    ],
+    [
+      "trstc",
+      2
+    ],
+    [
+      "trstm",
+      1
+    ]
+  ],
+  "halved": [
+    [
+      "trstd",
+      3
+    ]
+  ],
+  "left_out": [],
+  "record": {
+    "schema": "neuronte.standalone-bundle/v1",
+    "sha256": "9a92c86c183fa9b435d89663780c643a2031f853e0096bd233e7bfdf431a4b6d",
+    "bytes": 1484956,
+    "members": 27,
+    "group_nets": 26,
+    "ranges": 99,
+    "gate": null,
+    "trained_scalars": 197,
+    "fallback": {
+      "member": 26,
+      "kind": "blank",
+      "hidden_width": 1,
+      "distance": -8.0,
+      "image_sha256": "42d4790165297c3af39d178e1396f575991d6fe4d2e3c947762ef5eaedd05bf6",
+      "bytes": 592
+    },
+    "apart_from": [
+      {
+        "file": "neuronte-split-v9.nrt",
+        "sha256": "0a92f223d47f1680929b2c5d7512d1a1728d4871e6653b33cbaad060e6bb90c0",
+        "table_scalars": 1341
+      }
+    ],
+    "nets": [
+      {
+        "member": 0,
+        "json": "neuronte-term-rest-v1-trsth-g0.json",
+        "json_sha256": "a666059344666c2016aad9b4f0e492dffa363c02cd80dffd77dc5a3e616f9fcf",
+        "image_sha256": "048864d6d009422d7876f7a1a2dfa8985a36f2fa59dbaf8f107fe8fdc611ba4f",
+        "bytes": 57040,
+        "set": "trsth-repertoire",
+        "scalars": [
+          "U+05D3",
+          "U+05D4",
+          "U+05D7",
+          "U+05DA",
+          "U+05DD",
+          "U+05E7",
+          "U+05E8",
+          "U+05EA"
+        ]
+      },
+      {
+        "member": 1,
+        "json": "neuronte-term-rest-v1-trsth-g1.json",
+        "json_sha256": "ae875a267c98eeb2fdd03e444ac2585ad154c7251627ab7c6e0b35b132766d7e",
+        "image_sha256": "cbbb30a40d6e92b6e3a2eda275d1c2832bff6f61ae44644ee3d3f22aaa35ae48",
+        "bytes": 57040,
+        "set": "trsth-repertoire",
+        "scalars": [
+          "U+05D1",
+          "U+05D8",
+          "U+05DB",
+          "U+05DE",
+          "U+05E0",
+          "U+05E1",
+          "U+05E3",
+          "U+05E4"
+        ]
+      },
+      {
+        "member": 2,
+        "json": "neuronte-term-rest-v1-trsth-g2.json",
+        "json_sha256": "23188f38f97d701615ee226d90ad965d60497809ea3b460ab9c1ea009c6f8ace",
+        "image_sha256": "e6dc19098e35c91b67433eb650335f9af3db4ac873a132f9d0968842555f0c68",
+        "bytes": 57040,
+        "set": "trsth-repertoire",
+        "scalars": [
+          "U+05D2",
+          "U+05D5",
+          "U+05D6",
+          "U+05D9",
+          "U+05DF",
+          "U+05F0",
+          "U+05F1",
+          "U+05F2"
+        ]
+      },
+      {
+        "member": 3,
+        "json": "neuronte-term-rest-v1-trsth-g3.json",
+        "json_sha256": "d259f514a29b5449fa5574118f7550be6d540236438cb9243fb75765e6b33bae",
+        "image_sha256": "611fb083bea3068cebe72ea2d73cb86d20f94c83ea41efb5f260e4d34aa3db39",
+        "bytes": 57040,
+        "set": "trsth-repertoire",
+        "scalars": [
+          "U+05D0",
+          "U+05DC",
+          "U+05E2",
+          "U+05E5",
+          "U+05E6",
+          "U+05E9",
+          "U+FB20",
+          "U+FB4F"
+        ]
+      },
+      {
+        "member": 4,
+        "json": "neuronte-term-rest-v1-trstw-g0.json",
+        "json_sha256": "29785bedfb1e8c79c71acd003ee0f7cee2986849226160502864938048d57e0c",
+        "image_sha256": "754e8bd63e70562db2929293c7deaba9c52b7eb3760993166e6493a6cd5eff74",
+        "bytes": 57040,
+        "set": "trstw-repertoire",
+        "scalars": [
+          "U+05BE",
+          "U+05C0",
+          "U+05C3",
+          "U+05C6",
+          "U+05F3",
+          "U+05F4",
+          "U+0E3F",
+          "U+FB29"
+        ]
+      },
+      {
+        "member": 5,
+        "json": "neuronte-term-rest-v1-trstw-g1.json",
+        "json_sha256": "dea27ee5b524bddea27edb0b20a5ca8aaa99797365e6517ca0f7d7cf6322ef40",
+        "image_sha256": "a7a71ee37908d00f93a02637e6b089de4ab7d96d6e55bae53a43eb5c8ea0930a",
+        "bytes": 57040,
+        "set": "trstw-repertoire",
+        "scalars": [
+          "U+FB21",
+          "U+FB22",
+          "U+FB23",
+          "U+FB24",
+          "U+FB25",
+          "U+FB26",
+          "U+FB27",
+          "U+FB28"
+        ]
+      },
+      {
+        "member": 6,
+        "json": "neuronte-term-rest-v1-trstd-g0.json",
+        "json_sha256": "3e8214bafda09fc6f273c832a6cb472f65c77e3f1be0ba290143daa0d53ec84f",
+        "image_sha256": "2817a49c016467eb35178bd008f8a88fe7e2fbab8a7347448c22cdf68c92d34e",
+        "bytes": 57040,
+        "set": "trstd-repertoire",
+        "scalars": [
+          "U+FB31",
+          "U+FB3B",
+          "U+FB41",
+          "U+FB43",
+          "U+FB44",
+          "U+FB4C",
+          "U+FB4D",
+          "U+FB4E"
+        ]
+      },
+      {
+        "member": 7,
+        "json": "neuronte-term-rest-v1-trstd-g1.json",
+        "json_sha256": "8933385d9202459c46d40db54d4015cc8ee27ab9deacb8ddb0c90fbbc4bf2daa",
+        "image_sha256": "4190b31054eea5139efc21187714ba802cab2569847cd949458a80be9653f4a3",
+        "bytes": 57040,
+        "set": "trstd-repertoire",
+        "scalars": [
+          "U+FB33",
+          "U+FB34",
+          "U+FB38",
+          "U+FB3A",
+          "U+FB3E",
+          "U+FB40",
+          "U+FB47",
+          "U+FB48",
+          "U+FB4A"
+        ]
+      },
+      {
+        "member": 8,
+        "json": "neuronte-term-rest-v1-trstd-g2.json",
+        "json_sha256": "c306da26c0c8a7abccc2f1a15cbc82686f08876a9bc4d183c70c30137f775f53",
+        "image_sha256": "6aa3ae00a887f1cf26e8416c821f7f527b54308703a6ea29707d47257487e228",
+        "bytes": 57040,
+        "set": "trstd-repertoire",
+        "scalars": [
+          "U+FB1D",
+          "U+FB1F",
+          "U+FB32",
+          "U+FB35",
+          "U+FB36",
+          "U+FB39",
+          "U+FB3C",
+          "U+FB4B"
+        ]
+      },
+      {
+        "member": 9,
+        "json": "neuronte-term-rest-v1-trstdr3-g0.json",
+        "json_sha256": "f4c7e1a26f2dd3befc7544a07a1f2cb6dcff36a8b440b61c32a788b8c1e368e2",
+        "image_sha256": "fb2c289a45baeb21bf0feb954612ad6accec88cee360221c43443f5426e211f2",
+        "bytes": 57040,
+        "set": "trstdr3-repertoire",
+        "scalars": [
+          "U+FB2A",
+          "U+FB2B",
+          "U+FB2C",
+          "U+FB2D"
+        ]
+      },
+      {
+        "member": 10,
+        "json": "neuronte-term-rest-v1-trstdr3-g1.json",
+        "json_sha256": "d95598075ccd3264829deb80ca745b91e46fe6960d26f2d85a9f4c31f77e2aba",
+        "image_sha256": "99fc0f46b1c4ab6e5cc4256e038c34b407345b6b7aabee620d6cca3eedb1f11e",
+        "bytes": 57040,
+        "set": "trstdr3-repertoire",
+        "scalars": [
+          "U+FB2E",
+          "U+FB2F",
+          "U+FB30",
+          "U+FB46",
+          "U+FB49"
+        ]
+      },
+      {
+        "member": 11,
+        "json": "neuronte-term-rest-v1-trstl-g0.json",
+        "json_sha256": "caada35bde5f7979bb4b7ab549da5261341fd32baecc6b24420bc83d9d12b0e4",
+        "image_sha256": "6c75dd2d32be1d7c96f22fd88c9ce6562bb0081448c0324167b1f206743ae527",
+        "bytes": 57040,
+        "set": "trstl-repertoire",
+        "scalars": [
+          "U+0E81",
+          "U+0E84",
+          "U+0E94",
+          "U+0E95",
+          "U+0E96",
+          "U+0EA5",
+          "U+0EAA"
+        ]
+      },
+      {
+        "member": 12,
+        "json": "neuronte-term-rest-v1-trstl-g1.json",
+        "json_sha256": "894f5fdad0a978a229a8df2d44a46969b95b24301c454e1a8b1f16674caa6e10",
+        "image_sha256": "243236a92da426700e9fa694e8f072273b5a892ff1c180029923a0e85d7f8d64",
+        "bytes": 57040,
+        "set": "trstl-repertoire",
+        "scalars": [
+          "U+0E82",
+          "U+0E8A",
+          "U+0E8D",
+          "U+0E99",
+          "U+0E9A",
+          "U+0E9B",
+          "U+0EA1",
+          "U+0EA2"
+        ]
+      },
+      {
+        "member": 13,
+        "json": "neuronte-term-rest-v1-trstl-g2.json",
+        "json_sha256": "b1c84d1e21d30fc857e8aee59994cfba7c31e5aa61e57a25d68acc93479e001b",
+        "image_sha256": "aa6d507f607cda13886dd88fe6838388459e9d5dd70630a669f2631d78aa6493",
+        "bytes": 57040,
+        "set": "trstl-repertoire",
+        "scalars": [
+          "U+0E97",
+          "U+0E9C",
+          "U+0E9D",
+          "U+0E9E",
+          "U+0E9F",
+          "U+0EAB",
+          "U+0EDC",
+          "U+0EDD"
+        ]
+      },
+      {
+        "member": 14,
+        "json": "neuronte-term-rest-v1-trstl-g3.json",
+        "json_sha256": "4e82208faaee9c47627ab990225833654123209ddd393b7abaf7e28e4093a77b",
+        "image_sha256": "5adcfd7c4fd0f8c542ec2f7f8daa11af8bbe2da29bd1b0bd5a16a2c88270cb12",
+        "bytes": 57040,
+        "set": "trstl-repertoire",
+        "scalars": [
+          "U+0E87",
+          "U+0E88",
+          "U+0EA3",
+          "U+0EA7",
+          "U+0EAD",
+          "U+0EAE",
+          "U+0EBD",
+          "U+0EC6"
+        ]
+      },
+      {
+        "member": 15,
+        "json": "neuronte-term-rest-v1-trstl-g4.json",
+        "json_sha256": "bd47ffa31f83155fb0a885c55576e64f4ba418fc56d9171bc211dc92941452fc",
+        "image_sha256": "9be5e29cedae62934a6deb1b5b2bbcef0566f44435a48e3696d64670ce13b200",
+        "bytes": 57040,
+        "set": "trstl-repertoire",
+        "scalars": [
+          "U+0EB0",
+          "U+0EB2",
+          "U+0EB3",
+          "U+0EC0",
+          "U+0EC1",
+          "U+0EC2",
+          "U+0EC3",
+          "U+0EC4"
+        ]
+      },
+      {
+        "member": 16,
+        "json": "neuronte-term-rest-v1-trstf-g0.json",
+        "json_sha256": "8d59f8db9ffadab8ff581e67c18bf3075dc95038f433318d8c3eec88da0b1a3d",
+        "image_sha256": "4b573422800bc303e371efd67e72d5f2e83a7751b5a8f89a8da0cf32bb4b3bfd",
+        "bytes": 57040,
+        "set": "trstf-repertoire",
+        "scalars": [
+          "U+1F600",
+          "U+1F601",
+          "U+1F602",
+          "U+1F603",
+          "U+1F604",
+          "U+1F605",
+          "U+1F606"
+        ]
+      },
+      {
+        "member": 17,
+        "json": "neuronte-term-rest-v1-trstf-g1.json",
+        "json_sha256": "c7fbbdec8929123a43cc802054ee05f70e48d354f631715ec07c9e47a9b578e2",
+        "image_sha256": "34403d2ecccecbb1ab33a68778e59e6c88c6c7700914b612893c18f27b3218e4",
+        "bytes": 57040,
+        "set": "trstf-repertoire",
+        "scalars": [
+          "U+1F607",
+          "U+1F608",
+          "U+1F609",
+          "U+1F60A",
+          "U+1F60B",
+          "U+1F60C",
+          "U+1F60D",
+          "U+1F60E"
+        ]
+      },
+      {
+        "member": 18,
+        "json": "neuronte-term-rest-v1-trstf-g2.json",
+        "json_sha256": "9104d40223ad57a0b0a6e7ff1fe95b91ceb94954a169a7c948835a5b18ef222e",
+        "image_sha256": "a018ca9bcd293b72c50c994d08ce2ca94724a5b9154c2574b14dda6646f43e0e",
+        "bytes": 57040,
+        "set": "trstf-repertoire",
+        "scalars": [
+          "U+1F60F",
+          "U+1F610",
+          "U+1F611",
+          "U+1F612",
+          "U+1F615",
+          "U+1F633",
+          "U+1F636",
+          "U+1F643"
+        ]
+      },
+      {
+        "member": 19,
+        "json": "neuronte-term-rest-v1-trstf-g3.json",
+        "json_sha256": "c1696a15b89e6717b109d12c3d9505e102900c3474a7615bca55171bf3b7e904",
+        "image_sha256": "a270af497c41de9edc8cbfd241f27417e837dd7c9dd64dc99c8a46116ecb1d14",
+        "bytes": 57040,
+        "set": "trstf-repertoire",
+        "scalars": [
+          "U+1F616",
+          "U+1F617",
+          "U+1F618",
+          "U+1F619",
+          "U+1F61A",
+          "U+1F61B",
+          "U+1F61C",
+          "U+1F61D"
+        ]
+      },
+      {
+        "member": 20,
+        "json": "neuronte-term-rest-v1-trstf-g4.json",
+        "json_sha256": "bb15f79e8e881a7994c068b5875d662df1054a26633418963a95400447e041db",
+        "image_sha256": "76e814cdaf91e8a3b8a8cab4c76e8f06fbadfd5bfe71679fbb4447c8626d6cb6",
+        "bytes": 57040,
+        "set": "trstf-repertoire",
+        "scalars": [
+          "U+1F613",
+          "U+1F614",
+          "U+1F61E",
+          "U+1F61F",
+          "U+1F620",
+          "U+1F621",
+          "U+1F622",
+          "U+1F623"
+        ]
+      },
+      {
+        "member": 21,
+        "json": "neuronte-term-rest-v1-trstf-g5.json",
+        "json_sha256": "1649fcfedb74d23bbf293f3b2afbc8f04d50ede5105fc36ae2ebe14660773c6d",
+        "image_sha256": "b6b6fcf01905dbffe62091a7f22b7a8ff79b1e5c631b6333158f9a42aec83bb1",
+        "bytes": 57040,
+        "set": "trstf-repertoire",
+        "scalars": [
+          "U+1F625",
+          "U+1F626",
+          "U+1F627",
+          "U+1F628",
+          "U+1F629",
+          "U+1F62A",
+          "U+1F62B",
+          "U+1F62D"
+        ]
+      },
+      {
+        "member": 22,
+        "json": "neuronte-term-rest-v1-trstf-g6.json",
+        "json_sha256": "cd9755d16d20a0af145ce3890d8027eb8aab0e8ce3fae97e0d2b739de79e7238",
+        "image_sha256": "2012b3157b1b00a42b9c215607519651ebcfb235abca87b2ee12d7aedb37c6d2",
+        "bytes": 57040,
+        "set": "trstf-repertoire",
+        "scalars": [
+          "U+1F62E",
+          "U+1F62F",
+          "U+1F630",
+          "U+1F631",
+          "U+1F632",
+          "U+1F634",
+          "U+1F635",
+          "U+1F637"
+        ]
+      },
+      {
+        "member": 23,
+        "json": "neuronte-term-rest-v1-trstc-g0.json",
+        "json_sha256": "a616a6e42490ec6472be6728837382114fd8c3de793b385392031dff140da191",
+        "image_sha256": "366b626f09d0a6736d8a75594ae86b0f2092c826d6715b63014cdbf052d941a6",
+        "bytes": 57040,
+        "set": "trstc-repertoire",
+        "scalars": [
+          "U+1F638",
+          "U+1F639",
+          "U+1F63A",
+          "U+1F63B",
+          "U+1F63C",
+          "U+1F63D"
+        ]
+      },
+      {
+        "member": 24,
+        "json": "neuronte-term-rest-v1-trstc-g1.json",
+        "json_sha256": "497b80631da38c0a3a302ba7de68d8767501819f1a6a30018f25c7727d711014",
+        "image_sha256": "4a93ecc823c19deb822fc28af6b1f426ed1aa08b7834337374a1c36c856cc007",
+        "bytes": 57040,
+        "set": "trstc-repertoire",
+        "scalars": [
+          "U+1F42D",
+          "U+1F42E",
+          "U+1F431",
+          "U+1F435",
+          "U+1F63E",
+          "U+1F63F",
+          "U+1F640"
+        ]
+      },
+      {
+        "member": 25,
+        "json": "neuronte-term-rest-v1-trstm-g0.json",
+        "json_sha256": "6198ec9800f0e442c07dddfc7e5c385087c99006fea2901bb87ab195849abf5e",
+        "image_sha256": "83521021edaa07916786d6180c1408538bf06d81577ef44e7eb59909b23c2171",
+        "bytes": 57040,
+        "set": "trstm-repertoire",
+        "scalars": [
+          "U+1F311",
+          "U+1F312",
+          "U+1F313",
+          "U+1F314",
+          "U+1F315",
+          "U+1F316",
+          "U+1F317",
+          "U+1F318"
+        ]
+      }
+    ],
+    "list": {
+      "file": "neuronte-term-rest-v1.list.txt",
+      "sha256": "9c038bc0b95d6376ea75370560b875d5166ba2c161f418c546117ea2b077bda3"
+    }
+  }
+}

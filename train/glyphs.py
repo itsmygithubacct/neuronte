@@ -39,6 +39,11 @@ Tiers:
              marks alone. Two marks above are stacked; Greek capitals
              take their marks before the letter. No set made before
              holds any of them.
+    trst...  the characters neuronte-term-rest-v1 adds, one tier for each
+             set of font/term-rest.txt (trsth, trstl and so on): Hebrew
+             letters and presentation forms, Lao letters and vowel signs,
+             and one-colour faces and moon phases, drawn there or made by
+             train/term_rest.py. NAMErI is group net I of set NAME alone.
     ui1      the desktop face, printable ASCII and U+2026, from
     ...      font/ui-EM.txt, one file for every em from 1 to 128 except
     ui128    44. Stems are one pixel wide through 16, two from 17
@@ -1289,6 +1294,9 @@ SETS = {
 }
 SETS.update({name: [name] for name in term_latin_sets()})
 SETS["termlatin"] = list(term_latin_sets())  # every set of font/term-latin.txt
+import term_rest  # noqa: E402
+SETS.update({name: [name] for name in term_rest.sets()})  # the sets of font/term-rest.txt and each one's groups
+SETS["termrest"] = list(term_rest.primary())
 
 
 def tier(name):
@@ -1330,6 +1338,9 @@ def tier(name):
     if name.startswith("tl") and name in term_latin_sets():
         made = term_latin()
         return [(chr(c), made[chr(c)]) for c in term_latin_sets()[name]]
+    if name.startswith(term_rest.PREFIX) and name in term_rest.sets():
+        made = term_rest.made()
+        return [(chr(c), made[chr(c)]) for c in term_rest.sets()[name]]
     if name == "uilargelatin1":
         g = large_latin1()
         return [(c, g[c][0]) for c in sorted(g)]
@@ -1455,6 +1466,8 @@ def sources(name):
                   if f not in files]
     if "mosaic" in tiers:
         files.append("font/octants.txt")
+    if any(t.startswith(term_rest.PREFIX) for t in tiers):
+        files += ["font/term-rest.txt", "train/term_rest.py"]
     for em in UI:
         if f"ui{em}" in tiers:
             files.append(f"font/ui-{em}.txt")

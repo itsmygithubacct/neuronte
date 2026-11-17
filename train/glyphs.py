@@ -39,6 +39,11 @@ Tiers:
              marks alone. Two marks above are stacked; Greek capitals
              take their marks before the letter. No set made before
              holds any of them.
+    tscr...  the characters of the term-scripts bundles, one tier for
+             each set of font/term-scripts.txt: the double-struck,
+             sans-serif and monospace alphabets (tscrm...) and the rest
+             train/term_scripts.py describes. No set made before holds
+             any of them.
     ui1      the desktop face, printable ASCII and U+2026, from
     ...      font/ui-EM.txt, one file for every em from 1 to 128 except
     ui128    44. Stems are one pixel wide through 16, two from 17
@@ -58,7 +63,8 @@ symbol; accent; full, which is all of those; tsymbol, tgreek,
 tcyrillic, tletter (the two scripts) and terminal (all three); and three sets for choosing
 how the mosaics join the bundle: pixel (block, mosaic), pixelbraille
 (block, mosaic, braille) and boxshade (box, shade); the sets of
-font/term-latin.txt, each its tier alone, and termlatin, all of them. The sets ui1 to
+font/term-latin.txt, each its tier alone, and termlatin, all of them; the sets of
+font/term-scripts.txt, each its tier alone. The sets ui1 to
 ui128, except ui44, the italic sets ui3i to ui32i, and uilarge, are each their
 tier alone. They share their scalars with ascii and with each other, so
 they join no other set, and their nets no bundle.
@@ -87,6 +93,7 @@ import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import strokes  # noqa: E402
+import term_scripts  # noqa: E402
 
 OCTANTS = os.path.join(strokes.ROOT, "font", "octants.txt")
 
@@ -1289,6 +1296,7 @@ SETS = {
 }
 SETS.update({name: [name] for name in term_latin_sets()})
 SETS["termlatin"] = list(term_latin_sets())  # every set of font/term-latin.txt
+SETS.update({name: [name] for name in term_scripts.sets()})  # the sets of font/term-scripts.txt
 
 
 def tier(name):
@@ -1330,6 +1338,8 @@ def tier(name):
     if name.startswith("tl") and name in term_latin_sets():
         made = term_latin()
         return [(chr(c), made[chr(c)]) for c in term_latin_sets()[name]]
+    if name.startswith(term_scripts.PREFIX) and name in term_scripts.sets():
+        return term_scripts.tier(name)
     if name == "uilargelatin1":
         g = large_latin1()
         return [(c, g[c][0]) for c in sorted(g)]
@@ -1453,6 +1463,8 @@ def sources(name):
     if any(t in term_latin_sets() for t in tiers):
         files += [f for f in ("font/strokes.txt", "font/letters.txt", "font/marks.txt", "font/term-latin.txt")
                   if f not in files]
+    if any(t in term_scripts.sets() for t in tiers):
+        files += [f for f in ("font/strokes.txt", "font/term-scripts.txt", "train/term_scripts.py") if f not in files]
     if "mosaic" in tiers:
         files.append("font/octants.txt")
     for em in UI:

@@ -1,0 +1,1955 @@
+{
+  "schema": "neuronte.term-letters/v1",
+  "name": "neuronte-term-letters-v1",
+  "sha256": "a5b23948026761ce58ed11b3542df38b842a6f1c93fd2c4971e60d9d4b7700fd",
+  "bytes": 5882132,
+  "groups": [
+    [
+      "tletip",
+      10
+    ],
+    [
+      "tletlu",
+      13
+    ],
+    [
+      "tletll",
+      11
+    ],
+    [
+      "tletdg",
+      6
+    ],
+    [
+      "tletcu",
+      12
+    ],
+    [
+      "tletcl",
+      12
+    ],
+    [
+      "tletgu",
+      4
+    ],
+    [
+      "tletgl",
+      4
+    ],
+    [
+      "tletsc",
+      8
+    ],
+    [
+      "tletmu",
+      4
+    ],
+    [
+      "tletml",
+      10
+    ],
+    [
+      "tletsb",
+      1
+    ],
+    [
+      "tletsp",
+      7
+    ]
+  ],
+  "halved": [
+    {
+      "set": "tletml",
+      "group": 8,
+      "in_bundle": [
+        "a"
+      ]
+    },
+    {
+      "set": "tletsb",
+      "group": 0,
+      "in_bundle": [
+        "a",
+        "b"
+      ]
+    }
+  ],
+  "record": {
+    "schema": "neuronte.standalone-bundle/v1",
+    "sha256": "a5b23948026761ce58ed11b3542df38b842a6f1c93fd2c4971e60d9d4b7700fd",
+    "bytes": 5882132,
+    "members": 104,
+    "group_nets": 103,
+    "ranges": 498,
+    "gate": null,
+    "trained_scalars": 812,
+    "fallback": {
+      "member": 103,
+      "kind": "blank",
+      "hidden_width": 1,
+      "distance": -8.0,
+      "image_sha256": "42d4790165297c3af39d178e1396f575991d6fe4d2e3c947762ef5eaedd05bf6",
+      "bytes": 592
+    },
+    "apart_from": [
+      {
+        "file": "neuronte-split-v9.nrt",
+        "sha256": "0a92f223d47f1680929b2c5d7512d1a1728d4871e6653b33cbaad060e6bb90c0",
+        "table_scalars": 1341
+      },
+      {
+        "file": "neuronte-term-latin-v1.nrt",
+        "sha256": "d54279bcbb190178f61a10c1d55f9840cadbd6f1b858a9993c232dc0106a473b",
+        "table_scalars": 596
+      }
+    ],
+    "nets": [
+      {
+        "member": 0,
+        "json": "neuronte-term-letters-v1-tletip-g0.json",
+        "json_sha256": "31221fff9f01f9930a76320656fd480b65d53f36e62af222a23f4fe3af961300",
+        "image_sha256": "0822fee1bfc9b9a80f9634131c3f07e6749fb613e8c53c9440383646237e8741",
+        "bytes": 57040,
+        "set": "tletip-repertoire",
+        "scalars": [
+          "U+0250",
+          "U+0251",
+          "U+0252",
+          "U+0253",
+          "U+0254",
+          "U+0255",
+          "U+0256"
+        ]
+      },
+      {
+        "member": 1,
+        "json": "neuronte-term-letters-v1-tletip-g1.json",
+        "json_sha256": "b637186f9f3cb00ba4a41babcbae59ebef804bed5540ac1a49f5bb3863376022",
+        "image_sha256": "0d3aa8033cb0c8c9a121737fcf66f96c1b686bd89d804cbe219db76ceaaf6683",
+        "bytes": 57040,
+        "set": "tletip-repertoire",
+        "scalars": [
+          "U+0257",
+          "U+0258",
+          "U+0259",
+          "U+025A",
+          "U+025B",
+          "U+025C",
+          "U+025D",
+          "U+025E"
+        ]
+      },
+      {
+        "member": 2,
+        "json": "neuronte-term-letters-v1-tletip-g2.json",
+        "json_sha256": "0e20f49f9df6bce2efbd61f4950d1479af774eee0e3be84ad78e147b429bada6",
+        "image_sha256": "800021806f702bed829abb0b100932db58213361c6f54e4ee85e520f6e16fbb2",
+        "bytes": 57040,
+        "set": "tletip-repertoire",
+        "scalars": [
+          "U+025F",
+          "U+0260",
+          "U+0261",
+          "U+0263",
+          "U+0264",
+          "U+0265",
+          "U+0266"
+        ]
+      },
+      {
+        "member": 3,
+        "json": "neuronte-term-letters-v1-tletip-g3.json",
+        "json_sha256": "c6c661d5715806853693ed1801b85c2f78eabf1876142dc32b79754fc606e408",
+        "image_sha256": "ab305637047cfe67cabc6838539a91b1e0ef342cdbbcf33103aa9c57aef93a1b",
+        "bytes": 57040,
+        "set": "tletip-repertoire",
+        "scalars": [
+          "U+0267",
+          "U+0268",
+          "U+0269",
+          "U+026B",
+          "U+026C",
+          "U+026D",
+          "U+026E",
+          "U+026F"
+        ]
+      },
+      {
+        "member": 4,
+        "json": "neuronte-term-letters-v1-tletip-g4.json",
+        "json_sha256": "92fb96f1076d747fcd2b62376843ee107a68fcfc4b597570d08ef3102e7a11a0",
+        "image_sha256": "e828bd714cd7a2bf6c8431ce68a08fe0d3577cb4ecd8d7444ef555be319cfdac",
+        "bytes": 57040,
+        "set": "tletip-repertoire",
+        "scalars": [
+          "U+0270",
+          "U+0271",
+          "U+0272",
+          "U+0273",
+          "U+0275",
+          "U+0277",
+          "U+0278",
+          "U+0279"
+        ]
+      },
+      {
+        "member": 5,
+        "json": "neuronte-term-letters-v1-tletip-g5.json",
+        "json_sha256": "cd15f5688eca80ca9b1d304082fc886e820f870378e84ac72f4937cf0663bb0a",
+        "image_sha256": "239212063f9488ae2b15e5190177012c5a3f69bde1e0b6f653941615789ccce2",
+        "bytes": 57040,
+        "set": "tletip-repertoire",
+        "scalars": [
+          "U+027A",
+          "U+027B",
+          "U+027C",
+          "U+027D",
+          "U+027E",
+          "U+027F",
+          "U+0282"
+        ]
+      },
+      {
+        "member": 6,
+        "json": "neuronte-term-letters-v1-tletip-g6.json",
+        "json_sha256": "3a66060b2974e815feee55076e25d6586bcc0a72bcd45175fc49188fe20acf33",
+        "image_sha256": "85faba4ac6c214fefa2c7653fbd4f8869bbde469bf2d612a7cada8a467227ca5",
+        "bytes": 57040,
+        "set": "tletip-repertoire",
+        "scalars": [
+          "U+0283",
+          "U+0284",
+          "U+0285",
+          "U+0286",
+          "U+0287",
+          "U+0288",
+          "U+0289",
+          "U+028A"
+        ]
+      },
+      {
+        "member": 7,
+        "json": "neuronte-term-letters-v1-tletip-g7.json",
+        "json_sha256": "2644a73d8e710617bf2103e603683c838b2acf62bdb52bfcda739a960e2e3692",
+        "image_sha256": "76b229b512e804b84df2e7a824eff9bcdc3509c4ddae0d404ee358b2b8cc992d",
+        "bytes": 57040,
+        "set": "tletip-repertoire",
+        "scalars": [
+          "U+028B",
+          "U+028C",
+          "U+028D",
+          "U+028E",
+          "U+0290",
+          "U+0291",
+          "U+0292"
+        ]
+      },
+      {
+        "member": 8,
+        "json": "neuronte-term-letters-v1-tletip-g8.json",
+        "json_sha256": "3e3970aeacb69b1a0b08dc0c5ef440a2aef5335b611d837b653f3b21db7e95a7",
+        "image_sha256": "62a724f51753ea3d873728c30e54a488da477e166c19d2c4a57e89a6f7afce54",
+        "bytes": 57040,
+        "set": "tletip-repertoire",
+        "scalars": [
+          "U+0293",
+          "U+0294",
+          "U+0295",
+          "U+0296",
+          "U+0297",
+          "U+0298",
+          "U+029A",
+          "U+029D"
+        ]
+      },
+      {
+        "member": 9,
+        "json": "neuronte-term-letters-v1-tletip-g9.json",
+        "json_sha256": "30ff35b395272ab9b3e88478cd37d3dbb55c9a1206b648f1adeb266c97ef685d",
+        "image_sha256": "87e7b941c0631c79725395bbbbb095ad9ea5f0f8a5871228c88542e87d1c3a19",
+        "bytes": 57040,
+        "set": "tletip-repertoire",
+        "scalars": [
+          "U+029E",
+          "U+02A0",
+          "U+02A1",
+          "U+02A2",
+          "U+02AC",
+          "U+02AD",
+          "U+02AE",
+          "U+02AF"
+        ]
+      },
+      {
+        "member": 10,
+        "json": "neuronte-term-letters-v1-tletlu-g0.json",
+        "json_sha256": "230525473fd311706a133625bd73c2295989232a1acce9f5de7a7388d8975fea",
+        "image_sha256": "25d1af5d024d42de03eb550fc0f31e41fd47932021f9beac88ce8386131472c2",
+        "bytes": 57040,
+        "set": "tletlu-repertoire",
+        "scalars": [
+          "U+0181",
+          "U+0182",
+          "U+0184",
+          "U+0186",
+          "U+0187",
+          "U+0189",
+          "U+018A"
+        ]
+      },
+      {
+        "member": 11,
+        "json": "neuronte-term-letters-v1-tletlu-g1.json",
+        "json_sha256": "60b21a0b3afb9fc6023729d8e8ba7430b5589ed3b0453610f7b254c8c7afa7ee",
+        "image_sha256": "c09dd28b2381e3bf9fb87a5ef2f4569034df19b2570aa6ffe935f8068ee4c4a9",
+        "bytes": 57040,
+        "set": "tletlu-repertoire",
+        "scalars": [
+          "U+018B",
+          "U+018E",
+          "U+018F",
+          "U+0190",
+          "U+0191",
+          "U+0193",
+          "U+0194",
+          "U+0196"
+        ]
+      },
+      {
+        "member": 12,
+        "json": "neuronte-term-letters-v1-tletlu-g2.json",
+        "json_sha256": "0d84799580f89b53653f94310ced8b3aec2c7477c3decd6368b41dbb08db3e70",
+        "image_sha256": "6be7d62f8d7b14c5b2a0c694011573fd5ce715da356359a15edd5439e3869418",
+        "bytes": 57040,
+        "set": "tletlu-repertoire",
+        "scalars": [
+          "U+0197",
+          "U+0198",
+          "U+019C",
+          "U+019D",
+          "U+019F",
+          "U+01A2",
+          "U+01A4",
+          "U+01A6"
+        ]
+      },
+      {
+        "member": 13,
+        "json": "neuronte-term-letters-v1-tletlu-g3.json",
+        "json_sha256": "36d11f00fcc5b3dc829c75272c9c272ef59bf8cec2c21ebb32684d78000727f9",
+        "image_sha256": "118f14bf7ad583d96de6b3a019ebb01e14dfd6134685f347e760c3ee4548a694",
+        "bytes": 57040,
+        "set": "tletlu-repertoire",
+        "scalars": [
+          "U+01A7",
+          "U+01A9",
+          "U+01AC",
+          "U+01AE",
+          "U+01B1",
+          "U+01B2",
+          "U+01B3",
+          "U+01B5"
+        ]
+      },
+      {
+        "member": 14,
+        "json": "neuronte-term-letters-v1-tletlu-g4.json",
+        "json_sha256": "4965222b0b2b3ca6b52a381ca7f6b46875200db1777c975eb6bad8993316d5c1",
+        "image_sha256": "f1609f8fee5062dd16fb5a0993dbf9aff078abfeaf19737c2007e2577fbd0099",
+        "bytes": 57040,
+        "set": "tletlu-repertoire",
+        "scalars": [
+          "U+01B7",
+          "U+01B8",
+          "U+01BC",
+          "U+01E4",
+          "U+01EE",
+          "U+01F6",
+          "U+01F7",
+          "U+021C"
+        ]
+      },
+      {
+        "member": 15,
+        "json": "neuronte-term-letters-v1-tletlu-g5.json",
+        "json_sha256": "654edbdcbdc1a2ef94ed16c41d4fa680cc6bf5635cbad5d8686723a265c73b39",
+        "image_sha256": "8c4fd53db25df8d30714ee157e75e6edca03800e1486f94ab3384d5d8de84fd6",
+        "bytes": 57040,
+        "set": "tletlu-repertoire",
+        "scalars": [
+          "U+0220",
+          "U+0222",
+          "U+0224",
+          "U+023A",
+          "U+023B",
+          "U+023D",
+          "U+023E",
+          "U+0241"
+        ]
+      },
+      {
+        "member": 16,
+        "json": "neuronte-term-letters-v1-tletlu-g6.json",
+        "json_sha256": "00c85282a45dd8aa97b7de6613f5433c4d15e1d6130dfa65c1562bbe50c98cf7",
+        "image_sha256": "fd17bcb011204db027f2dbacf9d3782d126b24626b01972844a867b121f502fb",
+        "bytes": 57040,
+        "set": "tletlu-repertoire",
+        "scalars": [
+          "U+0243",
+          "U+0244",
+          "U+0245",
+          "U+0246",
+          "U+0248",
+          "U+024A",
+          "U+024C",
+          "U+024E"
+        ]
+      },
+      {
+        "member": 17,
+        "json": "neuronte-term-letters-v1-tletlu-g7.json",
+        "json_sha256": "00824b158f82f1a866e2b885ade55357ceca77833baa7d6f62002c8a75eac47f",
+        "image_sha256": "96b893b684a9a1e491dbc40f77c1445d256d97b883e59f968a2db7ebe844d234",
+        "bytes": 57040,
+        "set": "tletlu-repertoire",
+        "scalars": [
+          "U+1E9E",
+          "U+1EFA",
+          "U+2C60",
+          "U+2C62",
+          "U+2C63",
+          "U+2C64",
+          "U+2C67",
+          "U+2C69"
+        ]
+      },
+      {
+        "member": 18,
+        "json": "neuronte-term-letters-v1-tletlu-g8.json",
+        "json_sha256": "b4efb99c1fdc3fdfd3e9961bfafd2db814bb6768b2a5e8f78780d3899577435e",
+        "image_sha256": "b69b0a3c5f40eb2ce7471b0bf9cb37c2b6eee8cd86e8a79e1159c8636df78901",
+        "bytes": 57040,
+        "set": "tletlu-repertoire",
+        "scalars": [
+          "U+2C6B",
+          "U+2C6D",
+          "U+2C6E",
+          "U+2C6F",
+          "U+2C70",
+          "U+2C72",
+          "U+2C75",
+          "U+2C7E"
+        ]
+      },
+      {
+        "member": 19,
+        "json": "neuronte-term-letters-v1-tletlu-g9.json",
+        "json_sha256": "38fd4446dcd4c7100f485c728b99b628b8e79ea6d28b645d1988ad0b39edab16",
+        "image_sha256": "973137d6be5db1e6a97ff145a3c92bc82ecf6a0610cdff3981e47adfa1aae5bc",
+        "bytes": 57040,
+        "set": "tletlu-repertoire",
+        "scalars": [
+          "U+2C7F",
+          "U+A722",
+          "U+A724",
+          "U+A726",
+          "U+A728",
+          "U+A72A",
+          "U+A73E",
+          "U+A740"
+        ]
+      },
+      {
+        "member": 20,
+        "json": "neuronte-term-letters-v1-tletlu-g10.json",
+        "json_sha256": "ac73ba1dccd3aec592ec24739ac66923d8b80bcf2f300e3e1e9a849ac5adddd3",
+        "image_sha256": "e680391e0cddb3dd1c927b6c30e5428e02fc6e5049332a2dd198d766ae434434",
+        "bytes": 57040,
+        "set": "tletlu-repertoire",
+        "scalars": [
+          "U+A746",
+          "U+A748",
+          "U+A74A",
+          "U+A74E",
+          "U+A750",
+          "U+A752",
+          "U+A756",
+          "U+A764"
+        ]
+      },
+      {
+        "member": 21,
+        "json": "neuronte-term-letters-v1-tletlu-g11.json",
+        "json_sha256": "64d38e229106873075cada0299db75bd864dcb09d6f1976b8727e5d58bb481f8",
+        "image_sha256": "8e5ecb1ed938da30548e0d3a0951006742d5e5193532e1fbcf39dee3aff8440e",
+        "bytes": 57040,
+        "set": "tletlu-repertoire",
+        "scalars": [
+          "U+A766",
+          "U+A780",
+          "U+A782",
+          "U+A78D",
+          "U+A790",
+          "U+A7A0",
+          "U+A7A2",
+          "U+A7A4"
+        ]
+      },
+      {
+        "member": 22,
+        "json": "neuronte-term-letters-v1-tletlu-g12.json",
+        "json_sha256": "78b8b27fb93d1760b1993ee227273b3f57d56896511d6923771983e3d6bd5230",
+        "image_sha256": "6352a66f62ca67c59370bddaff02dd3cf45bfc5f7c2324e55e514be32b8daa8f",
+        "bytes": 57040,
+        "set": "tletlu-repertoire",
+        "scalars": [
+          "U+A7A6",
+          "U+A7A8",
+          "U+A7AA",
+          "U+A7FB",
+          "U+A7FC",
+          "U+A7FD",
+          "U+A7FE",
+          "U+A7FF"
+        ]
+      },
+      {
+        "member": 23,
+        "json": "neuronte-term-letters-v1-tletll-g0.json",
+        "json_sha256": "719c8cdb051e8a228672769b45e1d0437e72dc7103aacf543301cb6799a74f51",
+        "image_sha256": "6d31ede48b629685ce0add6248f2d4c9d4dedcafc2c43f431d4a6cb5165943a7",
+        "bytes": 57040,
+        "set": "tletll-repertoire",
+        "scalars": [
+          "U+0180",
+          "U+0183",
+          "U+0185",
+          "U+0188",
+          "U+018C",
+          "U+018D",
+          "U+0192",
+          "U+0195"
+        ]
+      },
+      {
+        "member": 24,
+        "json": "neuronte-term-letters-v1-tletll-g1.json",
+        "json_sha256": "62b8b7cdf1806463bab6646709e69ff39d944682f7fdc5ec7cdf805f8531bb97",
+        "image_sha256": "3be5ffb53916da008f4c46e5da27c233b0ac5b6ef225f6423ae4ff3f140fc71d",
+        "bytes": 57040,
+        "set": "tletll-repertoire",
+        "scalars": [
+          "U+0199",
+          "U+019A",
+          "U+019B",
+          "U+019E",
+          "U+01A3",
+          "U+01A5",
+          "U+01A8",
+          "U+01AA"
+        ]
+      },
+      {
+        "member": 25,
+        "json": "neuronte-term-letters-v1-tletll-g2.json",
+        "json_sha256": "ebe7077d1eaa0537fe398054495b97ce16d1ff80255698108acf6cafaeb27cfe",
+        "image_sha256": "777fd87e460201b67474cc62909ae2c9d125df5025245a05325fa7747b93d80e",
+        "bytes": 57040,
+        "set": "tletll-repertoire",
+        "scalars": [
+          "U+01AB",
+          "U+01AD",
+          "U+01B4",
+          "U+01B6",
+          "U+01B9",
+          "U+01BA",
+          "U+01BB",
+          "U+01BD"
+        ]
+      },
+      {
+        "member": 26,
+        "json": "neuronte-term-letters-v1-tletll-g3.json",
+        "json_sha256": "aab13e63d746606675439a332143f5b0812f44e44c9c0e8701e5f449514a1ce5",
+        "image_sha256": "e66a139ef37c0f2183563a6d9f96bf5f60796bb3cb168fecf459898c127ce347",
+        "bytes": 57040,
+        "set": "tletll-repertoire",
+        "scalars": [
+          "U+01BE",
+          "U+01BF",
+          "U+01DD",
+          "U+01E5",
+          "U+01EF",
+          "U+021D",
+          "U+0221",
+          "U+0223"
+        ]
+      },
+      {
+        "member": 27,
+        "json": "neuronte-term-letters-v1-tletll-g4.json",
+        "json_sha256": "6ae4896c47c07ea6747b8abe783668783e508e7341f3390bba327e07c1d9d642",
+        "image_sha256": "084c961588c19ec3c51dc6443ab6942530bae2e0e9fd69fb9eaafa779ce51d95",
+        "bytes": 57040,
+        "set": "tletll-repertoire",
+        "scalars": [
+          "U+0225",
+          "U+0234",
+          "U+0235",
+          "U+0236",
+          "U+0237",
+          "U+023C",
+          "U+023F",
+          "U+0240"
+        ]
+      },
+      {
+        "member": 28,
+        "json": "neuronte-term-letters-v1-tletll-g5.json",
+        "json_sha256": "a1accac5cd486637f28ca8ea20af2305c92e45aa6b14815373eea4b4490a2b00",
+        "image_sha256": "5394dd3684443cfe8e405054e256f15fb89a6a8fddd067e249553d0b9dee4db7",
+        "bytes": 57040,
+        "set": "tletll-repertoire",
+        "scalars": [
+          "U+0242",
+          "U+0247",
+          "U+0249",
+          "U+024B",
+          "U+024D",
+          "U+024F",
+          "U+1E9A",
+          "U+1E9C"
+        ]
+      },
+      {
+        "member": 29,
+        "json": "neuronte-term-letters-v1-tletll-g6.json",
+        "json_sha256": "aa89be97c32a85bcc399137e01bf034213dc50ce58a84086ed6c3f26f5304139",
+        "image_sha256": "8ff1cfe7459caf966199a3bf050c990d7bb19806a7b6bfe67ba7439a79bfbed5",
+        "bytes": 57040,
+        "set": "tletll-repertoire",
+        "scalars": [
+          "U+1E9D",
+          "U+1E9F",
+          "U+1EFB",
+          "U+2C61",
+          "U+2C65",
+          "U+2C66",
+          "U+2C68",
+          "U+2C6A"
+        ]
+      },
+      {
+        "member": 30,
+        "json": "neuronte-term-letters-v1-tletll-g7.json",
+        "json_sha256": "1170bf3871fe30f47c6d0d580227db0135056fb91fc313a4033595231fcc8a57",
+        "image_sha256": "bf9e431a31e609d88a596b67b0a6ddccec3f30bc0a13a0c1e2f7b0547e6433c2",
+        "bytes": 57040,
+        "set": "tletll-repertoire",
+        "scalars": [
+          "U+2C6C",
+          "U+2C71",
+          "U+2C73",
+          "U+2C74",
+          "U+2C76",
+          "U+2C77",
+          "U+2C79",
+          "U+2C7A"
+        ]
+      },
+      {
+        "member": 31,
+        "json": "neuronte-term-letters-v1-tletll-g8.json",
+        "json_sha256": "40f59e1efe3f0ffb7ea5d8218eff6931faa5e1052d1140cb815ab6498c8947f2",
+        "image_sha256": "37fd9e768a227be93897e0774079dd313a9f1ab6bfc186745a8ef4661a0d8f8c",
+        "bytes": 57040,
+        "set": "tletll-repertoire",
+        "scalars": [
+          "U+A723",
+          "U+A725",
+          "U+A727",
+          "U+A729",
+          "U+A72B",
+          "U+A73F",
+          "U+A741",
+          "U+A747"
+        ]
+      },
+      {
+        "member": 32,
+        "json": "neuronte-term-letters-v1-tletll-g9.json",
+        "json_sha256": "2c3d1ae57bdc3055fa9f34c14ce9de8b7afa86c2cd094403ba7dbc706d9d03d2",
+        "image_sha256": "2771705d702f4057210940457f92e902c14774b6ceb17f985ba03d3cdfcc399b",
+        "bytes": 57040,
+        "set": "tletll-repertoire",
+        "scalars": [
+          "U+A749",
+          "U+A74B",
+          "U+A74F",
+          "U+A751",
+          "U+A753",
+          "U+A757",
+          "U+A765",
+          "U+A767"
+        ]
+      },
+      {
+        "member": 33,
+        "json": "neuronte-term-letters-v1-tletll-g10.json",
+        "json_sha256": "71288feba810885e64563edb49a2d9081d7c646d3550056cc2e6667a6a21919c",
+        "image_sha256": "b614514d83e2286295e686d1326a19adeb65598b0d197a3d86c508a025b17b32",
+        "bytes": 57040,
+        "set": "tletll-repertoire",
+        "scalars": [
+          "U+A781",
+          "U+A783",
+          "U+A78E",
+          "U+A791",
+          "U+A7A1",
+          "U+A7A3",
+          "U+A7A5",
+          "U+A7A7",
+          "U+A7A9"
+        ]
+      },
+      {
+        "member": 34,
+        "json": "neuronte-term-letters-v1-tletdg-g0.json",
+        "json_sha256": "8b400d7fb1b41b1fa75f36d50cf6cfdbc89ef6ea11ac1219c01aaa76c0d6a45e",
+        "image_sha256": "f55d65adab2ca3b38da72293a920012bd01ddaeb5811b6156cad4ea34ecc8b69",
+        "bytes": 57040,
+        "set": "tletdg-repertoire",
+        "scalars": [
+          "U+01C4",
+          "U+01C5",
+          "U+01C6",
+          "U+01C7",
+          "U+01C8",
+          "U+01C9",
+          "U+01CA"
+        ]
+      },
+      {
+        "member": 35,
+        "json": "neuronte-term-letters-v1-tletdg-g1.json",
+        "json_sha256": "f08348c231b8709903dda496d5eb6576d2a375b7e6890b49e93c0bc3bdcb631b",
+        "image_sha256": "8d3ce4dc448bb90cbf1e20ff885e958cc6650b88e1db0085422b0f832262b398",
+        "bytes": 57040,
+        "set": "tletdg-repertoire",
+        "scalars": [
+          "U+01CB",
+          "U+01CC",
+          "U+01F1",
+          "U+01F2",
+          "U+01F3",
+          "U+0238",
+          "U+0239"
+        ]
+      },
+      {
+        "member": 36,
+        "json": "neuronte-term-letters-v1-tletdg-g2.json",
+        "json_sha256": "09e0bbadbedd9fa603c0bd8a94e0ef9a1fba764914e3227ae7b089c0db8ecfa5",
+        "image_sha256": "fa693eddce1cf9bdcb0d9ca9561c292729ecdcb3f327a669c9294858b752d05f",
+        "bytes": 57040,
+        "set": "tletdg-repertoire",
+        "scalars": [
+          "U+02A3",
+          "U+02A4",
+          "U+02A5",
+          "U+02A6",
+          "U+02A7",
+          "U+02A8",
+          "U+02A9"
+        ]
+      },
+      {
+        "member": 37,
+        "json": "neuronte-term-letters-v1-tletdg-g3.json",
+        "json_sha256": "379461e30eb7c4689568934043b9a5c960d6bfc99bcd08cc4e1126999869e9a8",
+        "image_sha256": "e1275c4cb8fc11c9f592b81f80aec91bbf4880a5d738bc9469633f4becb4262e",
+        "bytes": 57040,
+        "set": "tletdg-repertoire",
+        "scalars": [
+          "U+02AA",
+          "U+02AB",
+          "U+A732",
+          "U+A733",
+          "U+A734",
+          "U+A735",
+          "U+A736"
+        ]
+      },
+      {
+        "member": 38,
+        "json": "neuronte-term-letters-v1-tletdg-g4.json",
+        "json_sha256": "6d2578e2d2b4b280ee98f1c385150140cb2298621cbfbd1489fa0f45a0468984",
+        "image_sha256": "ee67abb4a61195a65158858cf084e5ab0d8e62e947d6f97dcc4ae815cf1d68d9",
+        "bytes": 57040,
+        "set": "tletdg-repertoire",
+        "scalars": [
+          "U+A737",
+          "U+A738",
+          "U+A739",
+          "U+A73A",
+          "U+A73B",
+          "U+A73C",
+          "U+A73D"
+        ]
+      },
+      {
+        "member": 39,
+        "json": "neuronte-term-letters-v1-tletdg-g5.json",
+        "json_sha256": "62f7da5f8df3314ebffa59f68a35aa7284837ec2abfb8eaf15530bcc11104339",
+        "image_sha256": "41e297a6f5db1c8ec0580e907a057170e53d4a22e8559fc70e9080dc3506c8a0",
+        "bytes": 57040,
+        "set": "tletdg-repertoire",
+        "scalars": [
+          "U+FB00",
+          "U+FB01",
+          "U+FB02",
+          "U+FB03",
+          "U+FB04",
+          "U+FB05",
+          "U+FB06"
+        ]
+      },
+      {
+        "member": 40,
+        "json": "neuronte-term-letters-v1-tletcu-g0.json",
+        "json_sha256": "b7ba67bb8d92aa2d0d526f35275d11e44f02e4fb5e6c533e8250cfd90a15670d",
+        "image_sha256": "9ee2bdd746f18c2e27dbe5e8e76a32e101b081e49037ac3ada76e9c49a60692f",
+        "bytes": 57040,
+        "set": "tletcu-repertoire",
+        "scalars": [
+          "U+0460",
+          "U+0462",
+          "U+0464",
+          "U+0466",
+          "U+0468",
+          "U+046A",
+          "U+046C",
+          "U+046E"
+        ]
+      },
+      {
+        "member": 41,
+        "json": "neuronte-term-letters-v1-tletcu-g1.json",
+        "json_sha256": "28afba34249b4f1ef3cf4c227ced997783baf262d9b54afd9588cf578ac05422",
+        "image_sha256": "237539b480ae3657be940640cad528c82e0fc7b284d806a597458b26c4c2de58",
+        "bytes": 57040,
+        "set": "tletcu-repertoire",
+        "scalars": [
+          "U+0470",
+          "U+0472",
+          "U+0474",
+          "U+0476",
+          "U+0478",
+          "U+047A",
+          "U+047C",
+          "U+047E"
+        ]
+      },
+      {
+        "member": 42,
+        "json": "neuronte-term-letters-v1-tletcu-g2.json",
+        "json_sha256": "637664a800e857ad4c857bee80e4e46e5ab52e385ff1e74d60c0e93ba222368f",
+        "image_sha256": "4f717eddbae2f4992e648650e0a6e613091529346c7424b25a0af6184f6cafa7",
+        "bytes": 57040,
+        "set": "tletcu-repertoire",
+        "scalars": [
+          "U+0480",
+          "U+0482",
+          "U+048A",
+          "U+048C",
+          "U+048E",
+          "U+0492",
+          "U+0494",
+          "U+0496"
+        ]
+      },
+      {
+        "member": 43,
+        "json": "neuronte-term-letters-v1-tletcu-g3.json",
+        "json_sha256": "d3bb34a19fc4f0dbc19519587b01761a335895bb1481ea0c67c336c3c0da1ee8",
+        "image_sha256": "c6a9e9f9f83e3ee3ab96ebfba1a625fd19a2d6a1cece4b9d2e11b048d0ceb361",
+        "bytes": 57040,
+        "set": "tletcu-repertoire",
+        "scalars": [
+          "U+0498",
+          "U+049A",
+          "U+049C",
+          "U+049E",
+          "U+04A0",
+          "U+04A2",
+          "U+04A4",
+          "U+04A6"
+        ]
+      },
+      {
+        "member": 44,
+        "json": "neuronte-term-letters-v1-tletcu-g4.json",
+        "json_sha256": "b68cb2b2ac18af43d27f0dca3f29b34b60c55848f1710d39827fb4c8b3bd491c",
+        "image_sha256": "39ed229cd0e59b41215c3b356d2aa3f773e4375174ed5d9304e99f2dc77abd81",
+        "bytes": 57040,
+        "set": "tletcu-repertoire",
+        "scalars": [
+          "U+04A8",
+          "U+04AA",
+          "U+04AC",
+          "U+04AE",
+          "U+04B0",
+          "U+04B2",
+          "U+04B4",
+          "U+04B6"
+        ]
+      },
+      {
+        "member": 45,
+        "json": "neuronte-term-letters-v1-tletcu-g5.json",
+        "json_sha256": "ee1ae87a9824f0a436fbbc94c7028760ceca7a932b1ee06e2649dc7c5da5e55a",
+        "image_sha256": "629b04d7ba44c223ef92fc4b075fad4ed7430ae3e1de20e4a971bc028413bb24",
+        "bytes": 57040,
+        "set": "tletcu-repertoire",
+        "scalars": [
+          "U+04B8",
+          "U+04BA",
+          "U+04BC",
+          "U+04BE",
+          "U+04C0",
+          "U+04C3",
+          "U+04C5",
+          "U+04C7"
+        ]
+      },
+      {
+        "member": 46,
+        "json": "neuronte-term-letters-v1-tletcu-g6.json",
+        "json_sha256": "06fca48979fe961b1a916a35f1a2ba89261139b6f9312de0fcc451af65a92587",
+        "image_sha256": "a42444fa6714872908387346247782aff66a7c7a99c2d35a354aea17cdbce5ff",
+        "bytes": 57040,
+        "set": "tletcu-repertoire",
+        "scalars": [
+          "U+04C9",
+          "U+04CB",
+          "U+04CD",
+          "U+04D4",
+          "U+04D8",
+          "U+04DA",
+          "U+04E0",
+          "U+04E8"
+        ]
+      },
+      {
+        "member": 47,
+        "json": "neuronte-term-letters-v1-tletcu-g7.json",
+        "json_sha256": "c7e8dc0bfbbe05dc62ae16e0f034a1c8ec73b284c507f2d30b076412cfadfbf7",
+        "image_sha256": "38f70c878f8d3c0365e2dfe8d092021c442576032b472e4bc9d68b8f547378ff",
+        "bytes": 57040,
+        "set": "tletcu-repertoire",
+        "scalars": [
+          "U+04EA",
+          "U+04F6",
+          "U+04FA",
+          "U+04FC",
+          "U+04FE",
+          "U+0500",
+          "U+0502",
+          "U+0504"
+        ]
+      },
+      {
+        "member": 48,
+        "json": "neuronte-term-letters-v1-tletcu-g8.json",
+        "json_sha256": "6ff1cab114d8fc0f1d348cf9612ac096323747638c6b6aeaf2fb1f91aa69338c",
+        "image_sha256": "817eb86682c69555fa431fc6b64a22eaa9e83bc8eab57c587788b7065c1d8862",
+        "bytes": 57040,
+        "set": "tletcu-repertoire",
+        "scalars": [
+          "U+0506",
+          "U+0508",
+          "U+050A",
+          "U+050C",
+          "U+050E",
+          "U+0510",
+          "U+0512",
+          "U+0514"
+        ]
+      },
+      {
+        "member": 49,
+        "json": "neuronte-term-letters-v1-tletcu-g9.json",
+        "json_sha256": "b92aec37901b29fceb5cfead3013db17091e77718554f55c57661b9447b16385",
+        "image_sha256": "f872bd6c0c015af3ea45ec29ca01d1cbe31228da2207ce2ce40f6cb3c034674f",
+        "bytes": 57040,
+        "set": "tletcu-repertoire",
+        "scalars": [
+          "U+0516",
+          "U+0518",
+          "U+051A",
+          "U+051C",
+          "U+051E",
+          "U+0520",
+          "U+0522",
+          "U+0524"
+        ]
+      },
+      {
+        "member": 50,
+        "json": "neuronte-term-letters-v1-tletcu-g10.json",
+        "json_sha256": "1e11fe75c4215cf947c76f3c00ca43b1ed22695ac03ff1d0c76af0798eb8a7f0",
+        "image_sha256": "2fd3516a0ccae4f944523b211b329d7b205feea23e42a0cbfa34906ced3465ed",
+        "bytes": 57040,
+        "set": "tletcu-repertoire",
+        "scalars": [
+          "U+A644",
+          "U+A646",
+          "U+A64C",
+          "U+A650",
+          "U+A654",
+          "U+A656",
+          "U+A662",
+          "U+A664"
+        ]
+      },
+      {
+        "member": 51,
+        "json": "neuronte-term-letters-v1-tletcu-g11.json",
+        "json_sha256": "b80ddca7f556aa594401ca9e8bae28ef99a86d55997b9d95a8c5e5c71d0c03f4",
+        "image_sha256": "079c57e13d029cda46023025942dc0c630f86077f4de72b13f9d3aaff33683f6",
+        "bytes": 57040,
+        "set": "tletcu-repertoire",
+        "scalars": [
+          "U+A666",
+          "U+A668",
+          "U+A66A",
+          "U+A66C",
+          "U+A68A",
+          "U+A68C",
+          "U+A694",
+          "U+A698"
+        ]
+      },
+      {
+        "member": 52,
+        "json": "neuronte-term-letters-v1-tletcl-g0.json",
+        "json_sha256": "e79b0fe37f71050c7f8928faf80763b9273ec0106f23510367339380de6c41d0",
+        "image_sha256": "25b38730423b7cc1f5a9f8d05b93caa7d8731c6dec8aa8740c2470870df603cc",
+        "bytes": 57040,
+        "set": "tletcl-repertoire",
+        "scalars": [
+          "U+0461",
+          "U+0463",
+          "U+0465",
+          "U+0467",
+          "U+0469",
+          "U+046B",
+          "U+046D",
+          "U+046F"
+        ]
+      },
+      {
+        "member": 53,
+        "json": "neuronte-term-letters-v1-tletcl-g1.json",
+        "json_sha256": "fc342c36d48d69a1d4a18872622ae40f5107a0bbbc7470891bc095fa0b03191e",
+        "image_sha256": "c3b2f32294ff733f84804e834f1b473d9b09ed1ec948a1fb70504aed8d0b5a4d",
+        "bytes": 57040,
+        "set": "tletcl-repertoire",
+        "scalars": [
+          "U+0471",
+          "U+0473",
+          "U+0475",
+          "U+0477",
+          "U+0479",
+          "U+047B",
+          "U+047D",
+          "U+047F"
+        ]
+      },
+      {
+        "member": 54,
+        "json": "neuronte-term-letters-v1-tletcl-g2.json",
+        "json_sha256": "efd7d8e4a7de8db80c441fe6fa8b928672de4df17dd50f948a305826dfb9c229",
+        "image_sha256": "4f12d113d4f35b2b42d667a738ddcf8c06e7d45236fe743e11b66cff9e946afa",
+        "bytes": 57040,
+        "set": "tletcl-repertoire",
+        "scalars": [
+          "U+0481",
+          "U+048B",
+          "U+048D",
+          "U+048F",
+          "U+0493",
+          "U+0495",
+          "U+0497",
+          "U+0499"
+        ]
+      },
+      {
+        "member": 55,
+        "json": "neuronte-term-letters-v1-tletcl-g3.json",
+        "json_sha256": "3ab9073c9bc721e1e9b8e07a34a8785fe5da9c45b5b43ad288bed88ac4cb0795",
+        "image_sha256": "cfc6ed55a8216a6a97e39bd908ac02a92c04a19cefb8f5543b98e6b1753c2014",
+        "bytes": 57040,
+        "set": "tletcl-repertoire",
+        "scalars": [
+          "U+049B",
+          "U+049D",
+          "U+049F",
+          "U+04A1",
+          "U+04A3",
+          "U+04A5",
+          "U+04A7",
+          "U+04A9"
+        ]
+      },
+      {
+        "member": 56,
+        "json": "neuronte-term-letters-v1-tletcl-g4.json",
+        "json_sha256": "479fa23c8763eb7b0ff38784751c3fc248bd53fe7d489b501cc9ba19da6fdacc",
+        "image_sha256": "4c03d1ce69da06c390c6db14145d601272c0f10ad77fd5376929f0f1896df22d",
+        "bytes": 57040,
+        "set": "tletcl-repertoire",
+        "scalars": [
+          "U+04AB",
+          "U+04AD",
+          "U+04AF",
+          "U+04B1",
+          "U+04B3",
+          "U+04B5",
+          "U+04B7",
+          "U+04B9"
+        ]
+      },
+      {
+        "member": 57,
+        "json": "neuronte-term-letters-v1-tletcl-g5.json",
+        "json_sha256": "1dc6d78070d094dc316a58eb15206af821f786820ac4b8cf054c2f4e73659eea",
+        "image_sha256": "e5839a9502f57c7a4119aea030bebc84b6f1a12d87225b525a3f606872aa0a96",
+        "bytes": 57040,
+        "set": "tletcl-repertoire",
+        "scalars": [
+          "U+04BB",
+          "U+04BD",
+          "U+04BF",
+          "U+04C4",
+          "U+04C6",
+          "U+04C8",
+          "U+04CA",
+          "U+04CC"
+        ]
+      },
+      {
+        "member": 58,
+        "json": "neuronte-term-letters-v1-tletcl-g6.json",
+        "json_sha256": "6365492bbeea27937fcf2cb26def4eba7ca327f1a8a8dde208e0f34aea65efcb",
+        "image_sha256": "b34674e97ebc2f17583816848933a33f511b0f7328dc8006d62fdb273ec62e7d",
+        "bytes": 57040,
+        "set": "tletcl-repertoire",
+        "scalars": [
+          "U+04CE",
+          "U+04CF",
+          "U+04D5",
+          "U+04D9",
+          "U+04DB",
+          "U+04E1",
+          "U+04E9",
+          "U+04EB"
+        ]
+      },
+      {
+        "member": 59,
+        "json": "neuronte-term-letters-v1-tletcl-g7.json",
+        "json_sha256": "f864a5bc058d0e8a47cbb3c3f3f89a7c751ad28f9520cfb49fcc662de03289d4",
+        "image_sha256": "20ffd815dfe536fc80cad7c96abec367a574195dc254dcd37262f9510a7840d8",
+        "bytes": 57040,
+        "set": "tletcl-repertoire",
+        "scalars": [
+          "U+04F7",
+          "U+04FB",
+          "U+04FD",
+          "U+04FF",
+          "U+0501",
+          "U+0503",
+          "U+0505",
+          "U+0507"
+        ]
+      },
+      {
+        "member": 60,
+        "json": "neuronte-term-letters-v1-tletcl-g8.json",
+        "json_sha256": "98f0bc7f7e464eab538fa695d68775130336c9369cd41b65659b69f7d57e0134",
+        "image_sha256": "4a613e591b2f1d1dedf6b289270747809b7fd1695bea70304c3459d64f449ec0",
+        "bytes": 57040,
+        "set": "tletcl-repertoire",
+        "scalars": [
+          "U+0509",
+          "U+050B",
+          "U+050D",
+          "U+050F",
+          "U+0511",
+          "U+0513",
+          "U+0515",
+          "U+0517"
+        ]
+      },
+      {
+        "member": 61,
+        "json": "neuronte-term-letters-v1-tletcl-g9.json",
+        "json_sha256": "9ccc91bf0b6dacdb9acbe4db084fb884c142ab3c850185f34207dc8cc11ce9bd",
+        "image_sha256": "5a0f3b551333b20ab24af3d8e85e822d42b1dd92a75847fb3269f87a01122978",
+        "bytes": 57040,
+        "set": "tletcl-repertoire",
+        "scalars": [
+          "U+0519",
+          "U+051B",
+          "U+051D",
+          "U+051F",
+          "U+0521",
+          "U+0523",
+          "U+0525",
+          "U+A645"
+        ]
+      },
+      {
+        "member": 62,
+        "json": "neuronte-term-letters-v1-tletcl-g10.json",
+        "json_sha256": "35c0c5d2140f2b286e9432cf50346d0b95c5f0c6213130b30befb651e4201d35",
+        "image_sha256": "d18c6e2e4a2d5effb41d06b582d12472eb037ea9efabd04e5a6ba3c89bb3f73d",
+        "bytes": 57040,
+        "set": "tletcl-repertoire",
+        "scalars": [
+          "U+A647",
+          "U+A64D",
+          "U+A651",
+          "U+A655",
+          "U+A657",
+          "U+A663",
+          "U+A665",
+          "U+A667"
+        ]
+      },
+      {
+        "member": 63,
+        "json": "neuronte-term-letters-v1-tletcl-g11.json",
+        "json_sha256": "96a32218a4553fa17ce6e8581d6ad88c3c4261f4b34a56025506a482ee237200",
+        "image_sha256": "aa28f598244bfb150d6c10e94cb7a069a07fe91db3c357d85d19044518fb94d6",
+        "bytes": 57040,
+        "set": "tletcl-repertoire",
+        "scalars": [
+          "U+A669",
+          "U+A66B",
+          "U+A66D",
+          "U+A66E",
+          "U+A68B",
+          "U+A68D",
+          "U+A695",
+          "U+A699"
+        ]
+      },
+      {
+        "member": 64,
+        "json": "neuronte-term-letters-v1-tletgu-g0.json",
+        "json_sha256": "db7749db2231b234f216347c6e684b5d2c60414f7bac839e3fcc856399287156",
+        "image_sha256": "96720f66bdf65dbe0ce74b6b1535b29dec265f06afb2b2dcd5f3bfd3f532097d",
+        "bytes": 57040,
+        "set": "tletgu-repertoire",
+        "scalars": [
+          "U+0370",
+          "U+0372",
+          "U+0376",
+          "U+037F",
+          "U+03CF",
+          "U+03D2"
+        ]
+      },
+      {
+        "member": 65,
+        "json": "neuronte-term-letters-v1-tletgu-g1.json",
+        "json_sha256": "f198df7456da656136df9ba16670c926872be88cb4f60874f7824af12c2d575f",
+        "image_sha256": "d82526a44969cacac19c986082f84c9d8ef3b201a0c5a50127b13e23dbd701c1",
+        "bytes": 57040,
+        "set": "tletgu-repertoire",
+        "scalars": [
+          "U+03D3",
+          "U+03D4",
+          "U+03D8",
+          "U+03DA",
+          "U+03DC",
+          "U+03DE",
+          "U+03E0"
+        ]
+      },
+      {
+        "member": 66,
+        "json": "neuronte-term-letters-v1-tletgu-g2.json",
+        "json_sha256": "a6efc5bf304cd34f293ca85b1b8aaad02d7b55805bab36db65ed670becc63f5a",
+        "image_sha256": "11b955d283691faf73b486c395b8475c9b628a0671f65b0f42027288c03be19a",
+        "bytes": 57040,
+        "set": "tletgu-repertoire",
+        "scalars": [
+          "U+03E2",
+          "U+03E4",
+          "U+03E6",
+          "U+03E8",
+          "U+03EA",
+          "U+03EC",
+          "U+03EE"
+        ]
+      },
+      {
+        "member": 67,
+        "json": "neuronte-term-letters-v1-tletgu-g3.json",
+        "json_sha256": "f4506dcc046d368c6dcb83f950fe6ccd6692bcfd3ee22f3602ede6850f9c0f23",
+        "image_sha256": "ffff20c36010e77e6fde4084a80ab5facbf82ab3f9075c502396ddb69e1e59e0",
+        "bytes": 57040,
+        "set": "tletgu-repertoire",
+        "scalars": [
+          "U+03F4",
+          "U+03F7",
+          "U+03F9",
+          "U+03FA",
+          "U+03FD",
+          "U+03FE",
+          "U+03FF"
+        ]
+      },
+      {
+        "member": 68,
+        "json": "neuronte-term-letters-v1-tletgl-g0.json",
+        "json_sha256": "4c0373b8b9d050185eb01add076f9e0728a0161c859440cfa12828b767728b58",
+        "image_sha256": "5ef083bf44d56859172fb1416e025d8695c9cc1c56242878ee758ecd975c2c2b",
+        "bytes": 57040,
+        "set": "tletgl-repertoire",
+        "scalars": [
+          "U+0371",
+          "U+0373",
+          "U+0377",
+          "U+037B",
+          "U+037C",
+          "U+037D",
+          "U+03D0",
+          "U+03D1"
+        ]
+      },
+      {
+        "member": 69,
+        "json": "neuronte-term-letters-v1-tletgl-g1.json",
+        "json_sha256": "b00f6256aff5e8578f0e333ac1a562b0efc7c92ab2ddaee649e2609153c32191",
+        "image_sha256": "3ac48828e97d390ba88e59c064e616690385ef5ccbeff29e30c497ab98da01a0",
+        "bytes": 57040,
+        "set": "tletgl-repertoire",
+        "scalars": [
+          "U+03D5",
+          "U+03D6",
+          "U+03D7",
+          "U+03D9",
+          "U+03DB",
+          "U+03DD",
+          "U+03DF",
+          "U+03E1"
+        ]
+      },
+      {
+        "member": 70,
+        "json": "neuronte-term-letters-v1-tletgl-g2.json",
+        "json_sha256": "32919c2e771f1b2d848bf5a31b110ee3007be3dc82b26c713ad088f13597d404",
+        "image_sha256": "3dd4bd8358fb40c7c57505b0115ef5cb031495bb3c88e9d98e265a047a90785a",
+        "bytes": 57040,
+        "set": "tletgl-repertoire",
+        "scalars": [
+          "U+03E3",
+          "U+03E5",
+          "U+03E7",
+          "U+03E9",
+          "U+03EB",
+          "U+03ED",
+          "U+03EF",
+          "U+03F0"
+        ]
+      },
+      {
+        "member": 71,
+        "json": "neuronte-term-letters-v1-tletgl-g3.json",
+        "json_sha256": "7489ab74276261d8855c804988e47f46132ee034717d7e1a45afc587a28bf2fb",
+        "image_sha256": "c16d24c3a751a7ce81699cb7aaae7893322a285912109c57154e2ce4d35692ab",
+        "bytes": 57040,
+        "set": "tletgl-repertoire",
+        "scalars": [
+          "U+03F1",
+          "U+03F2",
+          "U+03F3",
+          "U+03F5",
+          "U+03F6",
+          "U+03F8",
+          "U+03FB",
+          "U+03FC",
+          "U+1FBE"
+        ]
+      },
+      {
+        "member": 72,
+        "json": "neuronte-term-letters-v1-tletsc-g0.json",
+        "json_sha256": "d609b54b698990c1673688c41ce1ef95e458b1cd651701a13a7d94fb3941eaa2",
+        "image_sha256": "4113eb19eef3e8484d741ade4b2060c3c9fff1e284f07c0394dd5a629b36b659",
+        "bytes": 57040,
+        "set": "tletsc-repertoire",
+        "scalars": [
+          "U+0262",
+          "U+026A",
+          "U+0274",
+          "U+0276",
+          "U+0280",
+          "U+0281",
+          "U+028F"
+        ]
+      },
+      {
+        "member": 73,
+        "json": "neuronte-term-letters-v1-tletsc-g1.json",
+        "json_sha256": "451e2a5053ebd3d3af23bd1f15852c48568423b97ceada5af28d2d69c9bf2596",
+        "image_sha256": "043c71da90f48878de02ae49fea424dd4f8d9192dd31a28d27a9b7d6bae2b867",
+        "bytes": 57040,
+        "set": "tletsc-repertoire",
+        "scalars": [
+          "U+0299",
+          "U+029B",
+          "U+029C",
+          "U+029F",
+          "U+1D00",
+          "U+1D01",
+          "U+1D02",
+          "U+1D03"
+        ]
+      },
+      {
+        "member": 74,
+        "json": "neuronte-term-letters-v1-tletsc-g2.json",
+        "json_sha256": "a7f1f24e18eccb308886479b3efef6fbf69bee21ce69ca5c192f795d9c5d4018",
+        "image_sha256": "5ed4c50d9137ae4bb1058ee2c599f9566cd751c84d716b6968a7b4e2503e532a",
+        "bytes": 57040,
+        "set": "tletsc-repertoire",
+        "scalars": [
+          "U+1D04",
+          "U+1D05",
+          "U+1D06",
+          "U+1D07",
+          "U+1D08",
+          "U+1D09",
+          "U+1D0A"
+        ]
+      },
+      {
+        "member": 75,
+        "json": "neuronte-term-letters-v1-tletsc-g3.json",
+        "json_sha256": "4b77edb7170ccaa4895597126d0840d30dd7c25f854a649bfede10d204449032",
+        "image_sha256": "a715d765cfb7c0b4efa3b2399c9ab21267309350824002e9fd22e808fe4c6a68",
+        "bytes": 57040,
+        "set": "tletsc-repertoire",
+        "scalars": [
+          "U+1D0B",
+          "U+1D0C",
+          "U+1D0D",
+          "U+1D0E",
+          "U+1D0F",
+          "U+1D10",
+          "U+1D11",
+          "U+1D12"
+        ]
+      },
+      {
+        "member": 76,
+        "json": "neuronte-term-letters-v1-tletsc-g4.json",
+        "json_sha256": "f2253d1c9c71193a2c5301599c883449e3f6dc32b693ef0a2f869fb0b3d557ea",
+        "image_sha256": "3ea85ab342afdc288f7fc5e8c7af005fbb3870c18f21f3ff6b30af95c2262ff8",
+        "bytes": 57040,
+        "set": "tletsc-repertoire",
+        "scalars": [
+          "U+1D13",
+          "U+1D14",
+          "U+1D16",
+          "U+1D17",
+          "U+1D18",
+          "U+1D19",
+          "U+1D1A"
+        ]
+      },
+      {
+        "member": 77,
+        "json": "neuronte-term-letters-v1-tletsc-g5.json",
+        "json_sha256": "b9709ab4dfa69310313e6acb0a5fa69137a4216618c6f94093dec486e66d54b1",
+        "image_sha256": "d15e01339f7f6d116cfcbfde96e286222265ce9c43d942391d06523ed982e9de",
+        "bytes": 57040,
+        "set": "tletsc-repertoire",
+        "scalars": [
+          "U+1D1B",
+          "U+1D1C",
+          "U+1D1D",
+          "U+1D1E",
+          "U+1D1F",
+          "U+1D20",
+          "U+1D21",
+          "U+1D22"
+        ]
+      },
+      {
+        "member": 78,
+        "json": "neuronte-term-letters-v1-tletsc-g6.json",
+        "json_sha256": "d26470fada9244bb55ea02091b922b2384c115a415b94ce0c9831c8004c1fa52",
+        "image_sha256": "f6ed0813fe0c61c7f9252a71862889e3200d529f23c1ca73e707562e0917311f",
+        "bytes": 57040,
+        "set": "tletsc-repertoire",
+        "scalars": [
+          "U+1D23",
+          "U+1D26",
+          "U+1D27",
+          "U+1D28",
+          "U+1D29",
+          "U+1D2A",
+          "U+1D2B"
+        ]
+      },
+      {
+        "member": 79,
+        "json": "neuronte-term-letters-v1-tletsc-g7.json",
+        "json_sha256": "d275ddac56c5fdc6f6037ca191e2780fb31709398890964a3b98d993568bd167",
+        "image_sha256": "c3b4f442d79b0dd096bce884031142da750e03e58cdc7d4ae48ca88c1fb558e9",
+        "bytes": 57040,
+        "set": "tletsc-repertoire",
+        "scalars": [
+          "U+1D77",
+          "U+1D7B",
+          "U+1D7D",
+          "U+1D85",
+          "U+2C7B",
+          "U+A730",
+          "U+A731",
+          "U+A7FA"
+        ]
+      },
+      {
+        "member": 80,
+        "json": "neuronte-term-letters-v1-tletmu-g0.json",
+        "json_sha256": "5027ae22f5eb0cb2373b98714b89c6f48ba270594d3ef9da69d0e5b14481e296",
+        "image_sha256": "16af480a9027bbec7710257c1c4dda3289f09bdd348e0238a5ca6b98c0e0b1b9",
+        "bytes": 57040,
+        "set": "tletmu-repertoire",
+        "scalars": [
+          "U+02B6",
+          "U+1D2C",
+          "U+1D2D",
+          "U+1D2E",
+          "U+1D30",
+          "U+1D31",
+          "U+1D32"
+        ]
+      },
+      {
+        "member": 81,
+        "json": "neuronte-term-letters-v1-tletmu-g1.json",
+        "json_sha256": "894f467c56a0f3de84157f0ef91991b5c0fbdae326a3a57396ee4a29d3ca97a9",
+        "image_sha256": "0633a5dc314ae716e63098a735491d605f60f47cb44bb0659757f4a955971970",
+        "bytes": 57040,
+        "set": "tletmu-repertoire",
+        "scalars": [
+          "U+1D33",
+          "U+1D34",
+          "U+1D35",
+          "U+1D36",
+          "U+1D37",
+          "U+1D38",
+          "U+1D39",
+          "U+1D3A"
+        ]
+      },
+      {
+        "member": 82,
+        "json": "neuronte-term-letters-v1-tletmu-g2.json",
+        "json_sha256": "46acd3d747596bb2a40d7156c55596e25a33b697aa9dcdfa398fa05e358ed4bc",
+        "image_sha256": "182f46a7abdbb82de6be799b23a362b8b1d9085647b8353f393dc686136af655",
+        "bytes": 57040,
+        "set": "tletmu-repertoire",
+        "scalars": [
+          "U+1D3B",
+          "U+1D3C",
+          "U+1D3D",
+          "U+1D3E",
+          "U+1D3F",
+          "U+1D40",
+          "U+1D41"
+        ]
+      },
+      {
+        "member": 83,
+        "json": "neuronte-term-letters-v1-tletmu-g3.json",
+        "json_sha256": "087128e183425b8e90a932b18b424fef699e9d70cd036508e664710e2fd453ee",
+        "image_sha256": "ce47b8c4192cbdfbfeef51a176e8cb3e0d5cee40cd4b93b6068a14ac2d2f2e1e",
+        "bytes": 57040,
+        "set": "tletmu-repertoire",
+        "scalars": [
+          "U+1D42",
+          "U+1DA6",
+          "U+1DA7",
+          "U+1DAB",
+          "U+1DB0",
+          "U+1DB8",
+          "U+2C7D",
+          "U+A7F8"
+        ]
+      },
+      {
+        "member": 84,
+        "json": "neuronte-term-letters-v1-tletml-g0.json",
+        "json_sha256": "b8db2a288fb4020d568a6798e10e1de77049130e823e9b900d4c09e91abfb76f",
+        "image_sha256": "6dcbf85a9b0b545c42d1df2f45916f222e9e08ef42e708e3e7887bca196522e8",
+        "bytes": 57040,
+        "set": "tletml-repertoire",
+        "scalars": [
+          "U+02B0",
+          "U+02B1",
+          "U+02B2",
+          "U+02B3",
+          "U+02B4",
+          "U+02B5",
+          "U+02B7"
+        ]
+      },
+      {
+        "member": 85,
+        "json": "neuronte-term-letters-v1-tletml-g1.json",
+        "json_sha256": "81251f0f8aa65b0a4dd07a873ad4c46ba15b4dc57be953071f09701ebfab6926",
+        "image_sha256": "a62600fdec9a6861bfb38136e6c008131e1f54efe364d83cb3561d7a24919e9b",
+        "bytes": 57040,
+        "set": "tletml-repertoire",
+        "scalars": [
+          "U+02B8",
+          "U+02E0",
+          "U+02E1",
+          "U+02E2",
+          "U+02E3",
+          "U+02E4",
+          "U+1D43",
+          "U+1D44"
+        ]
+      },
+      {
+        "member": 86,
+        "json": "neuronte-term-letters-v1-tletml-g2.json",
+        "json_sha256": "a61b6d117688bf81f74c54da988b53d62ac2e3e131206bd5718d609125da241e",
+        "image_sha256": "875e15aa7549b2a3ab39645f5dbb3e5c8966bb2fdb9387e11752af73cbc2e821",
+        "bytes": 57040,
+        "set": "tletml-repertoire",
+        "scalars": [
+          "U+1D45",
+          "U+1D46",
+          "U+1D47",
+          "U+1D48",
+          "U+1D49",
+          "U+1D4A",
+          "U+1D4B",
+          "U+1D4C"
+        ]
+      },
+      {
+        "member": 87,
+        "json": "neuronte-term-letters-v1-tletml-g3.json",
+        "json_sha256": "2edf0fb2c05d2bf561d9e8192bff7442c7387da1a9206156bda03f36b5bda9fe",
+        "image_sha256": "2fa790d23cc6ad01257b14f062deb8727828d9fa253f8123eeff13577b92578c",
+        "bytes": 57040,
+        "set": "tletml-repertoire",
+        "scalars": [
+          "U+1D4D",
+          "U+1D4E",
+          "U+1D4F",
+          "U+1D50",
+          "U+1D51",
+          "U+1D52",
+          "U+1D53"
+        ]
+      },
+      {
+        "member": 88,
+        "json": "neuronte-term-letters-v1-tletml-g4.json",
+        "json_sha256": "5e755145b64ac1e066239acc4effe44f5ca29c02290b5448b7bc65b1a42570d3",
+        "image_sha256": "305976fc84782a67415e3c00cbe2bc364d57e133b2c4cb0901ea6e2f54c51df9",
+        "bytes": 57040,
+        "set": "tletml-repertoire",
+        "scalars": [
+          "U+1D54",
+          "U+1D55",
+          "U+1D56",
+          "U+1D57",
+          "U+1D58",
+          "U+1D59",
+          "U+1D5A",
+          "U+1D5B"
+        ]
+      },
+      {
+        "member": 89,
+        "json": "neuronte-term-letters-v1-tletml-g5.json",
+        "json_sha256": "cdea9e00f2a4fb2c38af6ef6ca1c950ca122a1ef5921c8f2d507f14c16fb9eb3",
+        "image_sha256": "2e12b72118968da047475a3eb723ac927e463d9104fd2b1f5931883de4a755aa",
+        "bytes": 57040,
+        "set": "tletml-repertoire",
+        "scalars": [
+          "U+1D5D",
+          "U+1D5E",
+          "U+1D5F",
+          "U+1D60",
+          "U+1D61",
+          "U+1D78",
+          "U+1D9B",
+          "U+1D9C"
+        ]
+      },
+      {
+        "member": 90,
+        "json": "neuronte-term-letters-v1-tletml-g6.json",
+        "json_sha256": "e46334dbaefc98ced6d14d5b44fc5f6eb69302efd9b8a7f303a2595ce92b7bd3",
+        "image_sha256": "2655c56147f30da2f5d6e2d89b4385707d406a8a9997b8802265e1b1b831eaed",
+        "bytes": 57040,
+        "set": "tletml-repertoire",
+        "scalars": [
+          "U+1D9D",
+          "U+1D9E",
+          "U+1D9F",
+          "U+1DA0",
+          "U+1DA1",
+          "U+1DA2",
+          "U+1DA3"
+        ]
+      },
+      {
+        "member": 91,
+        "json": "neuronte-term-letters-v1-tletml-g7.json",
+        "json_sha256": "83bbaa9ee8f9dbedee31d81851dc4f4b8f38d5c7aff5e6b05cd62fd4c210f463",
+        "image_sha256": "a8e1db6062f4db0b7dd670f989090ab11cf37895876fe60492072a0b3b702f6d",
+        "bytes": 57040,
+        "set": "tletml-repertoire",
+        "scalars": [
+          "U+1DA4",
+          "U+1DA5",
+          "U+1DA8",
+          "U+1DA9",
+          "U+1DAA",
+          "U+1DAC",
+          "U+1DAD",
+          "U+1DAE"
+        ]
+      },
+      {
+        "member": 92,
+        "json": "neuronte-term-letters-v1-tletml-g8a.json",
+        "json_sha256": "c465638f73958569a4b8f05ce5046263121d43b56869a8f656d755bf491b929e",
+        "image_sha256": "3230cf31dc99dc14277ed9dc012c08948712558b820b3cbdd874af74cdeec8ec",
+        "bytes": 57040,
+        "set": "tletml-repertoire",
+        "scalars": [
+          "U+1DAF",
+          "U+1DB1",
+          "U+1DB2",
+          "U+1DB3"
+        ]
+      },
+      {
+        "member": 93,
+        "json": "neuronte-term-letters-v1-tletml-g9.json",
+        "json_sha256": "df7db77e4a47112f6b8ec4b098ff630093a99b73eb8a1fc5fbfae161252bb036",
+        "image_sha256": "af700afff11a3a8763fc3843abe05e80bda7e4eb2aa143d45c5eb1f47bc3383d",
+        "bytes": 57040,
+        "set": "tletml-repertoire",
+        "scalars": [
+          "U+1DB9",
+          "U+1DBA",
+          "U+1DBB",
+          "U+1DBC",
+          "U+1DBD",
+          "U+1DBE",
+          "U+1DBF",
+          "U+A7F9"
+        ]
+      },
+      {
+        "member": 94,
+        "json": "neuronte-term-letters-v1-tletsb-g0a.json",
+        "json_sha256": "b9d59c5a42632494af2e7411948f9f3d0038f9e4b5f699dd11dddb68e898d287",
+        "image_sha256": "9ee008cd5900bf7e395c985a57660a814900894eaa620ba0677bf2ad550ada6d",
+        "bytes": 57040,
+        "set": "tletsb-repertoire",
+        "scalars": [
+          "U+1D62",
+          "U+1D63",
+          "U+1D64",
+          "U+1D65",
+          "U+1D66"
+        ]
+      },
+      {
+        "member": 95,
+        "json": "neuronte-term-letters-v1-tletsb-g0b.json",
+        "json_sha256": "b6db3773ca1909e83d37b59b9c4e87150529b397f579503278eafe65ba26021c",
+        "image_sha256": "ebd7c526f0a9acf887c874a0dd974ce72903c64c88c0c33a86a0fcda29a1d94a",
+        "bytes": 57040,
+        "set": "tletsb-repertoire",
+        "scalars": [
+          "U+1D67",
+          "U+1D68",
+          "U+1D69",
+          "U+1D6A",
+          "U+2C7C"
+        ]
+      },
+      {
+        "member": 96,
+        "json": "neuronte-term-letters-v1-tletsp-g0.json",
+        "json_sha256": "fb7520601c75eae3b55ee35cbd088d9bc5b34247c45a776f644e898925c127d6",
+        "image_sha256": "af5aeeec3435899cc60a15d82d9b368f5b936f4a915b50245313d0731dd55282",
+        "bytes": 57040,
+        "set": "tletsp-repertoire",
+        "scalars": [
+          "U+02E5",
+          "U+02E6",
+          "U+02E7",
+          "U+02E8",
+          "U+02E9",
+          "U+A708",
+          "U+A709",
+          "U+A70A",
+          "U+A70B",
+          "U+A70C",
+          "U+A712"
+        ]
+      },
+      {
+        "member": 97,
+        "json": "neuronte-term-letters-v1-tletsp-g1.json",
+        "json_sha256": "29fe23aa6b5a16ff4b902f76e071ef6274bf8e979105b7f3e2497d9742d893e0",
+        "image_sha256": "ca909128100c2d42860b49809c8015ab18c0643fffc90ed343609df69d749527",
+        "bytes": 57040,
+        "set": "tletsp-repertoire",
+        "scalars": [
+          "U+01C0",
+          "U+01C1",
+          "U+A70D",
+          "U+A70E",
+          "U+A70F",
+          "U+A710",
+          "U+A711",
+          "U+A713",
+          "U+A714",
+          "U+A715",
+          "U+A716"
+        ]
+      },
+      {
+        "member": 98,
+        "json": "neuronte-term-letters-v1-tletsp-g2.json",
+        "json_sha256": "11f168001d51d4a6252ec0a515186133ef353b1b136ba52733eb763f10e872fd",
+        "image_sha256": "cd87cd2530d2fb4f9e6e941e6ebbc76f5f51962c4706d9942e0891ef2b789469",
+        "bytes": 57040,
+        "set": "tletsp-repertoire",
+        "scalars": [
+          "U+01C2",
+          "U+01C3",
+          "U+02B9",
+          "U+02BA",
+          "U+02BB",
+          "U+02BC",
+          "U+02BD",
+          "U+02BE",
+          "U+02BF",
+          "U+02C0",
+          "U+02C1"
+        ]
+      },
+      {
+        "member": 99,
+        "json": "neuronte-term-letters-v1-tletsp-g3.json",
+        "json_sha256": "f21052d3c8ae856fa7a3e72704f006156448ab29597221830e0350139ee1f4ee",
+        "image_sha256": "ae188df8cc958d0c24b836bb7ed122c15265d7e6e19488e7a5734d42a4f3d31c",
+        "bytes": 57040,
+        "set": "tletsp-repertoire",
+        "scalars": [
+          "U+02C2",
+          "U+02C3",
+          "U+02C4",
+          "U+02C5",
+          "U+02C8",
+          "U+02C9",
+          "U+02CA",
+          "U+02CB",
+          "U+02CC",
+          "U+02CD",
+          "U+02CE"
+        ]
+      },
+      {
+        "member": 100,
+        "json": "neuronte-term-letters-v1-tletsp-g4.json",
+        "json_sha256": "f872da5f93fd2c2e08b84e8eaf8a0de4aa16dda2347d6fdeef8734f89ea2d9e0",
+        "image_sha256": "60725cba616b25c9af998479e86f064b101fd22fda6f51282f2daedf1a4b83e7",
+        "bytes": 57040,
+        "set": "tletsp-repertoire",
+        "scalars": [
+          "U+02CF",
+          "U+02D0",
+          "U+02D1",
+          "U+02D2",
+          "U+02D3",
+          "U+02D4",
+          "U+02D5",
+          "U+02D6",
+          "U+02D7",
+          "U+02DE",
+          "U+02DF"
+        ]
+      },
+      {
+        "member": 101,
+        "json": "neuronte-term-letters-v1-tletsp-g5.json",
+        "json_sha256": "d5fd6fe47c902ec51ff9c0ae01a331245157ef2e8bbe999b146e335d05aee049",
+        "image_sha256": "03b6740bad3e923abe05159320dd28a02acdd7de9cb407c796c68644daedd4f4",
+        "bytes": 57040,
+        "set": "tletsp-repertoire",
+        "scalars": [
+          "U+02EC",
+          "U+02ED",
+          "U+02EE",
+          "U+02F3",
+          "U+02F7",
+          "U+0374",
+          "U+0375",
+          "U+037A",
+          "U+037E",
+          "U+0384",
+          "U+0387"
+        ]
+      },
+      {
+        "member": 102,
+        "json": "neuronte-term-letters-v1-tletsp-g6.json",
+        "json_sha256": "c74aaf8f485876b0226ed76f45c803c3370cd8383db938c3ff8f876f6411bd8d",
+        "image_sha256": "a4ea97ca13696686f684f3189f76e719524579f86a4a2ece8349a9194e6d6cbe",
+        "bytes": 57040,
+        "set": "tletsp-repertoire",
+        "scalars": [
+          "U+1FEF",
+          "U+1FFD",
+          "U+A71B",
+          "U+A71C",
+          "U+A71D",
+          "U+A71E",
+          "U+A71F",
+          "U+A789",
+          "U+A78A",
+          "U+A78B",
+          "U+A78C"
+        ]
+      }
+    ],
+    "list": {
+      "file": "neuronte-term-letters-v1.list.txt",
+      "sha256": "5ab408b55ab47d538fb39f6fe117b0123da360e89f7890b65b5e1fb452f415a8"
+    }
+  }
+}

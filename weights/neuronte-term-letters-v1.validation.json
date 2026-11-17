@@ -1,0 +1,5259 @@
+{
+ "schema": "neuronte.term-letters.validation/v1",
+ "name": "neuronte-term-letters-v1",
+ "bundle_sha256": "a5b23948026761ce58ed11b3542df38b842a6f1c93fd2c4971e60d9d4b7700fd",
+ "gates": {
+  "file": "gates-v2.3.json",
+  "sha256": "2ccff8354eeda45e05525490b9fdee6ab13d4970a2389537c44af1504fc50fc4",
+  "kind": "letters",
+  "earlier": [
+   {
+    "file": "gates-v2.json",
+    "sha256": "5bf1a3f8312c45df2a20b2e69d51ee3c690c58891ec5390cf0e41cbdf9f9b51b"
+   },
+   {
+    "file": "gates-v2.1.json",
+    "sha256": "214942e398f88110cd7c6044c194f0f274274aeedb07abcbe8e1a18dc2b323c0"
+   },
+   {
+    "file": "gates-v2.2.json",
+    "sha256": "dd3cc2ea30ccb49d001c28a905bcc6e2a2d11edfcd6a741464fda91162b10e70"
+   }
+  ],
+  "amended": "gates-v2.json was declared before training. While these nets trained the owner dropped the letters rule on the overlap of the worst character (v2.1), had every rule that a perfect net fails skipped for that group and size (v2.2), then replaced the skip (v2.3): no limit is tighter than the perfect drawing's own score with 10% of room, and a seed that puts every pixel on the right side at every counted size passes. Nearest-to-itself and none-vanished always apply. Every verdict here is v2.3's.",
+  "rule": "both seeds meet every limit; the seed with the lower mean error at 8x16, 16x32 and 48x96 ships; a failing group is cut in two and each half trained once; a half that fails is left out; a limit tighter than the perfect drawing's own score eased by 10% is applied at that eased value (limits_eased)"
+ },
+ "teacher_sha256": "1fcc89cf877ec31f3b8a4fc515ffad83c773f2fd03471f247fb1c87b03ca7774",
+ "library_sha256": "429420ff1eb85a9b5c5a19cc832c958148145e122d6ce8a6e1acdbcbcfb151a2",
+ "groups_trained": 102,
+ "groups_passing_first": 100,
+ "groups_halved": 2,
+ "halves_shipped": 3,
+ "halves_left_out": 1,
+ "limits_eased_in_shipped": 44,
+ "seeds_passing_pixel_exact": 0,
+ "groups_trained_again_after_drawing_fix": [
+  "tletml:g4",
+  "tletsp:g6"
+ ],
+ "groups_shipped": 103,
+ "characters_shipped": 812,
+ "characters_left_out": [
+  "U+1DB4",
+  "U+1DB5",
+  "U+1DB6",
+  "U+1DB7"
+ ],
+ "units": [
+  {
+   "set": "tletip",
+   "group": 0,
+   "half": "",
+   "characters": [
+    "U+0250",
+    "U+0251",
+    "U+0252",
+    "U+0253",
+    "U+0254",
+    "U+0255",
+    "U+0256"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "77d5fe3e1b1f9d79ab9c112e64d6ad4e2d37dd43e73fc57245a22430360de3b5",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.002825564596735473,
+     "source": "tletip-repertoire-contiguous-k10-p0-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "31221fff9f01f9930a76320656fd480b65d53f36e62af222a23f4fe3af961300",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.002820418535044328,
+     "source": "tletip-repertoire-contiguous-k10-p0-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletip-g0.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletip",
+   "group": 1,
+   "half": "",
+   "characters": [
+    "U+0257",
+    "U+0258",
+    "U+0259",
+    "U+025A",
+    "U+025B",
+    "U+025C",
+    "U+025D",
+    "U+025E"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "9fef929c4e9ebd1d279209b9481d59ba1bf1dfbe4fe6403bf2c23c0d5555f632",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.002614189198842117,
+     "source": "tletip-repertoire-contiguous-k10-p1-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "b637186f9f3cb00ba4a41babcbae59ebef804bed5540ac1a49f5bb3863376022",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0025985190247107917,
+     "source": "tletip-repertoire-contiguous-k10-p1-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletip-g1.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletip",
+   "group": 2,
+   "half": "",
+   "characters": [
+    "U+025F",
+    "U+0260",
+    "U+0261",
+    "U+0263",
+    "U+0264",
+    "U+0265",
+    "U+0266"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "f2ede74d2a0006ad29bdee7832c0c96419cf703ad1cab10050cb5e956078f805",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.003057838218020541,
+     "source": "tletip-repertoire-contiguous-k10-p2-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "0e20f49f9df6bce2efbd61f4950d1479af774eee0e3be84ad78e147b429bada6",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.003036273399456626,
+     "source": "tletip-repertoire-contiguous-k10-p2-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletip-g2.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletip",
+   "group": 3,
+   "half": "",
+   "characters": [
+    "U+0267",
+    "U+0268",
+    "U+0269",
+    "U+026B",
+    "U+026C",
+    "U+026D",
+    "U+026E",
+    "U+026F"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 0,
+   "lower_error_seed": 0,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "c6c661d5715806853693ed1801b85c2f78eabf1876142dc32b79754fc606e408",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.004276956019263404,
+     "source": "tletip-repertoire-contiguous-k10-p3-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "b3b7b080f564014035b8f65e3361da98f32af40e5d588b9bc324fed2ebf9d8b6",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.004284088046309383,
+     "source": "tletip-repertoire-contiguous-k10-p3-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletip-g3.json",
+   "shipped_seed": 0
+  },
+  {
+   "set": "tletip",
+   "group": 4,
+   "half": "",
+   "characters": [
+    "U+0270",
+    "U+0271",
+    "U+0272",
+    "U+0273",
+    "U+0275",
+    "U+0277",
+    "U+0278",
+    "U+0279"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 0,
+   "lower_error_seed": 0,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "92fb96f1076d747fcd2b62376843ee107a68fcfc4b597570d08ef3102e7a11a0",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.004170588874937191,
+     "source": "tletip-repertoire-contiguous-k10-p4-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "a7595466df56498ce2ac0bd9d8233c0a4b17463b75ba008cef1526a1d950ec7d",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.004178951933378509,
+     "source": "tletip-repertoire-contiguous-k10-p4-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletip-g4.json",
+   "shipped_seed": 0
+  },
+  {
+   "set": "tletip",
+   "group": 5,
+   "half": "",
+   "characters": [
+    "U+027A",
+    "U+027B",
+    "U+027C",
+    "U+027D",
+    "U+027E",
+    "U+027F",
+    "U+0282"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "19a41ca32bd822569122300563c43184f5100672ce22aec17a03288e6f16a349",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.002216881360038228,
+     "source": "tletip-repertoire-contiguous-k10-p5-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "cd15f5688eca80ca9b1d304082fc886e820f870378e84ac72f4937cf0663bb0a",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.002211381742242901,
+     "source": "tletip-repertoire-contiguous-k10-p5-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletip-g5.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletip",
+   "group": 6,
+   "half": "",
+   "characters": [
+    "U+0283",
+    "U+0284",
+    "U+0285",
+    "U+0286",
+    "U+0287",
+    "U+0288",
+    "U+0289",
+    "U+028A"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "6b322effa8f84575c3385e20bb90f99de7b130390acde79c1ac65e26fed357e3",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0036509636580982865,
+     "source": "tletip-repertoire-contiguous-k10-p6-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "3a66060b2974e815feee55076e25d6586bcc0a72bcd45175fc49188fe20acf33",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0036302016451372765,
+     "source": "tletip-repertoire-contiguous-k10-p6-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletip-g6.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletip",
+   "group": 7,
+   "half": "",
+   "characters": [
+    "U+028B",
+    "U+028C",
+    "U+028D",
+    "U+028E",
+    "U+0290",
+    "U+0291",
+    "U+0292"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "a69a8bb3546b2cece4634bd9e0f3b9273f8251328dbb5bc9bf474db29963e6b0",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.002710225379338399,
+     "source": "tletip-repertoire-contiguous-k10-p7-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "2644a73d8e710617bf2103e603683c838b2acf62bdb52bfcda739a960e2e3692",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0026734113676606546,
+     "source": "tletip-repertoire-contiguous-k10-p7-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletip-g7.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletip",
+   "group": 8,
+   "half": "",
+   "characters": [
+    "U+0293",
+    "U+0294",
+    "U+0295",
+    "U+0296",
+    "U+0297",
+    "U+0298",
+    "U+029A",
+    "U+029D"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "21c3d0cf2fab917d52e65d365707aed02117850d324c67c8101c3ec209829386",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.002995225203145916,
+     "source": "tletip-repertoire-contiguous-k10-p8-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "3e3970aeacb69b1a0b08dc0c5ef440a2aef5335b611d837b653f3b21db7e95a7",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.002954547409899533,
+     "source": "tletip-repertoire-contiguous-k10-p8-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletip-g8.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletip",
+   "group": 9,
+   "half": "",
+   "characters": [
+    "U+029E",
+    "U+02A0",
+    "U+02A1",
+    "U+02A2",
+    "U+02AC",
+    "U+02AD",
+    "U+02AE",
+    "U+02AF"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "1e983e8f901b72c3cc1eaee581a35b1c7ef31dd8c80da3dc4264dec4802c02e0",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.003936573441023938,
+     "source": "tletip-repertoire-contiguous-k10-p9-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "30ff35b395272ab9b3e88478cd37d3dbb55c9a1206b648f1adeb266c97ef685d",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0038766340100361654,
+     "source": "tletip-repertoire-contiguous-k10-p9-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletip-g9.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletlu",
+   "group": 0,
+   "half": "",
+   "characters": [
+    "U+0181",
+    "U+0182",
+    "U+0184",
+    "U+0186",
+    "U+0187",
+    "U+0189",
+    "U+018A"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "74cddf5f93beba1e4b34033844410137b56de097b6a264d55dece933587e63f9",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.003986467418837405,
+     "source": "tletlu-repertoire-contiguous-k13-p0-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "230525473fd311706a133625bd73c2295989232a1acce9f5de7a7388d8975fea",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0039571953349791114,
+     "source": "tletlu-repertoire-contiguous-k13-p0-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletlu-g0.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletlu",
+   "group": 1,
+   "half": "",
+   "characters": [
+    "U+018B",
+    "U+018E",
+    "U+018F",
+    "U+0190",
+    "U+0191",
+    "U+0193",
+    "U+0194",
+    "U+0196"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "e5aa11f115af5b7ac2d9bd71a4b2e95da875f585744e57952ee1dbf72ebcc53c",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.00362161034233092,
+     "source": "tletlu-repertoire-contiguous-k13-p1-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "60b21a0b3afb9fc6023729d8e8ba7430b5589ed3b0453610f7b254c8c7afa7ee",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0035749373491853476,
+     "source": "tletlu-repertoire-contiguous-k13-p1-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletlu-g1.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletlu",
+   "group": 2,
+   "half": "",
+   "characters": [
+    "U+0197",
+    "U+0198",
+    "U+019C",
+    "U+019D",
+    "U+019F",
+    "U+01A2",
+    "U+01A4",
+    "U+01A6"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "b56eecef3cfd8cc865bc14b54ee75018d2e46b6a1892de3e4bf78fa61d6efcba",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.005252796268905513,
+     "source": "tletlu-repertoire-contiguous-k13-p2-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "0d84799580f89b53653f94310ced8b3aec2c7477c3decd6368b41dbb08db3e70",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.005196133812811847,
+     "source": "tletlu-repertoire-contiguous-k13-p2-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletlu-g2.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletlu",
+   "group": 3,
+   "half": "",
+   "characters": [
+    "U+01A7",
+    "U+01A9",
+    "U+01AC",
+    "U+01AE",
+    "U+01B1",
+    "U+01B2",
+    "U+01B3",
+    "U+01B5"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 0,
+   "lower_error_seed": 0,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "36d11f00fcc5b3dc829c75272c9c272ef59bf8cec2c21ebb32684d78000727f9",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0037296417576726526,
+     "source": "tletlu-repertoire-contiguous-k13-p3-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "faf655f2249a0d4b92b4f9dc408a34d93d9c560f06f526d40f6710268888b359",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0038040122453821823,
+     "source": "tletlu-repertoire-contiguous-k13-p3-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletlu-g3.json",
+   "shipped_seed": 0
+  },
+  {
+   "set": "tletlu",
+   "group": 4,
+   "half": "",
+   "characters": [
+    "U+01B7",
+    "U+01B8",
+    "U+01BC",
+    "U+01E4",
+    "U+01EE",
+    "U+01F6",
+    "U+01F7",
+    "U+021C"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "908c91a64e27f14978ee16e2551239a94cb43229a6074ae4271c927a97383ac7",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.004059941939582738,
+     "source": "tletlu-repertoire-contiguous-k13-p4-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "4965222b0b2b3ca6b52a381ca7f6b46875200db1777c975eb6bad8993316d5c1",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.004019538013380952,
+     "source": "tletlu-repertoire-contiguous-k13-p4-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletlu-g4.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletlu",
+   "group": 5,
+   "half": "",
+   "characters": [
+    "U+0220",
+    "U+0222",
+    "U+0224",
+    "U+023A",
+    "U+023B",
+    "U+023D",
+    "U+023E",
+    "U+0241"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "6c366272beed3d7dfa3336818bbbb3782d406691822cc44584c6088950ed66ac",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.003754241309555558,
+     "source": "tletlu-repertoire-contiguous-k13-p5-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "654edbdcbdc1a2ef94ed16c41d4fa680cc6bf5635cbad5d8686723a265c73b39",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0037412635235038274,
+     "source": "tletlu-repertoire-contiguous-k13-p5-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletlu-g5.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletlu",
+   "group": 6,
+   "half": "",
+   "characters": [
+    "U+0243",
+    "U+0244",
+    "U+0245",
+    "U+0246",
+    "U+0248",
+    "U+024A",
+    "U+024C",
+    "U+024E"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "c019da16e7acb20930e30761ce07f34d2eca79fa5f8e6b0d3c5958744065b206",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.004210000338692528,
+     "source": "tletlu-repertoire-contiguous-k13-p6-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "00c85282a45dd8aa97b7de6613f5433c4d15e1d6130dfa65c1562bbe50c98cf7",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.004184015427502648,
+     "source": "tletlu-repertoire-contiguous-k13-p6-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletlu-g6.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletlu",
+   "group": 7,
+   "half": "",
+   "characters": [
+    "U+1E9E",
+    "U+1EFA",
+    "U+2C60",
+    "U+2C62",
+    "U+2C63",
+    "U+2C64",
+    "U+2C67",
+    "U+2C69"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 0,
+   "lower_error_seed": 0,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "00824b158f82f1a866e2b885ade55357ceca77833baa7d6f62002c8a75eac47f",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.004872397597258289,
+     "source": "tletlu-repertoire-contiguous-k13-p7-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "22f15f0fdb663b668bd4a8ec2cc8a0102577bb80b1883e31c5dd5592b966d224",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.004941677694053699,
+     "source": "tletlu-repertoire-contiguous-k13-p7-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletlu-g7.json",
+   "shipped_seed": 0
+  },
+  {
+   "set": "tletlu",
+   "group": 8,
+   "half": "",
+   "characters": [
+    "U+2C6B",
+    "U+2C6D",
+    "U+2C6E",
+    "U+2C6F",
+    "U+2C70",
+    "U+2C72",
+    "U+2C75",
+    "U+2C7E"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 0,
+   "lower_error_seed": 0,
+   "limits_eased": [
+    {
+     "rule": "s1 8x16 p99",
+     "declared": 0.23541254103183748,
+     "perfect": 0.21479882299900055,
+     "applied": 0.23627870529890063
+    }
+   ],
+   "seeds": {
+    "0": {
+     "sha256": "b4efb99c1fdc3fdfd3e9961bfafd2db814bb6768b2a5e8f78780d3899577435e",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.003610340805607848,
+     "source": "tletlu-repertoire-contiguous-k13-p8-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "bf774e02f55f5f5d204e887a06b0528db81ba64e5043befda8c5c25ec9bb8c5d",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0036452161099684113,
+     "source": "tletlu-repertoire-contiguous-k13-p8-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletlu-g8.json",
+   "shipped_seed": 0
+  },
+  {
+   "set": "tletlu",
+   "group": 9,
+   "half": "",
+   "characters": [
+    "U+2C7F",
+    "U+A722",
+    "U+A724",
+    "U+A726",
+    "U+A728",
+    "U+A72A",
+    "U+A73E",
+    "U+A740"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "c330f7e9c218d555160258990f859a63c4d9db9b60466aff07697361a64c581b",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.00354043277426778,
+     "source": "tletlu-repertoire-contiguous-k13-p9-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "38fd4446dcd4c7100f485c728b99b628b8e79ea6d28b645d1988ad0b39edab16",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0034893232004833408,
+     "source": "tletlu-repertoire-contiguous-k13-p9-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletlu-g9.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletlu",
+   "group": 10,
+   "half": "",
+   "characters": [
+    "U+A746",
+    "U+A748",
+    "U+A74A",
+    "U+A74E",
+    "U+A750",
+    "U+A752",
+    "U+A756",
+    "U+A764"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 0,
+   "lower_error_seed": 0,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "ac73ba1dccd3aec592ec24739ac66923d8b80bcf2f300e3e1e9a849ac5adddd3",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.004001370461386007,
+     "source": "tletlu-repertoire-contiguous-k13-p10-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "67d487fdd23697d472105630721e773ef032a6ee44e22fb11a45d4955607e368",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.00408380381607761,
+     "source": "tletlu-repertoire-contiguous-k13-p10-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletlu-g10.json",
+   "shipped_seed": 0
+  },
+  {
+   "set": "tletlu",
+   "group": 11,
+   "half": "",
+   "characters": [
+    "U+A766",
+    "U+A780",
+    "U+A782",
+    "U+A78D",
+    "U+A790",
+    "U+A7A0",
+    "U+A7A2",
+    "U+A7A4"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [
+    {
+     "rule": "8x16 p99",
+     "declared": 0.08212547078728677,
+     "perfect": 0.08231637626886368,
+     "applied": 0.09054801389575005
+    }
+   ],
+   "seeds": {
+    "0": {
+     "sha256": "84d1db1d972cff6c744733980ddfc209be477f54e6d79a0e252b8beb7d4692d5",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.004422939251526259,
+     "source": "tletlu-repertoire-contiguous-k13-p11-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "64d38e229106873075cada0299db75bd864dcb09d6f1976b8727e5d58bb481f8",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0044152725507350015,
+     "source": "tletlu-repertoire-contiguous-k13-p11-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletlu-g11.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletlu",
+   "group": 12,
+   "half": "",
+   "characters": [
+    "U+A7A6",
+    "U+A7A8",
+    "U+A7AA",
+    "U+A7FB",
+    "U+A7FC",
+    "U+A7FD",
+    "U+A7FE",
+    "U+A7FF"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 0,
+   "lower_error_seed": 0,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "78b8b27fb93d1760b1993ee227273b3f57d56896511d6923771983e3d6bd5230",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.004239180392081228,
+     "source": "tletlu-repertoire-contiguous-k13-p12-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "288349a6c7d29665b49ebf02d10aa5b61475182ed263271db44c2ea41f9a2934",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.004275683138985187,
+     "source": "tletlu-repertoire-contiguous-k13-p12-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletlu-g12.json",
+   "shipped_seed": 0
+  },
+  {
+   "set": "tletll",
+   "group": 0,
+   "half": "",
+   "characters": [
+    "U+0180",
+    "U+0183",
+    "U+0185",
+    "U+0188",
+    "U+018C",
+    "U+018D",
+    "U+0192",
+    "U+0195"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "864c935d540483212e4c5fe967a57c3c4408957757797bad6bcba2c0152b08be",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.00348540092818439,
+     "source": "tletll-repertoire-contiguous-k11-p0-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "719c8cdb051e8a228672769b45e1d0437e72dc7103aacf543301cb6799a74f51",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0034576785255922005,
+     "source": "tletll-repertoire-contiguous-k11-p0-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletll-g0.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletll",
+   "group": 1,
+   "half": "",
+   "characters": [
+    "U+0199",
+    "U+019A",
+    "U+019B",
+    "U+019E",
+    "U+01A3",
+    "U+01A5",
+    "U+01A8",
+    "U+01AA"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "10d8c9904ec8d55a90336e95eb20ab185b933bb664990df26eed664ab7987c88",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0036289497948018834,
+     "source": "tletll-repertoire-contiguous-k11-p1-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "62b8b7cdf1806463bab6646709e69ff39d944682f7fdc5ec7cdf805f8531bb97",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0036212713118099296,
+     "source": "tletll-repertoire-contiguous-k11-p1-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletll-g1.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletll",
+   "group": 2,
+   "half": "",
+   "characters": [
+    "U+01AB",
+    "U+01AD",
+    "U+01B4",
+    "U+01B6",
+    "U+01B9",
+    "U+01BA",
+    "U+01BB",
+    "U+01BD"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "cb0fc13ab3786d8ea57e024a492e2f4f2316129c91cb0fc20b688d77af947b42",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0035025695203027376,
+     "source": "tletll-repertoire-contiguous-k11-p2-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "ebe7077d1eaa0537fe398054495b97ce16d1ff80255698108acf6cafaeb27cfe",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0034266614626782634,
+     "source": "tletll-repertoire-contiguous-k11-p2-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletll-g2.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletll",
+   "group": 3,
+   "half": "",
+   "characters": [
+    "U+01BE",
+    "U+01BF",
+    "U+01DD",
+    "U+01E5",
+    "U+01EF",
+    "U+021D",
+    "U+0221",
+    "U+0223"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "fae8634f862589bbdd920533e63cf38fca237e92c34181967c80abbd8dd48275",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.003399926198956867,
+     "source": "tletll-repertoire-contiguous-k11-p3-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "aab13e63d746606675439a332143f5b0812f44e44c9c0e8701e5f449514a1ce5",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0033266445194991925,
+     "source": "tletll-repertoire-contiguous-k11-p3-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletll-g3.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletll",
+   "group": 4,
+   "half": "",
+   "characters": [
+    "U+0225",
+    "U+0234",
+    "U+0235",
+    "U+0236",
+    "U+0237",
+    "U+023C",
+    "U+023F",
+    "U+0240"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "296f3dab6256bf97ab3c4c92cb5d339754a3459499df073c1e6f5d729d0695a2",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0035063302978718034,
+     "source": "tletll-repertoire-contiguous-k11-p4-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "6ae4896c47c07ea6747b8abe783668783e508e7341f3390bba327e07c1d9d642",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.003483140249348556,
+     "source": "tletll-repertoire-contiguous-k11-p4-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletll-g4.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletll",
+   "group": 5,
+   "half": "",
+   "characters": [
+    "U+0242",
+    "U+0247",
+    "U+0249",
+    "U+024B",
+    "U+024D",
+    "U+024F",
+    "U+1E9A",
+    "U+1E9C"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "f28d1184ae995591d28f8b67be67a677777355a0eac41aea14e6ef43056c7cea",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.003052096741157584,
+     "source": "tletll-repertoire-contiguous-k11-p5-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "a1accac5cd486637f28ca8ea20af2305c92e45aa6b14815373eea4b4490a2b00",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0030025499193773917,
+     "source": "tletll-repertoire-contiguous-k11-p5-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletll-g5.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletll",
+   "group": 6,
+   "half": "",
+   "characters": [
+    "U+1E9D",
+    "U+1E9F",
+    "U+1EFB",
+    "U+2C61",
+    "U+2C65",
+    "U+2C66",
+    "U+2C68",
+    "U+2C6A"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "748d1b288cf81146d348e185f42193b7632bca85dfe4987ad1a84a469243c328",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.004189313200186007,
+     "source": "tletll-repertoire-contiguous-k11-p6-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "aa89be97c32a85bcc399137e01bf034213dc50ce58a84086ed6c3f26f5304139",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.004102699846650164,
+     "source": "tletll-repertoire-contiguous-k11-p6-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletll-g6.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletll",
+   "group": 7,
+   "half": "",
+   "characters": [
+    "U+2C6C",
+    "U+2C71",
+    "U+2C73",
+    "U+2C74",
+    "U+2C76",
+    "U+2C77",
+    "U+2C79",
+    "U+2C7A"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "97e45a93e3b3924a27d2c395b190892dee1085708f99c1d9d3f432f181ca23a7",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0026083535776706412,
+     "source": "tletll-repertoire-contiguous-k11-p7-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "1170bf3871fe30f47c6d0d580227db0135056fb91fc313a4033595231fcc8a57",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0025857330717068785,
+     "source": "tletll-repertoire-contiguous-k11-p7-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletll-g7.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletll",
+   "group": 8,
+   "half": "",
+   "characters": [
+    "U+A723",
+    "U+A725",
+    "U+A727",
+    "U+A729",
+    "U+A72B",
+    "U+A73F",
+    "U+A741",
+    "U+A747"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "f51ba147f35becf8dfe6235c00ccb9febc1fe81ec4f1ef666cb435b6b4030a9b",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0028381167479286282,
+     "source": "tletll-repertoire-contiguous-k11-p8-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "40f59e1efe3f0ffb7ea5d8218eff6931faa5e1052d1140cb815ab6498c8947f2",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0027939475839957595,
+     "source": "tletll-repertoire-contiguous-k11-p8-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletll-g8.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletll",
+   "group": 9,
+   "half": "",
+   "characters": [
+    "U+A749",
+    "U+A74B",
+    "U+A74F",
+    "U+A751",
+    "U+A753",
+    "U+A757",
+    "U+A765",
+    "U+A767"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 0,
+   "lower_error_seed": 0,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "2c3d1ae57bdc3055fa9f34c14ce9de8b7afa86c2cd094403ba7dbc706d9d03d2",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0034623424629292763,
+     "source": "tletll-repertoire-contiguous-k11-p9-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "4d71c15b1ec25be83055079f0c527e6d8dd3419c3825643e6822110588269b08",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0034663885307963938,
+     "source": "tletll-repertoire-contiguous-k11-p9-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletll-g9.json",
+   "shipped_seed": 0
+  },
+  {
+   "set": "tletll",
+   "group": 10,
+   "half": "",
+   "characters": [
+    "U+A781",
+    "U+A783",
+    "U+A78E",
+    "U+A791",
+    "U+A7A1",
+    "U+A7A3",
+    "U+A7A5",
+    "U+A7A7",
+    "U+A7A9"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "24ce2bfba2ef03c6c41dadac7eee5738348736223280c6715bfa2b5fbfa2fa2a",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.003691289655829745,
+     "source": "tletll-repertoire-contiguous-k11-p10-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "71288feba810885e64563edb49a2d9081d7c646d3550056cc2e6667a6a21919c",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.003639519011981233,
+     "source": "tletll-repertoire-contiguous-k11-p10-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletll-g10.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletdg",
+   "group": 0,
+   "half": "",
+   "characters": [
+    "U+01C4",
+    "U+01C5",
+    "U+01C6",
+    "U+01C7",
+    "U+01C8",
+    "U+01C9",
+    "U+01CA"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 0,
+   "lower_error_seed": 0,
+   "limits_eased": [
+    {
+     "rule": "10x20 mae",
+     "declared": 0.008660606882767753,
+     "perfect": 0.008955589096461023,
+     "applied": 0.009851148006107126
+    },
+    {
+     "rule": "16x32 mae",
+     "declared": 0.006075804511783645,
+     "perfect": 0.00566479390753167,
+     "applied": 0.006231273298284838
+    },
+    {
+     "rule": "s1 16x32 mae",
+     "declared": 0.008982839866075665,
+     "perfect": 0.008214003672557217,
+     "applied": 0.00903540403981294
+    }
+   ],
+   "seeds": {
+    "0": {
+     "sha256": "8b400d7fb1b41b1fa75f36d50cf6cfdbc89ef6ea11ac1219c01aaa76c0d6a45e",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.006097118758286039,
+     "source": "tletdg-repertoire-contiguous-k6-p0-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "a3e0a2f5e0cc3c9fb998cc61afb5669de637286bb9ec956618fbe7cccbdf3c91",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.006098521041816899,
+     "source": "tletdg-repertoire-contiguous-k6-p0-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletdg-g0.json",
+   "shipped_seed": 0
+  },
+  {
+   "set": "tletdg",
+   "group": 1,
+   "half": "",
+   "characters": [
+    "U+01CB",
+    "U+01CC",
+    "U+01F1",
+    "U+01F2",
+    "U+01F3",
+    "U+0238",
+    "U+0239"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [
+    {
+     "rule": "10x20 mae",
+     "declared": 0.008660606882767753,
+     "perfect": 0.009176587286804403,
+     "applied": 0.010094246015484844
+    },
+    {
+     "rule": "s1 16x32 firm",
+     "declared": 0.0021484375,
+     "perfect": 0.002232142857142857,
+     "applied": 0.002455357142857143
+    }
+   ],
+   "seeds": {
+    "0": {
+     "sha256": "f096351e1f2ea61247b1b05b8eaaed04c45449280510dbfbe50a3acfd7c6e40e",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.005766299974528097,
+     "source": "tletdg-repertoire-contiguous-k6-p1-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "f08348c231b8709903dda496d5eb6576d2a375b7e6890b49e93c0bc3bdcb631b",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.005738862063957468,
+     "source": "tletdg-repertoire-contiguous-k6-p1-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletdg-g1.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletdg",
+   "group": 2,
+   "half": "",
+   "characters": [
+    "U+02A3",
+    "U+02A4",
+    "U+02A5",
+    "U+02A6",
+    "U+02A7",
+    "U+02A8",
+    "U+02A9"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [
+    {
+     "rule": "10x20 mae",
+     "declared": 0.008660606882767753,
+     "perfect": 0.008064825486923968,
+     "applied": 0.008871308035616365
+    },
+    {
+     "rule": "s1 8x16 firm",
+     "declared": 0.0107421875,
+     "perfect": 0.012276785714285714,
+     "applied": 0.013504464285714286
+    }
+   ],
+   "seeds": {
+    "0": {
+     "sha256": "1494d8f99facc9faec5a2e70e7944b3395abb75fde84588764b90d896832cffc",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0050790334519531044,
+     "source": "tletdg-repertoire-contiguous-k6-p2-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "09e0bbadbedd9fa603c0bd8a94e0ef9a1fba764914e3227ae7b089c0db8ecfa5",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.005060147438641815,
+     "source": "tletdg-repertoire-contiguous-k6-p2-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletdg-g2.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletdg",
+   "group": 3,
+   "half": "",
+   "characters": [
+    "U+02AA",
+    "U+02AB",
+    "U+A732",
+    "U+A733",
+    "U+A734",
+    "U+A735",
+    "U+A736"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "bbf3f6d48df5ea7e3742e158d94dfd071358efb0a4ebf74918271884649d392a",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0045623929306332555,
+     "source": "tletdg-repertoire-contiguous-k6-p3-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "379461e30eb7c4689568934043b9a5c960d6bfc99bcd08cc4e1126999869e9a8",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.004494630787078114,
+     "source": "tletdg-repertoire-contiguous-k6-p3-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletdg-g3.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletdg",
+   "group": 4,
+   "half": "",
+   "characters": [
+    "U+A737",
+    "U+A738",
+    "U+A739",
+    "U+A73A",
+    "U+A73B",
+    "U+A73C",
+    "U+A73D"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [
+    {
+     "rule": "24x48 firm",
+     "declared": 0.0006356336805555555,
+     "perfect": 0.0008680555555555555,
+     "applied": 0.0009548611111111112
+    },
+    {
+     "rule": "s1 16x32 p99",
+     "declared": 0.09528416693210602,
+     "perfect": 0.10605863481760025,
+     "applied": 0.11666449829936028
+    }
+   ],
+   "seeds": {
+    "0": {
+     "sha256": "8249662341fdfdb19e2f99d3501922e3b85ed5bc052bd398fc1b0c69b7201b29",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.004295277736327123,
+     "source": "tletdg-repertoire-contiguous-k6-p4-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "6d2578e2d2b4b280ee98f1c385150140cb2298621cbfbd1489fa0f45a0468984",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.004190281709833515,
+     "source": "tletdg-repertoire-contiguous-k6-p4-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletdg-g4.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletdg",
+   "group": 5,
+   "half": "",
+   "characters": [
+    "U+FB00",
+    "U+FB01",
+    "U+FB02",
+    "U+FB03",
+    "U+FB04",
+    "U+FB05",
+    "U+FB06"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [
+    {
+     "rule": "10x20 mae",
+     "declared": 0.008660606882767753,
+     "perfect": 0.00928463600575924,
+     "applied": 0.010213099606335164
+    },
+    {
+     "rule": "24x48 firm",
+     "declared": 0.0006356336805555555,
+     "perfect": 0.0006200396825396825,
+     "applied": 0.0006820436507936509
+    },
+    {
+     "rule": "24x48 iou_mean",
+     "declared": 0.9449324959405635,
+     "perfect": 0.9298864694373906,
+     "applied": 0.9228751163811297
+    },
+    {
+     "rule": "s1 8x16 firm",
+     "declared": 0.0107421875,
+     "perfect": 0.010044642857142858,
+     "applied": 0.011049107142857145
+    },
+    {
+     "rule": "s1 16x32 p99",
+     "declared": 0.09528416693210602,
+     "perfect": 0.087582528591156,
+     "applied": 0.09634078145027161
+    }
+   ],
+   "seeds": {
+    "0": {
+     "sha256": "10b3006145b94a1514427daf8292cfd24f9d78319bd607e3c94766f8544eded4",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.005687072884202712,
+     "source": "tletdg-repertoire-contiguous-k6-p5-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "62f7da5f8df3314ebffa59f68a35aa7284837ec2abfb8eaf15530bcc11104339",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.005638096476018074,
+     "source": "tletdg-repertoire-contiguous-k6-p5-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletdg-g5.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletcu",
+   "group": 0,
+   "half": "",
+   "characters": [
+    "U+0460",
+    "U+0462",
+    "U+0464",
+    "U+0466",
+    "U+0468",
+    "U+046A",
+    "U+046C",
+    "U+046E"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 0,
+   "lower_error_seed": 0,
+   "limits_eased": [
+    {
+     "rule": "s1 16x32 p99",
+     "declared": 0.09528416693210602,
+     "perfect": 0.0875985398888588,
+     "applied": 0.09635839387774468
+    }
+   ],
+   "seeds": {
+    "0": {
+     "sha256": "b7ba67bb8d92aa2d0d526f35275d11e44f02e4fb5e6c533e8250cfd90a15670d",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.005369960539004144,
+     "source": "tletcu-repertoire-contiguous-k12-p0-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "4c221d3247dc183f9ee1d46bb7f614de2d738088cf49a958bcd06801d6644651",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.005424935608364952,
+     "source": "tletcu-repertoire-contiguous-k12-p0-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletcu-g0.json",
+   "shipped_seed": 0
+  },
+  {
+   "set": "tletcu",
+   "group": 1,
+   "half": "",
+   "characters": [
+    "U+0470",
+    "U+0472",
+    "U+0474",
+    "U+0476",
+    "U+0478",
+    "U+047A",
+    "U+047C",
+    "U+047E"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 0,
+   "lower_error_seed": 0,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "28afba34249b4f1ef3cf4c227ced997783baf262d9b54afd9588cf578ac05422",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.004375692296889611,
+     "source": "tletcu-repertoire-contiguous-k12-p1-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "f48ec52df831f345154fa8c34a74db2159bce35e8b012141829932939119ec86",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.004394762169492121,
+     "source": "tletcu-repertoire-contiguous-k12-p1-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletcu-g1.json",
+   "shipped_seed": 0
+  },
+  {
+   "set": "tletcu",
+   "group": 2,
+   "half": "",
+   "characters": [
+    "U+0480",
+    "U+0482",
+    "U+048A",
+    "U+048C",
+    "U+048E",
+    "U+0492",
+    "U+0494",
+    "U+0496"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "c4364507bd81425d63048ad318a22d756fe000358c04009d47aa711cee3b1083",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.00421986590178373,
+     "source": "tletcu-repertoire-contiguous-k12-p2-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "637664a800e857ad4c857bee80e4e46e5ab52e385ff1e74d60c0e93ba222368f",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.004207412071991712,
+     "source": "tletcu-repertoire-contiguous-k12-p2-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletcu-g2.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletcu",
+   "group": 3,
+   "half": "",
+   "characters": [
+    "U+0498",
+    "U+049A",
+    "U+049C",
+    "U+049E",
+    "U+04A0",
+    "U+04A2",
+    "U+04A4",
+    "U+04A6"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "02cac7aae4968ab8d14bf76203f405cb0c7808e1eea8292bd8dd56e2cf84f087",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0051808038260787725,
+     "source": "tletcu-repertoire-contiguous-k12-p3-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "d3bb34a19fc4f0dbc19519587b01761a335895bb1481ea0c67c336c3c0da1ee8",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.005147127036858971,
+     "source": "tletcu-repertoire-contiguous-k12-p3-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletcu-g3.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletcu",
+   "group": 4,
+   "half": "",
+   "characters": [
+    "U+04A8",
+    "U+04AA",
+    "U+04AC",
+    "U+04AE",
+    "U+04B0",
+    "U+04B2",
+    "U+04B4",
+    "U+04B6"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "b8dd15f826a6e30dd3ca9e0ec853c938045eb4a4b98a3c117a4b93bffc893c71",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.00407763198018074,
+     "source": "tletcu-repertoire-contiguous-k12-p4-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "b68cb2b2ac18af43d27f0dca3f29b34b60c55848f1710d39827fb4c8b3bd491c",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.004057333717355505,
+     "source": "tletcu-repertoire-contiguous-k12-p4-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletcu-g4.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletcu",
+   "group": 5,
+   "half": "",
+   "characters": [
+    "U+04B8",
+    "U+04BA",
+    "U+04BC",
+    "U+04BE",
+    "U+04C0",
+    "U+04C3",
+    "U+04C5",
+    "U+04C7"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 0,
+   "lower_error_seed": 0,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "ee1ae87a9824f0a436fbbc94c7028760ceca7a932b1ee06e2649dc7c5da5e55a",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.004250753894060229,
+     "source": "tletcu-repertoire-contiguous-k12-p5-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "368aa24a7832aeff285a5a123c2e94b71d5575afd2cb1942948714afa5a47548",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.004311689549164536,
+     "source": "tletcu-repertoire-contiguous-k12-p5-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletcu-g5.json",
+   "shipped_seed": 0
+  },
+  {
+   "set": "tletcu",
+   "group": 6,
+   "half": "",
+   "characters": [
+    "U+04C9",
+    "U+04CB",
+    "U+04CD",
+    "U+04D4",
+    "U+04D8",
+    "U+04DA",
+    "U+04E0",
+    "U+04E8"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "68a669f40fc3426256681b70a2bf7b55b56f45f15c84de70f6dae9149a869346",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.004354232713618937,
+     "source": "tletcu-repertoire-contiguous-k12-p6-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "06fca48979fe961b1a916a35f1a2ba89261139b6f9312de0fcc451af65a92587",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.004275361342782465,
+     "source": "tletcu-repertoire-contiguous-k12-p6-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletcu-g6.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletcu",
+   "group": 7,
+   "half": "",
+   "characters": [
+    "U+04EA",
+    "U+04F6",
+    "U+04FA",
+    "U+04FC",
+    "U+04FE",
+    "U+0500",
+    "U+0502",
+    "U+0504"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 0,
+   "lower_error_seed": 0,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "c7e8dc0bfbbe05dc62ae16e0f034a1c8ec73b284c507f2d30b076412cfadfbf7",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0037528187094721943,
+     "source": "tletcu-repertoire-contiguous-k12-p7-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "32b7628f9bc6d7423dec10556f7a0d9c95023626363458c1b969cc45751bb2ed",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0037877842211552584,
+     "source": "tletcu-repertoire-contiguous-k12-p7-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletcu-g7.json",
+   "shipped_seed": 0
+  },
+  {
+   "set": "tletcu",
+   "group": 8,
+   "half": "",
+   "characters": [
+    "U+0506",
+    "U+0508",
+    "U+050A",
+    "U+050C",
+    "U+050E",
+    "U+0510",
+    "U+0512",
+    "U+0514"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "29400a1fc9d7382caa9a74e979b2eaafa290a7b3118dbf56bf06bab706a66ffa",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.004454353669037421,
+     "source": "tletcu-repertoire-contiguous-k12-p8-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "6ff1cab114d8fc0f1d348cf9612ac096323747638c6b6aeaf2fb1f91aa69338c",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.004393265029648319,
+     "source": "tletcu-repertoire-contiguous-k12-p8-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletcu-g8.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletcu",
+   "group": 9,
+   "half": "",
+   "characters": [
+    "U+0516",
+    "U+0518",
+    "U+051A",
+    "U+051C",
+    "U+051E",
+    "U+0520",
+    "U+0522",
+    "U+0524"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 0,
+   "lower_error_seed": 0,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "b92aec37901b29fceb5cfead3013db17091e77718554f55c57661b9447b16385",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0053493999391018105,
+     "source": "tletcu-repertoire-contiguous-k12-p9-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "f5fa9d6a3c8ddb985e86c289c7f7e7bc8dc836bd028cca0804a09078a7b68276",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.005421207587157066,
+     "source": "tletcu-repertoire-contiguous-k12-p9-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletcu-g9.json",
+   "shipped_seed": 0
+  },
+  {
+   "set": "tletcu",
+   "group": 10,
+   "half": "",
+   "characters": [
+    "U+A644",
+    "U+A646",
+    "U+A64C",
+    "U+A650",
+    "U+A654",
+    "U+A656",
+    "U+A662",
+    "U+A664"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "594d5a5875cd0e213d9487a84693ff2018f33ba5dcd277492febd7e0ec14981a",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.004985223781356278,
+     "source": "tletcu-repertoire-contiguous-k12-p10-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "1e11fe75c4215cf947c76f3c00ca43b1ed22695ac03ff1d0c76af0798eb8a7f0",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.004934616663376801,
+     "source": "tletcu-repertoire-contiguous-k12-p10-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletcu-g10.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletcu",
+   "group": 11,
+   "half": "",
+   "characters": [
+    "U+A666",
+    "U+A668",
+    "U+A66A",
+    "U+A66C",
+    "U+A68A",
+    "U+A68C",
+    "U+A694",
+    "U+A698"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 0,
+   "lower_error_seed": 0,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "b80ddca7f556aa594401ca9e8bae28ef99a86d55997b9d95a8c5e5c71d0c03f4",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.004570285091176629,
+     "source": "tletcu-repertoire-contiguous-k12-p11-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "146f8cb71c72b7ff561ec684010be490bdd5941541755a2f598b6b2cd37518d5",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.004594941371275733,
+     "source": "tletcu-repertoire-contiguous-k12-p11-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletcu-g11.json",
+   "shipped_seed": 0
+  },
+  {
+   "set": "tletcl",
+   "group": 0,
+   "half": "",
+   "characters": [
+    "U+0461",
+    "U+0463",
+    "U+0465",
+    "U+0467",
+    "U+0469",
+    "U+046B",
+    "U+046D",
+    "U+046F"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 0,
+   "lower_error_seed": 0,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "e79b0fe37f71050c7f8928faf80763b9273ec0106f23510367339380de6c41d0",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.004047901927454707,
+     "source": "tletcl-repertoire-contiguous-k12-p0-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "cda628006deb642c5ef056f5b8e3b6410f21554ee109db273e3ed0cc9e129e74",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.004049118021309066,
+     "source": "tletcl-repertoire-contiguous-k12-p0-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletcl-g0.json",
+   "shipped_seed": 0
+  },
+  {
+   "set": "tletcl",
+   "group": 1,
+   "half": "",
+   "characters": [
+    "U+0471",
+    "U+0473",
+    "U+0475",
+    "U+0477",
+    "U+0479",
+    "U+047B",
+    "U+047D",
+    "U+047F"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "ef962952463cc274f6571631b21ada4ddef9ecebf67bcb8c15cf5f10abfdb476",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.00363324480955877,
+     "source": "tletcl-repertoire-contiguous-k12-p1-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "fc342c36d48d69a1d4a18872622ae40f5107a0bbbc7470891bc095fa0b03191e",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0036025777808390558,
+     "source": "tletcl-repertoire-contiguous-k12-p1-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletcl-g1.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletcl",
+   "group": 2,
+   "half": "",
+   "characters": [
+    "U+0481",
+    "U+048B",
+    "U+048D",
+    "U+048F",
+    "U+0493",
+    "U+0495",
+    "U+0497",
+    "U+0499"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "7f9883007a23713d61d452bed1597604daded7929d63befd2a782c85c0caafcd",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0035576634739603228,
+     "source": "tletcl-repertoire-contiguous-k12-p2-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "efd7d8e4a7de8db80c441fe6fa8b928672de4df17dd50f948a305826dfb9c229",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.003543429086372877,
+     "source": "tletcl-repertoire-contiguous-k12-p2-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletcl-g2.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletcl",
+   "group": 3,
+   "half": "",
+   "characters": [
+    "U+049B",
+    "U+049D",
+    "U+049F",
+    "U+04A1",
+    "U+04A3",
+    "U+04A5",
+    "U+04A7",
+    "U+04A9"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "861785ea783e615ce5106f4092ad76ec4a70e899019891674d109f4fa04fabf3",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.003770874740439467,
+     "source": "tletcl-repertoire-contiguous-k12-p3-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "3ab9073c9bc721e1e9b8e07a34a8785fe5da9c45b5b43ad288bed88ac4cb0795",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0037395670951809734,
+     "source": "tletcl-repertoire-contiguous-k12-p3-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletcl-g3.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletcl",
+   "group": 4,
+   "half": "",
+   "characters": [
+    "U+04AB",
+    "U+04AD",
+    "U+04AF",
+    "U+04B1",
+    "U+04B3",
+    "U+04B5",
+    "U+04B7",
+    "U+04B9"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "942f962def7f8857fbc9e873b435cc177d2fed1c802744484eb179858bbd2d03",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.003282962235971354,
+     "source": "tletcl-repertoire-contiguous-k12-p4-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "479fa23c8763eb7b0ff38784751c3fc248bd53fe7d489b501cc9ba19da6fdacc",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0032686128348965817,
+     "source": "tletcl-repertoire-contiguous-k12-p4-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletcl-g4.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletcl",
+   "group": 5,
+   "half": "",
+   "characters": [
+    "U+04BB",
+    "U+04BD",
+    "U+04BF",
+    "U+04C4",
+    "U+04C6",
+    "U+04C8",
+    "U+04CA",
+    "U+04CC"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "9276ef5cd7ec86773e2e38b95fb685c1ab338a21843a631f7f934b15a84d7de4",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.003572139457295028,
+     "source": "tletcl-repertoire-contiguous-k12-p5-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "1dc6d78070d094dc316a58eb15206af821f786820ac4b8cf054c2f4e73659eea",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.003517242153369201,
+     "source": "tletcl-repertoire-contiguous-k12-p5-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletcl-g5.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletcl",
+   "group": 6,
+   "half": "",
+   "characters": [
+    "U+04CE",
+    "U+04CF",
+    "U+04D5",
+    "U+04D9",
+    "U+04DB",
+    "U+04E1",
+    "U+04E9",
+    "U+04EB"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "ab12f420f859dd7215c689e4078fbe36feacccc64ff86f848bf18f520894a85e",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0031013358044826114,
+     "source": "tletcl-repertoire-contiguous-k12-p6-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "6365492bbeea27937fcf2cb26def4eba7ca327f1a8a8dde208e0f34aea65efcb",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0030720829017809592,
+     "source": "tletcl-repertoire-contiguous-k12-p6-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletcl-g6.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletcl",
+   "group": 7,
+   "half": "",
+   "characters": [
+    "U+04F7",
+    "U+04FB",
+    "U+04FD",
+    "U+04FF",
+    "U+0501",
+    "U+0503",
+    "U+0505",
+    "U+0507"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 0,
+   "lower_error_seed": 0,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "f864a5bc058d0e8a47cbb3c3f3f89a7c751ad28f9520cfb49fcc662de03289d4",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.002934537682449445,
+     "source": "tletcl-repertoire-contiguous-k12-p7-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "0596881f15208cc23503735bdd45138345cebe57a9e21781a73d9a402180fc11",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.002935347438324243,
+     "source": "tletcl-repertoire-contiguous-k12-p7-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletcl-g7.json",
+   "shipped_seed": 0
+  },
+  {
+   "set": "tletcl",
+   "group": 8,
+   "half": "",
+   "characters": [
+    "U+0509",
+    "U+050B",
+    "U+050D",
+    "U+050F",
+    "U+0511",
+    "U+0513",
+    "U+0515",
+    "U+0517"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "4cdcf4c4e7a9c921d356a9bc82d334a5f7f1709f7286f7e753e0385e865e37e7",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0033035492427491895,
+     "source": "tletcl-repertoire-contiguous-k12-p8-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "98f0bc7f7e464eab538fa695d68775130336c9369cd41b65659b69f7d57e0134",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.003277469877502881,
+     "source": "tletcl-repertoire-contiguous-k12-p8-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletcl-g8.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletcl",
+   "group": 9,
+   "half": "",
+   "characters": [
+    "U+0519",
+    "U+051B",
+    "U+051D",
+    "U+051F",
+    "U+0521",
+    "U+0523",
+    "U+0525",
+    "U+A645"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "9158ab1e615663b8c09049a71643ed76f9bc21e4bd275180d0849cd2ac070e4e",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.003660680122266058,
+     "source": "tletcl-repertoire-contiguous-k12-p9-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "9ccc91bf0b6dacdb9acbe4db084fb884c142ab3c850185f34207dc8cc11ce9bd",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0036571554034405076,
+     "source": "tletcl-repertoire-contiguous-k12-p9-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletcl-g9.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletcl",
+   "group": 10,
+   "half": "",
+   "characters": [
+    "U+A647",
+    "U+A64D",
+    "U+A651",
+    "U+A655",
+    "U+A657",
+    "U+A663",
+    "U+A665",
+    "U+A667"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "f1a86e30437d7423b5c79e5d75f62fb6f65325579ed0e8435ca9dcd03f1d6a89",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0038308087726666904,
+     "source": "tletcl-repertoire-contiguous-k12-p10-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "35c0c5d2140f2b286e9432cf50346d0b95c5f0c6213130b30befb651e4201d35",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.003796680801315233,
+     "source": "tletcl-repertoire-contiguous-k12-p10-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletcl-g10.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletcl",
+   "group": 11,
+   "half": "",
+   "characters": [
+    "U+A669",
+    "U+A66B",
+    "U+A66D",
+    "U+A66E",
+    "U+A68B",
+    "U+A68D",
+    "U+A695",
+    "U+A699"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "1e3a827a115139d62478b4186e9b011abf04ec619d7645bae88e5a21cce09a28",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0035494661618334553,
+     "source": "tletcl-repertoire-contiguous-k12-p11-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "96a32218a4553fa17ce6e8581d6ad88c3c4261f4b34a56025506a482ee237200",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.003519767905042196,
+     "source": "tletcl-repertoire-contiguous-k12-p11-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletcl-g11.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletgu",
+   "group": 0,
+   "half": "",
+   "characters": [
+    "U+0370",
+    "U+0372",
+    "U+0376",
+    "U+037F",
+    "U+03CF",
+    "U+03D2"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "1ccdbb3d33915b7b5f845ce318c188b3147d81a0eb8b1437a6a763934c0bab25",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0036930161295458674,
+     "source": "tletgu-repertoire-contiguous-k4-p0-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "db7749db2231b234f216347c6e684b5d2c60414f7bac839e3fcc856399287156",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.003689471004892968,
+     "source": "tletgu-repertoire-contiguous-k4-p0-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletgu-g0.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletgu",
+   "group": 1,
+   "half": "",
+   "characters": [
+    "U+03D3",
+    "U+03D4",
+    "U+03D8",
+    "U+03DA",
+    "U+03DC",
+    "U+03DE",
+    "U+03E0"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 0,
+   "lower_error_seed": 0,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "f198df7456da656136df9ba16670c926872be88cb4f60874f7824af12c2d575f",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0028380091812106826,
+     "source": "tletgu-repertoire-contiguous-k4-p1-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "02db7806b2dd9e8898da706df646382ea795ebab7b852fbb7833bfa4c5c12b2c",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.002846839100432893,
+     "source": "tletgu-repertoire-contiguous-k4-p1-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletgu-g1.json",
+   "shipped_seed": 0
+  },
+  {
+   "set": "tletgu",
+   "group": 2,
+   "half": "",
+   "characters": [
+    "U+03E2",
+    "U+03E4",
+    "U+03E6",
+    "U+03E8",
+    "U+03EA",
+    "U+03EC",
+    "U+03EE"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "35c6f0c2d3175f96b05f8c5d1dbca5c93f8fefbebde1469c6d8d78660acdb133",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.004355998604469711,
+     "source": "tletgu-repertoire-contiguous-k4-p2-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "a6efc5bf304cd34f293ca85b1b8aaad02d7b55805bab36db65ed670becc63f5a",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.004354851264950065,
+     "source": "tletgu-repertoire-contiguous-k4-p2-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletgu-g2.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletgu",
+   "group": 3,
+   "half": "",
+   "characters": [
+    "U+03F4",
+    "U+03F7",
+    "U+03F9",
+    "U+03FA",
+    "U+03FD",
+    "U+03FE",
+    "U+03FF"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "0841a135a3146cd1fdc2c3cc786ef220aae8a286733fd22f4bb8b4e4b283db38",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0030884367325121447,
+     "source": "tletgu-repertoire-contiguous-k4-p3-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "f4506dcc046d368c6dcb83f950fe6ccd6692bcfd3ee22f3602ede6850f9c0f23",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0030656127048478946,
+     "source": "tletgu-repertoire-contiguous-k4-p3-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletgu-g3.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletgl",
+   "group": 0,
+   "half": "",
+   "characters": [
+    "U+0371",
+    "U+0373",
+    "U+0377",
+    "U+037B",
+    "U+037C",
+    "U+037D",
+    "U+03D0",
+    "U+03D1"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "80b564069b4abeaff1cccc67b4cdf4e8aa137e621f4a29a28e4714df800f5306",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0025421781247132458,
+     "source": "tletgl-repertoire-contiguous-k4-p0-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "4c0373b8b9d050185eb01add076f9e0728a0161c859440cfa12828b767728b58",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0025230291381982775,
+     "source": "tletgl-repertoire-contiguous-k4-p0-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletgl-g0.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletgl",
+   "group": 1,
+   "half": "",
+   "characters": [
+    "U+03D5",
+    "U+03D6",
+    "U+03D7",
+    "U+03D9",
+    "U+03DB",
+    "U+03DD",
+    "U+03DF",
+    "U+03E1"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 0,
+   "lower_error_seed": 0,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "b00f6256aff5e8578f0e333ac1a562b0efc7c92ab2ddaee649e2609153c32191",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0033313108093958967,
+     "source": "tletgl-repertoire-contiguous-k4-p1-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "48c8478f6ff904ab7c266701dd77d58f981ea0d6530772163cddc53bb5645a1a",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.003345947392517701,
+     "source": "tletgl-repertoire-contiguous-k4-p1-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletgl-g1.json",
+   "shipped_seed": 0
+  },
+  {
+   "set": "tletgl",
+   "group": 2,
+   "half": "",
+   "characters": [
+    "U+03E3",
+    "U+03E5",
+    "U+03E7",
+    "U+03E9",
+    "U+03EB",
+    "U+03ED",
+    "U+03EF",
+    "U+03F0"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 0,
+   "lower_error_seed": 0,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "32919c2e771f1b2d848bf5a31b110ee3007be3dc82b26c713ad088f13597d404",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.003313158405944705,
+     "source": "tletgl-repertoire-contiguous-k4-p2-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "bff89722233cb7b6941359a09086bd79d80f56677dd1dbe2bacb711ae522646b",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0033419485456154994,
+     "source": "tletgl-repertoire-contiguous-k4-p2-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletgl-g2.json",
+   "shipped_seed": 0
+  },
+  {
+   "set": "tletgl",
+   "group": 3,
+   "half": "",
+   "characters": [
+    "U+03F1",
+    "U+03F2",
+    "U+03F3",
+    "U+03F5",
+    "U+03F6",
+    "U+03F8",
+    "U+03FB",
+    "U+03FC",
+    "U+1FBE"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 0,
+   "lower_error_seed": 0,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "7489ab74276261d8855c804988e47f46132ee034717d7e1a45afc587a28bf2fb",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.002823872297691802,
+     "source": "tletgl-repertoire-contiguous-k4-p3-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "e75d1d70839e7a9ffeb790e1434226c66d28d8e033f48c72f44f6cdfaa3101eb",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0028416915447451174,
+     "source": "tletgl-repertoire-contiguous-k4-p3-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletgl-g3.json",
+   "shipped_seed": 0
+  },
+  {
+   "set": "tletsc",
+   "group": 0,
+   "half": "",
+   "characters": [
+    "U+0262",
+    "U+026A",
+    "U+0274",
+    "U+0276",
+    "U+0280",
+    "U+0281",
+    "U+028F"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 0,
+   "lower_error_seed": 0,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "d609b54b698990c1673688c41ce1ef95e458b1cd651701a13a7d94fb3941eaa2",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.003251000105159446,
+     "source": "tletsc-repertoire-contiguous-k8-p0-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "442af54e4cae146bc556e0448800b3f5aae9b85d7d4ab83fd6fe7c391b88430d",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.00327712942435894,
+     "source": "tletsc-repertoire-contiguous-k8-p0-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletsc-g0.json",
+   "shipped_seed": 0
+  },
+  {
+   "set": "tletsc",
+   "group": 1,
+   "half": "",
+   "characters": [
+    "U+0299",
+    "U+029B",
+    "U+029C",
+    "U+029F",
+    "U+1D00",
+    "U+1D01",
+    "U+1D02",
+    "U+1D03"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 0,
+   "lower_error_seed": 0,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "451e2a5053ebd3d3af23bd1f15852c48568423b97ceada5af28d2d69c9bf2596",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0034995674820189984,
+     "source": "tletsc-repertoire-contiguous-k8-p1-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "46606ed4cf232be95d5070c301dceb7d4ec261a77987061f49a12804dd5188ed",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0035107533573561036,
+     "source": "tletsc-repertoire-contiguous-k8-p1-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletsc-g1.json",
+   "shipped_seed": 0
+  },
+  {
+   "set": "tletsc",
+   "group": 2,
+   "half": "",
+   "characters": [
+    "U+1D04",
+    "U+1D05",
+    "U+1D06",
+    "U+1D07",
+    "U+1D08",
+    "U+1D09",
+    "U+1D0A"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "8ae8b8983dd0b75442ebd7969ba967da8037e08e5efa80f9f7dd30ea5c3d2810",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0028817621031997816,
+     "source": "tletsc-repertoire-contiguous-k8-p2-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "a7f1f24e18eccb308886479b3efef6fbf69bee21ce69ca5c192f795d9c5d4018",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0028817009546660954,
+     "source": "tletsc-repertoire-contiguous-k8-p2-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletsc-g2.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletsc",
+   "group": 3,
+   "half": "",
+   "characters": [
+    "U+1D0B",
+    "U+1D0C",
+    "U+1D0D",
+    "U+1D0E",
+    "U+1D0F",
+    "U+1D10",
+    "U+1D11",
+    "U+1D12"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 0,
+   "lower_error_seed": 0,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "4b77edb7170ccaa4895597126d0840d30dd7c25f854a649bfede10d204449032",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0026998627630140013,
+     "source": "tletsc-repertoire-contiguous-k8-p3-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "1a030d00531fc927325506d9af6be123d439370dfe1436ff3b1d77859263f71e",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.002715975332345503,
+     "source": "tletsc-repertoire-contiguous-k8-p3-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletsc-g3.json",
+   "shipped_seed": 0
+  },
+  {
+   "set": "tletsc",
+   "group": 4,
+   "half": "",
+   "characters": [
+    "U+1D13",
+    "U+1D14",
+    "U+1D16",
+    "U+1D17",
+    "U+1D18",
+    "U+1D19",
+    "U+1D1A"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "90f0c9d82eeb08543c20b5e6fb06f61678d295afff181a99b9f02b6bc1160337",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0026160992122077867,
+     "source": "tletsc-repertoire-contiguous-k8-p4-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "f2253d1c9c71193a2c5301599c883449e3f6dc32b693ef0a2f869fb0b3d557ea",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.002601521893493122,
+     "source": "tletsc-repertoire-contiguous-k8-p4-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletsc-g4.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletsc",
+   "group": 5,
+   "half": "",
+   "characters": [
+    "U+1D1B",
+    "U+1D1C",
+    "U+1D1D",
+    "U+1D1E",
+    "U+1D1F",
+    "U+1D20",
+    "U+1D21",
+    "U+1D22"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "221df1d51bf2d11c343ccaf47ec825e7dbbdf25c6b53bd80494ad4ae9aadedc7",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0030678980619995855,
+     "source": "tletsc-repertoire-contiguous-k8-p5-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "b9709ab4dfa69310313e6acb0a5fa69137a4216618c6f94093dec486e66d54b1",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0030609273017034866,
+     "source": "tletsc-repertoire-contiguous-k8-p5-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletsc-g5.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletsc",
+   "group": 6,
+   "half": "",
+   "characters": [
+    "U+1D23",
+    "U+1D26",
+    "U+1D27",
+    "U+1D28",
+    "U+1D29",
+    "U+1D2A",
+    "U+1D2B"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "28e1f67b93f927816fa63a62fd2351790a93417c999dea9c0a2deb16877905a1",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.003042300719590414,
+     "source": "tletsc-repertoire-contiguous-k8-p6-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "d26470fada9244bb55ea02091b922b2384c115a415b94ce0c9831c8004c1fa52",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0030256149087411663,
+     "source": "tletsc-repertoire-contiguous-k8-p6-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletsc-g6.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletsc",
+   "group": 7,
+   "half": "",
+   "characters": [
+    "U+1D77",
+    "U+1D7B",
+    "U+1D7D",
+    "U+1D85",
+    "U+2C7B",
+    "U+A730",
+    "U+A731",
+    "U+A7FA"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 0,
+   "lower_error_seed": 0,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "d275ddac56c5fdc6f6037ca191e2780fb31709398890964a3b98d993568bd167",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.003487189310059572,
+     "source": "tletsc-repertoire-contiguous-k8-p7-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "0f163c933e89367f4a35da5fb3f0cc190655b846ee5c01546ae765929cc09958",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.00351516456673077,
+     "source": "tletsc-repertoire-contiguous-k8-p7-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletsc-g7.json",
+   "shipped_seed": 0
+  },
+  {
+   "set": "tletmu",
+   "group": 0,
+   "half": "",
+   "characters": [
+    "U+02B6",
+    "U+1D2C",
+    "U+1D2D",
+    "U+1D2E",
+    "U+1D30",
+    "U+1D31",
+    "U+1D32"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [
+    {
+     "rule": "24x48 firm",
+     "declared": 0.0006356336805555555,
+     "perfect": 0.0008680555555555555,
+     "applied": 0.0009548611111111112
+    },
+    {
+     "rule": "24x48 iou_mean",
+     "declared": 0.9449324959405635,
+     "perfect": 0.8767944209191733,
+     "applied": 0.8644738630110906
+    }
+   ],
+   "seeds": {
+    "0": {
+     "sha256": "8b5890dae7fca10992e149becf1c85c1f924ade27ab79c6f7bb93d6f8f169b4a",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.003864141585793169,
+     "source": "tletmu-repertoire-contiguous-k4-p0-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "5027ae22f5eb0cb2373b98714b89c6f48ba270594d3ef9da69d0e5b14481e296",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0038592318555207127,
+     "source": "tletmu-repertoire-contiguous-k4-p0-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletmu-g0.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletmu",
+   "group": 1,
+   "half": "",
+   "characters": [
+    "U+1D33",
+    "U+1D34",
+    "U+1D35",
+    "U+1D36",
+    "U+1D37",
+    "U+1D38",
+    "U+1D39",
+    "U+1D3A"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [
+    {
+     "rule": "24x48 firm",
+     "declared": 0.0006356336805555555,
+     "perfect": 0.0010850694444444445,
+     "applied": 0.001193576388888889
+    },
+    {
+     "rule": "24x48 iou_mean",
+     "declared": 0.9449324959405635,
+     "perfect": 0.8265374990658347,
+     "applied": 0.8091912489724182
+    }
+   ],
+   "seeds": {
+    "0": {
+     "sha256": "6f047fb78afb6805a75f784de0eda56254112eb305c8c736396c06338dbe1c0f",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.00375158232539737,
+     "source": "tletmu-repertoire-contiguous-k4-p1-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "894f467c56a0f3de84157f0ef91991b5c0fbdae326a3a57396ee4a29d3ca97a9",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0037347252267257622,
+     "source": "tletmu-repertoire-contiguous-k4-p1-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletmu-g1.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletmu",
+   "group": 2,
+   "half": "",
+   "characters": [
+    "U+1D3B",
+    "U+1D3C",
+    "U+1D3D",
+    "U+1D3E",
+    "U+1D3F",
+    "U+1D40",
+    "U+1D41"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [
+    {
+     "rule": "24x48 iou_mean",
+     "declared": 0.9449324959405635,
+     "perfect": 0.8778094308101414,
+     "applied": 0.8655903738911556
+    }
+   ],
+   "seeds": {
+    "0": {
+     "sha256": "9b3538f11bc9b87648ba17b73cc664eaec92842d75fe8d9a98d2c7f2bf30d302",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0032078010346075253,
+     "source": "tletmu-repertoire-contiguous-k4-p2-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "46acd3d747596bb2a40d7156c55596e25a33b697aa9dcdfa398fa05e358ed4bc",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.00320648779771069,
+     "source": "tletmu-repertoire-contiguous-k4-p2-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletmu-g2.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletmu",
+   "group": 3,
+   "half": "",
+   "characters": [
+    "U+1D42",
+    "U+1DA6",
+    "U+1DA7",
+    "U+1DAB",
+    "U+1DB0",
+    "U+1DB8",
+    "U+2C7D",
+    "U+A7F8"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 0,
+   "lower_error_seed": 0,
+   "limits_eased": [
+    {
+     "rule": "24x48 firm",
+     "declared": 0.0006356336805555555,
+     "perfect": 0.0010850694444444445,
+     "applied": 0.001193576388888889
+    },
+    {
+     "rule": "24x48 iou_mean",
+     "declared": 0.9449324959405635,
+     "perfect": 0.9060351182677052,
+     "applied": 0.8966386300944758
+    }
+   ],
+   "seeds": {
+    "0": {
+     "sha256": "087128e183425b8e90a932b18b424fef699e9d70cd036508e664710e2fd453ee",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0026033612327106916,
+     "source": "tletmu-repertoire-contiguous-k4-p3-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "5602abfec2a9ca6e56a32a555f3f540357ad0a263ee2c9a41161145b1d623476",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.00260349411231194,
+     "source": "tletmu-repertoire-contiguous-k4-p3-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletmu-g3.json",
+   "shipped_seed": 0
+  },
+  {
+   "set": "tletml",
+   "group": 0,
+   "half": "",
+   "characters": [
+    "U+02B0",
+    "U+02B1",
+    "U+02B2",
+    "U+02B3",
+    "U+02B4",
+    "U+02B5",
+    "U+02B7"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [
+    {
+     "rule": "24x48 iou_mean",
+     "declared": 0.9449324959405635,
+     "perfect": 0.9282654899281148,
+     "applied": 0.9210920389209263
+    }
+   ],
+   "seeds": {
+    "0": {
+     "sha256": "15beadfbc6180b150a9c9e50cacaa9f3ade6076587220f6e1312f1a3a4bdb2ce",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.002264668702125727,
+     "source": "tletml-repertoire-contiguous-k10-p0-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "b8db2a288fb4020d568a6798e10e1de77049130e823e9b900d4c09e91abfb76f",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.002261396608359757,
+     "source": "tletml-repertoire-contiguous-k10-p0-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletml-g0.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletml",
+   "group": 1,
+   "half": "",
+   "characters": [
+    "U+02B8",
+    "U+02E0",
+    "U+02E1",
+    "U+02E2",
+    "U+02E3",
+    "U+02E4",
+    "U+1D43",
+    "U+1D44"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 0,
+   "lower_error_seed": 0,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "81251f0f8aa65b0a4dd07a873ad4c46ba15b4dc57be953071f09701ebfab6926",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0015948091895552352,
+     "source": "tletml-repertoire-contiguous-k10-p1-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "997b9efa404dc5af4cae82c9ba963fe35f5b518ba3f2e8f61ba2d09bb3c292c3",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0016072646928175043,
+     "source": "tletml-repertoire-contiguous-k10-p1-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletml-g1.json",
+   "shipped_seed": 0
+  },
+  {
+   "set": "tletml",
+   "group": 2,
+   "half": "",
+   "characters": [
+    "U+1D45",
+    "U+1D46",
+    "U+1D47",
+    "U+1D48",
+    "U+1D49",
+    "U+1D4A",
+    "U+1D4B",
+    "U+1D4C"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [
+    {
+     "rule": "24x48 iou_mean",
+     "declared": 0.9449324959405635,
+     "perfect": 0.9432922823266691,
+     "applied": 0.937621510559336
+    }
+   ],
+   "seeds": {
+    "0": {
+     "sha256": "b21d566c8e741b13a4da57690c3a55ff0eaf083c4b5fed0bc12749bcab873f69",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.002360265852378992,
+     "source": "tletml-repertoire-contiguous-k10-p2-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "a61b6d117688bf81f74c54da988b53d62ac2e3e131206bd5718d609125da241e",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0023472491981616863,
+     "source": "tletml-repertoire-contiguous-k10-p2-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletml-g2.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletml",
+   "group": 3,
+   "half": "",
+   "characters": [
+    "U+1D4D",
+    "U+1D4E",
+    "U+1D4F",
+    "U+1D50",
+    "U+1D51",
+    "U+1D52",
+    "U+1D53"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 0,
+   "lower_error_seed": 0,
+   "limits_eased": [
+    {
+     "rule": "24x48 iou_mean",
+     "declared": 0.9449324959405635,
+     "perfect": 0.9173281457482635,
+     "applied": 0.9090609603230898
+    }
+   ],
+   "seeds": {
+    "0": {
+     "sha256": "2edf0fb2c05d2bf561d9e8192bff7442c7387da1a9206156bda03f36b5bda9fe",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.002642938994713837,
+     "source": "tletml-repertoire-contiguous-k10-p3-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "5b1f5bc2cdee84aa9ebc207574b1919319e293965df5de78dc9a8b38594d41e1",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0026516072185976164,
+     "source": "tletml-repertoire-contiguous-k10-p3-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletml-g3.json",
+   "shipped_seed": 0
+  },
+  {
+   "set": "tletml",
+   "group": 4,
+   "half": "",
+   "characters": [
+    "U+1D54",
+    "U+1D55",
+    "U+1D56",
+    "U+1D57",
+    "U+1D58",
+    "U+1D59",
+    "U+1D5A",
+    "U+1D5B"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [
+    {
+     "rule": "10x20 firm",
+     "declared": 0.0005,
+     "perfect": 0.000625,
+     "applied": 0.0006875000000000001
+    },
+    {
+     "rule": "24x48 iou_mean",
+     "declared": 0.9449324959405635,
+     "perfect": 0.9216186162419594,
+     "applied": 0.9137804778661553
+    }
+   ],
+   "seeds": {
+    "0": {
+     "sha256": "cf2f2e770ae38b775c614e70cbc07019a503b2c61d433a3714222b7368174752",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0022142955410042,
+     "source": "tletml-repertoire-contiguous-k10-p4-s0.json",
+     "trained_again_after_drawing_fix": true
+    },
+    "1": {
+     "sha256": "5e755145b64ac1e066239acc4effe44f5ca29c02290b5448b7bc65b1a42570d3",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0021954080742337587,
+     "source": "tletml-repertoire-contiguous-k10-p4-s1.json",
+     "trained_again_after_drawing_fix": true
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletml-g4.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletml",
+   "group": 5,
+   "half": "",
+   "characters": [
+    "U+1D5D",
+    "U+1D5E",
+    "U+1D5F",
+    "U+1D60",
+    "U+1D61",
+    "U+1D78",
+    "U+1D9B",
+    "U+1D9C"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [
+    {
+     "rule": "24x48 firm",
+     "declared": 0.0006356336805555555,
+     "perfect": 0.0008680555555555555,
+     "applied": 0.0009548611111111112
+    },
+    {
+     "rule": "24x48 iou_mean",
+     "declared": 0.9449324959405635,
+     "perfect": 0.9159214853239156,
+     "applied": 0.9075136338563071
+    }
+   ],
+   "seeds": {
+    "0": {
+     "sha256": "3632dd03acdd25e9941c519ee0951db3cd3ca84f437999d8aed6051e06bb77eb",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0024753478986288733,
+     "source": "tletml-repertoire-contiguous-k10-p5-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "cdea9e00f2a4fb2c38af6ef6ca1c950ca122a1ef5921c8f2d507f14c16fb9eb3",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.002457357225163529,
+     "source": "tletml-repertoire-contiguous-k10-p5-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletml-g5.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletml",
+   "group": 6,
+   "half": "",
+   "characters": [
+    "U+1D9D",
+    "U+1D9E",
+    "U+1D9F",
+    "U+1DA0",
+    "U+1DA1",
+    "U+1DA2",
+    "U+1DA3"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 0,
+   "lower_error_seed": 0,
+   "limits_eased": [
+    {
+     "rule": "24x48 iou_mean",
+     "declared": 0.9449324959405635,
+     "perfect": 0.9292727573367088,
+     "applied": 0.9222000330703797
+    }
+   ],
+   "seeds": {
+    "0": {
+     "sha256": "e46334dbaefc98ced6d14d5b44fc5f6eb69302efd9b8a7f303a2595ce92b7bd3",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.002624011853532422,
+     "source": "tletml-repertoire-contiguous-k10-p6-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "7768125a1d9d13cc9cb6005de227befa8a59eb5cc8542a8de585a9877fd6f004",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0026405182739143215,
+     "source": "tletml-repertoire-contiguous-k10-p6-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletml-g6.json",
+   "shipped_seed": 0
+  },
+  {
+   "set": "tletml",
+   "group": 7,
+   "half": "",
+   "characters": [
+    "U+1DA4",
+    "U+1DA5",
+    "U+1DA8",
+    "U+1DA9",
+    "U+1DAA",
+    "U+1DAC",
+    "U+1DAD",
+    "U+1DAE"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 0,
+   "lower_error_seed": 0,
+   "limits_eased": [
+    {
+     "rule": "24x48 firm",
+     "declared": 0.0006356336805555555,
+     "perfect": 0.0006510416666666666,
+     "applied": 0.0007161458333333334
+    }
+   ],
+   "seeds": {
+    "0": {
+     "sha256": "83bbaa9ee8f9dbedee31d81851dc4f4b8f38d5c7aff5e6b05cd62fd4c210f463",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.002533600592869334,
+     "source": "tletml-repertoire-contiguous-k10-p7-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "336aa43435a7428c8a185e266fb0fb5cad0d8187ff1e15d2c7a39bdbb6f0596c",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0025407264183741063,
+     "source": "tletml-repertoire-contiguous-k10-p7-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletml-g7.json",
+   "shipped_seed": 0
+  },
+  {
+   "set": "tletml",
+   "group": 8,
+   "half": "",
+   "characters": [
+    "U+1DAF",
+    "U+1DB1",
+    "U+1DB2",
+    "U+1DB3",
+    "U+1DB4",
+    "U+1DB5",
+    "U+1DB6",
+    "U+1DB7"
+   ],
+   "both_seeds_pass": false,
+   "selected_seed": null,
+   "lower_error_seed": 1,
+   "limits_eased": [
+    {
+     "rule": "10x20 firm",
+     "declared": 0.0005,
+     "perfect": 0.000625,
+     "applied": 0.0006875000000000001
+    },
+    {
+     "rule": "24x48 firm",
+     "declared": 0.0006356336805555555,
+     "perfect": 0.0007595486111111111,
+     "applied": 0.0008355034722222223
+    },
+    {
+     "rule": "24x48 iou_mean",
+     "declared": 0.9449324959405635,
+     "perfect": 0.943623368890044,
+     "applied": 0.9379857057790484
+    }
+   ],
+   "seeds": {
+    "0": {
+     "sha256": "45e52eb5a82f33eb3e7c7a2622cf5b5702f9756278e88b6a12ec654a95560803",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.002457899128785357,
+     "source": "tletml-repertoire-contiguous-k10-p8-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "efbaadf1ba012d8159e89b93e1638db3cf27dd2810b8311ba05d4f14b855ad98",
+     "gates_passed": false,
+     "fail_count": 1,
+     "fails": [
+      "24x48 firm"
+     ],
+     "verdict": "fail",
+     "waived": [],
+     "mean_established_mae": 0.002425613475982876,
+     "source": "tletml-repertoire-contiguous-k10-p8-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": false,
+   "file": null,
+   "shipped_seed": null
+  },
+  {
+   "set": "tletml",
+   "group": 8,
+   "half": "a",
+   "characters": [
+    "U+1DAF",
+    "U+1DB1",
+    "U+1DB2",
+    "U+1DB3"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 0,
+   "lower_error_seed": 0,
+   "limits_eased": [
+    {
+     "rule": "24x48 firm",
+     "declared": 0.0006356336805555555,
+     "perfect": 0.0008680555555555555,
+     "applied": 0.0009548611111111112
+    },
+    {
+     "rule": "24x48 iou_mean",
+     "declared": 0.9449324959405635,
+     "perfect": 0.9490237084553637,
+     "applied": 0.9439260793009
+    }
+   ],
+   "seeds": {
+    "0": {
+     "sha256": "c465638f73958569a4b8f05ce5046263121d43b56869a8f656d755bf491b929e",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.002443351516073259,
+     "source": "tletml-repertoire-contiguous-k20-p16-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "de17b6759d8e3cbf0b85477a16a332b54ce8a1ed27093db51307a712426d783b",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0024447150596339875,
+     "source": "tletml-repertoire-contiguous-k20-p16-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletml-g8a.json",
+   "shipped_seed": 0
+  },
+  {
+   "set": "tletml",
+   "group": 8,
+   "half": "b",
+   "characters": [
+    "U+1DB4",
+    "U+1DB5",
+    "U+1DB6",
+    "U+1DB7"
+   ],
+   "both_seeds_pass": false,
+   "selected_seed": null,
+   "lower_error_seed": 0,
+   "limits_eased": [
+    {
+     "rule": "10x20 firm",
+     "declared": 0.0005,
+     "perfect": 0.00125,
+     "applied": 0.0013750000000000001
+    },
+    {
+     "rule": "24x48 firm",
+     "declared": 0.0006356336805555555,
+     "perfect": 0.0006510416666666666,
+     "applied": 0.0007161458333333334
+    },
+    {
+     "rule": "24x48 iou_mean",
+     "declared": 0.9449324959405635,
+     "perfect": 0.9382230293247242,
+     "applied": 0.9320453322571967
+    }
+   ],
+   "seeds": {
+    "0": {
+     "sha256": "d283a90b3c19aabd37c5a096ca9f8de1a63f04361cdc61a45e457fdd9278930d",
+     "gates_passed": false,
+     "fail_count": 1,
+     "fails": [
+      "24x48 firm"
+     ],
+     "verdict": "fail",
+     "waived": [],
+     "mean_established_mae": 0.002389052252207572,
+     "source": "tletml-repertoire-contiguous-k20-p17-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "7dcd38b1819bed33f2b01d89f6f2e0bf5217e2b021c233d8d9bde51aa68e0b92",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0024088632004956403,
+     "source": "tletml-repertoire-contiguous-k20-p17-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": false,
+   "file": null,
+   "shipped_seed": null
+  },
+  {
+   "set": "tletml",
+   "group": 9,
+   "half": "",
+   "characters": [
+    "U+1DB9",
+    "U+1DBA",
+    "U+1DBB",
+    "U+1DBC",
+    "U+1DBD",
+    "U+1DBE",
+    "U+1DBF",
+    "U+A7F9"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [
+    {
+     "rule": "24x48 iou_mean",
+     "declared": 0.9449324959405635,
+     "perfect": 0.9280053553612423,
+     "applied": 0.9208058908973665
+    }
+   ],
+   "seeds": {
+    "0": {
+     "sha256": "2fda88d1dde9e45704f322964ce61e574443e7a606288108d5fa21d38bfc710b",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.002368324542961394,
+     "source": "tletml-repertoire-contiguous-k10-p9-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "df7db77e4a47112f6b8ec4b098ff630093a99b73eb8a1fc5fbfae161252bb036",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0023607083179134256,
+     "source": "tletml-repertoire-contiguous-k10-p9-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletml-g9.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletsb",
+   "group": 0,
+   "half": "",
+   "characters": [
+    "U+1D62",
+    "U+1D63",
+    "U+1D64",
+    "U+1D65",
+    "U+1D66",
+    "U+1D67",
+    "U+1D68",
+    "U+1D69",
+    "U+1D6A",
+    "U+2C7C"
+   ],
+   "both_seeds_pass": false,
+   "selected_seed": null,
+   "lower_error_seed": 1,
+   "limits_eased": [
+    {
+     "rule": "24x48 firm",
+     "declared": 0.0006356336805555555,
+     "perfect": 0.0006076388888888889,
+     "applied": 0.0006684027777777779
+    },
+    {
+     "rule": "24x48 iou_mean",
+     "declared": 0.9449324959405635,
+     "perfect": 0.9426994960768453,
+     "applied": 0.9369694456845299
+    }
+   ],
+   "seeds": {
+    "0": {
+     "sha256": "173f2c736f0df0e2dd74018c9a8bc8e447b8a7f9663333ad52c3775b734ebfc9",
+     "gates_passed": false,
+     "fail_count": 1,
+     "fails": [
+      "24x48 iou_mean"
+     ],
+     "verdict": "fail",
+     "waived": [],
+     "mean_established_mae": 0.0022693970842131723,
+     "source": "tletsb-repertoire-contiguous-k1-p0-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "eca3dcebe202250468cce37d8cc3a9196c7263f80ae01f9991fcf7a790d0ef23",
+     "gates_passed": false,
+     "fail_count": 1,
+     "fails": [
+      "24x48 iou_mean"
+     ],
+     "verdict": "fail",
+     "waived": [],
+     "mean_established_mae": 0.0022333941713441165,
+     "source": "tletsb-repertoire-contiguous-k1-p0-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": false,
+   "file": null,
+   "shipped_seed": null
+  },
+  {
+   "set": "tletsb",
+   "group": 0,
+   "half": "a",
+   "characters": [
+    "U+1D62",
+    "U+1D63",
+    "U+1D64",
+    "U+1D65",
+    "U+1D66"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [
+    {
+     "rule": "24x48 iou_mean",
+     "declared": 0.9449324959405635,
+     "perfect": 0.9295269877897241,
+     "applied": 0.9224796865686965
+    }
+   ],
+   "seeds": {
+    "0": {
+     "sha256": "ae127ac2d5daa30ec2b25f45f4044875cb9ead11eb46b6eab223a7a9a7d976eb",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.002303283110571404,
+     "source": "tletsb-repertoire-contiguous-k2-p0-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "b9d59c5a42632494af2e7411948f9f3d0038f9e4b5f699dd11dddb68e898d287",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0022831999502765637,
+     "source": "tletsb-repertoire-contiguous-k2-p0-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletsb-g0a.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletsb",
+   "group": 0,
+   "half": "b",
+   "characters": [
+    "U+1D67",
+    "U+1D68",
+    "U+1D69",
+    "U+1D6A",
+    "U+2C7C"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 0,
+   "lower_error_seed": 0,
+   "limits_eased": [
+    {
+     "rule": "24x48 firm",
+     "declared": 0.0006356336805555555,
+     "perfect": 0.0008680555555555555,
+     "applied": 0.0009548611111111112
+    }
+   ],
+   "seeds": {
+    "0": {
+     "sha256": "b6db3773ca1909e83d37b59b9c4e87150529b397f579503278eafe65ba26021c",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.002184225739135096,
+     "source": "tletsb-repertoire-contiguous-k2-p1-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "a040767fd101a5f4a243dc994be0a5ed3b63e9769218c575772538bf6f14d2f5",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.002197998680640012,
+     "source": "tletsb-repertoire-contiguous-k2-p1-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletsb-g0b.json",
+   "shipped_seed": 0
+  },
+  {
+   "set": "tletsp",
+   "group": 0,
+   "half": "",
+   "characters": [
+    "U+02E5",
+    "U+02E6",
+    "U+02E7",
+    "U+02E8",
+    "U+02E9",
+    "U+A708",
+    "U+A709",
+    "U+A70A",
+    "U+A70B",
+    "U+A70C",
+    "U+A712"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [
+    {
+     "rule": "8x16 iou_mean",
+     "declared": 0.7035033831908831,
+     "perfect": 0.5968831168831169,
+     "applied": 0.5565714285714285
+    },
+    {
+     "rule": "24x48 iou_mean",
+     "declared": 0.9449324959405635,
+     "perfect": 0.8252827265358047,
+     "applied": 0.8078109991893851
+    },
+    {
+     "rule": "s1 8x16 iou_mean",
+     "declared": 0.5909305809364902,
+     "perfect": 0.5913734750098386,
+     "applied": 0.5505108225108224
+    }
+   ],
+   "seeds": {
+    "0": {
+     "sha256": "58f1fbd930fba5d373f5a6fb06cfa7d2827a3753862a9bcfa9c695166fc28d57",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0035388722564234872,
+     "source": "tletsp-repertoire-contiguous-k7-p0-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "fb7520601c75eae3b55ee35cbd088d9bc5b34247c45a776f644e898925c127d6",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0035251122087973986,
+     "source": "tletsp-repertoire-contiguous-k7-p0-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletsp-g0.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletsp",
+   "group": 1,
+   "half": "",
+   "characters": [
+    "U+01C0",
+    "U+01C1",
+    "U+A70D",
+    "U+A70E",
+    "U+A70F",
+    "U+A710",
+    "U+A711",
+    "U+A713",
+    "U+A714",
+    "U+A715",
+    "U+A716"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [
+    {
+     "rule": "8x16 iou_mean",
+     "declared": 0.7035033831908831,
+     "perfect": 0.6206926406926407,
+     "applied": 0.5827619047619048
+    },
+    {
+     "rule": "24x48 iou_mean",
+     "declared": 0.9449324959405635,
+     "perfect": 0.8553850745189474,
+     "applied": 0.8409235819708422
+    },
+    {
+     "rule": "s1 8x16 iou_mean",
+     "declared": 0.5909305809364902,
+     "perfect": 0.6110507674144038,
+     "applied": 0.5721558441558441
+    }
+   ],
+   "seeds": {
+    "0": {
+     "sha256": "f8c2949c21bc4bd92224dc47431eb15880c6f9f7e397bd35f065c15697944b41",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.003679826614009499,
+     "source": "tletsp-repertoire-contiguous-k7-p1-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "29fe23aa6b5a16ff4b902f76e071ef6274bf8e979105b7f3e2497d9742d893e0",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0036732547785945685,
+     "source": "tletsp-repertoire-contiguous-k7-p1-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletsp-g1.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletsp",
+   "group": 2,
+   "half": "",
+   "characters": [
+    "U+01C2",
+    "U+01C3",
+    "U+02B9",
+    "U+02BA",
+    "U+02BB",
+    "U+02BC",
+    "U+02BD",
+    "U+02BE",
+    "U+02BF",
+    "U+02C0",
+    "U+02C1"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "af3e443930a7cbebaf81a1ce62d17dd86ee863356995cdb9e81d8a63a1ee7c76",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0014431865085057464,
+     "source": "tletsp-repertoire-contiguous-k7-p2-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "11f168001d51d4a6252ec0a515186133ef353b1b136ba52733eb763f10e872fd",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.001436160848243162,
+     "source": "tletsp-repertoire-contiguous-k7-p2-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletsp-g2.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletsp",
+   "group": 3,
+   "half": "",
+   "characters": [
+    "U+02C2",
+    "U+02C3",
+    "U+02C4",
+    "U+02C5",
+    "U+02C8",
+    "U+02C9",
+    "U+02CA",
+    "U+02CB",
+    "U+02CC",
+    "U+02CD",
+    "U+02CE"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "29b05ab5687b22b7853ab69bd0b1cbc924306ef8ca7ef80a19bde028959480d9",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0009596241782701603,
+     "source": "tletsp-repertoire-contiguous-k7-p3-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "f21052d3c8ae856fa7a3e72704f006156448ab29597221830e0350139ee1f4ee",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0009455188489730723,
+     "source": "tletsp-repertoire-contiguous-k7-p3-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletsp-g3.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletsp",
+   "group": 4,
+   "half": "",
+   "characters": [
+    "U+02CF",
+    "U+02D0",
+    "U+02D1",
+    "U+02D2",
+    "U+02D3",
+    "U+02D4",
+    "U+02D5",
+    "U+02D6",
+    "U+02D7",
+    "U+02DE",
+    "U+02DF"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 0,
+   "lower_error_seed": 0,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "f872da5f93fd2c2e08b84e8eaf8a0de4aa16dda2347d6fdeef8734f89ea2d9e0",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0011723979533240763,
+     "source": "tletsp-repertoire-contiguous-k7-p4-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "0f5317402add3dc013baf0a874a79474a8dc0f313444c5cfea38a0b0e60bafd8",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0011748439424219682,
+     "source": "tletsp-repertoire-contiguous-k7-p4-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletsp-g4.json",
+   "shipped_seed": 0
+  },
+  {
+   "set": "tletsp",
+   "group": 5,
+   "half": "",
+   "characters": [
+    "U+02EC",
+    "U+02ED",
+    "U+02EE",
+    "U+02F3",
+    "U+02F7",
+    "U+0374",
+    "U+0375",
+    "U+037A",
+    "U+037E",
+    "U+0384",
+    "U+0387"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "1fdc667d6a426d420fc08a544d1d0bab6cd68241afd5decdf29dd563cae5644e",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0009247245633918228,
+     "source": "tletsp-repertoire-contiguous-k7-p5-s0.json",
+     "trained_again_after_drawing_fix": false
+    },
+    "1": {
+     "sha256": "d5fd6fe47c902ec51ff9c0ae01a331245157ef2e8bbe999b146e335d05aee049",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.000911168146448097,
+     "source": "tletsp-repertoire-contiguous-k7-p5-s1.json",
+     "trained_again_after_drawing_fix": false
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletsp-g5.json",
+   "shipped_seed": 1
+  },
+  {
+   "set": "tletsp",
+   "group": 6,
+   "half": "",
+   "characters": [
+    "U+1FEF",
+    "U+1FFD",
+    "U+A71B",
+    "U+A71C",
+    "U+A71D",
+    "U+A71E",
+    "U+A71F",
+    "U+A789",
+    "U+A78A",
+    "U+A78B",
+    "U+A78C"
+   ],
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "limits_eased": [],
+   "seeds": {
+    "0": {
+     "sha256": "81eb6335f1c129d0319edca387ded72e1a63a6e571d990867f124ebe7a2570e2",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0013001619584181092,
+     "source": "tletsp-repertoire-contiguous-k7-p6-s0.json",
+     "trained_again_after_drawing_fix": true
+    },
+    "1": {
+     "sha256": "c74aaf8f485876b0226ed76f45c803c3370cd8383db938c3ff8f876f6411bd8d",
+     "gates_passed": true,
+     "fail_count": 0,
+     "fails": [],
+     "verdict": "pass",
+     "waived": [],
+     "mean_established_mae": 0.0012974101780194112,
+     "source": "tletsp-repertoire-contiguous-k7-p6-s1.json",
+     "trained_again_after_drawing_fix": true
+    }
+   },
+   "shipped": true,
+   "file": "neuronte-term-letters-v1-tletsp-g6.json",
+   "shipped_seed": 1
+  }
+ ]
+}

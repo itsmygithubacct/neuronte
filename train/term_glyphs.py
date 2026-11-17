@@ -1,6 +1,7 @@
 """Terminal symbols made as families, for the term-* bundles.
 
-font/term-math.txt holds the shapes drawn once. This module makes the rest
+font/term-math.txt and font/term-sym.txt hold the shapes drawn once. This
+module makes the rest
 of each family from them and from the trained symbols: a shape turned,
 mirrored, flipped, negated with a stroke, stacked over another, filled or
 enclosed. Arrows are built in a frame of their own (along the shaft, across
@@ -11,7 +12,8 @@ Shapes are glyphs.py's, in cell units. The helpers here take grid units, 10
 to a cell width, as the font files do. No font was read.
 
     math()     {char: shapes} for the tmath tier (neuronte-term-math-v1)
-    FAMILY     {code point: family name}, what train/term_groups.py groups by
+    sym()      {char: shapes} for the tsym tier (neuronte-term-symbol-v1)
+    FAMILY     {code point: family name}, what tools/term-partition.py groups by
 """
 import math as m
 import os
@@ -19,10 +21,18 @@ import os
 import strokes
 
 MATH = os.path.join(strokes.ROOT, "font", "term-math.txt")
+SYMBOL = os.path.join(strokes.ROOT, "font", "term-sym.txt")
+DRAWN = {"math": MATH, "sym": SYMBOL}
 CY = 9.75          # the maths line
 T = {}             # code point -> function making its shapes
 FAMILY = {}        # code point -> family
+TIER = {}          # code point made here -> tier
 _fam = [None]
+_tier = ["math"]
+
+
+def tier(name):
+    _tier[0] = name
 
 
 def fam(name):
@@ -34,6 +44,19 @@ def d(cp, fn):
         raise ValueError(f"U+{cp:04X} is made twice")
     T[cp] = fn
     FAMILY[cp] = _fam[0]
+    TIER[cp] = _tier[0]
+
+
+def drawn_families(path):
+    """{code point: family} from a drawing file's "# family NAME" lines."""
+    out, name = {}, None
+    with open(path) as fh:
+        for line in fh:
+            if line.startswith("# family "):
+                name = line.split()[2]
+            elif line.startswith("U+"):
+                out[int(line.split()[0][2:], 16)] = name
+    return out
 
 
 # Shapes from grid units.
@@ -171,10 +194,12 @@ def G(cp):
         _bases.update({ord(c): g for c, g in strokes.parse(strokes.STROKES).items()})
         _bases.update({ord(c): g for c, g in strokes.parse(strokes.SYMBOLS).items()})
         _bases.update({ord(c): g for c, g in glyphs.terminal_symbols().items()})
-        for c, g in strokes.parse(MATH).items():
-            if ord(c) in _bases:
-                raise ValueError(f"U+{ord(c):04X} is drawn in term-math.txt and trained already")
-            _bases[ord(c)] = g
+        _bases.update({ord(c): g for c, g in strokes.parse(glyphs.LETTERS).items()})
+        for path in DRAWN.values():
+            for c, g in strokes.parse(path).items():
+                if ord(c) in _bases:
+                    raise ValueError(f"U+{ord(c):04X} is drawn in {os.path.basename(path)} and elsewhere")
+                _bases[ord(c)] = g
     return _bases[cp]
 
 
@@ -875,16 +900,512 @@ for _name, _cps in DRAWN_FAMILY.items():
         FAMILY[_cp] = _name
 
 
-def math():
-    """{char: shapes} for the tmath tier: every character drawn in
-    font/term-math.txt and every one made here."""
-    drawn = {ord(c): g for c, g in strokes.parse(MATH).items()}
+# Batch 2: punctuation, currency, letterlike symbols, number forms, technical
+# symbols and geometric shapes. font/term-sym.txt holds the shapes drawn
+# by hand; here are the forms a transform gives.
+
+tier("sym")
+FAMILY.update(drawn_families(SYMBOL))
+
+
+def shear(shapes, k=0.15, about=15.0):
+    """Slanted to the right, the line y = about staying where it is."""
+    return mv(shapes, lambda x, y: (x + (about - y) * k, y))
+
+
+def script(shapes, k=0.55, top=3.6, src=4.0, cx=5.0):
+    """Scaled by k about x = 5, the line y = src going to y = top: the
+    superscripts and subscripts of the trained digits."""
+    return mv(shapes, lambda x, y: (cx + (x - 5) * k, top + (y - src) * k))
+
+
+def squeeze(shapes, x0, x1):
+    """The shapes with their width fitted to x0..x1."""
+    a, _, b, _ = extent(shapes)
+    return mv(shapes, lambda x, y: (x0 + (x - a) * (x1 - x0) / (b - a), y))
+
+
+def cut(shapes):
+    return [("cut", sh) for sh in shapes]
+
+
+def regular(n, cx, cy, rad, start=-90.0):
+    return [(cx + rad * m.cos(m.radians(start + 360 * i / n)), cy + rad * m.sin(m.radians(start + 360 * i / n)))
+            for i in range(n)]
+
+
+def outline(pts, r=None):
+    return P(*pts, pts[0], r=r)
+
+
+def sector(cx, cy, rad, a0, a1):
+    n = max(2, int(abs(a1 - a0) / 10) + 1)
+    return F((cx, cy), *[(cx + rad * m.cos(m.radians(a0 + (a1 - a0) * i / n)),
+                          cy + rad * m.sin(m.radians(a0 + (a1 - a0) * i / n))) for i in range(n + 1)])
+
+
+def half_disc(cx, cy, rad, a0):
+    """Half a disc, the half that starts at a0 and runs on half a turn."""
+    return F(*[(cx + rad * m.cos(m.radians(a0 + 10 * i)), cy + rad * m.sin(m.radians(a0 + 10 * i))) for i in range(19)])
+
+
+def A(ch):
+    return G(ord(ch))
+
+
+SQ0, SQ1, SQT, SQB = 1.8, 8.2, 6.55, 12.95       # the square of U+25A1
+QUAD = lambda: G(0x2395)                          # noqa: E731
+TRI = [(5, 5.8), (8.4, 13.6), (1.6, 13.6)]        # the triangle of U+25B3
+DIA = [(5, 5.5), (9, 9.75), (5, 14), (1, 9.75)]   # the diamond of U+25C7
+
+fam("punct")
+d(0x2011, lambda: G(0x2010))
+d(0x201B, lambda: mirror(G(0x2019)))
+d(0x201F, lambda: mirror(G(0x201D)))
+d(0x2024, lambda: A("."))
+d(0x2025, lambda: dots((3, 14.6), (7, 14.6)))
+d(0x2027, lambda: dot(5, 10.5))
+d(0x2033, lambda: shift(G(0x2032), -1.3) + shift(G(0x2032), 1.3))
+d(0x2034, lambda: pen([s for dx in (-2.4, 0, 2.4) for s in shift(G(0x2032), dx)], 0.6))
+d(0x2057, lambda: pen([s for dx in (-3.3, -1.1, 1.1, 3.3) for s in shift(G(0x2032), dx)], 0.5))
+d(0x2035, lambda: mirror(G(0x2032)))
+d(0x2036, lambda: mirror(G(0x2033)))
+d(0x2037, lambda: mirror(G(0x2034)))
+d(0x203C, lambda: shift(A("!"), -2.5) + shift(A("!"), 2.5))
+d(0x203D, lambda: A("?") + P((5, 4.2), (5, 9.2)))
+d(0x2E18, lambda: rot(G(0x203D), 180, 5, 10.5))
+d(0x2047, lambda: pen(shift(scale(A("?"), 0.6, 1), -2.2) + shift(scale(A("?"), 0.6, 1), 2.2), 0.6))
+d(0x2048, lambda: pen(shift(scale(A("?"), 0.6, 1), -1.7), 0.65) + shift(A("!"), 2.6))
+d(0x2049, lambda: shift(A("!"), -2.6) + pen(shift(scale(A("?"), 0.6, 1), 1.7), 0.65))
+d(0x2042, lambda: pen([s for x, y in ((5, 6.4), (2.6, 12.6), (7.4, 12.6))
+                       for s in shift(scale(A("*"), 0.45, cy=9), x - 5, y - 9)], 0.5))
+d(0x2051, lambda: pen(shift(scale(A("*"), 0.55, cy=9), 0, -2.6) + shift(scale(A("*"), 0.55, cy=9), 0, 3.9), 0.55))
+d(0x204E, lambda: shift(scale(A("*"), 0.8, cy=9), 0, 5))
+d(0x2045, lambda: A("[") + P((4, 10), (6.4, 10)))
+d(0x2046, lambda: mirror(G(0x2045)))
+d(0x204B, lambda: mirror(G(0xB6)))
+d(0x204C, lambda: F(*[(4.6 + 2.6 * m.cos(m.radians(90 + 10 * i)), CY + 2.6 * m.sin(m.radians(90 + 10 * i)))
+                      for i in range(19)], (7.8, CY - 2.6), (7.8, CY + 2.6)))
+d(0x204D, lambda: mirror(G(0x204C)))
+d(0x204F, lambda: mirror(A(";")))
+d(0x2055, lambda: [s for k in range(8) for s in P((5 + 1.5 * m.cos(m.radians(45 * k)), CY + 1.5 * m.sin(m.radians(45 * k))),
+                                                 (5 + 3.6 * m.cos(m.radians(45 * k)), CY + 3.6 * m.sin(m.radians(45 * k))), r=0.55)]
+  + disc(5, CY, 1.0))
+d(0x2056, lambda: dots((3, 6.6), (3, 12.9), (7, CY)))
+d(0x2058, lambda: dots((5, 6.4), (2.4, CY), (7.6, CY), (5, 13.1)))
+d(0x205A, lambda: dots((5, 6), (5, 13.5)))
+d(0x205B, lambda: dots((5, 4.6), (1.8, CY), (8.2, CY), (5, 14.9), r=0.95))
+d(0x205C, lambda: P((5, 5.5), (5, 14)) + P((1.5, CY), (8.5, CY)) + dots((2.8, 7.2), (7.2, 7.2), (2.8, 12.3), (7.2, 12.3)))
+d(0x205D, lambda: dots((5, 5.6), (5, 10.1), (5, 14.6)))
+d(0x205E, lambda: dots((5, 4.2), (5, 7.9), (5, 11.6), (5, 15.3)))
+d(0x2E1F, lambda: shift(A("~"), 0, -1) + dot(5, 13.2))
+d(0x2E23, lambda: mirror(G(0x2E22)))
+d(0x2E25, lambda: mirror(G(0x2E24)))
+d(0x2E2E, lambda: mirror(A("?")))
+
+# Superscripts and subscripts, as the trained digits are: 0.55 of the size,
+# tops at y 3.6 and 10.4. A small letter without an ascender is 0.6 of its
+# size, as the ordinals are.
+fam("small")
+SUP = {0x2071: "i", 0x207A: "+", 0x207B: "−", 0x207C: "=", 0x207D: "(", 0x207E: ")", 0x207F: "n"}
+SUB = {0x208A: "+", 0x208B: "−", 0x208C: "=", 0x208D: "(", 0x208E: ")", 0x2090: "a", 0x2091: "e", 0x2092: "o",
+       0x2093: "x", 0x2094: "ə", 0x2095: "h", 0x2096: "k", 0x2097: "l", 0x2098: "m", 0x2099: "n", 0x209A: "p",
+       0x209B: "s", 0x209C: "t"}
+
+
+def _script(ch, top):
+    if ch == "ə":
+        base = rot(A("e"), 180, 5, 11.5)
+    else:
+        base = A(ch)
+    if ch in "aeoxmnsə":                 # x-height letters: 8..15
+        return script(base, 0.6, top + (0.4 if top < 9 else 1.9), 8.0)
+    if ch == "p":
+        return script(base, 0.55, top + 1.2, 8.0)
+    if ch in "+=−":                     # signs keep to the middle of the digits
+        return script(base, 0.6, top + 3.0, 9.5)
+    return script(base, 0.55, top, 3.5 if ch in "hklt()" else 4.0)
+
+
+for _cp, _ch in SUP.items():
+    d(_cp, lambda ch=_ch: _script(ch, 3.6))
+for _cp, _ch in SUB.items():
+    d(_cp, lambda ch=_ch: _script(ch, 10.4))
+d(0x23E8, lambda: pen(script(A("1"), 0.5, 9.5, 4.0, 2.9) + script(A("0"), 0.5, 9.5, 4.0, 7.1), 0.65))
+
+
+def over(a, b, r=0.6):
+    """a over a slash over b: the care-of signs."""
+    return pen(small(a, 0.52, 2.7, 4.2) + small(b, 0.52, 7.3, 15 - 0.52 * (extent(b)[3] - extent(b)[1])), r) + \
+        P((8, 4.5), (2, 14.5), r=r)
+
+
+d(0x2100, lambda: over(A("a"), A("c")))
+d(0x2101, lambda: over(A("a"), A("s")))
+d(0x2105, lambda: over(A("c"), A("o")))
+d(0x2106, lambda: over(A("c"), A("u")))
+d(0x2103, lambda: ring(1.9, 5.2, 1.2, r=0.6) + S("E 6.3,9.5 2.6,5.5 40 320"))
+d(0x2109, lambda: ring(1.9, 5.2, 1.2, r=0.6) + S("P 8.8,4 4.6,4 4.6,15 | P 4.6,9.5 7.8,9.5"))
+d(0x2120, lambda: pen(small(A("S"), 0.39, 2.3, 4.2), 0.6) + S("P 5,8.5 5,4.2 7.1,7 9.2,4.2 9.2,8.5"))
+d(0x2121, lambda: S("P@0.55 0.6,7 3.2,7 | P@0.55 1.9,7 1.9,12.5 | P@0.55 6,7 4,7 4,12.5 6,12.5 | P@0.55 4,9.75 5.6,9.75 | "
+                    "P@0.55 7.2,7 7.2,12.5 9.4,12.5"))
+d(0x213B, lambda: S("P@0.55 3,7 0.8,7 0.8,12.5 | P@0.55 0.8,9.75 2.6,9.75 | P@0.55 3.6,12.5 4.9,7 6.2,12.5 | "
+                    "P@0.55 4.1,10.8 5.7,10.8 | P@0.55 6.9,7 9.3,12.5 | P@0.55 9.3,7 6.9,12.5"))
+d(0x20A8, lambda: pen(squeeze(A("R"), 0.8, 5.2), 0.65) + pen(small(A("s"), 0.62, 7.5, 10.6), 0.65))
+
+fam("currency")
+d(0x20A1, lambda: A("C") + P((5.6, 3), (3.4, 16), r=0.6) + P((7.2, 3), (5, 16), r=0.6))
+d(0x20A2, lambda: A("C") + S("P@0.6 4.6,9 4.6,13 | E@0.6 6.2,10.6 1.6,1.6 180 300"))
+d(0x20A3, lambda: A("F") + P((0.8, 12.2), (5, 12.2)))
+d(0x20A5, lambda: A("m") + P((7.2, 6), (2.8, 17)))
+d(0x20A6, lambda: A("N") + P((0.8, 8.3), (9.2, 8.3), r=0.6) + P((0.8, 10.7), (9.2, 10.7), r=0.6))
+d(0x20A9, lambda: A("W") + P((0.8, 9.2), (9.2, 9.2)))
+d(0x20AB, lambda: A("d") + P((5.6, 5.4), (9.6, 5.4)) + P((2.5, 17.3), (8, 17.3)))
+d(0x20AD, lambda: A("K") + P((0.6, 9.6), (6.2, 9.6)))
+d(0x20AE, lambda: A("T") + P((3, 9.4), (7, 7.6)) + P((3, 11.9), (7, 10.1)))
+d(0x20B1, lambda: A("P") + P((0.8, 6), (9.2, 6), r=0.55) + P((0.8, 8), (9.2, 8), r=0.55))
+d(0x20B2, lambda: A("G") + P((5.2, 2.6), (5.2, 16.4)))
+d(0x20B5, lambda: A("C") + P((5.2, 2.8), (5.2, 16.2)))
+
+# Letters turned, mirrored, slanted or struck through.
+fam("letter")
+d(0x2107, lambda: mirror(A("3")))
+d(0x210E, lambda: shear(A("h")))
+d(0x210F, lambda: shear(A("h")) + P((1.2, 6.6), (5.6, 5.2)))
+d(0x2114, lambda: S("P 2.6,3.5 2.6,15 | P 5.4,3.5 5.4,15 | E 7.2,11.8 1.8,3.2 0 360 | P 1,6.2 7,6.2"))
+d(0x2117, lambda: S("E 5,9.5 4,4 0 360 | P 3.9,12 3.9,7 5.4,7 | E 5.4,8.25 1.25,1.25 270 450 | P 5.4,9.5 3.9,9.5"))
+d(0x211E, lambda: A("R") + P((5.2, 14.6), (8.8, 11.4)))
+d(0x211F, lambda: A("R") + P((7.4, 3), (3.4, 16)))
+d(0x2123, lambda: A("V") + P((4.6, 11), (9, 7.6)))
+d(0x2126, lambda: G(0x3A9))
+d(0x2127, lambda: flip(G(0x3A9), 9.5))
+d(0x2129, lambda: rot(G(0x3B9), 180, 5, 11.5))
+d(0x212A, lambda: A("K"))
+d(0x2132, lambda: rot(A("F"), 180, 5, 9.5))
+d(0x2139, lambda: pen(shear(A("i")), 0.95))
+d(0x213A, lambda: scale(rot(A("Q"), -90, 5, 9.5), 0.85, cy=9.5))
+d(0x2141, lambda: rot(A("G"), 180, 5, 9.5))
+d(0x2142, lambda: rot(A("L"), 180, 5, 9.5))
+d(0x2143, lambda: mirror(A("L")))
+d(0x2144, lambda: rot(A("Y"), 180, 5, 9.5))
+d(0x214B, lambda: rot(A("&"), 180, 5, 9.5))
+d(0x214E, lambda: rot(A("f"), 180, 5, 11.5))
+d(0x2183, lambda: mirror(A("C")))
+d(0x2184, lambda: mirror(A("c")))
+d(0x2422, lambda: A("b") + P((0.6, 7.4), (4.6, 5)))
+d(0x2373, lambda: G(0x3B9))
+d(0x2374, lambda: G(0x3C1))
+d(0x2375, lambda: G(0x3C9))
+d(0x237A, lambda: G(0x3B1))
+d(0x2376, lambda: G(0x3B1) + P((2, 17.3), (8.5, 17.3)))
+d(0x2377, lambda: shift(G(0x220A), 0, -0.6) + P((2.4, 14.6), (7.6, 14.6)))
+d(0x2378, lambda: G(0x3B9) + P((2.5, 17.3), (8, 17.3)))
+d(0x2379, lambda: G(0x3C9) + P((1.5, 17.3), (8.5, 17.3)))
+
+fam("double")
+d(0x2102, lambda: A("C") + P((3.7, 5.6), (3.7, 13.4), r=0.55))
+d(0x211A, lambda: A("Q") + P((3.7, 5.6), (3.7, 13.4), r=0.55))
+d(0x2145, lambda: shear(S("P@0.55 1.8,4 1.8,15 3.6,15 3.6,4 1.8,4 | P@0.55 3.6,4 4,4 | E@0.55 4,9.5 4.2,5.5 270 450 | P@0.55 4,15 3.6,15"), 0.12))
+d(0x2146, lambda: shear(S("P@0.55 8.2,3.5 8.2,15 6.5,15 6.5,3.5 8.2,3.5 | E@0.55 4.2,11.5 2.5,3.5 0 360"), 0.12))
+d(0x2147, lambda: shear(pen(A("e"), 0.55) + P((3.7, 9), (3.7, 14), r=0.55), 0.12))
+d(0x2148, lambda: shear(S("P@0.55 4.2,8 5.9,8 5.9,15 4.2,15 4.2,8 | P@0.55 4.2,4.9 5.9,4.9"), 0.12))
+d(0x2149, lambda: shear(S("P@0.55 5.2,8 6.9,8 6.9,16.5 | P@0.55 5.2,8 5.2,16.5 | E@0.55 4.4,16.5 2.5,2.5 0 140 | "
+                          "P@0.55 5.2,4.9 6.9,4.9"), 0.12))
+
+# Fractions, laid out as the trained quarter and three quarters are.
+fam("fraction")
+
+
+def frac(num, den):
+    out = script(A(num), 0.5, 4.0, 4.0, 2.4) if num else []
+    out += P((8, 4.5), (2, 14.5))
+    if len(den) == 1:
+        out += script(A(den), 0.5, 9.5, 4.0, 7.1)
+    elif den:
+        out += pen(squeeze(script(A(den[0]), 0.5, 9.5, 4.0, 5), 4.6, 5.9) + squeeze(script(A(den[1]), 0.5, 9.5, 4.0, 5), 7, 9.4), 0.5)
+        return pen(out[:-len(squeeze(A(den[0]), 0, 1) + squeeze(A(den[1]), 0, 1))], 0.65) + out[-len(squeeze(A(den[0]), 0, 1) + squeeze(A(den[1]), 0, 1)):]
+    return pen(out, 0.65)
+
+
+for _cp, _nd in {0x2150: "17", 0x2151: "19", 0x2153: "13", 0x2154: "23", 0x2155: "15", 0x2156: "25", 0x2157: "35",
+                 0x2158: "45", 0x2159: "16", 0x215A: "56", 0x215B: "18", 0x215C: "38", 0x215D: "58", 0x215E: "78",
+                 0x2189: "03"}.items():
+    d(_cp, lambda nd=_nd: frac(nd[0], nd[1]))
+d(0x2152, lambda: frac("1", "10"))
+d(0x215F, lambda: frac("1", ""))
+
+# Roman numerals: the letters, narrowed to stand together; ones as stems
+# between a bar above and a bar below.
+fam("roman")
+
+
+def stems(xs, x0, x1):
+    return P((x0, 4), (x1, 4)) + P((x0, 15), (x1, 15)) + [s for x in xs for s in P((x, 4), (x, 15))]
+
+
+def istems(xs):
+    return [s for x in xs for s in P((x, 8), (x, 15)) + dot(x, 5)]
+
+
+d(0x2160, lambda: A("I"))
+d(0x2161, lambda: stems((3.4, 6.6), 1.6, 8.4))
+d(0x2162, lambda: pen(stems((2.4, 5, 7.6), 1, 9), 0.65))
+d(0x2163, lambda: pen(stems((2,), 0.9, 3.1) + squeeze(A("V"), 4, 9.2), 0.65))
+d(0x2164, lambda: A("V"))
+d(0x2165, lambda: pen(squeeze(A("V"), 0.8, 6) + stems((8,), 6.9, 9.1), 0.65))
+d(0x2166, lambda: pen(squeeze(A("V"), 0.6, 4.2) + stems((5.8, 8.2), 4.9, 9.1), 0.55))
+d(0x2167, lambda: pen(squeeze(A("V"), 0.5, 3.5) + stems((4.9, 6.9, 8.9), 4.3, 9.5), 0.5))
+d(0x2168, lambda: pen(stems((1.9,), 0.8, 3) + squeeze(A("X"), 4, 9.2), 0.65))
+d(0x2169, lambda: A("X"))
+d(0x216A, lambda: pen(squeeze(A("X"), 0.8, 5.8) + stems((7.9,), 6.8, 9), 0.65))
+d(0x216B, lambda: pen(squeeze(A("X"), 0.6, 4.4) + stems((6, 8.4), 5.1, 9.3), 0.55))
+d(0x216C, lambda: A("L"))
+d(0x216D, lambda: A("C"))
+d(0x216E, lambda: A("D"))
+d(0x216F, lambda: A("M"))
+d(0x2170, lambda: A("i"))
+d(0x2171, lambda: istems((2.5, 7.5)))
+d(0x2172, lambda: pen(istems((2.4, 5, 7.6)), 0.65))
+d(0x2173, lambda: pen(istems((2,)) + squeeze(A("v"), 3.8, 9), 0.65))
+d(0x2174, lambda: A("v"))
+d(0x2175, lambda: pen(squeeze(A("v"), 1, 6.2) + istems((8,)), 0.65))
+d(0x2176, lambda: pen(squeeze(A("v"), 0.8, 4.6) + istems((6.2, 8.4)), 0.6))
+d(0x2177, lambda: pen(squeeze(A("v"), 0.6, 3.8) + istems((5.2, 7, 8.8)), 0.5))
+d(0x2178, lambda: pen(istems((1.8,)) + squeeze(A("x"), 3.6, 9), 0.65))
+d(0x2179, lambda: A("x"))
+d(0x217A, lambda: pen(squeeze(A("x"), 1, 6.2) + istems((8,)), 0.65))
+d(0x217B, lambda: pen(squeeze(A("x"), 0.8, 4.6) + istems((6.2, 8.4)), 0.6))
+d(0x217C, lambda: A("l"))
+d(0x217D, lambda: A("c"))
+d(0x217E, lambda: A("d"))
+d(0x217F, lambda: A("m"))
+d(0x2180, lambda: S("P 5,4 5,15 | E 5,9.5 4,5.5 0 360"))
+d(0x2181, lambda: A("D") + S("E 2,9.5 3,3.2 270 450"))
+d(0x2182, lambda: S("P@0.55 5,4 5,15 | E@0.55 5,9.5 4,5.5 0 360 | E@0.55 5,9.5 2.2,3.2 0 360"))
+
+fam("tech")
+d(0x2300, lambda: ring(5, CY, 3.4) + P((8.6, 5.4), (1.4, 14.1)))
+d(0x2307, lambda: P(*[(5 + 1.5 * m.sin(2 * m.pi * 3 * i / 30), 3.5 + 13 * i / 30) for i in range(31)]))
+d(0x2309, lambda: mirror(G(0x2308)))
+d(0x230B, lambda: mirror(G(0x230A)))
+d(0x230D, lambda: mirror(G(0x230C)))
+d(0x230F, lambda: mirror(G(0x230E)))
+d(0x231D, lambda: mirror(G(0x231C)))
+d(0x231F, lambda: mirror(G(0x231E)))
+d(0x2310, lambda: mirror(G(0xAC)))
+d(0x2319, lambda: flip(G(0x2310), 10.3))
+d(0x2314, lambda: arc(5, 14.5, 7.8, 7.8, 244, 296) + P((1.58, 7.49), (5, 14.5), (8.42, 7.49)))
+d(0x232B, lambda: mirror(G(0x2326)))
+d(0x232C, lambda: outline(regular(6, 5, CY, 4.4), r=0.6) +
+  [s for k in (0, 2, 4) for s in P(*[(5 + 2.9 * m.cos(m.radians(-90 + 60 * (k + j))), CY + 2.9 * m.sin(m.radians(-90 + 60 * (k + j))))
+                                     for j in (0, 1)], r=0.5)])
+d(0x23E3, lambda: outline(regular(6, 5, CY, 4.4), r=0.6) + ring(5, CY, 2.2, r=0.55))
+d(0x2388, lambda: ring(5, CY, 2.7, r=0.55) +
+  [s for k in range(8) for s in P((5 + 1.1 * m.cos(m.radians(45 * k)), CY + 1.1 * m.sin(m.radians(45 * k))),
+                                  (5 + 4.4 * m.cos(m.radians(45 * k)), CY + 4.4 * m.sin(m.radians(45 * k))), r=0.5)])
+d(0xFFFC, lambda: [s for a, b in (((1, 4), (9, 4)), ((9, 4), (9, 15.5)), ((9, 15.5), (1, 15.5)), ((1, 15.5), (1, 4)))
+                   for t in (0.0, 0.4, 0.8)
+                   for s in P((a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t),
+                              (a[0] + (b[0] - a[0]) * (t + 0.2), a[1] + (b[1] - a[1]) * (t + 0.2)), r=0.5)] +
+  pen(squeeze(scale(A("O"), 1, 0.4, cy=9.75), 2, 3.8) + squeeze(scale(A("B"), 1, 0.4, cy=9.75), 4.3, 5.9) +
+      squeeze(scale(A("J"), 1, 0.4, cy=9.75), 6.4, 8), 0.45))
+d(0xFFFD, lambda: F((5, 3.5), (9.7, CY), (5, 16), (0.3, CY)) + cut(pen(scale(A("?"), 0.62, cy=9.5), 0.6)))
+
+fam("piece")
+d(0x239D, lambda: flip(G(0x239B), 10.0))
+d(0x239E, lambda: mirror(G(0x239B)))
+d(0x239F, lambda: mirror(G(0x239C)))
+d(0x23A0, lambda: mirror(G(0x239D)))
+d(0x23A3, lambda: flip(G(0x23A1), 10.0))
+d(0x23A4, lambda: mirror(G(0x23A1)))
+d(0x23A5, lambda: mirror(G(0x23A2)))
+d(0x23A6, lambda: mirror(G(0x23A3)))
+d(0x23A9, lambda: flip(G(0x23A7), 10.0))
+d(0x23AB, lambda: mirror(G(0x23A7)))
+d(0x23AC, lambda: mirror(G(0x23A8)))
+d(0x23AD, lambda: mirror(G(0x23A9)))
+d(0x23AE, lambda: G(0x23AA))
+
+# APL: the quad, the circle and the tacks with a sign inside or beside.
+fam("apl")
+TILDE = lambda y=CY: S(f"E 3,{y} 2,1.3 180 360 | E 7,{y} 2,1.3 180 0")     # noqa: E731
+DIAERESIS = lambda y=4.8: dots((3.4, y), (6.6, y))                         # noqa: E731
+d(0x2338, lambda: QUAD() + P((3.4, 8.4), (6.6, 8.4), r=0.6) + P((3.4, 11.1), (6.6, 11.1), r=0.6))
+d(0x2339, lambda: QUAD() + P((3.4, CY), (6.6, CY), r=0.6) + dots((5, 7.3), (5, 12.2), r=0.6))
+d(0x233A, lambda: QUAD() + outline([(5, 6.2), (7.2, CY), (5, 13.3), (2.8, CY)], r=0.6))
+d(0x233B, lambda: QUAD() + ring(5, CY, 1.4, r=0.6))
+d(0x233C, lambda: QUAD() + ring(5, CY, 2.4, r=0.6))
+d(0x233D, lambda: ring(5, CY, 3.4) + P((5, 4), (5, 15.5)))
+d(0x233E, lambda: ring(5, CY, 3.4) + ring(5, CY, 1.2, r=0.55))
+d(0x2340, lambda: mirror(G(0x233F)))
+d(0x2341, lambda: QUAD() + P((8.2, 4.5), (1.8, 15), r=0.6))
+d(0x2342, lambda: QUAD() + P((1.8, 4.5), (8.2, 15), r=0.6))
+d(0x2343, lambda: QUAD() + P((6.6, 7), (3.4, CY), (6.6, 12.5), r=0.6))
+d(0x2344, lambda: mirror(G(0x2343)))
+d(0x2345, lambda: G(0x2190) + P((6.2, 5.5), (6.2, 14)))
+d(0x2346, lambda: mirror(G(0x2345)))
+d(0x2347, lambda: QUAD() + S("P@0.6 3.2,9.75 6.8,9.75 | P@0.6 4.8,8 3.2,9.75 4.8,11.5"))
+d(0x2348, lambda: mirror(G(0x2347)))
+d(0x2349, lambda: ring(5, CY, 3.4) + P((1.6, 5.4), (8.4, 14.1)))
+d(0x234B, lambda: S("P 2,14 5,5.5 8,14 2,14 | P 5,3.8 5,15.8"))
+d(0x2352, lambda: flip(G(0x234B), 9.8))
+d(0x234C, lambda: QUAD() + P((3.2, 7.5), (5, 12), (6.8, 7.5), r=0.6))
+d(0x2353, lambda: QUAD() + P((3.2, 12), (5, 7.5), (6.8, 12), r=0.6))
+d(0x234D, lambda: QUAD() + outline([(5, 6.9), (7.2, 12.3), (2.8, 12.3)], r=0.6))
+d(0x2354, lambda: QUAD() + outline([(5, 12.6), (7.2, 7.2), (2.8, 7.2)], r=0.6))
+d(0x234F, lambda: G(0x2191) + P((2, 11.2), (8, 11.2)))
+d(0x2356, lambda: G(0x2193) + P((2, 7.6), (8, 7.6)))
+d(0x2350, lambda: QUAD() + S("P@0.6 5,7 5,12.6 | P@0.6 3.3,8.7 5,7 6.7,8.7"))
+d(0x2357, lambda: QUAD() + S("P@0.6 5,6.9 5,12.5 | P@0.6 3.3,10.8 5,12.5 6.7,10.8"))
+d(0x235E, lambda: QUAD() + P((5, 6.6), (5, 9.8)))
+d(0x235F, lambda: ring(5, CY, 3.6) + star5(5, CY, 2.6))
+d(0x2360, lambda: QUAD() + dots((5, 7.6), (5, 12)))
+d(0x2361, lambda: S("P 2,7.5 8,7.5 | P 5,7.5 5,15") + DIAERESIS(4.6))
+d(0x2362, lambda: S("P 2,7.5 8,7.5 5,15 2,7.5") + DIAERESIS(4.6))
+d(0x2363, lambda: shift(scale(A("*"), 0.8, cy=9), 0, 2.4) + DIAERESIS(4.8))
+d(0x2364, lambda: ring(5, 11.6, 2.0) + DIAERESIS(5.8))
+d(0x2365, lambda: ring(5, 11.4, 3.2) + DIAERESIS(4.8))
+d(0x2367, lambda: G(0x2282) + P((5.4, 4), (5.4, 15.5)))
+d(0x2368, lambda: A("~") + DIAERESIS(6))
+d(0x2369, lambda: S("P 2,7.5 8,11.2 2,15") + DIAERESIS(4.8))
+d(0x236B, lambda: S("P 2,5 8,5 5,15 2,5") + TILDE(9.4))
+d(0x236C, lambda: S("E 5,9.75 3,5 0 360") + TILDE(CY))
+d(0x236D, lambda: P((5, 4.5), (5, 15)) + TILDE(CY))
+d(0x236E, lambda: shift(A(";"), 0, -2) + P((2.5, 17.5), (7.5, 17.5)))
+d(0x236F, lambda: QUAD() + S("P@0.55 3.4,8.5 6.6,8.5 | P@0.55 3.4,11 6.6,11 | P@0.55 6,6.8 4,12.7"))
+d(0x2370, lambda: QUAD() + pen(scale(A("?"), 0.6, cy=9.5), 0.6))
+d(0x2371, lambda: S("P 2,5.5 5,14 8,5.5") + TILDE(9.2))
+d(0x2372, lambda: S("P 2,14 5,5.5 8,14") + TILDE(10.3))
+
+fam("enclosed")
+for _i in range(9):
+    d(0x2460 + _i, lambda i=_i: ring(5, CY, 4.3, 4.9, r=0.6) + pen(script(A(str(i + 1)), 0.52, 6.9, 4.0), 0.6))
+d(0x2469, lambda: ring(5, CY, 4.3, 4.9, r=0.55) +
+  pen(squeeze(script(A("1"), 0.5, 7, 4.0), 2.3, 3.9) + squeeze(script(A("0"), 0.5, 7, 4.0), 4.9, 7.5), 0.55))
+
+fam("shape")
+SQ = lambda r=None: outline([(SQ0, SQT), (SQ1, SQT), (SQ1, SQB), (SQ0, SQB)], r)     # noqa: E731
+RING = lambda: ring(5, CY, 3.6)                                                  # noqa: E731
+
+
+def hatch(kind, n=2, r=0.45):
+    out = []
+    for i in range(1, n + 1):
+        t = i / (n + 1)
+        if kind == "h":
+            out += P((SQ0, SQT + (SQB - SQT) * t), (SQ1, SQT + (SQB - SQT) * t), r=r)
+        elif kind == "v":
+            out += P((SQ0 + (SQ1 - SQ0) * t, SQT), (SQ0 + (SQ1 - SQ0) * t, SQB), r=r)
+    if kind in ("\\", "/"):
+        for i in range(1, 2 * n):                # diagonals at 45 degrees across the square
+            t = i / n
+            a = (SQ0 + 6.4 * min(t, 1), SQT + 6.4 * max(0, t - 1))
+            b = (SQ0 + 6.4 * max(0, t - 1), SQT + 6.4 * min(t, 1))
+            seg = P(a, b, r=r)                    # runs "/"
+            out += seg if kind == "/" else mirror(seg)
+    return out
+
+
+d(0x25A2, lambda: [s for cx, cy, a in ((3.2, 7.95, 180), (6.8, 7.95, 270), (6.8, 11.55, 0), (3.2, 11.55, 90))
+                   for s in arc(cx, cy, 1.4, 1.4, a, a + 90)] +
+  P((3.2, SQT), (6.8, SQT)) + P((SQ1, 7.95), (SQ1, 11.55)) + P((6.8, SQB), (3.2, SQB)) + P((SQ0, 11.55), (SQ0, 7.95)))
+d(0x25A4, lambda: SQ(0.6) + hatch("h"))
+d(0x25A5, lambda: SQ(0.6) + hatch("v"))
+d(0x25A6, lambda: SQ(0.6) + hatch("h") + hatch("v"))
+d(0x25A7, lambda: SQ(0.6) + hatch("\\"))
+d(0x25A8, lambda: SQ(0.6) + hatch("/"))
+d(0x25A9, lambda: SQ(0.6) + hatch("\\") + hatch("/"))
+d(0x25BD, lambda: flip(G(0x25B3), 9.7))
+d(0x25BF, lambda: flip(G(0x25B5), 10.45))
+d(0x25C1, lambda: mirror(G(0x25B7)))
+d(0x25C3, lambda: mirror(G(0x25B9)))
+d(0x25C5, lambda: mirror(G(0x25BB)))
+d(0x25CC, lambda: [s for k in range(8) for s in dot(5 + 3.6 * m.cos(m.radians(45 * k)), CY + 3.6 * m.sin(m.radians(45 * k)), 0.6)])
+d(0x25CD, lambda: RING() + [s for x in (3.4, 5, 6.6)
+                            for s in P((x, CY - m.sqrt(3.6 ** 2 - (x - 5) ** 2)), (x, CY + m.sqrt(3.6 ** 2 - (x - 5) ** 2)), r=0.4)])
+d(0x25CE, lambda: RING() + ring(5, CY, 2.0, r=0.6))
+for _i in range(4):
+    d(0x25DC + _i, lambda i=_i: arc(5, CY, 3.6, 3.6, 180 + 90 * i, 270 + 90 * i))
+d(0x25E0, lambda: arc(5, CY, 3.6, 3.6, 180, 360))
+d(0x25E1, lambda: arc(5, CY, 3.6, 3.6, 0, 180))
+d(0x25EB, lambda: SQ() + P((5, SQT), (5, SQB)))
+d(0x25EC, lambda: G(0x25B3) + dot(5, 11.4))
+d(0x25F0, lambda: SQ() + P((5, SQT), (5, CY), (SQ0, CY)))
+d(0x25F1, lambda: flip(G(0x25F0)))
+d(0x25F2, lambda: mirror(G(0x25F1)))
+d(0x25F3, lambda: mirror(G(0x25F0)))
+d(0x25F4, lambda: RING() + P((5, CY - 3.6), (5, CY), (1.4, CY)))
+d(0x25F5, lambda: flip(G(0x25F4)))
+d(0x25F6, lambda: mirror(G(0x25F5)))
+d(0x25F7, lambda: mirror(G(0x25F4)))
+d(0x25F9, lambda: mirror(G(0x25F8)))
+d(0x25FA, lambda: flip(G(0x25F8)))
+d(0x25FF, lambda: mirror(G(0x25FA)))
+d(0x2B1A, lambda: [s for a, b in (((SQ0, SQT), (SQ1, SQT)), ((SQ1, SQT), (SQ1, SQB)), ((SQ1, SQB), (SQ0, SQB)), ((SQ0, SQB), (SQ0, SQT)))
+                   for t in (0.0, 0.4, 0.8)
+                   for s in P((a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t),
+                              (a[0] + (b[0] - a[0]) * (t + 0.2), a[1] + (b[1] - a[1]) * (t + 0.2)), r=0.55)])
+d(0x2B20, lambda: outline(regular(5, 5, 10.1, 4.0)))
+d(0x2B21, lambda: outline(regular(6, 5, CY, 4.2)))
+
+# Shapes filled or half filled: the outline, then the black part.
+fam("shape-black")
+d(0x25A3, lambda: SQ() + F((3.6, 8.35), (6.4, 8.35), (6.4, 11.15), (3.6, 11.15)))
+d(0x25C4, lambda: mirror(G(0x25BA)))
+d(0x25D2, lambda: RING() + half_disc(5, CY, 3.6, 0))
+d(0x25D3, lambda: RING() + half_disc(5, CY, 3.6, 180))
+d(0x25D4, lambda: RING() + sector(5, CY, 3.6, 270, 360))
+d(0x25D5, lambda: RING() + sector(5, CY, 3.6, 270, 540))
+d(0x25D6, lambda: half_disc(4.9, CY, 4.0, 90))
+d(0x25D7, lambda: half_disc(5.1, CY, 4.0, 270))
+BLOCK = lambda y0=5.55, y1=13.95: F((0.8, y0), (9.2, y0), (9.2, y1), (0.8, y1))     # noqa: E731
+d(0x25D8, lambda: BLOCK() + cut(disc(5, CY, 1.8)))
+d(0x25D9, lambda: BLOCK() + cut(ring(5, CY, 2.7, r=0.6)))
+d(0x25DA, lambda: BLOCK(5.55, CY) + cut(arc(5, CY, 2.7, 2.7, 180, 360, r=0.6)))
+d(0x25DB, lambda: BLOCK(CY, 13.95) + cut(arc(5, CY, 2.7, 2.7, 0, 180, r=0.6)))
+d(0x25E3, lambda: mirror(G(0x25E2)))
+d(0x25E4, lambda: flip(G(0x25E3)))
+d(0x25E5, lambda: mirror(G(0x25E4)))
+d(0x25E7, lambda: SQ() + F((SQ0, SQT), (5, SQT), (5, SQB), (SQ0, SQB)))
+d(0x25E8, lambda: mirror(G(0x25E7)))
+d(0x25E9, lambda: SQ() + F((SQ0, SQT), (SQ1, SQT), (SQ0, SQB)))
+d(0x25EA, lambda: rot(G(0x25E9), 180))
+d(0x2B12, lambda: SQ() + F((SQ0, SQT), (SQ1, SQT), (SQ1, CY), (SQ0, CY)))
+d(0x2B13, lambda: flip(G(0x2B12)))
+d(0x2B14, lambda: mirror(G(0x25E9)))
+d(0x2B15, lambda: rot(G(0x2B14), 180))
+d(0x25ED, lambda: G(0x25B3) + F((5, 5.8), (5, 13.6), (1.6, 13.6)))
+d(0x25EE, lambda: mirror(G(0x25ED)))
+d(0x2B16, lambda: outline(DIA) + F(DIA[0], DIA[2], DIA[3]))
+d(0x2B17, lambda: mirror(G(0x2B16)))
+d(0x2B18, lambda: outline(DIA) + F(DIA[3], DIA[0], DIA[1]))
+d(0x2B19, lambda: flip(G(0x2B18)))
+d(0x2B1F, lambda: F(*regular(5, 5, 10.1, 4.4)))
+d(0x2B22, lambda: F(*regular(6, 5, CY, 4.6)))
+d(0x2B23, lambda: F(*regular(6, 5, CY, 4.6, 0)))
+
+
+def made(name):
+    """{char: shapes} for a tier: every character drawn in its file and every
+    one made here for it."""
+    drawn = {ord(c): g for c, g in strokes.parse(DRAWN[name]).items()}
+    mine = [c for c in T if TIER[c] == name]
     both = set(drawn) & set(T)
     if both:
         raise ValueError("drawn and made: " + " ".join(f"U+{c:04X}" for c in sorted(both)))
     out = {chr(c): g for c, g in drawn.items()}
-    out.update({chr(c): G(c) for c in T})
-    lost = [c for c in out if ord(c) not in FAMILY]
+    out.update({chr(c): G(c) for c in mine})
+    lost = [c for c in out if FAMILY.get(ord(c)) is None]
     if lost:
         raise ValueError("no family: " + " ".join(f"U+{ord(c):04X}" for c in sorted(lost)))
     return out
+
+
+def math():
+    """{char: shapes} for the tmath tier."""
+    return made("math")
+
+
+def sym():
+    """{char: shapes} for the tsym tier."""
+    return made("sym")

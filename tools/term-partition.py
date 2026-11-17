@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """Group a term-* tier's characters for training: by shape family, then balanced.
 
-usage: tools/term-partition.py TIER [--check]        TIER: math
+usage: tools/term-partition.py TIER [--check]        TIER: math or sym
 
 A group net draws about the same amount of ink edge whatever its family. A
 drawing's edge is counted on a 48-wide grid with the training pen (the cells
 where ink meets no ink), and a family's class is set by its mean edge: 12
 characters to a net up to 265, 10 up to 330, 8 above. Each class is one
-training set (tmath12, tmath10, tmath8): its families in a fixed order, cut
-into consecutive groups whose sizes differ by at most one, exactly as
+training set (tmath12, tmath10 and tmath8 for math): its families in a
+fixed order, cut into consecutive groups whose sizes differ by at most one, as
 train/split_expert.py's contiguous partition cuts a set, so the trainer
 needs no change. Inside a family the characters are dealt, largest edge
 first, to the group with the least edge per place so far, so the groups a
@@ -26,6 +26,10 @@ sys.path.insert(0, str(ROOT / "train"))
 import glyphs  # noqa: E402
 import term_glyphs  # noqa: E402
 
+# The words each file carries about how it was made. The math file was written
+# with the usage line here and its bytes are what its nets recorded, so it
+# keeps that line.
+METHOD = {"math": "usage: tools/term-partition.py TIER [--check] TIER: math"}
 CLASSES = ((12, 265.0), (10, 330.0), (8, float("inf")))
 NODES = glyphs.nodes(48)
 
@@ -74,7 +78,7 @@ def partition(tier):
             "groups": [[f"U+{c:04X}" for c in g] for g in groups],
             "group_edge": [sum(edges[c] for c in g) for g in groups]}
     return {"format": "neuronte-term-partition", "version": 1, "tier": f"t{tier}",
-            "method": " ".join(__doc__.split("\n\n")[1].split()), "edge": {f"U+{c:04X}": e for c, e in sorted(edges.items())},
+            "method": METHOD.get(tier, " ".join(__doc__.split("\n\n")[2].split())), "edge": {f"U+{c:04X}": e for c, e in sorted(edges.items())},
             "sets": sets}
 
 

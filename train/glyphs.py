@@ -38,6 +38,11 @@ Tiers:
              and tmath8 are the same characters as three training sets, in
              the order of font/term-math-partition.json: families of about
              the same ink edge, 12, 10 and 8 characters to a group net.
+    tsym     the punctuation, currency, letterlike symbols, number forms,
+             technical symbols and geometric shapes of
+             neuronte-term-symbol-v1, drawn in font/term-sym.txt and made by
+             train/term_glyphs.py the same way; tsym12, tsym10 and tsym8 are
+             its training sets, in the order of font/term-sym-partition.json.
     ui1      the desktop face, printable ASCII and U+2026, from
     ...      font/ui-EM.txt, one file for every em from 1 to 128 except
     ui128    44. Stems are one pixel wide through 16, two from 17
@@ -58,7 +63,8 @@ tcyrillic, tletter (the two scripts) and terminal (all three); and three sets fo
 how the mosaics join the bundle: pixel (block, mosaic), pixelbraille
 (block, mosaic, braille) and boxshade (box, shade). The sets ui1 to
 ui128, except ui44, the italic sets ui3i to ui32i, and uilarge, are each their
-tier alone. tmath is its tier, and tmath12, tmath10 and tmath8 divide it.
+tier alone. tmath and tsym are their tiers, and tmath12, tmath10 and tmath8
+divide the one as tsym12, tsym10 and tsym8 divide the other.
 The desktop sets share their scalars with ascii and with each other, so
 they join no other set, and their nets no bundle.
 Each has a pen of its own, in PENS: a little over one pixel wide at its em
@@ -1054,7 +1060,8 @@ def colour_icons(pal=None):
 
 # The term-* bundles: a tier of all a bundle's characters, and its training
 # sets, each a class of font/term-TIER-partition.json.
-TERM_TIERS = {"tmath": ("tmath12", "tmath10", "tmath8")}
+TERM_TIERS = {"tmath": ("tmath12", "tmath10", "tmath8"), "tsym": ("tsym12", "tsym10", "tsym8")}
+TERM_LETTERS = {"tsym"}     # tiers that also start from the letters of font/letters.txt
 TERM_SETS = {name: tier for tier, parts in TERM_TIERS.items() for name in (tier,) + parts}
 
 
@@ -1271,8 +1278,10 @@ def sources(name):
     for t in tiers:
         if t in TERM_SETS:   # the trained strokes these families start from, their own, and the groups
             stem = TERM_SETS[t][1:]
-            return ["font/strokes.txt", "font/symbols.txt", f"font/term-{stem}.txt",
-                    f"font/term-{stem}-partition.json", "train/term_glyphs.py", "train/strokes.py", "train/glyphs.py"]
+            return (["font/strokes.txt", "font/symbols.txt"] +
+                    (["font/letters.txt"] if TERM_SETS[t] in TERM_LETTERS else []) +
+                    [f"font/term-{stem}.txt", f"font/term-{stem}-partition.json", "train/term_glyphs.py",
+                     "train/strokes.py", "train/glyphs.py"])
     for em in UI:
         if f"ui{em}" in tiers:
             files.append(f"font/ui-{em}.txt")

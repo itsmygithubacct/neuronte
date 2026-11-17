@@ -576,6 +576,24 @@ pack-term-rest-v1:
 
 .PHONY: test-term-rest-v1 pack-term-rest-v1
 
+# kilix-chrome-v1: the symbols Kilix prints on its bars, a standalone
+# bundle of group nets opened before the terminal bundles.
+KILIX_CHROME_V1 = $(shell $(PYTHON) train/build_kilix_chrome_v1.py --files)
+KILIX_CHROME_V1_INK = F0156
+
+test-kilix-chrome-v1: build/libneuronte.so build/test_api
+	@set -e; for n in $(KILIX_CHROME_V1); do \
+		$(PYTHON) train/pack.py $$n.json build/$$(basename $$n).nrt; \
+		$(PYTHON) tests/check_reference.py build/libneuronte.so $$n.json build/$$(basename $$n).nrt; \
+	done
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_kilix_chrome_v1.py build/libneuronte.so
+	./build/test_api weights/neuronte-kilix-chrome-v1.nrt --standalone $(KILIX_CHROME_V1_INK)
+
+pack-kilix-chrome-v1:
+	$(PYTHON) train/build_kilix_chrome_v1.py
+
+.PHONY: test-kilix-chrome-v1 pack-kilix-chrome-v1
+
 test-ascii-next: build/libneuronte.so build/test_api
 	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_ascii_next.py build/libneuronte.so
 	./build/test_api weights/neuronte-split-ascii-groups-v1.nrt --full --accent --pixel
@@ -739,7 +757,7 @@ test-bits: build/libneuronte.so
 	$(PYTHON) tests/check_bits.py build/libneuronte.so
 .PHONY: test-bits
 
-test: all $(TESTS) test-bits test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7 test-face-bundle test-symbol-v1 test-split-v7-symbol test-split-v8 test-split-v9 test-faces-v1 test-faces-v1-192-256 test-known-bundle test-untrained test-standalone test-term-latin-v1 test-faces-wide-v1 test-faces-v1-h512 test-colour-marks test-faces-v1-small test-emoji-v1 test-letter-snap test-ui-scaled test-ui-large-v1 test-ui-latin1 test-term-rest-v1
+test: all $(TESTS) test-bits test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7 test-face-bundle test-symbol-v1 test-split-v7-symbol test-split-v8 test-split-v9 test-faces-v1 test-faces-v1-192-256 test-known-bundle test-untrained test-standalone test-term-latin-v1 test-faces-wide-v1 test-faces-v1-h512 test-colour-marks test-faces-v1-small test-emoji-v1 test-letter-snap test-ui-scaled test-ui-large-v1 test-ui-latin1 test-term-rest-v1 test-kilix-chrome-v1
 	cd weights && sha256sum -c --quiet SHA256SUMS
 	# The pointer net keeps its own list, with paths from the top of the tree.
 	sha256sum -c --quiet weights/neuronte-pointer-v0.sha256

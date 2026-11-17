@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Group a term-* tier's characters for training: by shape family, then balanced.
 
-usage: tools/term-partition.py TIER [--check]        TIER: math or sym
+usage: tools/term-partition.py TIER [--check]        TIER: math, sym or ding
 
 A group net draws about the same amount of ink edge whatever its family. A
 drawing's edge is counted on a 48-wide grid with the training pen (the cells

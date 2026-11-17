@@ -22,7 +22,8 @@ import strokes
 
 MATH = os.path.join(strokes.ROOT, "font", "term-math.txt")
 SYMBOL = os.path.join(strokes.ROOT, "font", "term-sym.txt")
-DRAWN = {"math": MATH, "sym": SYMBOL}
+DING = os.path.join(strokes.ROOT, "font", "term-ding.txt")
+DRAWN = {"math": MATH, "sym": SYMBOL, "ding": DING}
 CY = 9.75          # the maths line
 T = {}             # code point -> function making its shapes
 FAMILY = {}        # code point -> family
@@ -1385,6 +1386,330 @@ d(0x2B22, lambda: F(*regular(6, 5, CY, 4.6)))
 d(0x2B23, lambda: F(*regular(6, 5, CY, 4.6, 0)))
 
 
+# Batch 3: Miscellaneous Symbols and Dingbats. font/term-ding.txt holds the
+# pictures drawn by hand, the white (outlined) one of each pair; here are the
+# black ones, the turned ones, and the families a rule gives: lines, dice,
+# suits, crosses, stars, florettes, shadowed shapes, circled digits, arrows.
+
+tier("ding")
+FAMILY.update(drawn_families(DING))
+
+
+def fill(shapes, tol=0.004):
+    """The shapes with every closed run of strokes filled."""
+    out, run = [], []
+
+    def close():
+        if len(run) > 2 and abs(run[0][1] - run[-1][3]) < tol and abs(run[0][2] - run[-1][4]) < tol:
+            out.append(("poly", [(s[1], s[2]) for s in run]))
+        else:
+            out.extend(run)
+        run.clear()
+
+    for sh in shapes:
+        if sh[0] == "seg" and (not run or (abs(run[-1][3] - sh[1]) < tol and abs(run[-1][4] - sh[2]) < tol)):
+            run.append(sh)
+            continue
+        close()
+        if sh[0] == "seg":
+            run.append(sh)
+        else:
+            out.append(sh)
+    close()
+    return out
+
+
+def glyphs_():
+    import glyphs
+    return glyphs
+
+
+def at(rad, deg, cx=5.0, cy=CY):
+    return (cx + rad * m.cos(m.radians(deg)), cy + rad * m.sin(m.radians(deg)))
+
+
+def rays(n, r0, r1, r=None, start=0.0):
+    return [s for k in range(n) for s in P(at(r0, start + 360 * k / n), at(r1, start + 360 * k / n), r=r)]
+
+
+def star(n, big, little, twist=0.0, start=-90.0):
+    """The corners of an n-pointed star; twist turns the inner corners."""
+    return [at(big if k % 2 == 0 else little, start + 180 * k / n + (twist if k % 2 else 0)) for k in range(2 * n)]
+
+
+def shadow(pts, dx=0.8, dy=0.8, r=0.4):
+    """A white shape with a black copy behind it, moved by (dx, dy)."""
+    return F(*[(x + dx, y + dy) for x, y in pts]) + cut(F(*pts)) + outline(pts, r)
+
+
+def around(shapes, n, start=0.0):
+    return [s for k in range(n) for s in rot(shapes, start + 360 * k / n)]
+
+
+fam("sky")
+d(0x2600, lambda: disc(5, CY, 2.2) + rays(8, 3.3, 4.5, 0.45))
+d(0x263C, lambda: ring(5, CY, 2.1, r=0.55) + rays(8, 3.4, 4.6, 0.45))
+d(0x2609, lambda: ring(5, CY, 3.4) + disc(5, CY, 0.9))
+d(0x260B, lambda: flip(G(0x260A)))
+d(0x263D, lambda: mirror(G(0x263E)))
+d(0x269B, lambda: around(ring(5, CY, 4.4, 1.6, r=0.45), 3) + disc(5, CY, 0.8))
+
+fam("sign")
+d(0x2622, lambda: sector(5, CY, 4.4, 180, 240) + sector(5, CY, 4.4, 300, 360) + sector(5, CY, 4.4, 60, 120) +
+  cut(disc(5, CY, 1.6)) + disc(5, CY, 0.8))
+d(0x2623, lambda: [s for a in (270, 30, 150) for s in ring(*at(2.2, a), 2.0, r=0.5)] + disc(5, CY, 0.7))
+d(0x2629, lambda: P((5, 5.2), (5, 14.3), r=0.6) + P((0.9, CY), (9.1, CY), r=0.6) +
+  [s for x in (2.3, 7.7) for y in (6.9, 12.6) for s in P((x, y - 1), (x, y + 1), r=0.35) + P((x - 1, y), (x + 1, y), r=0.35)])
+d(0x262E, lambda: ring(5, CY, 4.0, r=0.6) + P((5, 5.75), (5, 13.75), r=0.6) + P((5, CY), at(4, 135), r=0.6) +
+  P((5, CY), at(4, 45), r=0.6))
+d(0x262F, lambda: half_disc(5, CY, 4, 90) + disc(5, CY - 2, 2) + cut(disc(5, CY + 2, 2)) + cut(disc(5, CY - 2, 0.65)) +
+  disc(5, CY + 2, 0.65) + ring(5, CY, 4.0, r=0.5))
+d(0x2638, lambda: ring(5, CY, 3.3, r=0.55) + rays(8, 0, 4.6, 0.4) + disc(5, CY, 0.9))
+d(0x2639, lambda: ring(5, CY, 4.0, r=0.55) + disc(3.6, 8.4, 0.6) + disc(6.4, 8.4, 0.6) + arc(5, 12.9, 2, 1.6, 200, 340, r=0.5))
+d(0x263A, lambda: ring(5, CY, 4.0, r=0.55) + disc(3.6, 8.4, 0.6) + disc(6.4, 8.4, 0.6) + arc(5, 10.4, 2, 1.6, 20, 160, r=0.5))
+d(0x263B, lambda: disc(5, CY, 4.4) + cut(disc(3.6, 8.4, 0.7) + disc(6.4, 8.4, 0.7) + arc(5, 10.4, 2, 1.6, 20, 160, r=0.5)))
+d(0x267E, lambda: ring(5, CY, 4.2, r=0.5) + pen(scale(G(0x221E), 0.62), 0.5))
+d(0x2699, lambda: ring(5, CY, 2.4, r=0.85) + rays(8, 3.2, 4.3, 0.75))
+d(0x269F, lambda: mirror(G(0x269E)))
+
+fam("line")
+_ROW = lambda y, whole, r=0.9: (P((1.2, y), (8.8, y), r=r) if whole                 # noqa: E731
+                                else P((1.2, y), (3.3, y), r=r) + P((6.7, y), (8.8, y), r=r))
+_rows = lambda ys, bits: [s for y, b in zip(ys, bits) for s in _ROW(y, b == "1")]   # noqa: E731
+for _cp, _bits in ((0x2631, "011"), (0x2632, "101"), (0x2633, "001"), (0x2634, "110"), (0x2635, "010"),
+                   (0x2636, "100"), (0x2637, "000")):
+    d(_cp, lambda b=_bits: _rows((6.4, 9.75, 13.1), b))
+d(0x268A, lambda: _rows((9.75,), "1"))
+d(0x268B, lambda: _rows((9.75,), "0"))
+for _cp, _bits in ((0x268C, "11"), (0x268D, "01"), (0x268E, "10"), (0x268F, "00")):
+    d(_cp, lambda b=_bits: _rows((8.0, 11.5), b))
+d(0x2758, lambda: P((5, 4), (5, 15.5), r=0.45))
+d(0x2759, lambda: P((5, 4), (5, 15.5), r=0.9))
+d(0x275A, lambda: P((5, 4.4), (5, 15.1), r=1.5))
+
+fam("game")
+_PIP = {1: "e", 2: "ai", 3: "aei", 4: "acgi", 5: "acegi", 6: "acdfgi"}
+for _n in range(1, 7):
+    d(0x267F + _n, lambda n=_n: outline([(1.3, 6.05), (8.7, 6.05), (8.7, 13.45), (1.3, 13.45)], 0.4) +
+      [s for c in _PIP[n] for s in disc(3.0 + 2.0 * ((ord(c) - 97) % 3), 7.75 + 2.0 * ((ord(c) - 97) // 3), 0.9)])
+d(0x2686, lambda: ring(5, CY, 4.0, r=0.55) + disc(6.7, CY, 0.9))
+d(0x2687, lambda: ring(5, CY, 4.0, r=0.55) + disc(6.7, CY, 0.9) + disc(3.3, CY, 0.9))
+d(0x2688, lambda: disc(5, CY, 4.4) + cut(disc(6.7, CY, 1.0)))
+d(0x2689, lambda: disc(5, CY, 4.4) + cut(disc(6.7, CY, 1.0) + disc(3.3, CY, 1.0)))
+_MAN = lambda y, r=0.5: arc(5, y, 4, 2.1, 0, 180, r=r) + P((1, y - 1.8), (1, y), r=r) + P((9, y - 1.8), (9, y), r=r)   # noqa: E731
+d(0x26C0, lambda: ring(5, 9.2, 4, 2.1, r=0.5) + _MAN(11))
+d(0x26C1, lambda: ring(5, 7.6, 4, 2.1, r=0.5) + _MAN(9.4) + _MAN(11.2) + _MAN(13))
+d(0x26C2, lambda: disc(5, 11, 4.4, 2.5) + F((0.6, 9.2), (9.4, 9.2), (9.4, 11), (0.6, 11)) + disc(5, 9.2, 4.4, 2.5) +
+  cut(arc(5, 9.2, 4.4, 2.5, 0, 180, r=0.3)))
+d(0x26C3, lambda: disc(5, 13, 4.4, 2.5) + F((0.6, 7.6), (9.4, 7.6), (9.4, 13), (0.6, 13)) + disc(5, 7.6, 4.4, 2.5) +
+  cut(arc(5, 7.6, 4.4, 2.5, 0, 180, r=0.3) + arc(5, 10.3, 4.4, 2.5, 0, 180, r=0.3)))
+HEART = lambda: G(0x2661)                                                           # noqa: E731
+_SPADE = lambda: scale(flip(HEART(), about=10.0), 1, 0.85, cy=5.8)                 # noqa: E731
+_STEM = lambda: P((5, 11.4), (5, 15.2), r=0.5) + P((3.4, 15.2), (6.6, 15.2), r=0.5)   # noqa: E731
+d(0x2664, lambda: _SPADE() + _STEM())
+d(0x2660, lambda: fill(_SPADE()) + _STEM())
+d(0x2665, lambda: fill(HEART()))
+d(0x2666, lambda: fill(G(0x2662)))
+d(0x2663, lambda: fill(G(0x2667)))
+
+fam("object-black")
+d(0x260E, lambda: fill(G(0x260F)) + cut(disc(5, 12.5, 1.0)))
+d(0x2617, lambda: fill(G(0x2616)))
+d(0x261B, lambda: fill(G(0x261E)))
+d(0x261A, lambda: mirror(G(0x261B)))
+for _i in range(6):
+    d(0x265A + _i, lambda i=_i: fill(G(0x2654 + i)))
+d(0x2712, lambda: fill(G(0x2711)) + cut(P((5, 15.4), (5, 10.6), r=0.3) + disc(5, 9.4, 0.8)))
+
+fam("object")
+d(0x261C, lambda: mirror(G(0x261E)))
+d(0x261D, lambda: rot(G(0x261E), -90))
+d(0x261F, lambda: rot(G(0x261E), 90))
+d(0x2703, lambda: flip(G(0x2701)))
+d(0x270E, lambda: rot(G(0x270F), 45))
+d(0x2710, lambda: rot(G(0x270F), -45))
+
+fam("recycle")
+_TRI3 = lambda: regular(3, 5, 10.6, 4.6)                                            # noqa: E731
+
+
+def _chase(r, length):
+    pts = _TRI3()
+    out = outline(pts, r)
+    for i in range(3):
+        (x0, y0), (x1, y1) = pts[i], pts[(i + 1) % 3]
+        out += head_at(x0 + (x1 - x0) * 0.58, y0 + (y1 - y0) * 0.58, m.degrees(m.atan2(y1 - y0, x1 - x0)), length, 42, r)
+    return out
+
+
+d(0x2672, lambda: _chase(0.5, 1.7))
+for _i in range(1, 8):
+    d(0x2672 + _i, lambda i=_i: outline(regular(3, 5, 10.9, 5.3), 0.4) + pen(script(A(str(i)), 0.45, 8.4, 4.0), 0.45))
+d(0x267A, lambda: outline(_TRI3(), 0.45))
+d(0x267B, lambda: _chase(0.95, 2.0))
+d(0x267C, lambda: disc(5, CY, 4.6) + cut(shift(scale(_chase(0.45, 1.6), 0.66, cy=10.6), 0, -0.5)))
+d(0x267D, lambda: ring(5, CY, 4.3, r=0.45) + shift(scale(_chase(0.45, 1.6), 0.66, cy=10.6), 0, -0.5))
+
+fam("gender")
+_g = lambda *parts: pen([s for p in parts for s in p], 0.55)                        # noqa: E731
+_NE = lambda x, y, n=2.2: P((x, y), (x + n, y - n * 1.25)) + P((x + n - 2, y - n * 1.25), (x + n, y - n * 1.25), (x + n, y - n * 1.25 + 2))   # noqa: E731
+d(0x26A2, lambda: _g(ring(3.8, 7.2, 2.3), ring(6.2, 7.2, 2.3), P((5, 9.2), (5, 15.2)), P((3, 12.6), (7, 12.6))))
+d(0x26A3, lambda: _g(shift(scale(G(0x2642), 0.82), -1.1, 0.6), shift(scale(G(0x2642), 0.82), 1.0, -0.6)))
+d(0x26A4, lambda: _g(ring(3.8, 8.4, 2.3), P((3.8, 10.7), (3.8, 15.4)), P((2.2, 13.4), (5.4, 13.4)), ring(6.2, 9.8, 2.3),
+                     _NE(7.7, 8.1, 1.6)))
+d(0x26A5, lambda: _g(ring(5, 9.4, 2.6), P((5, 12), (5, 15.6)), P((3.4, 13.8), (6.6, 13.8)), _NE(6.8, 7.5, 2.0)))
+d(0x26A6, lambda: G(0x2642) + P((5.4, 5.6), (8.9, 9.4), r=0.6))
+d(0x26A7, lambda: _g(G(0x26A5), mirror(_NE(6.8, 7.5, 2.0)), P((1.3, 7.3), (3.1, 5.5))))
+d(0x26A8, lambda: _g(ring(5, 11.8, 2.6), P((5, 9.2), (5, 4.2)), P((3.4, 5.8), (5, 4.2), (6.6, 5.8)), P((3.4, 7.6), (6.6, 7.6))))
+d(0x26A9, lambda: _g(ring(3.6, CY, 2.6), P((6.2, CY), (9.2, CY)), P((7.8, 8.2), (9.2, CY), (7.8, 11.3)), P((7, 8.2), (7, 11.3))))
+d(0x26AC, lambda: ring(5, CY, 2.0, r=0.55))
+d(0x26AD, lambda: _g(ring(3.6, CY, 2.6), ring(6.4, CY, 2.6)))
+d(0x26AE, lambda: _g(ring(2.7, CY, 1.9), ring(7.3, CY, 1.9), P((5, 5.5), (5, 14))))
+d(0x26AF, lambda: _g(ring(2.5, CY, 1.8), ring(7.5, CY, 1.8), P((4.3, CY), (5.7, CY))))
+d(0x26B2, lambda: ring(5, 7.6, 2.8) + P((5, 10.4), (5, 15.4)))
+
+fam("cross")
+_PLUS = lambda arm, half: [(5 + sx * a, CY + sy * b) for sx, sy, a, b in (       # noqa: E731
+    (-1, -1, half, arm), (1, -1, half, arm), (1, -1, half, half), (1, -1, arm, half), (1, 1, arm, half), (1, 1, half, half),
+    (1, 1, half, arm), (-1, 1, half, arm), (-1, 1, half, half), (-1, 1, arm, half), (-1, -1, arm, half), (-1, -1, half, half))]
+_LATIN = [(3.9, 4), (6.1, 4), (6.1, 6.6), (8.4, 6.6), (8.4, 8.8), (6.1, 8.8), (6.1, 15.5), (3.9, 15.5), (3.9, 8.8),
+          (1.6, 8.8), (1.6, 6.6), (3.9, 6.6)]
+_arms = lambda r0, r1, r: rays(4, r0, r1, r)                                        # noqa: E731
+d(0x2719, lambda: outline(_PLUS(4.0, 1.5), 0.45))
+d(0x271A, lambda: F(*_PLUS(4.3, 1.4)))
+d(0x271B, lambda: _arms(1.5, 4.2, 0.6))
+d(0x271C, lambda: _arms(2.3, 3.9, 1.1))
+d(0x271D, lambda: P((5, 4), (5, 15.5), r=0.6) + P((2, 7.6), (8, 7.6), r=0.6))
+d(0x271E, lambda: shadow([(x - 0.4, y - 0.3) for x, y in _LATIN], 0.9, 0.7, 0.4))
+d(0x271F, lambda: outline(_LATIN, 0.45))
+d(0x2720, lambda: around(F((5, CY - 0.4), (2.9, CY - 4.5), (5, CY - 3.6), (7.1, CY - 4.5)), 4))
+
+fam("star")
+_balls = lambda n, r, b, start=-90.0: rays(n, 0, 2.8, r, start) + [s for k in range(n) for s in disc(*at(3.5, start + 360 * k / n), b)]   # noqa: E731
+_petals = lambda n, dist, rad, start=-90.0: [at(dist, start + 360 * k / n) + (rad,) for k in range(n)]   # noqa: E731
+d(0x2721, lambda: outline(regular(3, 5, CY, 4.5), 0.5) + outline(regular(3, 5, CY, 4.5, 90), 0.5))
+d(0x2723, lambda: _balls(4, 0.4, 1.0))
+d(0x2724, lambda: _balls(4, 0.75, 1.35))
+d(0x2725, lambda: rays(4, 0, 3.0, 0.45, -90) + around(disc(5, CY - 3.9, 0.8) + disc(4.0, CY - 2.9, 0.8) + disc(6.0, CY - 2.9, 0.8), 4))
+d(0x2726, lambda: F(*star(4, 4.7, 1.5)))
+d(0x2727, lambda: outline(star(4, 4.7, 1.5), 0.5))
+d(0x2729, lambda: outline(star(5, 4.9, 2.0), 0.35) + outline(star(5, 2.9, 1.2), 0.35))
+d(0x272A, lambda: disc(5, CY, 4.6) + cut(F(*star(5, 4.0, 1.65))))
+d(0x272B, lambda: F(*star(5, 4.9, 2.0)) + cut(disc(5, CY + 0.1, 1.05)))
+d(0x272C, lambda: outline(star(5, 4.8, 1.95), 0.45) + disc(5, CY + 0.1, 1.1))
+d(0x272D, lambda: F(*star(5, 3.3, 1.35)) + outline(star(5, 4.9, 2.0), 0.3))
+d(0x272E, lambda: F(*star(5, 2.9, 1.2)) + outline(star(5, 4.8, 2.0), 0.6))
+d(0x272F, lambda: F(*star(5, 4.8, 1.5, twist=24)))
+d(0x2730, lambda: shadow([(x - 0.4, y - 0.4) for x, y in star(5, 4.3, 1.75)], 0.9, 0.9, 0.4))
+d(0x2731, lambda: rays(6, 0, 3.6, 1.0, -90))
+d(0x2732, lambda: rays(6, 1.6, 4.2, 0.7, -90))
+d(0x2734, lambda: F(*star(8, 4.7, 2.6)))
+d(0x2735, lambda: F(*star(8, 4.7, 2.2, twist=16)))
+d(0x2737, lambda: F(*regular(4, 5, CY, 4.3, 0)) + F(*regular(4, 5, CY, 4.3, 45)))
+d(0x2738, lambda: F(*regular(4, 5, CY, 4.9, 0)) + F(*regular(4, 5, CY, 4.9, 45)) + cut(disc(5, CY, 0.9)))
+d(0x2739, lambda: F(*star(12, 4.7, 3.2)))
+d(0x273A, lambda: rays(16, 0.9, 4.5, 0.3, -90))
+d(0x273C, lambda: glyphs_().spokes(8, 0.43, 0.075)[:-1] + cut(disc(5, CY, 1.2)))
+d(0x273E, lambda: [s for k, (x, y, r) in enumerate(_petals(6, 3.0, 1.5)) for s in (disc(x, y, r) if k % 2 == 0 else ring(x, y, r - 0.35, r=0.35))] +
+  disc(5, CY, 0.9))
+d(0x273F, lambda: [s for x, y, r in _petals(5, 2.8, 1.8) for s in disc(x, y, r)] + cut(disc(5, CY, 1.0)))
+d(0x2740, lambda: [s for x, y, r in _petals(5, 2.8, 1.5) for s in ring(x, y, r, r=0.4)] + ring(5, CY, 0.9, r=0.4))
+d(0x2741, lambda: [s for x, y, r in _petals(8, 3.3, 1.2) for s in disc(x, y, r)] + ring(5, CY, 1.3, r=0.4))
+d(0x2742, lambda: disc(5, CY, 4.7) + cut(F(*star(8, 4.0, 2.0))) + disc(5, CY, 0.9))
+d(0x2743, lambda: glyphs_().spokes(5, 0.44, 0.13, -54.0))
+_snow = lambda r, barb, r1=4.4: rays(6, 0, r1, r, -90) + around(P((5 - barb, CY - 3.0 - barb), (5, CY - 3.0), (5 + barb, CY - 3.0 - barb), r=r), 6)   # noqa: E731
+d(0x2744, lambda: _snow(0.4, 1.1))
+d(0x2745, lambda: rays(6, 0, 3.1, 0.5, -90) + [s for k in range(6) for s in disc(*at(3.8, -90 + 60 * k), 0.95)])
+d(0x2746, lambda: _snow(0.8, 1.5, 4.0))
+_diag = lambda r: rays(4, 1.9, 3.4, r, 45)                                          # noqa: E731
+d(0x2747, lambda: F(*star(4, 4.8, 0.9)) + _diag(0.4))
+d(0x2748, lambda: F(*star(4, 4.8, 1.6)) + _diag(0.75))
+d(0x2749, lambda: _balls(6, 0.4, 0.85))
+d(0x274A, lambda: glyphs_().spokes(8, 0.42, 0.07, -67.5))
+d(0x274B, lambda: glyphs_().spokes(8, 0.45, 0.105, -67.5))
+
+fam("ornament")
+_SQ3 = [(1.4, 6.4), (7.6, 6.4), (7.6, 12.6), (1.4, 12.6)]
+d(0x274D, lambda: disc(5.8, 10.6, 3.8) + cut(disc(4.6, 9.4, 3.8)) + ring(4.6, 9.4, 3.8, r=0.4))
+d(0x274F, lambda: shadow(_SQ3, 1.3, 1.3))
+d(0x2750, lambda: shadow([(x, y + 0.9) for x, y in _SQ3], 1.3, -1.3))
+d(0x2751, lambda: outline(_SQ3, 0.4) + P((8.3, 7.4), (8.3, 13.3), (2.4, 13.3), r=0.7))
+d(0x2752, lambda: outline([(x, y + 0.9) for x, y in _SQ3], 0.4) + P((2.4, 6.6), (8.3, 6.6), (8.3, 12.5), r=0.7))
+d(0x2756, lambda: F(*DIA) + cut(P((3.4, 8.15), (6.6, 11.35), r=0.5) + P((6.6, 8.15), (3.4, 11.35), r=0.5)))
+_COMMA = lambda cx, cy, k=1.0: disc(cx, cy, 1.5 * k) + F((cx + 1.5 * k, cy), (cx - 1.4 * k, cy + 4.6 * k), (cx + 0.2 * k, cy + 1.0 * k))   # noqa: E731
+_TURNED = lambda cx, cy, k=1.0: disc(cx, cy, 1.5 * k) + F((cx - 1.5 * k, cy), (cx + 1.4 * k, cy - 4.6 * k), (cx - 0.2 * k, cy - 1.0 * k))   # noqa: E731
+d(0x275B, lambda: _TURNED(5, 9.6))
+d(0x275C, lambda: _COMMA(5, 6.0))
+d(0x275D, lambda: _TURNED(2.9, 9.2, 0.85) + _TURNED(7.1, 9.2, 0.85))
+d(0x275E, lambda: _COMMA(2.9, 6.2, 0.85) + _COMMA(7.1, 6.2, 0.85))
+d(0x2762, lambda: F((3.5, 4), (6.5, 4), (5.5, 11.4), (4.5, 11.4)) + disc(5, 14.1, 1.3))
+d(0x2763, lambda: shift(scale(fill(HEART()), 0.8, 0.8, 5, 10), 0, -2.2) + disc(5, 14.3, 1.2))
+d(0x2764, lambda: scale(fill(HEART()), 1.17, 1.12, 5, 10))
+d(0x2765, lambda: rot(fill(HEART()), -90, 5, 10))
+d(0x2767, lambda: rot(G(0x2766), -90, 5, 10))
+d(0x2619, lambda: mirror(G(0x2767)))
+d(0x2768, lambda: arc(7.6, 10, 3.6, 6.4, 120, 240, r=0.85))
+d(0x2769, lambda: mirror(G(0x2768)))
+d(0x276A, lambda: arc(10.4, 10, 6.2, 6.6, 145, 215, r=0.85))
+d(0x276B, lambda: mirror(G(0x276A)))
+d(0x276C, lambda: P((6.4, 3.8), (3.6, 10), (6.4, 16.2), r=0.85))
+d(0x276D, lambda: mirror(G(0x276C)))
+d(0x276E, lambda: P((6.4, 5.6), (3.4, 9.75), (6.4, 13.9), r=1.2))
+d(0x2770, lambda: P((6.9, 3.8), (3.1, 10), (6.9, 16.2), r=1.3))
+d(0x2771, lambda: mirror(G(0x2770)))
+d(0x2772, lambda: P((6.4, 3.6), (4, 5.6), (4, 14.4), (6.4, 16.4), r=0.5))
+d(0x2773, lambda: mirror(G(0x2772)))
+d(0x2774, lambda: pen(A("{"), 0.9))
+d(0x2775, lambda: pen(A("}"), 0.9))
+
+fam("digit")
+_num = lambda i, r: (pen(script(A(str(i)), 0.52, 6.9, 4.0), r) if i < 10 else                                # noqa: E731
+                     pen(squeeze(script(A("1"), 0.5, 7, 4.0), 2.3, 3.9) + squeeze(script(A("0"), 0.5, 7, 4.0), 4.9, 7.5), r))
+for _i in range(1, 11):
+    d(0x2775 + _i, lambda i=_i: disc(5, CY, 4.5, 5.0) + cut(_num(i, 0.55)))
+    d(0x277F + _i, lambda i=_i: ring(5, CY, 4.3, 4.9, r=0.5) + _num(i, 0.5))
+    d(0x2789 + _i, lambda i=_i: G(0x2775 + i))
+
+fam("arrow")
+_BA = lambda x0, x1, sh, hl, hh, notch=0.0: ([(x0, CY - sh), (x1 - hl, CY - sh), (x1 - hl, CY - hh), (x1, CY),      # noqa: E731
+                                              (x1 - hl, CY + hh), (x1 - hl, CY + sh), (x0, CY + sh)] +
+                                             ([(x0 + notch, CY)] if notch else []))
+_tilt = lambda pts, k: [(x + (y - CY) * k, y) for x, y in pts]                      # noqa: E731
+_HEAD = lambda x=6.0, hh=2.15: F((9.4, CY), (x, CY - hh), (x, CY + hh))             # noqa: E731
+d(0x2794, lambda: P((1.2, CY), (6, CY), r=1.0) + F((9.5, CY), (5.4, CY - 4.2), (5.4, CY + 4.2)))
+d(0x2799, lambda: P((1.2, CY), (8, CY), r=1.0) + P((5.2, 6.4), (8.6, CY), (5.2, 13.1), r=1.0))
+d(0x2798, lambda: rot(G(0x2799), 45))
+d(0x279A, lambda: rot(G(0x2799), -45))
+d(0x279D, lambda: P((1, CY), (6, CY), r=0.5) + _HEAD())
+d(0x279E, lambda: P((1.3, CY), (5.6, CY), r=0.95) + _HEAD(5.6, 2.95))
+d(0x279F, lambda: P((1, CY), (2.0, CY), r=0.5) + P((3.8, CY), (4.8, CY), r=0.5) + _HEAD())
+d(0x27A0, lambda: P((1.3, CY), (1.7, CY), r=0.95) + P((4.0, CY), (4.4, CY), r=0.95) + _HEAD(5.6, 2.95))
+d(0x27A1, lambda: F(*_BA(0.8, 9.4, 1.3, 4.0, 3.6)))
+d(0x27A3, lambda: flip(G(0x27A2)))
+d(0x27A6, lambda: flip(G(0x27A5)))
+d(0x27A7, lambda: F(*_BA(1.8, 8.6, 2.3, 3.4, 4.3)))
+d(0x27A8, lambda: F(*_BA(0.8, 9.4, 1.7, 4.4, 4.2, notch=1.8)))
+_WA = lambda: _BA(1.0, 8.4, 1.5, 3.6, 3.5)                                          # noqa: E731
+d(0x27A9, lambda: shadow(_WA(), 1.0, 0.0))
+d(0x27AA, lambda: shadow([(x + 1.0, y) for x, y in _WA()], -1.0, 0.0))
+d(0x27AB, lambda: shadow(_tilt(_WA(), 0.22), 0.8, 0.8))
+d(0x27AC, lambda: shadow(_tilt(_WA(), -0.22), 0.8, 0.8))
+d(0x27AD, lambda: shadow(_WA(), 0.9, 1.0, 0.6))
+d(0x27AE, lambda: shadow([(x, y + 0.6) for x, y in _WA()], 0.9, -1.0, 0.6))
+d(0x27AF, lambda: shadow(_BA(1.0, 8.4, 1.5, 3.6, 3.5, notch=1.6), 0.9, 1.0))
+d(0x27B1, lambda: shadow([(x, y + 0.6) for x, y in _BA(1.0, 8.4, 1.5, 3.6, 3.5, notch=1.6)], 0.9, -1.0))
+d(0x27B2, lambda: disc(5, CY, 4.7) + cut(F(*_BA(2.0, 8.6, 1.0, 3.0, 2.7))))
+_FEATHER = lambda r, w: (P((2.6, CY), (6.4, CY), r=r) + _HEAD(6.0, w) +             # noqa: E731
+                         F((0.6, CY - w), (2.2, CY - w), (4.2, CY), (2.2, CY + w), (0.6, CY + w), (2.6, CY)))
+d(0x27B5, lambda: _FEATHER(0.5, 2.2))
+d(0x27B4, lambda: rot(G(0x27B5), 45))
+d(0x27B6, lambda: rot(G(0x27B5), -45))
+d(0x27B8, lambda: _FEATHER(0.95, 3.1))
+d(0x27B7, lambda: rot(G(0x27B8), 45))
+d(0x27B9, lambda: rot(G(0x27B8), -45))
+d(0x27BD, lambda: F((0.8, 6.5), (3.8, CY), (0.8, 13.0)) + P((2.4, CY), (5.8, CY), r=0.95) + _HEAD(5.6, 3.1))
+
+
 def made(name):
     """{char: shapes} for a tier: every character drawn in its file and every
     one made here for it."""
@@ -1409,3 +1734,8 @@ def math():
 def sym():
     """{char: shapes} for the tsym tier."""
     return made("sym")
+
+
+def ding():
+    """{char: shapes} for the tding tier."""
+    return made("ding")

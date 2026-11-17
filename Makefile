@@ -584,6 +584,26 @@ pack-term-blocks-v1:
 
 .PHONY: test-term-blocks-v1 pack-term-blocks-v1
 
+# term-letters-v1: new letters of Latin, Greek and Cyrillic, a standalone
+# bundle of group nets used beside split-v9 and term-latin-v1.
+TERM_LETTERS_V1 = $(shell $(PYTHON) train/build_term_letters_v1.py --files)
+TERM_LETTERS_V1_INK = 0250
+
+test-term-letters-v1: build/libneuronte.so build/test_api
+	@set -e; for n in $(TERM_LETTERS_V1); do \
+		$(PYTHON) train/pack.py $$n.json build/$$(basename $$n).nrt; \
+		$(PYTHON) tests/check_reference.py build/libneuronte.so $$n.json build/$$(basename $$n).nrt; \
+	done
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_term_letters_v1.py build/libneuronte.so
+	./build/test_api weights/neuronte-term-letters-v1.nrt --standalone $(TERM_LETTERS_V1_INK)
+
+pack-term-letters-v1:
+	$(PYTHON) train/build_term_letters_v1.py
+
+test: test-term-letters-v1
+
+.PHONY: test-term-letters-v1 pack-term-letters-v1
+
 test-ascii-next: build/libneuronte.so build/test_api
 	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_ascii_next.py build/libneuronte.so
 	./build/test_api weights/neuronte-split-ascii-groups-v1.nrt --full --accent --pixel

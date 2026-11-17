@@ -44,7 +44,7 @@ NAME = build.NAME
 SIZES = ((3, 6), (4, 8), (5, 10), (6, 12), (7, 13), (8, 16), (9, 17), (12, 24), (13, 27), (16, 32), (17, 35),
          (23, 47), (24, 48), (25, 49), (31, 63), (32, 64), (33, 61), (48, 96), (64, 128))
 S1_SIZES = ((8, 16), (16, 32), (48, 96))
-GATES_SHA = 'dd3cc2ea30ccb49d001c28a905bcc6e2a2d11edfcd6a741464fda91162b10e70'   # gates v2.2 of 2026-11-17: gates v2, a rule not applied where the drawing itself fails it
+GATES_SHA = '2ccff8354eeda45e05525490b9fdee6ab13d4970a2389537c44af1504fc50fc4'   # gates v2.3 of 2026-11-17, the final verdicts
 
 
 def fail(message):

@@ -2,14 +2,15 @@
  "schema": "neuronte.term-rest.validation/v1",
  "bundle": "neuronte-term-rest-v1.nrt",
  "bundle_sha256": "9a92c86c183fa9b435d89663780c643a2031f853e0096bd233e7bfdf431a4b6d",
- "gates": "gates-v2.2.json",
- "gates_sha256": "dd3cc2ea30ccb49d001c28a905bcc6e2a2d11edfcd6a741464fda91162b10e70",
- "gates_note": "gates v2 with every rule left unapplied, group by group and size by size, where the drawing itself (a perfect net) fails it; the owner decided it on 2026-11-17 after the first scores of this bundle, on the evidence that such failures measure the sampling and not the net",
+ "gates": "gates-v2.3.json",
+ "gates_sha256": "2ccff8354eeda45e05525490b9fdee6ab13d4970a2389537c44af1504fc50fc4",
+ "gates_note": "gates v2 with no limit tighter than the score of the drawing itself (a perfect net) with 10% of room, and a seed that puts every pixel on the right side at every counted size passing the error-amount rules; the owner decided it on 2026-11-17 after the first scores of this lane, on the evidence that some limits measured the sampling and not the net",
  "earlier_gates_sha256": {
   "gates-v2.1.json": "214942e398f88110cd7c6044c194f0f274274aeedb07abcbe8e1a18dc2b323c0",
+  "gates-v2.2.json": "dd3cc2ea30ccb49d001c28a905bcc6e2a2d11edfcd6a741464fda91162b10e70",
   "gates-v2.json": "5bf1a3f8312c45df2a20b2e69d51ee3c690c58891ec5390cf0e41cbdf9f9b51b"
  },
- "scoring_command_sha256": "50be2da87f2208d0c7c98f639b89a1286ecc13980079331a52c3d4fa8bdba80e",
+ "scoring_command_sha256": "572d573b643f5f7074ceca1fd4505eee9cc8da05bbebdf5e391d1689a9d31f2c",
  "metric_code_sha256": "7c3baaba1a8a0433f147bfaae84c5868e8f2377617a96d1f216a69533dbd32d4",
  "teacher": {
   "set": "termrest",
@@ -25,8 +26,9 @@
  "halves_trained_not_used": [
   "trstwr1"
  ],
- "rules_skipped": 20,
- "rules_skipped_what": "rules not applied to a net in the bundle at one size because the drawing itself fails them there; each is listed with the net",
+ "limits_eased": 24,
+ "limits_eased_what": "limits applied to a net in the bundle at the perfect drawing's own score with 10% of room, where that is looser than the declared limit; each is listed with the net (rule, declared, perfect, applied)",
+ "seeds_passing_pixel_exact": 0,
  "nets_shipped": 26,
  "nets_left_out": 0,
  "characters_drawn": 197,
@@ -56,13 +58,21 @@
      ],
      "both_seeds_pass": true,
      "selected_seed": 1,
-     "rules_skipped": [
-      "24x48 iou_mean skipped: perfect net fails (0.863399, limit 0.944932)"
+     "rules_skipped": [],
+     "limits_eased": [
+      {
+       "rule": "24x48 iou_mean",
+       "declared": 0.9449324959405635,
+       "perfect": 0.8633987777468379,
+       "applied": 0.8497386555215217
+      }
      ],
      "drawing_problems": [],
      "lower_error_seed": 1,
      "seeds": {
       "0": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "57f0cbe7bfac390a9801af484332803f01d809402a7fd9b49991dd65c050da90",
        "packed_sha256": "b3207999da3c29443dd64e22d3456bb7f80ad2b6a92bc126f06c8b7376c38d3f",
        "reference_check_passed": true,
@@ -367,6 +377,8 @@
        }
       },
       "1": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "a666059344666c2016aad9b4f0e492dffa363c02cd80dffd77dc5a3e616f9fcf",
        "packed_sha256": "048864d6d009422d7876f7a1a2dfa8985a36f2fa59dbaf8f107fe8fdc611ba4f",
        "reference_check_passed": true,
@@ -693,13 +705,21 @@
      ],
      "both_seeds_pass": true,
      "selected_seed": 1,
-     "rules_skipped": [
-      "24x48 iou_mean skipped: perfect net fails (0.905581, limit 0.944932)"
+     "rules_skipped": [],
+     "limits_eased": [
+      {
+       "rule": "24x48 iou_mean",
+       "declared": 0.9449324959405635,
+       "perfect": 0.9055807524880369,
+       "applied": 0.8961388277368406
+      }
      ],
      "drawing_problems": [],
      "lower_error_seed": 1,
      "seeds": {
       "0": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "fe2644bab7563d48079fcd34cb106de7d7f6a6b3048aeeba2f0894ed9035f2ba",
        "packed_sha256": "74a74cdcfd7811cb4f9880631a79b04b53ccca606c425651fd9d8ba078c887a5",
        "reference_check_passed": true,
@@ -1005,6 +1025,8 @@
        }
       },
       "1": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "ae875a267c98eeb2fdd03e444ac2585ad154c7251627ab7c6e0b35b132766d7e",
        "packed_sha256": "cbbb30a40d6e92b6e3a2eda275d1c2832bff6f61ae44644ee3d3f22aaa35ae48",
        "reference_check_passed": true,
@@ -1333,10 +1355,13 @@
      "both_seeds_pass": true,
      "selected_seed": 0,
      "rules_skipped": [],
+     "limits_eased": [],
      "drawing_problems": [],
      "lower_error_seed": 0,
      "seeds": {
       "0": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "23188f38f97d701615ee226d90ad965d60497809ea3b460ab9c1ea009c6f8ace",
        "packed_sha256": "e6dc19098e35c91b67433eb650335f9af3db4ac873a132f9d0968842555f0c68",
        "reference_check_passed": true,
@@ -1642,6 +1667,8 @@
        }
       },
       "1": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "3c028baba4bdb5c5600827a0a678f72a28c910b8ff7b08ed58d0159f11fdd0b5",
        "packed_sha256": "fc9cf385cb1c96c165b0e79d9afe47a4cbfb32cfcf04204e5b94caf08b356c5c",
        "reference_check_passed": true,
@@ -1970,10 +1997,13 @@
      "both_seeds_pass": true,
      "selected_seed": 1,
      "rules_skipped": [],
+     "limits_eased": [],
      "drawing_problems": [],
      "lower_error_seed": 1,
      "seeds": {
       "0": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "ab233f889b03bc802bfc218d58c035b3a6f0ad72ea58be35027ef755fdc242e6",
        "packed_sha256": "cf71bbcd3fa357851e5167344d816ccc463763305a3a49679c8a28ffc4f9a3c5",
        "reference_check_passed": true,
@@ -2279,6 +2309,8 @@
        }
       },
       "1": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "d259f514a29b5449fa5574118f7550be6d540236438cb9243fb75765e6b33bae",
        "packed_sha256": "611fb083bea3068cebe72ea2d73cb86d20f94c83ea41efb5f260e4d34aa3db39",
        "reference_check_passed": true,
@@ -2614,10 +2646,13 @@
      "both_seeds_pass": true,
      "selected_seed": 1,
      "rules_skipped": [],
+     "limits_eased": [],
      "drawing_problems": [],
      "lower_error_seed": 1,
      "seeds": {
       "0": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "d2f874fa92919856289e9d38a1a6c7dc4d819a2a7b43238e4b401fad3eaabd3d",
        "packed_sha256": "ec8a7b218e8526384aa4ffc1099e6869774e9d9a1e606b044200ac26bda9913f",
        "reference_check_passed": true,
@@ -2887,6 +2922,8 @@
        }
       },
       "1": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "29785bedfb1e8c79c71acd003ee0f7cee2986849226160502864938048d57e0c",
        "packed_sha256": "754e8bd63e70562db2929293c7deaba9c52b7eb3760993166e6493a6cd5eff74",
        "reference_check_passed": true,
@@ -3179,10 +3216,13 @@
      "both_seeds_pass": true,
      "selected_seed": 0,
      "rules_skipped": [],
+     "limits_eased": [],
      "drawing_problems": [],
      "lower_error_seed": 0,
      "seeds": {
       "0": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "dea27ee5b524bddea27edb0b20a5ca8aaa99797365e6517ca0f7d7cf6322ef40",
        "packed_sha256": "a7a71ee37908d00f93a02637e6b089de4ab7d96d6e55bae53a43eb5c8ea0930a",
        "reference_check_passed": true,
@@ -3489,6 +3529,8 @@
        }
       },
       "1": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "93656abf3600dae9823e6b36115596d8208d23eb8fd0367097db5fb4e12a6fed",
        "packed_sha256": "b6e0f40712769900c1cabb3937a2b6a32f84ee46fd1c5082814272105a8434eb",
        "reference_check_passed": true,
@@ -3821,13 +3863,21 @@
      ],
      "both_seeds_pass": true,
      "selected_seed": 0,
-     "rules_skipped": [
-      "24x48 iou_mean skipped: perfect net fails (0.90254, limit 0.944932)"
+     "rules_skipped": [],
+     "limits_eased": [
+      {
+       "rule": "24x48 iou_mean",
+       "declared": 0.9449324959405635,
+       "perfect": 0.9025400178449369,
+       "applied": 0.8927940196294305
+      }
      ],
      "drawing_problems": [],
      "lower_error_seed": 0,
      "seeds": {
       "0": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "3e8214bafda09fc6f273c832a6cb472f65c77e3f1be0ba290143daa0d53ec84f",
        "packed_sha256": "2817a49c016467eb35178bd008f8a88fe7e2fbab8a7347448c22cdf68c92d34e",
        "reference_check_passed": true,
@@ -4131,6 +4181,8 @@
        }
       },
       "1": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "764db3a29768173e758638a02eb2770c6e0d7468b4b7ed984202b51a88034aa4",
        "packed_sha256": "2872fcea7d1449dc558dad171822cf7bd5521db1e83b73c62334a424e9cc179c",
        "reference_check_passed": true,
@@ -4457,13 +4509,21 @@
      ],
      "both_seeds_pass": true,
      "selected_seed": 1,
-     "rules_skipped": [
-      "24x48 iou_mean skipped: perfect net fails (0.896161, limit 0.944932)"
+     "rules_skipped": [],
+     "limits_eased": [
+      {
+       "rule": "24x48 iou_mean",
+       "declared": 0.9449324959405635,
+       "perfect": 0.8961609150825987,
+       "applied": 0.8857770065908586
+      }
      ],
      "drawing_problems": [],
      "lower_error_seed": 1,
      "seeds": {
       "0": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "97e97c4cdd75791c9889a09fdab403bc83c0e5997a8d0e66681fc6ff6ec997ac",
        "packed_sha256": "1d24b27a84ac30dd0bf09b5d9664d4b75d9da25a9f84a9d2b840c8c1009c0527",
        "reference_check_passed": true,
@@ -4768,6 +4828,8 @@
        }
       },
       "1": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "8933385d9202459c46d40db54d4015cc8ee27ab9deacb8ddb0c90fbbc4bf2daa",
        "packed_sha256": "4190b31054eea5139efc21187714ba802cab2569847cd949458a80be9653f4a3",
        "reference_check_passed": true,
@@ -5095,10 +5157,13 @@
      "both_seeds_pass": true,
      "selected_seed": 0,
      "rules_skipped": [],
+     "limits_eased": [],
      "drawing_problems": [],
      "lower_error_seed": 0,
      "seeds": {
       "0": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "c306da26c0c8a7abccc2f1a15cbc82686f08876a9bc4d183c70c30137f775f53",
        "packed_sha256": "6aa3ae00a887f1cf26e8416c821f7f527b54308703a6ea29707d47257487e228",
        "reference_check_passed": true,
@@ -5401,6 +5466,8 @@
        }
       },
       "1": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "0989640e4023df4ce43c630281a9679044893b9dfb612592a928a6ad021bc200",
        "packed_sha256": "895274980eadd00caddc197580d7f64d2eb024dc831bb104965114b960afbb1d",
        "reference_check_passed": true,
@@ -5726,13 +5793,21 @@
      ],
      "both_seeds_pass": false,
      "selected_seed": null,
-     "rules_skipped": [
-      "s1 8x16 p99 skipped: perfect net fails (0.24415, limit 0.235413)"
+     "rules_skipped": [],
+     "limits_eased": [
+      {
+       "rule": "s1 8x16 p99",
+       "declared": 0.23541254103183748,
+       "perfect": 0.24414986371994019,
+       "applied": 0.2685648500919342
+      }
      ],
      "drawing_problems": [],
      "lower_error_seed": 0,
      "seeds": {
       "0": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "4ed37a0b6c028c8284a5b2b61fa3ffbd8144120f0dc6c52052dd12eb20ec4a41",
        "packed_sha256": "3976aaf6534de52c9b1d6ed8df92e85ce38140fe4ac0d6d070a38a80db06629d",
        "reference_check_passed": true,
@@ -6039,6 +6114,8 @@
        }
       },
       "1": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "087e3036c15d025ef94516a3267fd2f90e640bc43728c8d7fc525e30a6fc9f7b",
        "packed_sha256": "80c30ad8735395c877622ee08a01c6e73a4b074fe615d2207ab8dcdcfafc3f89",
        "reference_check_passed": true,
@@ -6362,15 +6439,39 @@
        ],
        "both_seeds_pass": true,
        "selected_seed": 0,
-       "rules_skipped": [
-        "24x48 iou_mean skipped: perfect net fails (0.944621, limit 0.944932)",
-        "s1 8x16 p99 skipped: perfect net fails (0.27997, limit 0.235413)",
-        "s1 16x32 firm skipped: perfect net fails (0.00292969, limit 0.00214844)"
+       "rules_skipped": [],
+       "limits_eased": [
+        {
+         "rule": "10x20 mae",
+         "declared": 0.008660606882767753,
+         "perfect": 0.007901074248366058,
+         "applied": 0.008691181673202665
+        },
+        {
+         "rule": "24x48 iou_mean",
+         "declared": 0.9449324959405635,
+         "perfect": 0.9446209048011223,
+         "applied": 0.9390829952812345
+        },
+        {
+         "rule": "s1 8x16 p99",
+         "declared": 0.23541254103183748,
+         "perfect": 0.2799701690673828,
+         "applied": 0.3079671859741211
+        },
+        {
+         "rule": "s1 16x32 firm",
+         "declared": 0.0021484375,
+         "perfect": 0.0029296875,
+         "applied": 0.0032226562500000003
+        }
        ],
        "drawing_problems": [],
        "lower_error_seed": 0,
        "seeds": {
         "0": {
+         "pixel_exact": false,
+         "waived": [],
          "sha256": "f4c7e1a26f2dd3befc7544a07a1f2cb6dcff36a8b440b61c32a788b8c1e368e2",
          "packed_sha256": "fb2c289a45baeb21bf0feb954612ad6accec88cee360221c43443f5426e211f2",
          "reference_check_passed": true,
@@ -6676,6 +6777,8 @@
          }
         },
         "1": {
+         "pixel_exact": false,
+         "waived": [],
          "sha256": "d841a7ed4a133c0c82ed998abb22638cdc8d1dc1295a747c4012f02f21696b15",
          "packed_sha256": "b62739a3510b7191e421e1c090a55107f71aab3dbca81649cd930a2809ce9352",
          "reference_check_passed": true,
@@ -7000,10 +7103,13 @@
        "both_seeds_pass": true,
        "selected_seed": 1,
        "rules_skipped": [],
+       "limits_eased": [],
        "drawing_problems": [],
        "lower_error_seed": 1,
        "seeds": {
         "0": {
+         "pixel_exact": false,
+         "waived": [],
          "sha256": "7a6e43118839d47842a08e46bf50dff9ea1aa07938c3ee08ad2cf7443fb9e2a0",
          "packed_sha256": "ad56c545a48e9ababcb8bcbadae21aa9a3749f115071cdd7935cf52b6c8f42ec",
          "reference_check_passed": true,
@@ -7306,6 +7412,8 @@
          }
         },
         "1": {
+         "pixel_exact": false,
+         "waived": [],
          "sha256": "d95598075ccd3264829deb80ca745b91e46fe6960d26f2d85a9f4c31f77e2aba",
          "packed_sha256": "99fc0f46b1c4ab6e5cc4256e038c34b407345b6b7aabee620d6cca3eedb1f11e",
          "reference_check_passed": true,
@@ -7637,13 +7745,21 @@
      ],
      "both_seeds_pass": true,
      "selected_seed": 0,
-     "rules_skipped": [
-      "24x48 iou_mean skipped: perfect net fails (0.919952, limit 0.944932)"
+     "rules_skipped": [],
+     "limits_eased": [
+      {
+       "rule": "24x48 iou_mean",
+       "declared": 0.9449324959405635,
+       "perfect": 0.9199524755901941,
+       "applied": 0.9119477231492135
+      }
      ],
      "drawing_problems": [],
      "lower_error_seed": 0,
      "seeds": {
       "0": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "caada35bde5f7979bb4b7ab549da5261341fd32baecc6b24420bc83d9d12b0e4",
        "packed_sha256": "6c75dd2d32be1d7c96f22fd88c9ce6562bb0081448c0324167b1f206743ae527",
        "reference_check_passed": true,
@@ -7944,6 +8060,8 @@
        }
       },
       "1": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "04a2461f18f1ff0905fad7bc195b1ce35da9aaf7bee9b8b40679c0fe9f46cc3b",
        "packed_sha256": "444c90ace6aa4152040e87ec27be931671c90553702fbb53f4d190576c09a402",
        "reference_check_passed": true,
@@ -8266,13 +8384,21 @@
      ],
      "both_seeds_pass": true,
      "selected_seed": 1,
-     "rules_skipped": [
-      "24x48 iou_mean skipped: perfect net fails (0.920063, limit 0.944932)"
+     "rules_skipped": [],
+     "limits_eased": [
+      {
+       "rule": "24x48 iou_mean",
+       "declared": 0.9449324959405635,
+       "perfect": 0.9200628785948539,
+       "applied": 0.9120691664543393
+      }
      ],
      "drawing_problems": [],
      "lower_error_seed": 1,
      "seeds": {
       "0": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "796c16929952e75308fcbd141b8be51cc5cc7acdaf6d0859a0f94d118d957c5a",
        "packed_sha256": "5dead5f6c5b17851de5b230e2c3f93a781798f98d3278d26b3302d308f509bfe",
        "reference_check_passed": true,
@@ -8579,6 +8705,8 @@
        }
       },
       "1": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "894f5fdad0a978a229a8df2d44a46969b95b24301c454e1a8b1f16674caa6e10",
        "packed_sha256": "243236a92da426700e9fa694e8f072273b5a892ff1c180029923a0e85d7f8d64",
        "reference_check_passed": true,
@@ -8907,17 +9035,45 @@
      ],
      "both_seeds_pass": true,
      "selected_seed": 0,
-     "rules_skipped": [
-      "8x16 p99 skipped: perfect net fails (0.101052, limit 0.0821255)",
-      "24x48 iou_mean skipped: perfect net fails (0.943394, limit 0.944932)",
-      "s1 8x16 mae skipped: perfect net fails (0.0253735, limit 0.0251433)",
-      "s1 8x16 p99 skipped: perfect net fails (0.343788, limit 0.235413)",
-      "s1 16x32 p99 skipped: perfect net fails (0.102447, limit 0.0952842)"
+     "rules_skipped": [],
+     "limits_eased": [
+      {
+       "rule": "8x16 p99",
+       "declared": 0.08212547078728677,
+       "perfect": 0.10105228424072266,
+       "applied": 0.11115751266479493
+      },
+      {
+       "rule": "24x48 iou_mean",
+       "declared": 0.9449324959405635,
+       "perfect": 0.943393648454836,
+       "applied": 0.9377330133003196
+      },
+      {
+       "rule": "s1 8x16 mae",
+       "declared": 0.02514328407123685,
+       "perfect": 0.025373535230755806,
+       "applied": 0.027910888753831388
+      },
+      {
+       "rule": "s1 8x16 p99",
+       "declared": 0.23541254103183748,
+       "perfect": 0.3437884747982025,
+       "applied": 0.3781673222780228
+      },
+      {
+       "rule": "s1 16x32 p99",
+       "declared": 0.09528416693210602,
+       "perfect": 0.10244664549827576,
+       "applied": 0.11269131004810334
+      }
      ],
      "drawing_problems": [],
      "lower_error_seed": 0,
      "seeds": {
       "0": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "b1c84d1e21d30fc857e8aee59994cfba7c31e5aa61e57a25d68acc93479e001b",
        "packed_sha256": "aa6d507f607cda13886dd88fe6838388459e9d5dd70630a669f2631d78aa6493",
        "reference_check_passed": true,
@@ -9223,6 +9379,8 @@
        }
       },
       "1": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "7ddfd39adc8bf6d32eb156130270e109bade5daadf2d64a68486ac6cd244ea6c",
        "packed_sha256": "a66742a250e9b05c1fbf4f70de7e17c2a4885e90e8a13747ca6aec4490cd040e",
        "reference_check_passed": true,
@@ -9551,10 +9709,20 @@
      "both_seeds_pass": true,
      "selected_seed": 1,
      "rules_skipped": [],
+     "limits_eased": [
+      {
+       "rule": "24x48 iou_mean",
+       "declared": 0.9449324959405635,
+       "perfect": 0.9456714684807168,
+       "applied": 0.9402386153287885
+      }
+     ],
      "drawing_problems": [],
      "lower_error_seed": 1,
      "seeds": {
       "0": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "a0e8412e39960c1c2165838de8c451a0d44d4b36f120f096a3a9979e9e77f10f",
        "packed_sha256": "f4547c46811b2b0b8d1b2b6f0d5d9606e4eaeec5f502121fb5f47a125078085f",
        "reference_check_passed": true,
@@ -9855,6 +10023,8 @@
        }
       },
       "1": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "4e82208faaee9c47627ab990225833654123209ddd393b7abaf7e28e4093a77b",
        "packed_sha256": "5adcfd7c4fd0f8c542ec2f7f8daa11af8bbe2da29bd1b0bd5a16a2c88270cb12",
        "reference_check_passed": true,
@@ -10178,10 +10348,13 @@
      "both_seeds_pass": true,
      "selected_seed": 0,
      "rules_skipped": [],
+     "limits_eased": [],
      "drawing_problems": [],
      "lower_error_seed": 0,
      "seeds": {
       "0": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "bd47ffa31f83155fb0a885c55576e64f4ba418fc56d9171bc211dc92941452fc",
        "packed_sha256": "9be5e29cedae62934a6deb1b5b2bbcef0566f44435a48e3696d64670ce13b200",
        "reference_check_passed": true,
@@ -10482,6 +10655,8 @@
        }
       },
       "1": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "f11cbcf2d74d54b2e8b9432a8a89d0611a4a1a4d1adc72eacd977580a8ff720c",
        "packed_sha256": "1cef2fc105e3ef93dd25bf536e15b122f3a916d932803e7f303c5a148d655331",
        "reference_check_passed": true,
@@ -10811,10 +10986,13 @@
      "both_seeds_pass": true,
      "selected_seed": 0,
      "rules_skipped": [],
+     "limits_eased": [],
      "drawing_problems": [],
      "lower_error_seed": 0,
      "seeds": {
       "0": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "8d59f8db9ffadab8ff581e67c18bf3075dc95038f433318d8c3eec88da0b1a3d",
        "packed_sha256": "4b573422800bc303e371efd67e72d5f2e83a7751b5a8f89a8da0cf32bb4b3bfd",
        "reference_check_passed": true,
@@ -11089,6 +11267,8 @@
        }
       },
       "1": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "66226ac242e31076e9c8811231f8e2ae84c263a317c0c2305de4a742314922d7",
        "packed_sha256": "a59faf3f5c10c4456da23e2b710f89aa37e4155ef7be98c9cf5af9a77b012562",
        "reference_check_passed": true,
@@ -11386,10 +11566,13 @@
      "both_seeds_pass": true,
      "selected_seed": 0,
      "rules_skipped": [],
+     "limits_eased": [],
      "drawing_problems": [],
      "lower_error_seed": 0,
      "seeds": {
       "0": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "c7fbbdec8929123a43cc802054ee05f70e48d354f631715ec07c9e47a9b578e2",
        "packed_sha256": "34403d2ecccecbb1ab33a68778e59e6c88c6c7700914b612893c18f27b3218e4",
        "reference_check_passed": true,
@@ -11658,6 +11841,8 @@
        }
       },
       "1": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "ae7011b402a528116078fef774063d3f610bc300a74f5b20aa68351b8c7a98ac",
        "packed_sha256": "3b3fb4bb6808b75af0686bdb663c38658988fe0d44416212f9d371a7f73e1be2",
        "reference_check_passed": true,
@@ -11949,10 +12134,13 @@
      "both_seeds_pass": true,
      "selected_seed": 0,
      "rules_skipped": [],
+     "limits_eased": [],
      "drawing_problems": [],
      "lower_error_seed": 0,
      "seeds": {
       "0": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "9104d40223ad57a0b0a6e7ff1fe95b91ceb94954a169a7c948835a5b18ef222e",
        "packed_sha256": "a018ca9bcd293b72c50c994d08ce2ca94724a5b9154c2574b14dda6646f43e0e",
        "reference_check_passed": true,
@@ -12223,6 +12411,8 @@
        }
       },
       "1": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "601c280ea7dfc1c6dbf08a2187278c0bde393eb9e1fc8023a4e331687a0a65a2",
        "packed_sha256": "097a88532766b9a23c891a11d68a535a26fa8b4fc44e37d115560da798dd62d7",
        "reference_check_passed": true,
@@ -12518,10 +12708,13 @@
      "both_seeds_pass": true,
      "selected_seed": 0,
      "rules_skipped": [],
+     "limits_eased": [],
      "drawing_problems": [],
      "lower_error_seed": 0,
      "seeds": {
       "0": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "c1696a15b89e6717b109d12c3d9505e102900c3474a7615bca55171bf3b7e904",
        "packed_sha256": "a270af497c41de9edc8cbfd241f27417e837dd7c9dd64dc99c8a46116ecb1d14",
        "reference_check_passed": true,
@@ -12794,6 +12987,8 @@
        }
       },
       "1": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "9f430a77a049be24d77a4b59674d8d4da47676d457c07450c9cc78af40b2a3b5",
        "packed_sha256": "04afe287c27be37a7cc5c281df433d8bd61467c18dc3f3ec9d1ffd457b1b3f0f",
        "reference_check_passed": true,
@@ -13088,14 +13283,27 @@
      ],
      "both_seeds_pass": true,
      "selected_seed": 1,
-     "rules_skipped": [
-      "10x20 p99 skipped: perfect net fails (0.075062, limit 0.0711483)",
-      "24x48 firm skipped: perfect net fails (0.00119358, limit 0.000954861)"
+     "rules_skipped": [],
+     "limits_eased": [
+      {
+       "rule": "10x20 p99",
+       "declared": 0.07114832893013955,
+       "perfect": 0.07506197690963745,
+       "applied": 0.0825681746006012
+      },
+      {
+       "rule": "24x48 firm",
+       "declared": 0.0009548611111111112,
+       "perfect": 0.001193576388888889,
+       "applied": 0.0013129340277777779
+      }
      ],
      "drawing_problems": [],
      "lower_error_seed": 1,
      "seeds": {
       "0": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "acfeb48f17285ef5310f4c95137303315d33ecdf61d226f41dac7054dabed28d",
        "packed_sha256": "cb10c94831045a5a7b0292d5be28840910c2b6cb7b684bd17f412657ef86db4e",
        "reference_check_passed": true,
@@ -13367,6 +13575,8 @@
        }
       },
       "1": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "bb15f79e8e881a7994c068b5875d662df1054a26633418963a95400447e041db",
        "packed_sha256": "76e814cdaf91e8a3b8a8cab4c76e8f06fbadfd5bfe71679fbb4447c8626d6cb6",
        "reference_check_passed": true,
@@ -13661,10 +13871,13 @@
      "both_seeds_pass": true,
      "selected_seed": 0,
      "rules_skipped": [],
+     "limits_eased": [],
      "drawing_problems": [],
      "lower_error_seed": 0,
      "seeds": {
       "0": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "1649fcfedb74d23bbf293f3b2afbc8f04d50ede5105fc36ae2ebe14660773c6d",
        "packed_sha256": "b6b6fcf01905dbffe62091a7f22b7a8ff79b1e5c631b6333158f9a42aec83bb1",
        "reference_check_passed": true,
@@ -13935,6 +14148,8 @@
        }
       },
       "1": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "84407240aaa54172d4961079d06ef9598303b887596c18b7c77768537027e5f2",
        "packed_sha256": "95a182d711d0f4cd0c9f9e421e58aa253f9c554249b65740d13a64f9005595c7",
        "reference_check_passed": true,
@@ -14228,10 +14443,20 @@
      "both_seeds_pass": true,
      "selected_seed": 1,
      "rules_skipped": [],
+     "limits_eased": [
+      {
+       "rule": "8x16 p99",
+       "declared": 0.08183252587914468,
+       "perfect": 0.07516808062791824,
+       "applied": 0.08268488869071007
+      }
+     ],
      "drawing_problems": [],
      "lower_error_seed": 1,
      "seeds": {
       "0": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "d3d24337142fcbc890bfca20c8afe9d05aacae2a9f78d876f258efd23142ee8c",
        "packed_sha256": "e065d28121afa13e1845a0d9b078705607db581111831b8c85b93152473484a6",
        "reference_check_passed": true,
@@ -14509,6 +14734,8 @@
        }
       },
       "1": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "cd9755d16d20a0af145ce3890d8027eb8aab0e8ce3fae97e0d2b739de79e7238",
        "packed_sha256": "2012b3157b1b00a42b9c215607519651ebcfb235abca87b2ee12d7aedb37c6d2",
        "reference_check_passed": true,
@@ -14813,13 +15040,27 @@
      ],
      "both_seeds_pass": true,
      "selected_seed": 1,
-     "rules_skipped": [
-      "10x20 p99 skipped: perfect net fails (0.0753387, limit 0.0711483)"
+     "rules_skipped": [],
+     "limits_eased": [
+      {
+       "rule": "10x20 p99",
+       "declared": 0.07114832893013955,
+       "perfect": 0.07533866167068481,
+       "applied": 0.0828725278377533
+      },
+      {
+       "rule": "24x48 p99",
+       "declared": 0.08273293972015382,
+       "perfect": 0.08092302083969116,
+       "applied": 0.08901532292366028
+      }
      ],
      "drawing_problems": [],
      "lower_error_seed": 1,
      "seeds": {
       "0": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "8dca3ef63096590763254638ebcf37aff333ffcefa7bf93f16449d403ab50a01",
        "packed_sha256": "d21ebd39b9214b1a8a98d4fc7a4a708eb4e390fff08c2acdb3daa1c5e4531dbb",
        "reference_check_passed": true,
@@ -15090,6 +15331,8 @@
        }
       },
       "1": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "a616a6e42490ec6472be6728837382114fd8c3de793b385392031dff140da191",
        "packed_sha256": "366b626f09d0a6736d8a75594ae86b0f2092c826d6715b63014cdbf052d941a6",
        "reference_check_passed": true,
@@ -15381,15 +15624,33 @@
      ],
      "both_seeds_pass": true,
      "selected_seed": 1,
-     "rules_skipped": [
-      "8x16 p99 skipped: perfect net fails (0.0832185, limit 0.0818325)",
-      "10x20 p99 skipped: perfect net fails (0.0753387, limit 0.0711483)",
-      "24x48 p99 skipped: perfect net fails (0.0839428, limit 0.0827329)"
+     "rules_skipped": [],
+     "limits_eased": [
+      {
+       "rule": "8x16 p99",
+       "declared": 0.08183252587914468,
+       "perfect": 0.08321845531463623,
+       "applied": 0.09154030084609986
+      },
+      {
+       "rule": "10x20 p99",
+       "declared": 0.07114832893013955,
+       "perfect": 0.07533866167068481,
+       "applied": 0.0828725278377533
+      },
+      {
+       "rule": "24x48 p99",
+       "declared": 0.08273293972015382,
+       "perfect": 0.08394282311201096,
+       "applied": 0.09233710542321207
+      }
      ],
      "drawing_problems": [],
      "lower_error_seed": 1,
      "seeds": {
       "0": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "e4b4e500aee8bdd8876bdc7fe8843faec929ae5310e7685bc08517f07ddda103",
        "packed_sha256": "4826d8525b745886cade6f5d1fea05cdc7b1f281285adf854d1b524078b7cf74",
        "reference_check_passed": true,
@@ -15658,6 +15919,8 @@
        }
       },
       "1": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "497b80631da38c0a3a302ba7de68d8767501819f1a6a30018f25c7727d711014",
        "packed_sha256": "4a93ecc823c19deb822fc28af6b1f426ed1aa08b7834337374a1c36c856cc007",
        "reference_check_passed": true,
@@ -15956,10 +16219,13 @@
      "both_seeds_pass": true,
      "selected_seed": 1,
      "rules_skipped": [],
+     "limits_eased": [],
      "drawing_problems": [],
      "lower_error_seed": 1,
      "seeds": {
       "0": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "5fc1f031f3346a6d9d1846c7dfd426730b1b4e6c231d774b1025e493edae7d8d",
        "packed_sha256": "97d200f0835ee696c78d59efa820207fe04d76b966a03f2e85ec3b48479a5e9a",
        "reference_check_passed": true,
@@ -16226,6 +16492,8 @@
        }
       },
       "1": {
+       "pixel_exact": false,
+       "waived": [],
        "sha256": "6198ec9800f0e442c07dddfc7e5c385087c99006fea2901bb87ab195849abf5e",
        "packed_sha256": "83521021edaa07916786d6180c1408538bf06d81577ef44e7eb59909b23c2171",
        "reference_check_passed": true,

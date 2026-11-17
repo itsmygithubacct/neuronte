@@ -1,0 +1,7 @@
+# neuronte-term-dingbat-v1: the 323 characters it was trained on (train/glyphs.py tier tding).
+# Written by train/build_term_symbols.py; tests/check_term_symbols.py compares.
+U+2600..U+2604 U+2607..U+260F U+2613 U+2616..U+262F U+2631..U+2647 U+2654..U+267E U+2680..U+2692 U+2694..U+269C
+U+269E..U+269F U+26A2..U+26A9 U+26AC..U+26B8 U+26C0..U+26C3 U+26E2 U+2701..U+2704 U+2706..U+2709 U+270C..U+2712
+U+2719..U+2721 U+2723..U+2727 U+2729..U+2732 U+2734..U+2735 U+2737..U+273A U+273C U+273E..U+274B U+274D
+U+274F..U+2752 U+2756 U+2758..U+275E U+2761..U+276E U+2770..U+2794 U+2798..U+279B U+279D..U+27A3 U+27A5..U+27AF
+U+27B1..U+27BE

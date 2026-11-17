@@ -1,0 +1,848 @@
+{
+  "schema": "neuronte.term-symbols/v1",
+  "name": "neuronte-term-dingbat-v1",
+  "tier": "tding",
+  "sha256": "0f2a6b1548c0b129ab127d6e23a96c3e7e631865f9bee37ead58513293eaf6b3",
+  "bytes": 2000188,
+  "groups": [
+    [
+      "tding12",
+      8
+    ],
+    [
+      "tding10",
+      8
+    ],
+    [
+      "tding8",
+      19
+    ]
+  ],
+  "left_out": [],
+  "owner_chosen": [
+    {
+      "set": "tding10",
+      "group": 0,
+      "seed": 1
+    },
+    {
+      "set": "tding10",
+      "group": 1,
+      "seed": 0
+    },
+    {
+      "set": "tding10",
+      "group": 2,
+      "seed": 1
+    },
+    {
+      "set": "tding10",
+      "group": 4,
+      "seed": 1
+    },
+    {
+      "set": "tding12",
+      "group": 2,
+      "seed": 1
+    },
+    {
+      "set": "tding12",
+      "group": 3,
+      "seed": 1
+    },
+    {
+      "set": "tding12",
+      "group": 5,
+      "seed": 1
+    },
+    {
+      "set": "tding8",
+      "group": 0,
+      "seed": 1
+    },
+    {
+      "set": "tding8",
+      "group": 1,
+      "seed": 1
+    },
+    {
+      "set": "tding8",
+      "group": 3,
+      "seed": 1
+    },
+    {
+      "set": "tding8",
+      "group": 4,
+      "seed": 0
+    },
+    {
+      "set": "tding8",
+      "group": 6,
+      "seed": 1
+    },
+    {
+      "set": "tding8",
+      "group": 7,
+      "seed": 0
+    },
+    {
+      "set": "tding8",
+      "group": 8,
+      "seed": 1
+    },
+    {
+      "set": "tding8",
+      "group": 9,
+      "seed": 1
+    },
+    {
+      "set": "tding8",
+      "group": 10,
+      "seed": 1
+    },
+    {
+      "set": "tding8",
+      "group": 11,
+      "seed": 1
+    },
+    {
+      "set": "tding8",
+      "group": 12,
+      "seed": 1
+    },
+    {
+      "set": "tding8",
+      "group": 13,
+      "seed": 1
+    },
+    {
+      "set": "tding8",
+      "group": 14,
+      "seed": 1
+    },
+    {
+      "set": "tding8",
+      "group": 15,
+      "seed": 0
+    },
+    {
+      "set": "tding8",
+      "group": 16,
+      "seed": 1
+    },
+    {
+      "set": "tding8",
+      "group": 17,
+      "seed": 0
+    },
+    {
+      "set": "tding8",
+      "group": 18,
+      "seed": 0
+    }
+  ],
+  "record": {
+    "schema": "neuronte.standalone-bundle/v1",
+    "sha256": "0f2a6b1548c0b129ab127d6e23a96c3e7e631865f9bee37ead58513293eaf6b3",
+    "bytes": 2000188,
+    "members": 36,
+    "group_nets": 35,
+    "ranges": 252,
+    "gate": null,
+    "trained_scalars": 323,
+    "fallback": {
+      "member": 35,
+      "kind": "blank",
+      "hidden_width": 1,
+      "distance": -8.0,
+      "image_sha256": "42d4790165297c3af39d178e1396f575991d6fe4d2e3c947762ef5eaedd05bf6",
+      "bytes": 592
+    },
+    "apart_from": [
+      {
+        "file": "neuronte-split-v9.nrt",
+        "sha256": "0a92f223d47f1680929b2c5d7512d1a1728d4871e6653b33cbaad060e6bb90c0",
+        "table_scalars": 1341
+      }
+    ],
+    "nets": [
+      {
+        "member": 0,
+        "json": "neuronte-term-dingbat-v1-tding12-g0.json",
+        "json_sha256": "a6232bf40d68daf476aac1dad33e5ce10ee7c5a54677506dc5db4fd6b08a8cd1",
+        "image_sha256": "18dd9c2b532006cd970952ccce7ea5afbe56ca0bf29a4f8323ccd155a093b8de",
+        "bytes": 57040,
+        "set": "tding12-repertoire",
+        "scalars": [
+          "U+2794",
+          "U+279A",
+          "U+279B",
+          "U+279F",
+          "U+27A2",
+          "U+27A8",
+          "U+27AD",
+          "U+27AF",
+          "U+27B4",
+          "U+27B8",
+          "U+27BE"
+        ]
+      },
+      {
+        "member": 1,
+        "json": "neuronte-term-dingbat-v1-tding12-g1.json",
+        "json_sha256": "4c45fbc60e1c535f3cd4aa6849adc5e6c5bfad6713888e5809dc394da89c3a81",
+        "image_sha256": "28301fcffc25b8a9459be04533da66696fb7c3e0e31e4f016d6ff8f93eed487f",
+        "bytes": 57040,
+        "set": "tding12-repertoire",
+        "scalars": [
+          "U+2798",
+          "U+279D",
+          "U+27A0",
+          "U+27A1",
+          "U+27A5",
+          "U+27A9",
+          "U+27AB",
+          "U+27AE",
+          "U+27B1",
+          "U+27B6",
+          "U+27B7",
+          "U+27BB"
+        ]
+      },
+      {
+        "member": 2,
+        "json": "neuronte-term-dingbat-v1-tding12-g2.json",
+        "json_sha256": "39a12a411d57f628000039b2c9b5a3ee3dd7d90ad600d1e5d16771c4808faeda",
+        "image_sha256": "8521a50393f6968699943524e8881336d97543137b8e4603316ab4b52ce255da",
+        "bytes": 57040,
+        "set": "tding12-repertoire",
+        "scalars": [
+          "U+2799",
+          "U+279E",
+          "U+27A3",
+          "U+27A7",
+          "U+27AA",
+          "U+27B2",
+          "U+27B3",
+          "U+27B5",
+          "U+27B9",
+          "U+27BC",
+          "U+27BD"
+        ]
+      },
+      {
+        "member": 3,
+        "json": "neuronte-term-dingbat-v1-tding12-g3.json",
+        "json_sha256": "fdde0b080d617b762aa081927ba56b31e342deae7fc22618976b794ad9080c35",
+        "image_sha256": "2c3036f749e5cd51650188d3db8eadfa694203d89b8c6e7593b7405ab93948e8",
+        "bytes": 57040,
+        "set": "tding12-repertoire",
+        "scalars": [
+          "U+2631",
+          "U+2634",
+          "U+2635",
+          "U+2637",
+          "U+268A",
+          "U+268D",
+          "U+268E",
+          "U+2758",
+          "U+275A",
+          "U+27A6",
+          "U+27AC",
+          "U+27BA"
+        ]
+      },
+      {
+        "member": 4,
+        "json": "neuronte-term-dingbat-v1-tding12-g4.json",
+        "json_sha256": "636f1338c440af356094198214bc42eb4a403bd3f62ee9f670370e76b286591d",
+        "image_sha256": "309bda8cef22a5cf5037059b62f8af3c15800b8025342e842fea7780daae273d",
+        "bytes": 57040,
+        "set": "tding12-repertoire",
+        "scalars": [
+          "U+2617",
+          "U+261B",
+          "U+2632",
+          "U+2633",
+          "U+2636",
+          "U+265A",
+          "U+265C",
+          "U+268B",
+          "U+268C",
+          "U+268F",
+          "U+2712",
+          "U+2759"
+        ]
+      },
+      {
+        "member": 5,
+        "json": "neuronte-term-dingbat-v1-tding12-g5.json",
+        "json_sha256": "7ca7a239f6be9236cf5baa784d7a1eb56adb198c5bd780d35fe1559797c0c7a0",
+        "image_sha256": "71c0f8cadc85f9e3eadb765d178840c79167c4dd8741b4b57b6b8af5a4da461e",
+        "bytes": 57040,
+        "set": "tding12-repertoire",
+        "scalars": [
+          "U+260E",
+          "U+2619",
+          "U+261A",
+          "U+265B",
+          "U+265D",
+          "U+265E",
+          "U+265F",
+          "U+2750",
+          "U+275D",
+          "U+276B",
+          "U+2772"
+        ]
+      },
+      {
+        "member": 6,
+        "json": "neuronte-term-dingbat-v1-tding12-g6.json",
+        "json_sha256": "90081bdd9690c65ae714742ca5fccf2988042ab0371e83564581cbef6c7cfc8a",
+        "image_sha256": "b57e44f8c8500ece36dfa0730010ce03a8614a0ec4cd7de91f97c35bbac78802",
+        "bytes": 57040,
+        "set": "tding12-repertoire",
+        "scalars": [
+          "U+274F",
+          "U+2751",
+          "U+275B",
+          "U+275E",
+          "U+2763",
+          "U+2764",
+          "U+2767",
+          "U+2769",
+          "U+276A",
+          "U+276D",
+          "U+2771",
+          "U+2775"
+        ]
+      },
+      {
+        "member": 7,
+        "json": "neuronte-term-dingbat-v1-tding12-g7.json",
+        "json_sha256": "91e14c00c11c537e562d480b7852b9e5b0ebcd963328eb574f39d830d806a897",
+        "image_sha256": "f5c6fcbe63634ef2e8963b80896a7840a380ed8d1f33d6bc951cb0945e2e83ac",
+        "bytes": 57040,
+        "set": "tding12-repertoire",
+        "scalars": [
+          "U+274D",
+          "U+2752",
+          "U+2756",
+          "U+275C",
+          "U+2762",
+          "U+2765",
+          "U+2768",
+          "U+276C",
+          "U+276E",
+          "U+2770",
+          "U+2773",
+          "U+2774"
+        ]
+      },
+      {
+        "member": 8,
+        "json": "neuronte-term-dingbat-v1-tding10-g0.json",
+        "json_sha256": "8de19c1f1df3fe01c6d9962adf7b25b6a1f7d0fae3efc77d969416d372bb2a49",
+        "image_sha256": "32ebaf3de0fee9bca3a3c8fa878f74ea19bd27d3284c41e4b315e1998c38494c",
+        "bytes": 57040,
+        "set": "tding10-repertoire",
+        "scalars": [
+          "U+26C1",
+          "U+2719",
+          "U+271A",
+          "U+271B",
+          "U+271C",
+          "U+271D",
+          "U+271E",
+          "U+271F",
+          "U+2720"
+        ]
+      },
+      {
+        "member": 9,
+        "json": "neuronte-term-dingbat-v1-tding10-g1.json",
+        "json_sha256": "866b4648efc297978f700f21e235f3a76f319795837b6ea76ce4632055a929c5",
+        "image_sha256": "084804c4dc03164e1c1d838d08930fbcc38f20365aab74d5275dcf57687910f5",
+        "bytes": 57040,
+        "set": "tding10-repertoire",
+        "scalars": [
+          "U+2660",
+          "U+2663",
+          "U+2664",
+          "U+2666",
+          "U+2681",
+          "U+2682",
+          "U+2683",
+          "U+2685",
+          "U+2689",
+          "U+26C0"
+        ]
+      },
+      {
+        "member": 10,
+        "json": "neuronte-term-dingbat-v1-tding10-g2.json",
+        "json_sha256": "a31c3082afa045fcd8c2040bb090f350d2fc81adb89ffa916b7bcc4d466d692f",
+        "image_sha256": "37d492e01cc3ab2f12a11a5ccee06e78415ae4ac318cff463e49880ebc68a6f1",
+        "bytes": 57040,
+        "set": "tding10-repertoire",
+        "scalars": [
+          "U+2665",
+          "U+2680",
+          "U+2684",
+          "U+2686",
+          "U+2687",
+          "U+2688",
+          "U+26A4",
+          "U+26C2",
+          "U+26C3"
+        ]
+      },
+      {
+        "member": 11,
+        "json": "neuronte-term-dingbat-v1-tding10-g3.json",
+        "json_sha256": "645801f7c1d37479a59db08851d7bd544c651eb805a1269a17539df068064fdd",
+        "image_sha256": "39ab220675d7f7838f02a8f7b30fece5484349e267e4d66e5da220eef11f40cd",
+        "bytes": 57040,
+        "set": "tding10-repertoire",
+        "scalars": [
+          "U+26A2",
+          "U+26A3",
+          "U+26A5",
+          "U+26A8",
+          "U+26A9",
+          "U+26AC",
+          "U+26AD",
+          "U+26AE",
+          "U+26AF",
+          "U+26B2"
+        ]
+      },
+      {
+        "member": 12,
+        "json": "neuronte-term-dingbat-v1-tding10-g4.json",
+        "json_sha256": "05dee3496864e4554aa93fd07d76d138373e71a107c431e05afe46c17622f58b",
+        "image_sha256": "489de6523246ba444441c871205cf3f5565f114ff1d542e08a8443b25d024557",
+        "bytes": 57040,
+        "set": "tding10-repertoire",
+        "scalars": [
+          "U+2668",
+          "U+2669",
+          "U+266A",
+          "U+266B",
+          "U+266C",
+          "U+266D",
+          "U+266E",
+          "U+266F",
+          "U+26A6",
+          "U+26A7"
+        ]
+      },
+      {
+        "member": 13,
+        "json": "neuronte-term-dingbat-v1-tding10-g5.json",
+        "json_sha256": "8eb5a800f4ecce7cf78693cf109adf90a6771fe2fe5c122d9bba8c3123b03eba",
+        "image_sha256": "1687c454d491649d11f5ef6b49cd6a9acf3b1affb88c7a1d124a6e47dbad5c62",
+        "bytes": 57040,
+        "set": "tding10-repertoire",
+        "scalars": [
+          "U+2602",
+          "U+2604",
+          "U+260A",
+          "U+260D",
+          "U+263D",
+          "U+263F",
+          "U+2640",
+          "U+269B",
+          "U+26B7"
+        ]
+      },
+      {
+        "member": 14,
+        "json": "neuronte-term-dingbat-v1-tding10-g6.json",
+        "json_sha256": "68c5167e91b23742e0adada3122d9f5d34c40b4635523834404139488f680e1e",
+        "image_sha256": "3282a2c743c8362637be41d951c2ccf8c6bba6f16f72e20bdae1518162c682bc",
+        "bytes": 57040,
+        "set": "tding10-repertoire",
+        "scalars": [
+          "U+2603",
+          "U+2607",
+          "U+2609",
+          "U+260C",
+          "U+263C",
+          "U+2642",
+          "U+2643",
+          "U+2644",
+          "U+2645",
+          "U+26E2"
+        ]
+      },
+      {
+        "member": 15,
+        "json": "neuronte-term-dingbat-v1-tding10-g7.json",
+        "json_sha256": "69041b3b70e43fe3fe9d7cc1ee53d09c5609ed60787af763dfd9f56e1ca3acc9",
+        "image_sha256": "7fc733db957845c7120939bf4d6ef869a7d7347875bdf70093c2843e83321c0c",
+        "bytes": 57040,
+        "set": "tding10-repertoire",
+        "scalars": [
+          "U+2600",
+          "U+2601",
+          "U+2608",
+          "U+260B",
+          "U+2641",
+          "U+2646",
+          "U+2647",
+          "U+26B3",
+          "U+26B4",
+          "U+26B6"
+        ]
+      },
+      {
+        "member": 16,
+        "json": "neuronte-term-dingbat-v1-tding8-g0.json",
+        "json_sha256": "65e4bb99d02022775ff094b77980ea0a8067bee4c5b9328761efcd6ec71879b3",
+        "image_sha256": "e6e60d2b8fc5fbd9dcda811bfcc88b088fb3e97ef5d759c81ba02b7c4469c994",
+        "bytes": 57040,
+        "set": "tding8-repertoire",
+        "scalars": [
+          "U+2776",
+          "U+2777",
+          "U+277F",
+          "U+2785",
+          "U+2789",
+          "U+278C",
+          "U+278D",
+          "U+278F"
+        ]
+      },
+      {
+        "member": 17,
+        "json": "neuronte-term-dingbat-v1-tding8-g1.json",
+        "json_sha256": "7e3eff04c1e28af54488c9f3496a9d9adb3a8edb11148078e0c08b9e60d89087",
+        "image_sha256": "b4cde63bdc220823022b385c9255eb7b65233d0da7bcd75b396380513bf028a0",
+        "bytes": 57040,
+        "set": "tding8-repertoire",
+        "scalars": [
+          "U+2779",
+          "U+277B",
+          "U+2780",
+          "U+2784",
+          "U+2787",
+          "U+278B",
+          "U+2790",
+          "U+2791"
+        ]
+      },
+      {
+        "member": 18,
+        "json": "neuronte-term-dingbat-v1-tding8-g2.json",
+        "json_sha256": "7eae0a62b59ac0e306b35e136a95bfcb460682158a7a968b4d46fc5b39821831",
+        "image_sha256": "e3514ad0b5fee81696a99bca5f9cc0ca23f977528717e65cabddeb046dd19b54",
+        "bytes": 57040,
+        "set": "tding8-repertoire",
+        "scalars": [
+          "U+2778",
+          "U+277D",
+          "U+2781",
+          "U+2786",
+          "U+2788",
+          "U+278A",
+          "U+278E",
+          "U+2792"
+        ]
+      },
+      {
+        "member": 19,
+        "json": "neuronte-term-dingbat-v1-tding8-g3.json",
+        "json_sha256": "52c6760ef7f65bc8bbcb27ab575e078d0709f397b450d4bcb82a2625da292b98",
+        "image_sha256": "3e8951ee8a97de91d3d2421b0ada5d30104c423da62585af102727cdd0646ee7",
+        "bytes": 57040,
+        "set": "tding8-repertoire",
+        "scalars": [
+          "U+2620",
+          "U+263E",
+          "U+277A",
+          "U+277C",
+          "U+277E",
+          "U+2782",
+          "U+2783",
+          "U+2793"
+        ]
+      },
+      {
+        "member": 20,
+        "json": "neuronte-term-dingbat-v1-tding8-g4.json",
+        "json_sha256": "1231293e3e195d7b7d12e675239c1f0e16efd52cbf867f0258452322417e0036",
+        "image_sha256": "d5c3d2a8ddd78dc0e55a6402e09ab94dd38fb1c19898884044cf050a3615f63f",
+        "bytes": 57040,
+        "set": "tding8-repertoire",
+        "scalars": [
+          "U+260F",
+          "U+2616",
+          "U+2654",
+          "U+269A",
+          "U+26B8",
+          "U+2703",
+          "U+270D",
+          "U+2710"
+        ]
+      },
+      {
+        "member": 21,
+        "json": "neuronte-term-dingbat-v1-tding8-g5.json",
+        "json_sha256": "fa945e4a27f06952e81fe659a4ad53fe61a25b6daafa49f6d1684fceba627c62",
+        "image_sha256": "fac8371c5dc5932ad5eb72b2898e41bf2a157f6e21262eb132293451cc90145f",
+        "bytes": 57040,
+        "set": "tding8-repertoire",
+        "scalars": [
+          "U+261D",
+          "U+262A",
+          "U+2661",
+          "U+2662",
+          "U+2706",
+          "U+270F",
+          "U+2711",
+          "U+2766"
+        ]
+      },
+      {
+        "member": 22,
+        "json": "neuronte-term-dingbat-v1-tding8-g6.json",
+        "json_sha256": "ad3bf12b7eed53827b29a48d21c4a4a77fafe3ca64da812a65615b6424404d4c",
+        "image_sha256": "9ba968850749b076fe8b1357a5a67a2a51010e0efa6fc9f599bb2a20a178bdab",
+        "bytes": 57040,
+        "set": "tding8-repertoire",
+        "scalars": [
+          "U+2618",
+          "U+261F",
+          "U+2624",
+          "U+2701",
+          "U+2702",
+          "U+2707",
+          "U+2709",
+          "U+270E"
+        ]
+      },
+      {
+        "member": 23,
+        "json": "neuronte-term-dingbat-v1-tding8-g7.json",
+        "json_sha256": "17e3502737dd1da5f162223be0f27824064fdff305d96ceb623b2cc4ace480cc",
+        "image_sha256": "e3a4a442beb68d546b9e77dfb0c5b15395a992f1447675651d1f85de89fd7b26",
+        "bytes": 57040,
+        "set": "tding8-repertoire",
+        "scalars": [
+          "U+261C",
+          "U+2655",
+          "U+2656",
+          "U+2657",
+          "U+2695",
+          "U+26B5",
+          "U+2704",
+          "U+2708"
+        ]
+      },
+      {
+        "member": 24,
+        "json": "neuronte-term-dingbat-v1-tding8-g8.json",
+        "json_sha256": "c3f1f5231e36387966f6177fafc666d077ac5cc70296162919d9712683bdf59e",
+        "image_sha256": "41be9c2253080b9bb3e86652051484d2b4dc086ff2a283f7d8c401fc308d93ca",
+        "bytes": 57040,
+        "set": "tding8-repertoire",
+        "scalars": [
+          "U+261E",
+          "U+2658",
+          "U+2659",
+          "U+2667",
+          "U+2672",
+          "U+267D",
+          "U+270C",
+          "U+2761"
+        ]
+      },
+      {
+        "member": 25,
+        "json": "neuronte-term-dingbat-v1-tding8-g9.json",
+        "json_sha256": "041e68ca09f59ed53e1199909259b67eb91666980d7b8d13c3521ddc6944a405",
+        "image_sha256": "c228bcfd56c40cc16e0cae16d9caf30a0a8f1380905c52d772535a0676abefdd",
+        "bytes": 57040,
+        "set": "tding8-repertoire",
+        "scalars": [
+          "U+2673",
+          "U+2674",
+          "U+2675",
+          "U+2677",
+          "U+2678",
+          "U+2679",
+          "U+267A",
+          "U+267B"
+        ]
+      },
+      {
+        "member": 26,
+        "json": "neuronte-term-dingbat-v1-tding8-g10.json",
+        "json_sha256": "f6feaf04b676a2e0503983f08a65ab46d40f00c24a447974f325b682eb7b7670",
+        "image_sha256": "462261659f8817ae3d5037c409f259943b8b43d59d1ac002e11f3f14fbeb589c",
+        "bytes": 57040,
+        "set": "tding8-repertoire",
+        "scalars": [
+          "U+2627",
+          "U+2628",
+          "U+262C",
+          "U+2676",
+          "U+267C",
+          "U+2692",
+          "U+269E",
+          "U+26B0"
+        ]
+      },
+      {
+        "member": 27,
+        "json": "neuronte-term-dingbat-v1-tding8-g11.json",
+        "json_sha256": "08b3d369146bb63514995a3de84c0622c207296c4cf3ae8d2f7b6afb659163c1",
+        "image_sha256": "4386ea0d48903788dcc432786088fe5e3733318c33a89e8104bcdec25692ee23",
+        "bytes": 57040,
+        "set": "tding8-repertoire",
+        "scalars": [
+          "U+2613",
+          "U+2622",
+          "U+262B",
+          "U+262E",
+          "U+2670",
+          "U+2690",
+          "U+269C",
+          "U+269F"
+        ]
+      },
+      {
+        "member": 28,
+        "json": "neuronte-term-dingbat-v1-tding8-g12.json",
+        "json_sha256": "64eac4841e3cee33271b4b17dbe7eea45eb0d3a5c36926104f35e95bbac26b34",
+        "image_sha256": "4ba39d8f710da2e9681e99ab1e45edbbbc2b4135b134b9ac0919c17820485c51",
+        "bytes": 57040,
+        "set": "tding8-repertoire",
+        "scalars": [
+          "U+2621",
+          "U+2625",
+          "U+262D",
+          "U+2638",
+          "U+2639",
+          "U+263B",
+          "U+2694",
+          "U+2697"
+        ]
+      },
+      {
+        "member": 29,
+        "json": "neuronte-term-dingbat-v1-tding8-g13.json",
+        "json_sha256": "861cce0839dc86e3d8fe28b1fd5d8c6f9187b5b37ed4aa823a44f4e1bb247e92",
+        "image_sha256": "408e9b03827cf50ddf7d7a310adcce2214847ce52f68e17739c0e47beeaedb2e",
+        "bytes": 57040,
+        "set": "tding8-repertoire",
+        "scalars": [
+          "U+2623",
+          "U+2626",
+          "U+262F",
+          "U+267E",
+          "U+2691",
+          "U+2696",
+          "U+2698",
+          "U+26B1"
+        ]
+      },
+      {
+        "member": 30,
+        "json": "neuronte-term-dingbat-v1-tding8-g14.json",
+        "json_sha256": "cfc63fc0db75474e9126683978797fd66ac6d9ab40f2463290f654c8d4faff68",
+        "image_sha256": "9c4eced6562088014dff2fb701f39bd4bbe175c437069ed64b8e1c606307068a",
+        "bytes": 57040,
+        "set": "tding8-repertoire",
+        "scalars": [
+          "U+2629",
+          "U+263A",
+          "U+2671",
+          "U+2699",
+          "U+2725",
+          "U+2729",
+          "U+2737",
+          "U+273A"
+        ]
+      },
+      {
+        "member": 31,
+        "json": "neuronte-term-dingbat-v1-tding8-g15.json",
+        "json_sha256": "ecaa6a10ab5e17da8b80bf5454205d9dbebde20bc6b4900f366cd20178812fc6",
+        "image_sha256": "5d4269e54cacbda218fb005da1affe87026c4c6b87cbfcdf253d5c6c758c165d",
+        "bytes": 57040,
+        "set": "tding8-repertoire",
+        "scalars": [
+          "U+2721",
+          "U+272D",
+          "U+2730",
+          "U+2734",
+          "U+2738",
+          "U+2739",
+          "U+273C",
+          "U+2745"
+        ]
+      },
+      {
+        "member": 32,
+        "json": "neuronte-term-dingbat-v1-tding8-g16.json",
+        "json_sha256": "a06f8752f3b9e906a80ca9a5aca8a853cdd620b3f95ad21a62a372aa05bcb795",
+        "image_sha256": "6cae6323f14c56b6464cf4e83277e5fdfb06342c8ff9d803f796639f870e99bc",
+        "bytes": 57040,
+        "set": "tding8-repertoire",
+        "scalars": [
+          "U+2723",
+          "U+272C",
+          "U+272E",
+          "U+2731",
+          "U+2735",
+          "U+2742",
+          "U+2749",
+          "U+274B"
+        ]
+      },
+      {
+        "member": 33,
+        "json": "neuronte-term-dingbat-v1-tding8-g17.json",
+        "json_sha256": "be9b4e41ad3e04424c9fe68e0e2904c00d469d8e446ff3ca9647a7a8091bfb81",
+        "image_sha256": "4218115f1374bd75ea58886787f484b4c897027cf349622f0798110cf1402ee0",
+        "bytes": 57040,
+        "set": "tding8-repertoire",
+        "scalars": [
+          "U+2726",
+          "U+2732",
+          "U+273F",
+          "U+2740",
+          "U+2741",
+          "U+2747",
+          "U+2748",
+          "U+274A"
+        ]
+      },
+      {
+        "member": 34,
+        "json": "neuronte-term-dingbat-v1-tding8-g18.json",
+        "json_sha256": "ac27328793bad2379c5ed15d0a2212cd17d548c7eca55d27042c3fd4ca7de1bc",
+        "image_sha256": "6dfe2bec13a26bbbef3d392ccea320b3a09492bd58843f5d75e12c6824542fc5",
+        "bytes": 57040,
+        "set": "tding8-repertoire",
+        "scalars": [
+          "U+2724",
+          "U+2727",
+          "U+272A",
+          "U+272B",
+          "U+272F",
+          "U+273E",
+          "U+2743",
+          "U+2744",
+          "U+2746"
+        ]
+      }
+    ],
+    "list": {
+      "file": "neuronte-term-dingbat-v1.list.txt",
+      "sha256": "fe4cb65a64767ebb0b1340aa4425fa97626e4667e2f66fc2c85a04019aa92f71"
+    }
+  }
+}

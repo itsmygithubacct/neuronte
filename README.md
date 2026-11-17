@@ -5,7 +5,7 @@ UTF-8. The net writes that character's pixels into a buffer the caller
 owns. No font file, glyph table or bitmap atlas is consulted. The
 weights are the font.
 
-This is version 0.1.4. [CHANGES.md](CHANGES.md) lists what is new since
+This is version 0.1.5. [CHANGES.md](CHANGES.md) lists what is new since
 0.1.1.
 
 Version-1 distance models accept any integer hidden width from 1 to
@@ -35,6 +35,9 @@ letter. Desktop adapters fall back for unsupported strings and styles.
 | `neuronte-term-mathalpha-v1` | 179 styled letters and digits of Mathematical Alphanumeric Symbols that split-v9 was not trained on: the sans-serif, monospace and double-struck alphabets and digits; alone in a standalone bundle to open beside split-v9; every group net passed the common gates (gates-v2.3) with both seeds; not a default; [recipe, checks and speed](weights/neuronte-term-mathalpha-v1.md) | 179, over 17 group nets, a table and a blank net | 64 | 241,689 in the group nets | 971,056 bytes |
 | `neuronte-term-syllabics-v1` | 168 Canadian syllabics made by rule: the vowels and the p, t, k, c, m and n series with their long and w forms and finals; the other 236 syllabics of the list were not drawn; alone in a standalone bundle to open beside split-v9; every group net passed the common gates (gates-v2.3) with both seeds; not a default; [recipe, checks and speed](weights/neuronte-term-syllabics-v1.md) | 168, over 15 group nets, a table and a blank net | 64 | 213,255 in the group nets | 856,824 bytes |
 | `neuronte-term-scripts-v1` | 48 characters of the Lisu alphabet: Latin capitals, fifteen of them turned, and its marks; Ogham, Old Italic and parts of Tifinagh and Armenian are drawn in the font file and held back by the owner's word; alone in a standalone bundle to open beside split-v9; every group net passed the common gates (gates-v2.3) with both seeds; not a default; [recipe, checks and speed](weights/neuronte-term-scripts-v1.md) | 48, over 6 group nets, a table and a blank net | 64 | 85,302 in the group nets | 343,188 bytes |
+| `neuronte-term-math-v1` | 465 arrows and mathematical operators that split-v9 was not trained on: the rest of Arrows and Mathematical Operators, long and supplemental arrows, mathematical brackets and the large and supplemental operators DejaVu Sans Mono covers, alone in a standalone bundle to open beside split-v9; 23 of its 47 group nets failed their declared gates and were shipped by the owner's choice after review; not a default; [recipe, checks and speed](weights/neuronte-term-math-v1.md) | 465, over 47 group nets, a table and a blank net | 64 | 667,823 in the group nets | 2,686,120 bytes |
+| `neuronte-term-symbol-v1` | 480 punctuation marks, superscripts and subscripts, currency signs, letterlike symbols, number forms, technical symbols, enclosed digits and geometric shapes that split-v9 was not trained on, alone in a standalone bundle to open beside split-v9; 28 of its 48 group nets failed their declared gates and were shipped by the owner's choice after review; not a default; [recipe, checks and speed](weights/neuronte-term-symbol-v1.md) | 480, over 48 group nets, a table and a blank net | 64 | 682,032 in the group nets | 2,743,740 bytes |
+| `neuronte-term-dingbat-v1` | 323 Miscellaneous Symbols and Dingbats that split-v9 was not trained on: weather, planets and zodiac, chess, cards and dice, music, stars, crosses, hands, pencils, scissors, circled digits and arrows, alone in a standalone bundle to open beside split-v9; 24 of its 35 group nets failed their declared gates and were shipped by the owner's choice after review; not a default; [recipe, checks and speed](weights/neuronte-term-dingbat-v1.md) | 323, over 35 group nets, a table and a blank net | 64 | 497,315 in the group nets | 2,000,188 bytes |
 | `neuronte-split-v4` | the default before Greek and Russian, kept; most measurements below were made on it | 1,061, over six nets and a router | 48, 128 and 192 | 329,356 | 1,319,616 bytes |
 | `neuronte-full-v3` | explicit RC9 monolithic font; [quality and baseline comparison](weights/neuronte-full-v3.md) | 878, including the Greek and Russian additions | 384 | 331,009 | 1,324,240 bytes |
 | `neuronte-full-v2` | the baseline `split` is measured against | 763 of them in one net, all but the sextants and octants | 320 | 234,881 | 939,728 bytes |
@@ -190,6 +193,32 @@ The common gates of the coverage phases judged it automatically: every group net
 It is not a default. Rebuild it with `make pack-term-scripts-v1`; see
 [its recipe, checks and speed](weights/neuronte-term-scripts-v1.md).
 
+`neuronte-term-math-v1.nrt`, `neuronte-term-symbol-v1.nrt` and
+`neuronte-term-dingbat-v1.nrt` are three more bundles of that kind, for the
+symbols DejaVu Sans Mono covers and split-v9 was not trained on: 465 arrows
+and mathematical operators; 480 punctuation marks, superscripts and
+subscripts, currency signs, letterlike symbols, number forms, technical
+symbols and geometric shapes; and 323 Miscellaneous Symbols and Dingbats.
+DejaVu gave only the list of code points. Every character is drawn in the
+project's own strokes (`font/term-math.txt`, `font/term-sym.txt`,
+`font/term-ding.txt`) or made from them by `train/term_glyphs.py`: turned,
+mirrored, negated, stacked, filled or enclosed. The 21 characters of these
+blocks that Unicode makes two cells wide are left out. Each bundle holds no
+copy of split-v9 and is used beside it in the same way, and no character is in
+two bundles. Of their 47, 48 and 35 group nets, 24, 20 and 11 passed the gates
+declared before training. The others failed, every one on the amount of error
+and none on which character is drawn, and are in the bundles at width 64 by
+the owner's choice after seeing the nets beside their teachers; the one
+declared retry at width 96 was run for the first bundle, where it rescued none
+of 23 groups, and not for the other two. On an Intel i7-6820HQ and an
+i7-10700F each draws its characters about 2.7 times as fast as split-v9's
+fallback does (2.69 to 2.76 over the three bundles and both hosts). None is a
+default. Rebuild them with `make pack-term-math-v1`, `make
+pack-term-symbol-v1` and `make pack-term-dingbat-v1`; see the recipe, checks
+and speed of [term-math-v1](weights/neuronte-term-math-v1.md),
+[term-symbol-v1](weights/neuronte-term-symbol-v1.md) and
+[term-dingbat-v1](weights/neuronte-term-dingbat-v1.md).
+
 RC9 also ships the separate `neuronte-emoji-v0.nrt` colour bundle: 300 original
 single-scalar emoji, 600 left/right half labels, three experts, and up to six
 layers with dark/light palettes. The 7,011,412-byte bundle is used through the
@@ -284,6 +313,8 @@ a letter and a mark, such as ß æ œ ð þ ø ł đ ħ ŋ ĳ, are drawn in
 | `font/marks.txt` | The diacritic marks, keyed by their combining code points |
 | `font/term-latin.txt` | The code points of `neuronte-term-latin-v1`, by training set: letters with one to three marks, composed by `train/glyphs.py` from letters drawn before and `font/marks.txt` |
 | `font/term-scripts.txt` | The drawings and code points of `neuronte-term-mathalpha-v1`, `neuronte-term-syllabics-v1` and `neuronte-term-scripts-v1`, by training set, read by `train/term_scripts.py`: drawn characters, characters made by rule from the ASCII strokes or from a few shapes, and drawings held back from training |
+| `font/term-math.txt`, `font/term-sym.txt`, `font/term-ding.txt` | The symbols of `neuronte-term-math-v1`, `neuronte-term-symbol-v1` and `neuronte-term-dingbat-v1` that are drawn by hand, in the same form; `train/term_glyphs.py` makes the rest of each family from them. Written for this project; no font was read |
+| `font/term-math-partition.json`, `font/term-sym-partition.json`, `font/term-ding-partition.json` | Their training groups: families of about the same ink edge, 12, 10 or 8 characters to a group net, as `tools/term-partition.py` makes them from the drawings |
 | `font/letters.txt` | The Latin letters beyond ASCII that are not a letter plus a mark, and the Greek and Russian Cyrillic letters. The 49 Greek and 66 Russian Cyrillic letters are trained in RC9 accent-v2 and explicit split-v5 |
 | `font/ui-1.txt` to `font/ui-128.txt` | A proportional face for binary desktop text, printable ASCII and the ellipsis, drawn as pixels for every em from 1 to 128 except 44, each character with its advance in pixels. Stems are one pixel wide through 16, two from 17 through 26, and three from 27. Written for this project. `train/train.py --set ui10` and so on train one net each, and score it pixel by pixel at its size. `train/pack.py --advances` packs a file's advances, bold one pixel more. The nets so far are `neuronte-ui1-v0` through `neuronte-ui39-v0`, one for every em, and `neuronte-ui43-v0`. `font/ui-EM-italic.txt` is that face sheared on the grid so the top sits to the right of the bottom, trained as `uiEMi`. The packed `neuronte-uiEM-italic-v0` nets now cover every integer em from 3 through 32; [paired validation and small-grid limits](weights/neuronte-italic-v0.md) accompany the additional 17 faces |
 | `font/ui-large.txt`, `font/ui-large-advances.txt` | The same face above 32 pixels: the first-pass strokes the pixel faces were fitted to, drawn once for every em with a pen 3/32 em wide, the 32 px drawing's three-pixel stem, and blended. The advances are the 32 px drawing's in em, bold 0.2 design units (0.02 em) more. `train/train.py --set uilarge` trains the net and scores it by overlap at 32, 48, 64 and 96 pixels. The net is `neuronte-ui-large-v0` |

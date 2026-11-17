@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "cell_columns": 2,
+  "glyphs": [
+    {
+      "scalar": "U+2600",
+      "name": "BLACK SUN WITH RAYS",
+      "category": "weather",
+      "layers": 2
+    },
+    {
+      "scalar": "U+2601",
+      "name": "CLOUD",
+      "category": "weather",
+      "layers": 1
+    },
+    {
+      "scalar": "U+26C5",
+      "name": "SUN BEHIND CLOUD",
+      "category": "weather",
+      "layers": 3
+    },
+    {
+      "scalar": "U+26C8",
+      "name": "THUNDER CLOUD AND RAIN",
+      "category": "weather",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F324",
+      "name": "WHITE SUN WITH SMALL CLOUD",
+      "category": "weather",
+      "layers": 3
+    },
+    {
+      "scalar": "U+1F326",
+      "name": "WHITE SUN BEHIND CLOUD WITH RAIN",
+      "category": "weather",
+      "layers": 4
+    },
+    {
+      "scalar": "U+1F327",
+      "name": "CLOUD WITH RAIN",
+      "category": "weather",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F328",
+      "name": "CLOUD WITH SNOW",
+      "category": "weather",
+      "layers": 2
+    },
+    {
+      "scalar": "U+1F32B",
+      "name": "FOG",
+      "category": "weather",
+      "layers": 2
+    }
+  ]
+}

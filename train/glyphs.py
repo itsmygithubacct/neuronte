@@ -32,6 +32,12 @@ Tiers:
              accent tier from a letter and a mark, or taken from
              font/letters.txt. The symbol and accent tiers leave both
              lists out, so every set trained before is unchanged.
+    tmath    the arrows and mathematical operators of neuronte-term-math-v1:
+             drawn in font/term-math.txt, and the families train/term_glyphs.py
+             makes from those and from the trained symbols. tmath12, tmath10
+             and tmath8 are the same characters as three training sets, in
+             the order of font/term-math-partition.json: families of about
+             the same ink edge, 12, 10 and 8 characters to a group net.
     ui1      the desktop face, printable ASCII and U+2026, from
     ...      font/ui-EM.txt, one file for every em from 1 to 128 except
     ui128    44. Stems are one pixel wide through 16, two from 17
@@ -52,7 +58,8 @@ tcyrillic, tletter (the two scripts) and terminal (all three); and three sets fo
 how the mosaics join the bundle: pixel (block, mosaic), pixelbraille
 (block, mosaic, braille) and boxshade (box, shade). The sets ui1 to
 ui128, except ui44, the italic sets ui3i to ui32i, and uilarge, are each their
-tier alone. They share their scalars with ascii and with each other, so
+tier alone. tmath is its tier, and tmath12, tmath10 and tmath8 divide it.
+The desktop sets share their scalars with ascii and with each other, so
 they join no other set, and their nets no bundle.
 Each has a pen of its own, in PENS: a little over one pixel wide at its em
 for pixel faces, and 3/32 em for uilarge.
@@ -1045,6 +1052,38 @@ def colour_icons(pal=None):
     return icons
 
 
+# The term-* bundles: a tier of all a bundle's characters, and its training
+# sets, each a class of font/term-TIER-partition.json.
+TERM_TIERS = {"tmath": ("tmath12", "tmath10", "tmath8")}
+TERM_SETS = {name: tier for tier, parts in TERM_TIERS.items() for name in (tier,) + parts}
+
+
+def term_partition(tier):
+    """{set: [[code point, ...] for each group net]} from font/term-TIER-partition.json."""
+    import json
+    with open(os.path.join(strokes.ROOT, "font", f"term-{tier[1:]}-partition.json")) as fh:
+        doc = json.load(fh)
+    return {name: [[int(c[2:], 16) for c in group] for group in body["groups"]]
+            for name, body in doc["sets"].items()}
+
+
+def term_tier(name):
+    """[(char, shapes)]: a term tier in code point order, or one of its
+    training sets in the order of its groups."""
+    import term_glyphs
+    tier = TERM_SETS[name]
+    made = getattr(term_glyphs, tier[1:])()
+    parts = term_partition(tier)
+    if set(parts) != set(TERM_TIERS[tier]):
+        raise ValueError(f"{tier}: the partition's sets are not {TERM_TIERS[tier]}")
+    listed = [c for groups in parts.values() for group in groups for c in group]
+    if sorted(listed) != sorted(map(ord, made)):
+        raise ValueError(f"{tier}: the partition and the drawings differ")
+    if name == tier:
+        return [(c, made[c]) for c in sorted(made)]
+    return [(chr(c), made[chr(c)]) for group in parts[name] for c in group]
+
+
 SETS = {
     "ascii": ["ascii"],
     "draw": ["box", "block", "shade", "braille"],
@@ -1060,6 +1099,7 @@ SETS = {
     "tcyrillic": ["tcyrillic"],
     "tletter": ["tgreek", "tcyrillic"],
     "terminal": ["tsymbol", "tgreek", "tcyrillic"],
+    **{name: [name] for name in TERM_SETS},
     **{f"ui{em}": [f"ui{em}"] for em in UI_TOP},
     **{f"ui{em}i": [f"ui{em}i"] for em in UI_ITALIC},
     "uilarge": ["uilarge"],
@@ -1104,6 +1144,8 @@ def tier(name):
             raise ValueError(f"{name}: the drawings and the list differ; missing "
                              + " ".join(f"U+{c:04X}" for c in missing))
         return [(c, made[c]) for c in sorted(made)]
+    if name in TERM_SETS:
+        return term_tier(name)
     if name == "uilargelatin1":
         g = large_latin1()
         return [(c, g[c][0]) for c in sorted(g)]
@@ -1226,6 +1268,11 @@ def sources(name):
         files += ["font/letters.txt", "font/marks.txt"]
     if "mosaic" in tiers:
         files.append("font/octants.txt")
+    for t in tiers:
+        if t in TERM_SETS:   # the trained strokes these families start from, their own, and the groups
+            stem = TERM_SETS[t][1:]
+            return ["font/strokes.txt", "font/symbols.txt", f"font/term-{stem}.txt",
+                    f"font/term-{stem}-partition.json", "train/term_glyphs.py", "train/strokes.py", "train/glyphs.py"]
     for em in UI:
         if f"ui{em}" in tiers:
             files.append(f"font/ui-{em}.txt")

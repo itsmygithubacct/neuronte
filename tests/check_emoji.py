@@ -11,6 +11,7 @@ A separate float64 numpy evaluation checks sampled halves against the C API.
 --manifest additionally requires the complete 300-scalar/600-half publication
 inventory, over exactly --experts experts (3, as v0, unless stated). Without it, individual training shards remain testable.
 """
+import os
 import argparse
 import ctypes as ct
 import hashlib
@@ -165,7 +166,11 @@ def main():
                         v=interpolate(f,points[cw],d['training']['grid'])
                         targets[cw][i]=(v>0).reshape(2*cw,8,cw,8).mean((1,3))
                 if cached:
-                    np.savez_compressed(cached,**{str(w):t for w,t in targets.items()})
+                    # Two test targets share this cache and may run side by side under make -j:
+                    # write beside the final name and rename, so no reader sees half a file.
+                    part=cache/(key+'.%d.part.npz'%os.getpid())
+                    np.savez_compressed(part,**{str(w):t for w,t in targets.items()})
+                    os.replace(part,cached)
             for cw in points:
                 r=group[str(cw)]; cov,ent=c_mask(lib,h,s,cw,k)
                 r['head_wrong']+=sum(x!=y for x,y in zip(ent,entries))

@@ -1,0 +1,23 @@
+# The symbols neuronte-kilix-chrome-v2.nrt was trained on, in the order of
+# font/kilix-chrome-2.txt, one line group for each group net. This is not a
+# NAME.list.txt: the file draws the code points of neuronte-kilix-chrome-v1
+# again, for a box of two cells, and the sun and the cloud that a terminal
+# bundle draws for one cell, so it is outside the rule that no two listed
+# bundles claim one character. tests/check_kilix_chrome_v2.py holds the
+# bundle's table to this list exactly.
+# tchwa g0
+U+F0731 U+F0737 U+F072E U+F0734 U+EAB9 U+F0293 U+F0156
+# tchwbr0 g0
+U+1F56D U+F0219 U+F030C
+# tchwbr0 g1
+U+F035B U+F08AE U+F2C9
+# tchwbr1 g0
+U+F028 U+F05CB U+F036C
+# tchwbr1 g1
+U+F036D U+F1EB U+F073 U+F0E7
+# tchwp g0
+U+F007A U+F007B U+F007C U+F007D U+F007E U+F007F
+# tchwp g1
+U+F0080 U+F0081 U+F0082 U+F0079 U+F0083 U+F0091
+# tchwx g0
+U+2600 U+2601 U+1F324 U+26C5 U+1F32B U+1F326 U+1F327 U+1F328 U+26C8

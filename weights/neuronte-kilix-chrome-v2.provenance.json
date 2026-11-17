@@ -1,0 +1,184 @@
+{
+  "schema": "neuronte.kilix-chrome/v2",
+  "name": "neuronte-kilix-chrome-v2",
+  "sha256": "8583eadf252d499fe5b8b3ae5c28c4716cdd502c6f509f5a5c473dd033e9519c",
+  "bytes": 457336,
+  "sets": [
+    [
+      "tchwa",
+      1
+    ],
+    [
+      "tchwb",
+      2
+    ],
+    [
+      "tchwp",
+      2
+    ],
+    [
+      "tchwx",
+      1
+    ]
+  ],
+  "one_cell": [
+    "U+1F56D"
+  ],
+  "halved": [
+    [
+      "tchwb",
+      0
+    ],
+    [
+      "tchwb",
+      1
+    ]
+  ],
+  "left_out": [],
+  "record": {
+    "schema": "neuronte.standalone-bundle/v1",
+    "sha256": "8583eadf252d499fe5b8b3ae5c28c4716cdd502c6f509f5a5c473dd033e9519c",
+    "bytes": 457336,
+    "members": 9,
+    "group_nets": 8,
+    "ranges": 30,
+    "gate": null,
+    "trained_scalars": 41,
+    "fallback": {
+      "member": 8,
+      "kind": "blank",
+      "hidden_width": 1,
+      "distance": -8.0,
+      "image_sha256": "42d4790165297c3af39d178e1396f575991d6fe4d2e3c947762ef5eaedd05bf6",
+      "bytes": 592
+    },
+    "apart_from": [],
+    "nets": [
+      {
+        "member": 0,
+        "json": "neuronte-kilix-chrome-v2-tchwa-g0.json",
+        "json_sha256": "2d71a1394c5f13572841a6883df33fc7bec6fb0a69864f786f4ffa190307f6f0",
+        "image_sha256": "0a1fbf8b9aa437bbe0222c9e32220f8fb9dc6944a1e1ca149803186b5b795ccc",
+        "bytes": 57040,
+        "set": "tchwa-repertoire",
+        "scalars": [
+          "U+EAB9",
+          "U+F0156",
+          "U+F0293",
+          "U+F072E",
+          "U+F0731",
+          "U+F0734",
+          "U+F0737"
+        ]
+      },
+      {
+        "member": 1,
+        "json": "neuronte-kilix-chrome-v2-tchwbr0-g0.json",
+        "json_sha256": "45dd36e00587ea16c4d86811532322f7a69841d5c0dc54ad1a435664b2939d14",
+        "image_sha256": "c451585c970b537837d23166fa4b19c6bb135ef7d9b3a1b9ebf17e3e4b0a17a2",
+        "bytes": 57040,
+        "set": "tchwbr0-repertoire",
+        "scalars": [
+          "U+1F56D",
+          "U+F0219",
+          "U+F030C"
+        ]
+      },
+      {
+        "member": 2,
+        "json": "neuronte-kilix-chrome-v2-tchwbr0-g1.json",
+        "json_sha256": "361fbe82afda066b2c18880e57e66616fce809fa0878cd0dcb343bb347023b8d",
+        "image_sha256": "099c519f4f5349ecaba5c8d1f2ebfc3942a634d372a46639838310c85023ea9b",
+        "bytes": 57040,
+        "set": "tchwbr0-repertoire",
+        "scalars": [
+          "U+F2C9",
+          "U+F035B",
+          "U+F08AE"
+        ]
+      },
+      {
+        "member": 3,
+        "json": "neuronte-kilix-chrome-v2-tchwbr1-g0.json",
+        "json_sha256": "b8be85fe5cafed6f49ade92b846b1034f4de56d5b4d3d872062f176547e5acc2",
+        "image_sha256": "1af7969973c5da102d611474eddcde502b11c47654834853d6ba5aeb8502f2bd",
+        "bytes": 57040,
+        "set": "tchwbr1-repertoire",
+        "scalars": [
+          "U+F028",
+          "U+F036C",
+          "U+F05CB"
+        ]
+      },
+      {
+        "member": 4,
+        "json": "neuronte-kilix-chrome-v2-tchwbr1-g1.json",
+        "json_sha256": "69c4560d598d85609d8c436d2bed1539fbe1d47747de1a72c1ffb5043459c41f",
+        "image_sha256": "edd29cc39f611102d256db0745028368bf32aa71c10c461a06e0e524839e8d33",
+        "bytes": 57040,
+        "set": "tchwbr1-repertoire",
+        "scalars": [
+          "U+F073",
+          "U+F0E7",
+          "U+F1EB",
+          "U+F036D"
+        ]
+      },
+      {
+        "member": 5,
+        "json": "neuronte-kilix-chrome-v2-tchwp-g0.json",
+        "json_sha256": "ae0cf666ac0fbb89d8621863c722f954c7698aac5468a5f3df5f6705b9f5f6a9",
+        "image_sha256": "27f6d47cba643194099aff5042e54da28106de700eae277ade5d49fc284235cf",
+        "bytes": 57040,
+        "set": "tchwp-repertoire",
+        "scalars": [
+          "U+F007A",
+          "U+F007B",
+          "U+F007C",
+          "U+F007D",
+          "U+F007E",
+          "U+F007F"
+        ]
+      },
+      {
+        "member": 6,
+        "json": "neuronte-kilix-chrome-v2-tchwp-g1.json",
+        "json_sha256": "c664deb852b1fca937a5cc35424ea8e3f4628938d70619952b70ac3011e5f8e4",
+        "image_sha256": "c5abcdc6cda9f558e59b860036ca4d21c2db3424ef56408c83ebf9b62cb24966",
+        "bytes": 57040,
+        "set": "tchwp-repertoire",
+        "scalars": [
+          "U+F0079",
+          "U+F0080",
+          "U+F0081",
+          "U+F0082",
+          "U+F0083",
+          "U+F0091"
+        ]
+      },
+      {
+        "member": 7,
+        "json": "neuronte-kilix-chrome-v2-tchwx-g0.json",
+        "json_sha256": "afb5079a06581446d9db4b8b135e640ad76fe4b7703ec3b7615d62ef051c278e",
+        "image_sha256": "ca040ee3083a6ff786e7d7ee6c7d05ed058b776e75103da1aa98d732e758b813",
+        "bytes": 57040,
+        "set": "tchwx-repertoire",
+        "scalars": [
+          "U+2600",
+          "U+2601",
+          "U+26C5",
+          "U+26C8",
+          "U+1F324",
+          "U+1F326",
+          "U+1F327",
+          "U+1F328",
+          "U+1F32B"
+        ]
+      }
+    ],
+    "list": {
+      "file": "neuronte-kilix-chrome-v2.symbols.txt",
+      "sha256": "9022dd947a1433a64fec6530df5f50316d9759dad3748332860d73d376ae032d"
+    }
+  }
+}

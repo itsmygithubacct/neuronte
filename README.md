@@ -386,6 +386,7 @@ a letter and a mark, such as ß æ œ ð þ ø ł đ ħ ŋ ĳ, are drawn in
 | `train/pack.py` | Packs weights JSON into the binary file the C library loads: a distance net, a colour net, a bundle, an advance table, or a drawing file. A pixel face such as `font/ui-10.txt` packs as an advance table, bold one pixel more. Documents the layouts |
 | `weights/` | The trained weights as JSON, the packed files, the scores and `SHA256SUMS`. `neuronte-draw-v2`, `neuronte-symbol-v0`, `neuronte-accent-v1`, `neuronte-pixel-v1`, `neuronte-braille-v0` and `neuronte-gate-v3` are the parts of `neuronte-split-v4`, with `neuronte-ascii-v0`. `neuronte-full-v2` is here so that `make test` and `make bench` run from a clone. `neuronte-ui1-v0` through `neuronte-ui39-v0`, one for every em, and `neuronte-ui43-v0` are the desktop face, each a drawing file of one net and its advances. `neuronte-uiEM-italic-v0` covers every integer native italic size 3–32. `neuronte-braille-v1` is the tiled Braille part of `neuronte-split-v6`. The `-v1` faces at 24 to 30 px draw the same pixels as their `-v0`, each as a drawing file of one bundle of small nets with seed 1's nets kept beside seed 0's (`neuronte-ui-v1.md`). `neuronte-ui-large-v0` is the scalable upright face from 33 px; `neuronte-flame-v0`, `neuronte-icon-v1`, `neuronte-emoji-v0` and `neuronte-emoji-v1` are separate colour files |
 | `include/neuronte.h`, `src/` | The C library |
+| `include/neuronte_cells.h`, `src/cells.c` | Cells files: coverage drawn once and kept in a file every process maps |
 | `tools/neuronte-render.c` | Draws lines of text into a PPM file |
 | `tools/neuronte-bench.c` | Times a net per cell, or a full net against a bundle per class of character |
 | `tests/` | UTF-8 cases, API and loader checks, a cross-check against numpy, and a check of the packed advance table against the library |
@@ -671,6 +672,36 @@ not invalidate that identity. Historical source hashes remain recorded
 without being rewritten. Legacy colour weights without expanded hashes
 still require their named drawing/palette and recorded parser/rule-module
 hashes. If parser metadata is absent, the original archived parser is required.
+
+### Cells files
+
+The library's cache belongs to one handle in one process, so every
+process pays for a character the first time it draws it. A cells file
+holds the floats `neuronte_coverage_styled()` writes, for the
+characters, cells and styles its maker chose, and every process maps the
+same file read-only. A hit is bit for bit what a miss would compute:
+
+```c
+#include "neuronte_cells.h"
+
+neuronte_cells *cells = NULL; /* stays NULL when there is no usable file */
+neuronte_cells_open("neuronte-split-v9.cells", "neuronte-split-v9.nrt", 0, &cells);
+
+const float *kept = cells ? neuronte_cells_find(cells, scalar, w, h, 0, style,
+                                                NEURONTE_CELLS_SNAP_FILE) : NULL;
+if (!kept)
+    return neuronte_coverage_styled(font, scalar, w, h, 0, style, out);
+memcpy(out, kept, (size_t)w * h * sizeof *out);
+```
+
+`neuronte_cells_write()` makes one, from a handle and a list of keys.
+`include/neuronte_cells.h` has the contracts, what a file answers for
+(the scalar, the cell, the samples, the style and the snap threshold are
+the key; a file holds trained characters only, so the untrained mode is
+not), and the layout of the file. This is a new translation unit:
+`src/neuronte.c` and `include/neuronte.h` are unchanged. `make
+test-cells` compares every entry of a written file with the library,
+and opens some 11,000 damaged files, plain and under AddressSanitizer.
 
 ## The net
 

@@ -184,9 +184,9 @@ FLAME = weights/neuronte-flame-v0
 # The icon net: a colour net, form A, a version 3 file by itself. It is not
 # in the bundle; neuronte-split-v5 is the default font.
 ICON = weights/neuronte-icon-v1
-OBJS = build/neuronte.o build/utf8.o build/video.o build/bits.o
+OBJS = build/neuronte.o build/utf8.o build/video.o build/bits.o build/cells.o
 TOOLS = build/neuronte-render build/neuronte-bench
-TESTS = build/test_utf8 build/test_api build/test_tiled
+TESTS = build/test_utf8 build/test_api build/test_tiled build/test_cells
 
 all: build/libneuronte.a build/libneuronte.so $(TOOLS)
 
@@ -205,8 +205,24 @@ build/libneuronte.so: $(OBJS)
 build/%: tools/%.c build/libneuronte.a
 	$(CC) $(NRT_CFLAGS) -o $@ $< build/libneuronte.a $(LDLIBS)
 
+build/cells.o: include/neuronte_cells.h
+
 build/test_%: tests/test_%.c build/libneuronte.a
 	$(CC) $(NRT_CFLAGS) -o $@ $< build/libneuronte.a $(LDLIBS)
+
+# Cells files (include/neuronte_cells.h). The test runs twice: as built
+# above, and with every read and write of src/cells.c and of the test
+# checked by AddressSanitizer and the undefined behaviour checks. The nets
+# themselves are the library's ordinary build.
+SANITIZE ?= -fsanitize=address,undefined -fno-sanitize-recover=all
+build/test_cells_checked: tests/test_cells.c src/cells.c build/libneuronte.a include/neuronte_cells.h
+	$(CC) -std=c11 -Wall -Wextra -Wpedantic -Iinclude $(CPPFLAGS) -O1 -g $(SANITIZE) -o $@ \
+		tests/test_cells.c src/cells.c build/neuronte.o build/utf8.o $(LDLIBS)
+
+test-cells: build/test_cells build/test_cells_checked
+	./build/test_cells weights/neuronte-split-v9.nrt weights/neuronte-term-dingbat-v1.nrt build/cells-test
+	./build/test_cells_checked weights/neuronte-split-v9.nrt weights/neuronte-term-dingbat-v1.nrt build/cells-test
+.PHONY: test-cells
 
 # The library again, with every tiled sample evaluated where it is summed
 # instead of kept per tile; its coverage must be the same, bit for bit.
@@ -998,7 +1014,7 @@ test-face-v0-ui43: build/libneuronte.so
 test-face-v0-uilarge: build/libneuronte.so
 	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UILARGE).nrt $(UILARGE).json font/ui-large-advances.txt
 
-test: all $(TESTS) test-bits test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7 test-face-bundle test-symbol-v1 test-split-v7-symbol test-split-v8 test-split-v9 test-term-math-v1 test-term-symbol-v1 test-term-dingbat-v1 test-faces-v1 test-faces-v1-192-256 test-known-bundle test-untrained test-standalone test-term-latin-v1 test-term-blocks-v1 test-faces-wide-v1 test-faces-v1-h512 test-colour-marks test-faces-v1-small test-emoji-v1 test-letter-snap test-ui-scaled test-ui-large-v1 test-ui-latin1 test-term-mathalpha-v1 test-term-syllabics-v1 test-term-scripts-v1 test-weather-colour-v1
+test: all $(TESTS) test-cells test-bits test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7 test-face-bundle test-symbol-v1 test-split-v7-symbol test-split-v8 test-split-v9 test-term-math-v1 test-term-symbol-v1 test-term-dingbat-v1 test-faces-v1 test-faces-v1-192-256 test-known-bundle test-untrained test-standalone test-term-latin-v1 test-term-blocks-v1 test-faces-wide-v1 test-faces-v1-h512 test-colour-marks test-faces-v1-small test-emoji-v1 test-letter-snap test-ui-scaled test-ui-large-v1 test-ui-latin1 test-term-mathalpha-v1 test-term-syllabics-v1 test-term-scripts-v1 test-weather-colour-v1
 	cd weights && sha256sum -c --quiet SHA256SUMS
 	# The pointer net keeps its own list, with paths from the top of the tree.
 	sha256sum -c --quiet weights/neuronte-pointer-v0.sha256

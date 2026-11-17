@@ -1,5 +1,20 @@
 # Changes
 
+## Unreleased
+
+### Cells files
+
+`include/neuronte_cells.h` and `src/cells.c`, a new translation unit in
+`libneuronte`: `neuronte_cells_open()`, `neuronte_cells_find()`,
+`neuronte_cells_count()`, `neuronte_cells_entry()`,
+`neuronte_cells_close()` and `neuronte_cells_write()`. A cells file holds
+coverage exactly as `neuronte_coverage_styled()` writes it, for chosen
+characters, cells and styles of one weight file, so that a process maps
+it in place of asking the nets at its first use of a character.
+`src/neuronte.c` and `include/neuronte.h` are unchanged byte for byte,
+and no existing call behaves differently. `make test-cells` is in `make
+test`.
+
 ## 0.1.5
 
 Every file of 0.1.4 is still here byte for byte and draws the same pixels

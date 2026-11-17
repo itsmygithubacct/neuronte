@@ -1,0 +1,10 @@
+# The characters neuronte-term-scripts-v1.nrt was trained on, in the order of its group nets,
+# one line for each group net, under its training set of font/term-scripts.txt.
+# A bundle's table must be exactly its list (tests/check_bundle_lists.py).
+# tscrl
+U+A4D0 U+A4D1 U+A4D3 U+A4D4 U+A4D6 U+A4D7 U+A4D9 U+A4DA
+U+A4DC U+A4DD U+A4DF U+A4E0 U+A4E1 U+A4E2 U+A4E3 U+A4E6
+U+A4E7 U+A4EA U+A4EB U+A4EC U+A4EE U+A4F0 U+A4F2 U+A4F3
+U+A4F4 U+A4D2 U+A4D5 U+A4D8 U+A4DB U+A4DE U+A4E4 U+A4E5
+U+A4E8 U+A4E9 U+A4ED U+A4EF U+A4F1 U+A4F5 U+A4F6 U+A4F7
+U+A4F8 U+A4F9 U+A4FA U+A4FB U+A4FC U+A4FD U+A4FE U+A4FF

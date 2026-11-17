@@ -1,0 +1,153 @@
+{
+  "schema": "neuronte.term-scripts/v1",
+  "name": "neuronte-term-scripts-v1",
+  "sha256": "d18eda009dfb6a955ca0a74e0f22f74f7f314d34a036ed331be44c581fb552e6",
+  "bytes": 343188,
+  "groups": [
+    [
+      "tscrl",
+      6
+    ]
+  ],
+  "again": [],
+  "left_out": [],
+  "record": {
+    "schema": "neuronte.standalone-bundle/v1",
+    "sha256": "d18eda009dfb6a955ca0a74e0f22f74f7f314d34a036ed331be44c581fb552e6",
+    "bytes": 343188,
+    "members": 7,
+    "group_nets": 6,
+    "ranges": 25,
+    "gate": null,
+    "trained_scalars": 48,
+    "fallback": {
+      "member": 6,
+      "kind": "blank",
+      "hidden_width": 1,
+      "distance": -8.0,
+      "image_sha256": "42d4790165297c3af39d178e1396f575991d6fe4d2e3c947762ef5eaedd05bf6",
+      "bytes": 592
+    },
+    "apart_from": [
+      {
+        "file": "neuronte-split-v9.nrt",
+        "sha256": "0a92f223d47f1680929b2c5d7512d1a1728d4871e6653b33cbaad060e6bb90c0",
+        "table_scalars": 1341
+      }
+    ],
+    "nets": [
+      {
+        "member": 0,
+        "json": "neuronte-term-scripts-v1-tscrl-g0.json",
+        "json_sha256": "c7954b76bd10698e31f51dfa0e75c01eaa6ac9fd54055255892e5bdd7645f1e1",
+        "image_sha256": "4e3523acf50e005ec1ab8f017dc5e012fde79d6aca86cd1fdc4fa99d6a99cbf2",
+        "bytes": 57040,
+        "set": "tscrl-repertoire",
+        "scalars": [
+          "U+A4D0",
+          "U+A4D1",
+          "U+A4D3",
+          "U+A4D4",
+          "U+A4D6",
+          "U+A4D7",
+          "U+A4D9",
+          "U+A4DA"
+        ]
+      },
+      {
+        "member": 1,
+        "json": "neuronte-term-scripts-v1-tscrl-g1.json",
+        "json_sha256": "f746b51b8cab0229c41233a60db06ff840dd31f21d903445a47495fec5ed7f3d",
+        "image_sha256": "28897e2c1a356a3c43a1ae1dae44c1e0b8e2b6b8fb6ba25508ffc6f41703fa70",
+        "bytes": 57040,
+        "set": "tscrl-repertoire",
+        "scalars": [
+          "U+A4DC",
+          "U+A4DD",
+          "U+A4DF",
+          "U+A4E0",
+          "U+A4E1",
+          "U+A4E2",
+          "U+A4E3",
+          "U+A4E6"
+        ]
+      },
+      {
+        "member": 2,
+        "json": "neuronte-term-scripts-v1-tscrl-g2.json",
+        "json_sha256": "fa28b9a4781e89c144aba41de94ec60cdbea378736e76d80d4131eca744860c6",
+        "image_sha256": "aeae8d23678de0eaafe02fd666e22f11d324172b568234f92b9d186d9a60addb",
+        "bytes": 57040,
+        "set": "tscrl-repertoire",
+        "scalars": [
+          "U+A4E7",
+          "U+A4EA",
+          "U+A4EB",
+          "U+A4EC",
+          "U+A4EE",
+          "U+A4F0",
+          "U+A4F2",
+          "U+A4F3"
+        ]
+      },
+      {
+        "member": 3,
+        "json": "neuronte-term-scripts-v1-tscrl-g3.json",
+        "json_sha256": "3e714a7a86878454e6a0f6dd4c0e1623e97e20c991f1a928f2a8d6acbe6e8d56",
+        "image_sha256": "63daf9b7eacc6157422b43ffa0bfbb0607849b97b1191e5d8f85abfa3e95ff81",
+        "bytes": 57040,
+        "set": "tscrl-repertoire",
+        "scalars": [
+          "U+A4D2",
+          "U+A4D5",
+          "U+A4D8",
+          "U+A4DB",
+          "U+A4DE",
+          "U+A4E4",
+          "U+A4E5",
+          "U+A4F4"
+        ]
+      },
+      {
+        "member": 4,
+        "json": "neuronte-term-scripts-v1-tscrl-g4.json",
+        "json_sha256": "8b7bf4d670911dcf2237b16724e34651a4e4181f8c6cecfbf1f8b497c761a242",
+        "image_sha256": "39a0c96d4eac47de511ca8611bc801a22186f023c6c70d2bbb3a2df1bffe6316",
+        "bytes": 57040,
+        "set": "tscrl-repertoire",
+        "scalars": [
+          "U+A4E8",
+          "U+A4E9",
+          "U+A4ED",
+          "U+A4EF",
+          "U+A4F1",
+          "U+A4F5",
+          "U+A4F6",
+          "U+A4F7"
+        ]
+      },
+      {
+        "member": 5,
+        "json": "neuronte-term-scripts-v1-tscrl-g5.json",
+        "json_sha256": "ed75326430a618d92d02ba7a89d7504d93fd0d783d2e18464998462f37543869",
+        "image_sha256": "814f37e2afed3dd5fd23ea1fc56f3207622b0f213db369537f20e06ca4043b94",
+        "bytes": 57040,
+        "set": "tscrl-repertoire",
+        "scalars": [
+          "U+A4F8",
+          "U+A4F9",
+          "U+A4FA",
+          "U+A4FB",
+          "U+A4FC",
+          "U+A4FD",
+          "U+A4FE",
+          "U+A4FF"
+        ]
+      }
+    ],
+    "list": {
+      "file": "neuronte-term-scripts-v1.list.txt",
+      "sha256": "9435f0e5e5d95d12eab0e8eeb779661edae60ebe63b87ef68db7f643d379d098"
+    }
+  }
+}

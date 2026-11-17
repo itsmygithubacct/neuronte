@@ -1,0 +1,367 @@
+{
+  "schema": "neuronte.term-scripts/v1",
+  "name": "neuronte-term-syllabics-v1",
+  "sha256": "bb992b61ed2c31a6ae81240e5504a9adb95bf19d8a933f4066c149f37de5f5af",
+  "bytes": 856824,
+  "groups": [
+    [
+      "tscrsa",
+      12
+    ],
+    [
+      "tscrsb",
+      3
+    ]
+  ],
+  "again": [],
+  "left_out": [],
+  "record": {
+    "schema": "neuronte.standalone-bundle/v1",
+    "sha256": "bb992b61ed2c31a6ae81240e5504a9adb95bf19d8a933f4066c149f37de5f5af",
+    "bytes": 856824,
+    "members": 16,
+    "group_nets": 15,
+    "ranges": 45,
+    "gate": null,
+    "trained_scalars": 168,
+    "fallback": {
+      "member": 15,
+      "kind": "blank",
+      "hidden_width": 1,
+      "distance": -8.0,
+      "image_sha256": "42d4790165297c3af39d178e1396f575991d6fe4d2e3c947762ef5eaedd05bf6",
+      "bytes": 592
+    },
+    "apart_from": [
+      {
+        "file": "neuronte-split-v9.nrt",
+        "sha256": "0a92f223d47f1680929b2c5d7512d1a1728d4871e6653b33cbaad060e6bb90c0",
+        "table_scalars": 1341
+      }
+    ],
+    "nets": [
+      {
+        "member": 0,
+        "json": "neuronte-term-syllabics-v1-tscrsa-g0.json",
+        "json_sha256": "18e8a0f787e4ee2501df2f41453c772fc96c0ab205cf64332579df5ab732b130",
+        "image_sha256": "054338cfe6308754014cffd2e4f44ebf844173b3ecfee577c86fef70acec87d9",
+        "bytes": 57040,
+        "set": "tscrsa-repertoire",
+        "scalars": [
+          "U+1401",
+          "U+1403",
+          "U+1404",
+          "U+1405",
+          "U+1406",
+          "U+140C",
+          "U+140D",
+          "U+140E",
+          "U+140F",
+          "U+1410",
+          "U+1411"
+        ]
+      },
+      {
+        "member": 1,
+        "json": "neuronte-term-syllabics-v1-tscrsa-g1.json",
+        "json_sha256": "fef6e6eaa194b6398f825d28e91bdbf49520cdc8c5ff1a85dd50709b6c969051",
+        "image_sha256": "38f5ad9a171ba6e28e52068dcc98f2e18922cd17eadb78ed18224c01dc1082dd",
+        "bytes": 57040,
+        "set": "tscrsa-repertoire",
+        "scalars": [
+          "U+1407",
+          "U+140A",
+          "U+140B",
+          "U+1412",
+          "U+1413",
+          "U+1414",
+          "U+1415",
+          "U+1417",
+          "U+1418",
+          "U+1419",
+          "U+141A"
+        ]
+      },
+      {
+        "member": 2,
+        "json": "neuronte-term-syllabics-v1-tscrsa-g2.json",
+        "json_sha256": "646595aff628d28091a15ce02b24577e7cec7dd0c255a1f4ea1e0d745de8ab60",
+        "image_sha256": "5b68cb4d6c34588e5e6e9ee3832ac429c10f6faf8cec718d363c32a73c1d5753",
+        "bytes": 57040,
+        "set": "tscrsa-repertoire",
+        "scalars": [
+          "U+142F",
+          "U+1431",
+          "U+1432",
+          "U+1433",
+          "U+1434",
+          "U+143A",
+          "U+143B",
+          "U+143C",
+          "U+143D",
+          "U+143E",
+          "U+143F"
+        ]
+      },
+      {
+        "member": 3,
+        "json": "neuronte-term-syllabics-v1-tscrsa-g3.json",
+        "json_sha256": "c9fcf44685e909fb3b3a64fb71d7980f909d9abd78e2cebf96acd222d9534eaa",
+        "image_sha256": "6db7e43ed776b7dd73a286d4b8aa2a0f856a8e39211225d9899ab0619625812a",
+        "bytes": 57040,
+        "set": "tscrsa-repertoire",
+        "scalars": [
+          "U+1435",
+          "U+1438",
+          "U+1439",
+          "U+1440",
+          "U+1441",
+          "U+1442",
+          "U+1443",
+          "U+1444",
+          "U+1445",
+          "U+1446",
+          "U+1447"
+        ]
+      },
+      {
+        "member": 4,
+        "json": "neuronte-term-syllabics-v1-tscrsa-g4.json",
+        "json_sha256": "c0f567215f2c3b457dd051c920d2bef7cd42c7e8b569415ecbb37994a03ac2e5",
+        "image_sha256": "03e626f82484bdabb2cb88ecc8cdfcd8aa42891f0d256ed8e3f94f7c82cf5815",
+        "bytes": 57040,
+        "set": "tscrsa-repertoire",
+        "scalars": [
+          "U+144C",
+          "U+144E",
+          "U+144F",
+          "U+1450",
+          "U+1451",
+          "U+1457",
+          "U+1458",
+          "U+1459",
+          "U+145A",
+          "U+145B",
+          "U+145C"
+        ]
+      },
+      {
+        "member": 5,
+        "json": "neuronte-term-syllabics-v1-tscrsa-g5.json",
+        "json_sha256": "c282fc4be651b90dd575ef7b2937ed483046642801153529534ac84638f644a5",
+        "image_sha256": "125f4ccf29f5289e0d575fd334aab18dbea1e7f2494071ed45ca2ebcef7a168b",
+        "bytes": 57040,
+        "set": "tscrsa-repertoire",
+        "scalars": [
+          "U+1452",
+          "U+1455",
+          "U+1456",
+          "U+145D",
+          "U+145E",
+          "U+145F",
+          "U+1460",
+          "U+1461",
+          "U+1462",
+          "U+1463",
+          "U+1464"
+        ]
+      },
+      {
+        "member": 6,
+        "json": "neuronte-term-syllabics-v1-tscrsa-g6.json",
+        "json_sha256": "21246e8f934ef90d9b9aa63279e68008f4e776a1c62925f7dd5896fa5dfa13bd",
+        "image_sha256": "48fa749c24193b9704e9a89301ca9cf29156f8942b54c355362a91447c08b432",
+        "bytes": 57040,
+        "set": "tscrsa-repertoire",
+        "scalars": [
+          "U+146B",
+          "U+146D",
+          "U+146E",
+          "U+146F",
+          "U+1470",
+          "U+1474",
+          "U+1475",
+          "U+1476",
+          "U+1477",
+          "U+1478",
+          "U+1479"
+        ]
+      },
+      {
+        "member": 7,
+        "json": "neuronte-term-syllabics-v1-tscrsa-g7.json",
+        "json_sha256": "3b3de43d6abd5c917aeec3ed9427859cbdb17837554a9c40e58c4a30562805aa",
+        "image_sha256": "8b456dfdc8ef79f0f29777a245b2eeff38989c5dead0779e1e8f47c7d396331f",
+        "bytes": 57040,
+        "set": "tscrsa-repertoire",
+        "scalars": [
+          "U+1471",
+          "U+1472",
+          "U+1473",
+          "U+147A",
+          "U+147B",
+          "U+147C",
+          "U+147D",
+          "U+147E",
+          "U+147F",
+          "U+1480",
+          "U+1481"
+        ]
+      },
+      {
+        "member": 8,
+        "json": "neuronte-term-syllabics-v1-tscrsa-g8.json",
+        "json_sha256": "d9a13daefa5b1f8fa9e3344aacee6ca8049cdd55f32c3a5782a027a459482e2e",
+        "image_sha256": "afc58b5c0b482ebc94f2f1f75bd7af5ac631900ddd16499eeb76f218932efe82",
+        "bytes": 57040,
+        "set": "tscrsa-repertoire",
+        "scalars": [
+          "U+1489",
+          "U+148B",
+          "U+148C",
+          "U+148D",
+          "U+148E",
+          "U+1492",
+          "U+1493",
+          "U+1494",
+          "U+1495",
+          "U+1496",
+          "U+1497"
+        ]
+      },
+      {
+        "member": 9,
+        "json": "neuronte-term-syllabics-v1-tscrsa-g9.json",
+        "json_sha256": "3e96a56cacc72d1bea651a6a74536a67e3bf1b9319cd3082eb481682ad62e1ca",
+        "image_sha256": "03fe1845bc9c3ecc5b1ba051cd565d73c8467ff312a3e8340c4f24c310071e1f",
+        "bytes": 57040,
+        "set": "tscrsa-repertoire",
+        "scalars": [
+          "U+148F",
+          "U+1490",
+          "U+1491",
+          "U+1498",
+          "U+1499",
+          "U+149A",
+          "U+149B",
+          "U+149C",
+          "U+149D",
+          "U+149E",
+          "U+149F"
+        ]
+      },
+      {
+        "member": 10,
+        "json": "neuronte-term-syllabics-v1-tscrsa-g10.json",
+        "json_sha256": "072e6f4d04fde27a060f655036acf7fa8a93eddb81e02e1222987e437749ee4b",
+        "image_sha256": "28873c2e62151c1a1c7e3bfceb5ee563091a6c2f232fd064e0b7b8ad19e3aeca",
+        "bytes": 57040,
+        "set": "tscrsa-repertoire",
+        "scalars": [
+          "U+14A3",
+          "U+14A5",
+          "U+14A6",
+          "U+14A7",
+          "U+14A8",
+          "U+14AC",
+          "U+14AD",
+          "U+14AE",
+          "U+14AF",
+          "U+14B0",
+          "U+14B1"
+        ]
+      },
+      {
+        "member": 11,
+        "json": "neuronte-term-syllabics-v1-tscrsa-g11.json",
+        "json_sha256": "0f550409a9ce9fa686105ba4fa77b5ca9fd807d2a7a39f5cc1faa75906ceb8ca",
+        "image_sha256": "0a6641bf7ea9fafed63e208313e1cfb5708e07c33043d2c4437adced3bc59fea",
+        "bytes": 57040,
+        "set": "tscrsa-repertoire",
+        "scalars": [
+          "U+14A9",
+          "U+14AA",
+          "U+14AB",
+          "U+14B2",
+          "U+14B3",
+          "U+14B4",
+          "U+14B5",
+          "U+14B6",
+          "U+14B7",
+          "U+14B8",
+          "U+14B9"
+        ]
+      },
+      {
+        "member": 12,
+        "json": "neuronte-term-syllabics-v1-tscrsb-g0.json",
+        "json_sha256": "02a0291624b88094c922adde4d53850bad466e5e996632f2f632af03d07a533d",
+        "image_sha256": "d129d7faf116c09e3ad7689f9e138444cf7d3f7120e1d0873638b1207bf6bb6a",
+        "bytes": 57040,
+        "set": "tscrsb-repertoire",
+        "scalars": [
+          "U+14C0",
+          "U+14C2",
+          "U+14C3",
+          "U+14C4",
+          "U+14C5",
+          "U+14C6",
+          "U+14C7",
+          "U+14C8",
+          "U+14C9",
+          "U+14CA",
+          "U+14CB",
+          "U+14CC"
+        ]
+      },
+      {
+        "member": 13,
+        "json": "neuronte-term-syllabics-v1-tscrsb-g1.json",
+        "json_sha256": "1b0d968fb42a69039483adf2e3a4f4d5b72b324a68635938a969c2781e75c92e",
+        "image_sha256": "b182e0e095d2915b8c17264ab4c38e3d4a34971fce1bf4d252922555221dfc03",
+        "bytes": 57040,
+        "set": "tscrsb-repertoire",
+        "scalars": [
+          "U+1449",
+          "U+144A",
+          "U+1466",
+          "U+1483",
+          "U+1484",
+          "U+14A1",
+          "U+14BB",
+          "U+14BC",
+          "U+14CD",
+          "U+14CE",
+          "U+14D0",
+          "U+166E"
+        ]
+      },
+      {
+        "member": 14,
+        "json": "neuronte-term-syllabics-v1-tscrsb-g2.json",
+        "json_sha256": "b6bc6b32d4090970f5a7e5b73f98cd506bb5ecab4782ee0cc0ddbc25533422e3",
+        "image_sha256": "32878711412f6a2922b09b855b264df780224bd7e0edd942a855851c89bd410b",
+        "bytes": 57040,
+        "set": "tscrsb-repertoire",
+        "scalars": [
+          "U+141F",
+          "U+1420",
+          "U+1421",
+          "U+1422",
+          "U+1423",
+          "U+1424",
+          "U+1425",
+          "U+1426",
+          "U+1427",
+          "U+1428",
+          "U+1429",
+          "U+142A"
+        ]
+      }
+    ],
+    "list": {
+      "file": "neuronte-term-syllabics-v1.list.txt",
+      "sha256": "dbbe5d6efaf1082d96a7940bb7d6846e186cdf23e1e00609f5557ec9a66afaf8"
+    }
+  }
+}

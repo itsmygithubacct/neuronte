@@ -64,7 +64,8 @@ tcyrillic, tletter (the two scripts) and terminal (all three); and three sets fo
 how the mosaics join the bundle: pixel (block, mosaic), pixelbraille
 (block, mosaic, braille) and boxshade (box, shade); the sets of
 font/term-latin.txt, each its tier alone, and termlatin, all of them; the sets of
-font/term-scripts.txt, each its tier alone. The sets ui1 to
+font/term-scripts.txt, each its tier alone, and termmathalpha and termsyllabics,
+each all the sets of its bundle. The sets ui1 to
 ui128, except ui44, the italic sets ui3i to ui32i, and uilarge, are each their
 tier alone. They share their scalars with ascii and with each other, so
 they join no other set, and their nets no bundle.
@@ -1297,6 +1298,7 @@ SETS = {
 SETS.update({name: [name] for name in term_latin_sets()})
 SETS["termlatin"] = list(term_latin_sets())  # every set of font/term-latin.txt
 SETS.update({name: [name] for name in term_scripts.sets()})  # the sets of font/term-scripts.txt
+SETS.update(term_scripts.bundles())  # termmathalpha, termsyllabics: each bundle's sets together
 
 
 def tier(name):

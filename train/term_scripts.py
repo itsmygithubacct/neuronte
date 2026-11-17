@@ -223,3 +223,20 @@ def tier(name, path=FILE):
 def bundle_sets(letter, path=FILE):
     """The sets of one bundle: tscrm... the styled alphabets, tscrs... syllabics, and so on."""
     return [name for name in sets(path) if name.startswith(PREFIX + letter)]
+
+
+# A bundle's characters as one set, to judge a character against every
+# other of its bundle. A set named tscrx... is a failed group's characters
+# again, to train as two halves: it repeats characters and joins no bundle.
+BUNDLES = {"termmathalpha": "m", "termsyllabics": "s", "termscripts": "agtlo"}
+AGAIN = PREFIX + "x"
+
+
+def bundles(path=FILE):
+    """{bundle set: [its training sets]} for the bundles that have any."""
+    out = {}
+    for name, letters in BUNDLES.items():
+        mine = [s for s in sets(path) if s[len(PREFIX):len(PREFIX) + 1] in letters and not s.startswith(AGAIN)]
+        if mine:
+            out[name] = mine
+    return out

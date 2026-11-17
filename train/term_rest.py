@@ -256,8 +256,11 @@ CATS = {
     0x1F431: ("dot", "cat", None, ()),
 }
 CAT_HEAD = (5.0, 10.9, 3.55)
-MOONS = {0x1F311: ("all", 0), 0x1F312: ("left", -0.5), 0x1F313: ("left", 0), 0x1F314: ("left", 0.5),
-         0x1F315: ("none", 0), 0x1F316: ("right", 0.5), 0x1F317: ("right", 0), 0x1F318: ("right", -0.5)}
+# The terminator of a crescent or gibbous moon bows by 0.35 of the radius: at
+# 8 and 10 pixels wide the dark part of a gibbous moon is then plainly wider
+# than the full moon's ring, and a crescent still differs from a quarter.
+MOONS = {0x1F311: ("all", 0), 0x1F312: ("left", -0.35), 0x1F313: ("left", 0), 0x1F314: ("left", 0.35),
+         0x1F315: ("none", 0), 0x1F316: ("right", 0.35), 0x1F317: ("right", 0), 0x1F318: ("right", -0.35)}
 MOON = (5.0, 9.75, 4.2)
 HEART = [(0, 0.9), (-0.95, -0.1), (-0.95, -0.6), (-0.5, -0.9), (0, -0.5), (0.5, -0.9), (0.95, -0.6), (0.95, -0.1)]
 DROP = [(0, -0.95), (0.55, 0.2), (0.4, 0.75), (0, 0.95), (-0.4, 0.75), (-0.55, 0.2)]

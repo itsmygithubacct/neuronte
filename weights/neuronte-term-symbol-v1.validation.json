@@ -95,7 +95,7 @@
  "selection_rule": "of a passing group, the seed with the lower mean error over 8x16, 16x32 and 48x96",
  "retry_rule": "one, declared with the gates: a failing group trained once more at width 96, same characters, seeds and steps, judged by the same rules; still failing, it is left out",
  "retry_run": false,
- "retry_note": "A change to the declared recipe: the retry was not run for this bundle. The batch before it retried 23 failing groups at width 96 and none passed; the accented-letter bundle retried 72 and one passed; and the owner had decided that failed groups ship at width 64. Every group that failed at width 64 is recorded FAILED without a second attempt.",
+ "retry_note": "A change to the declared recipe: the retry was not run for this bundle. The arrows and mathematical operators bundle retried 23 failing groups at width 96 and none passed; the accented-letter bundle retried 72 and one passed; and the owner had decided that failed groups ship at width 64. Every group that failed at width 64 is recorded FAILED without a second attempt.",
  "owner_choice": "The owner decided on 2026-11-17, with the trained-net sheet of the first bundle open, that groups failing the declared gates ship at width 64 marked FAILED and owner-chosen, in all three bundles. The owner named no seed: of each such group the seed with the lower mean error over 8x16, 16x32 and 48x96 ships, the rule declared for the groups that pass.",
  "evaluator": "native library coverage, automatic sampling, each character through its own packed group net, against the training teacher supersampled 8x8; tests/check_reference.py on every packed net",
  "library_sha256": "429420ff1eb85a9b5c5a19cc832c958148145e122d6ce8a6e1acdbcbcfb151a2",

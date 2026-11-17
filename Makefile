@@ -721,6 +721,23 @@ pack-term-symbol-v1:
 
 .PHONY: test-term-symbol-v1 pack-term-symbol-v1
 
+# term-dingbat-v1: Miscellaneous Symbols and Dingbats, the same way.
+TERM_DINGBAT_V1 = $(shell $(PYTHON) train/build_term_symbols.py dingbat --files)
+
+test-term-dingbat-v1: build/libneuronte.so build/test_api
+	$(PYTHON) tools/term-partition.py ding --check
+	@set -e; for n in $(TERM_DINGBAT_V1); do \
+		$(PYTHON) train/pack.py $$n.json build/$$(basename $$n).nrt; \
+		$(PYTHON) tests/check_reference.py build/libneuronte.so $$n.json build/$$(basename $$n).nrt; \
+	done
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_term_symbols.py build/libneuronte.so dingbat
+	./build/test_api weights/neuronte-term-dingbat-v1.nrt --standalone $$($(PYTHON) train/build_term_symbols.py dingbat --ink)
+
+pack-term-dingbat-v1:
+	$(PYTHON) train/build_term_symbols.py dingbat
+
+.PHONY: test-term-dingbat-v1 pack-term-dingbat-v1
+
 test-symbol-v1: build/libneuronte.so build/test_api
 	@set -e; for g in 0 1 2 3; do \
 		$(PYTHON) train/pack.py $(SYMBOL_V1)-g$$g.json build/symbol-v1-g$$g.nrt; \
@@ -758,7 +775,7 @@ test-bits: build/libneuronte.so
 	$(PYTHON) tests/check_bits.py build/libneuronte.so
 .PHONY: test-bits
 
-test: all $(TESTS) test-bits test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7 test-face-bundle test-symbol-v1 test-split-v7-symbol test-split-v8 test-split-v9 test-term-math-v1 test-term-symbol-v1 test-faces-v1test-faces-v1-192-256 test-known-bundle test-untrained test-standalone test-term-latin-v1 test-faces-wide-v1 test-faces-v1-h512 test-colour-marks test-faces-v1-small test-emoji-v1 test-letter-snap test-ui-scaled test-ui-large-v1 test-ui-latin1
+test: all $(TESTS) test-bits test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7 test-face-bundle test-symbol-v1 test-split-v7-symbol test-split-v8 test-split-v9 test-term-math-v1 test-term-symbol-v1 test-term-dingbat-v1 test-faces-v1 test-faces-v1-192-256 test-known-bundle test-untrained test-standalone test-term-latin-v1 test-faces-wide-v1 test-faces-v1-h512 test-colour-marks test-faces-v1-small test-emoji-v1 test-letter-snap test-ui-scaled test-ui-large-v1 test-ui-latin1
 	cd weights && sha256sum -c --quiet SHA256SUMS
 	# The pointer net keeps its own list, with paths from the top of the tree.
 	sha256sum -c --quiet weights/neuronte-pointer-v0.sha256

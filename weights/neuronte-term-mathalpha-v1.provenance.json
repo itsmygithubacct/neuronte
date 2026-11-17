@@ -1,0 +1,406 @@
+{
+  "schema": "neuronte.term-scripts/v1",
+  "name": "neuronte-term-mathalpha-v1",
+  "sha256": "b6bd7d73a1c2116b4383d70c810fe780ca3e36846c32c7178c1e5a2764167c57",
+  "bytes": 971056,
+  "groups": [
+    [
+      "tscrmp",
+      10
+    ],
+    [
+      "tscrmn",
+      2
+    ],
+    [
+      "tscrmdu",
+      2
+    ],
+    [
+      "tscrmdl",
+      3
+    ]
+  ],
+  "again": [],
+  "left_out": [],
+  "record": {
+    "schema": "neuronte.standalone-bundle/v1",
+    "sha256": "b6bd7d73a1c2116b4383d70c810fe780ca3e36846c32c7178c1e5a2764167c57",
+    "bytes": 971056,
+    "members": 18,
+    "group_nets": 17,
+    "ranges": 57,
+    "gate": null,
+    "trained_scalars": 179,
+    "fallback": {
+      "member": 17,
+      "kind": "blank",
+      "hidden_width": 1,
+      "distance": -8.0,
+      "image_sha256": "42d4790165297c3af39d178e1396f575991d6fe4d2e3c947762ef5eaedd05bf6",
+      "bytes": 592
+    },
+    "apart_from": [
+      {
+        "file": "neuronte-split-v9.nrt",
+        "sha256": "0a92f223d47f1680929b2c5d7512d1a1728d4871e6653b33cbaad060e6bb90c0",
+        "table_scalars": 1341
+      }
+    ],
+    "nets": [
+      {
+        "member": 0,
+        "json": "neuronte-term-mathalpha-v1-tscrmp-g0.json",
+        "json_sha256": "952adf50b402809dd80c72b902d9697d2aed49f59b0c1df6ea3e43063d0e57a8",
+        "image_sha256": "e10f102e455c59a9dc7ded6043be375befb519ab0c47e55c310f4052d7746a4c",
+        "bytes": 57040,
+        "set": "tscrmp-repertoire",
+        "scalars": [
+          "U+1D5A0",
+          "U+1D5A1",
+          "U+1D5A2",
+          "U+1D5A3",
+          "U+1D5A4",
+          "U+1D5A5",
+          "U+1D670",
+          "U+1D671",
+          "U+1D672",
+          "U+1D673",
+          "U+1D674",
+          "U+1D675"
+        ]
+      },
+      {
+        "member": 1,
+        "json": "neuronte-term-mathalpha-v1-tscrmp-g1.json",
+        "json_sha256": "35112de48874f58c68cf45f1306a70a30e9c41a536683c4d169c02621c52c259",
+        "image_sha256": "3bff16062ff896bb2291fd679524a0f8a307cdbe6fb9eacc856afef7953b3d7a",
+        "bytes": 57040,
+        "set": "tscrmp-repertoire",
+        "scalars": [
+          "U+1D5A6",
+          "U+1D5A7",
+          "U+1D5A8",
+          "U+1D5A9",
+          "U+1D5AA",
+          "U+1D5AB",
+          "U+1D676",
+          "U+1D677",
+          "U+1D678",
+          "U+1D679",
+          "U+1D67A",
+          "U+1D67B"
+        ]
+      },
+      {
+        "member": 2,
+        "json": "neuronte-term-mathalpha-v1-tscrmp-g2.json",
+        "json_sha256": "d1a70cd6854803bb88ef0ee80e02817059f63adb5fb5864891016e5d7bd3a65e",
+        "image_sha256": "993be71a7b138fc53f4c9e4635185aceea5fcd5eacc591f62003b3704ce4936d",
+        "bytes": 57040,
+        "set": "tscrmp-repertoire",
+        "scalars": [
+          "U+1D5AC",
+          "U+1D5AD",
+          "U+1D5AF",
+          "U+1D5B0",
+          "U+1D5B1",
+          "U+1D5B3",
+          "U+1D67C",
+          "U+1D67D",
+          "U+1D67F",
+          "U+1D680",
+          "U+1D681",
+          "U+1D683"
+        ]
+      },
+      {
+        "member": 3,
+        "json": "neuronte-term-mathalpha-v1-tscrmp-g3.json",
+        "json_sha256": "38e70ecb23c93aa16fd4a54701976ed05460e205a81bb55d545fc2cc0a77deea",
+        "image_sha256": "52e4c1b37a83e1248ce43e479c2bc36bd6d531a9f8150754cc21d60a6707cc67",
+        "bytes": 57040,
+        "set": "tscrmp-repertoire",
+        "scalars": [
+          "U+1D5B4",
+          "U+1D5B5",
+          "U+1D5B6",
+          "U+1D5B7",
+          "U+1D5B8",
+          "U+1D5B9",
+          "U+1D684",
+          "U+1D685",
+          "U+1D686",
+          "U+1D687",
+          "U+1D688",
+          "U+1D689"
+        ]
+      },
+      {
+        "member": 4,
+        "json": "neuronte-term-mathalpha-v1-tscrmp-g4.json",
+        "json_sha256": "5e0d1d162263912cc936caa07c83f87329ca959ff043cfc97ee23c2cca21fa81",
+        "image_sha256": "1fb7f33d19df2dc2aa802357c584b44b60bebe01b7de5391edab96b36f184f2e",
+        "bytes": 57040,
+        "set": "tscrmp-repertoire",
+        "scalars": [
+          "U+1D5AE",
+          "U+1D5B2",
+          "U+1D5C8",
+          "U+1D5CC",
+          "U+1D67E",
+          "U+1D682",
+          "U+1D698",
+          "U+1D69C",
+          "U+1D7E5",
+          "U+1D7EA",
+          "U+1D7F9",
+          "U+1D7FE"
+        ]
+      },
+      {
+        "member": 5,
+        "json": "neuronte-term-mathalpha-v1-tscrmp-g5.json",
+        "json_sha256": "d7880ceac10f7930056413bf2ef6ffd8a737f39ac47242ef14c29490c26ae5f8",
+        "image_sha256": "083b63b7a9290d2d2af3d35e9b6abbe9404b3f2185b5b1b9029baf796284b2ce",
+        "bytes": 57040,
+        "set": "tscrmp-repertoire",
+        "scalars": [
+          "U+1D5BA",
+          "U+1D5BB",
+          "U+1D5BC",
+          "U+1D5BD",
+          "U+1D5BE",
+          "U+1D5BF",
+          "U+1D68A",
+          "U+1D68B",
+          "U+1D68C",
+          "U+1D68D",
+          "U+1D68E",
+          "U+1D68F"
+        ]
+      },
+      {
+        "member": 6,
+        "json": "neuronte-term-mathalpha-v1-tscrmp-g6.json",
+        "json_sha256": "994e0b08c79bee13dfd3bed25953a24c02531de879b85aa6bd541bd52db0e475",
+        "image_sha256": "811b1c792e931593663cc28c27ea8981f01988fc16f73f7b501090df34aabb8c",
+        "bytes": 57040,
+        "set": "tscrmp-repertoire",
+        "scalars": [
+          "U+1D5C0",
+          "U+1D5C1",
+          "U+1D5C2",
+          "U+1D5C3",
+          "U+1D5C4",
+          "U+1D5C5",
+          "U+1D690",
+          "U+1D691",
+          "U+1D692",
+          "U+1D693",
+          "U+1D694",
+          "U+1D695"
+        ]
+      },
+      {
+        "member": 7,
+        "json": "neuronte-term-mathalpha-v1-tscrmp-g7.json",
+        "json_sha256": "929d201b9d353453defb998210decfe875d591c9fe849e5a9e2ea29614aa3100",
+        "image_sha256": "9d75358069ee91d2818951fa9e4d53d9982d647b046366153f11a2a7aec6bfd8",
+        "bytes": 57040,
+        "set": "tscrmp-repertoire",
+        "scalars": [
+          "U+1D5C6",
+          "U+1D5C7",
+          "U+1D5C9",
+          "U+1D5CA",
+          "U+1D5CB",
+          "U+1D5CD",
+          "U+1D696",
+          "U+1D697",
+          "U+1D699",
+          "U+1D69A",
+          "U+1D69B",
+          "U+1D69D"
+        ]
+      },
+      {
+        "member": 8,
+        "json": "neuronte-term-mathalpha-v1-tscrmp-g8.json",
+        "json_sha256": "f19786b3be1400f009b60ad69d195db991214896e313ebe15c4e2ac6bacd4923",
+        "image_sha256": "4da8a2ccc5a1958fae31fd6be24b33833ec3a3abb36c051bd5bfd4130ad2fe8b",
+        "bytes": 57040,
+        "set": "tscrmp-repertoire",
+        "scalars": [
+          "U+1D5CE",
+          "U+1D5CF",
+          "U+1D5D0",
+          "U+1D5D1",
+          "U+1D5D2",
+          "U+1D5D3",
+          "U+1D69E",
+          "U+1D69F",
+          "U+1D6A0",
+          "U+1D6A1",
+          "U+1D6A2",
+          "U+1D6A3"
+        ]
+      },
+      {
+        "member": 9,
+        "json": "neuronte-term-mathalpha-v1-tscrmp-g9.json",
+        "json_sha256": "21c56344216df3ed2c9087237607f9f45da5120e35c3cd12fc0c11d9df1e0700",
+        "image_sha256": "5bdd9370f1036ed2ab3c053d355ff31a37ef7af850dbcb30bf091d6f4e26783c",
+        "bytes": 57040,
+        "set": "tscrmp-repertoire",
+        "scalars": [
+          "U+1D7E4",
+          "U+1D7E6",
+          "U+1D7E7",
+          "U+1D7E8",
+          "U+1D7E9",
+          "U+1D7EB",
+          "U+1D7F8",
+          "U+1D7FA",
+          "U+1D7FB",
+          "U+1D7FC",
+          "U+1D7FD",
+          "U+1D7FF"
+        ]
+      },
+      {
+        "member": 10,
+        "json": "neuronte-term-mathalpha-v1-tscrmn-g0.json",
+        "json_sha256": "6c68ce355d14289ffbfa7d05c188353253b87a9560932385683366e570523ab3",
+        "image_sha256": "17f3d64953b5152b59d5c76ff23077ac5853cbc31e9fe422c22d38113e665183",
+        "bytes": 57040,
+        "set": "tscrmn-repertoire",
+        "scalars": [
+          "U+1D7D8",
+          "U+1D7D9",
+          "U+1D7DA",
+          "U+1D7DB",
+          "U+1D7DC",
+          "U+1D7E2",
+          "U+1D7F6"
+        ]
+      },
+      {
+        "member": 11,
+        "json": "neuronte-term-mathalpha-v1-tscrmn-g1.json",
+        "json_sha256": "5f99c797c4bcf69bd742343c2d9c2bd5d5ebe13e8e88dd41367682994dad99ca",
+        "image_sha256": "56cb7afbb0cd48a1891588e5372cd936a6f74c2002a9814a3029717255c98358",
+        "bytes": 57040,
+        "set": "tscrmn-repertoire",
+        "scalars": [
+          "U+1D7DD",
+          "U+1D7DE",
+          "U+1D7DF",
+          "U+1D7E0",
+          "U+1D7E1",
+          "U+1D7E3",
+          "U+1D7F7"
+        ]
+      },
+      {
+        "member": 12,
+        "json": "neuronte-term-mathalpha-v1-tscrmdu-g0.json",
+        "json_sha256": "ad88e4e131c1f713637b9f30fe2ad2d041185106c5513a412542445665a8a9ce",
+        "image_sha256": "2dbe23d63743afe245f4c1ac1603e54c0f74ac6cd6b48db01c09965657e8ab0a",
+        "bytes": 57040,
+        "set": "tscrmdu-repertoire",
+        "scalars": [
+          "U+1D538",
+          "U+1D539",
+          "U+1D53B",
+          "U+1D53C",
+          "U+1D53D",
+          "U+1D53E",
+          "U+1D540",
+          "U+1D541",
+          "U+1D542"
+        ]
+      },
+      {
+        "member": 13,
+        "json": "neuronte-term-mathalpha-v1-tscrmdu-g1.json",
+        "json_sha256": "9eeb654215530fd8c0551e5505d642b94d00c5c34bed4864286358dd193a95ef",
+        "image_sha256": "21ff331437fc86029ad772e5a8a24efc7f4502bafbfdc1c43a90005eba89532c",
+        "bytes": 57040,
+        "set": "tscrmdu-repertoire",
+        "scalars": [
+          "U+1D543",
+          "U+1D544",
+          "U+1D546",
+          "U+1D54A",
+          "U+1D54B",
+          "U+1D54C",
+          "U+1D54D",
+          "U+1D54E",
+          "U+1D54F",
+          "U+1D550"
+        ]
+      },
+      {
+        "member": 14,
+        "json": "neuronte-term-mathalpha-v1-tscrmdl-g0.json",
+        "json_sha256": "eb59fd6d6231370c7529ae2600eee67fe8bf4cf18312b47c86c980f98a54f763",
+        "image_sha256": "92b290be81afb521050fc40b9de59d53ee320d7aa19dfbe2a878adc170cc5a4b",
+        "bytes": 57040,
+        "set": "tscrmdl-repertoire",
+        "scalars": [
+          "U+1D552",
+          "U+1D553",
+          "U+1D554",
+          "U+1D555",
+          "U+1D556",
+          "U+1D557",
+          "U+1D558",
+          "U+1D559"
+        ]
+      },
+      {
+        "member": 15,
+        "json": "neuronte-term-mathalpha-v1-tscrmdl-g1.json",
+        "json_sha256": "164aa80777f9812e1c1c34e5c9ce01800d0c3ad75c0d7627930448887975ca17",
+        "image_sha256": "741d0e0b5f698a44d6251a9dd374ae966d1ed2ba852546a60570947f0deab2cd",
+        "bytes": 57040,
+        "set": "tscrmdl-repertoire",
+        "scalars": [
+          "U+1D55A",
+          "U+1D55B",
+          "U+1D55C",
+          "U+1D55D",
+          "U+1D55E",
+          "U+1D55F",
+          "U+1D560",
+          "U+1D561",
+          "U+1D562"
+        ]
+      },
+      {
+        "member": 16,
+        "json": "neuronte-term-mathalpha-v1-tscrmdl-g2.json",
+        "json_sha256": "82e5eb546bf594272d5622d01945e277f27c0628483de3089dcb3276e1c4e655",
+        "image_sha256": "8fad00992df209dd970e84c5894f0501a84a5ea22e83911e6eae4e3e2cf3df60",
+        "bytes": 57040,
+        "set": "tscrmdl-repertoire",
+        "scalars": [
+          "U+1D563",
+          "U+1D564",
+          "U+1D565",
+          "U+1D566",
+          "U+1D567",
+          "U+1D568",
+          "U+1D569",
+          "U+1D56A",
+          "U+1D56B"
+        ]
+      }
+    ],
+    "list": {
+      "file": "neuronte-term-mathalpha-v1.list.txt",
+      "sha256": "5b004506be1bb3724a5f8b531ec346bdd0693e006f3a825ae180f27ff361a8c1"
+    }
+  }
+}

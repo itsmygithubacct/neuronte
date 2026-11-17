@@ -1,0 +1,4983 @@
+{
+ "schema": "neuronte.term-scripts.validation/v1",
+ "bundle": "neuronte-term-mathalpha-v1.nrt",
+ "bundle_sha256": "b6bd7d73a1c2116b4383d70c810fe780ca3e36846c32c7178c1e5a2764167c57",
+ "groups_trained": 17,
+ "groups_shipped": 17,
+ "groups_failed_first": 0,
+ "halves_trained": 0,
+ "halves_left_out": 0,
+ "characters_drawn": 179,
+ "characters_trained": 179,
+ "characters_left_out": [],
+ "limits_eased": 20,
+ "limits_eased_in_shipped_groups": 20,
+ "seeds_passing_pixel_exact": 0,
+ "drawing_problems": 0,
+ "perfect_margin": {
+  "factor": 1.1,
+  "floor": "shortfall",
+  "rule": "for each group, size, sampling mode and rule (for the worst-character error rule, each character) the limit applied is the looser of the declared limit and the perfect drawing's own score eased by the factor: a ceiling (mae, p99, firm, glyph_mae) at perfect * 1.10; a floor (iou_mean) at 1 - (1 - perfect) * 1.10, the shortfall from 1 grown by the factor, as the gates' own slack treats an overlap; where the perfect score is exactly 0 the declared limit stands",
+  "replaces": "perfect_skip of gates-v2.2: a rule the perfect drawing fails is no longer switched off, it is applied at the perfect score eased by the factor",
+  "perfect_drawing": "the exact signed distance d of the drawing (REPO/train/glyphs.py signed_distance, the teacher's pen) at the library's own sample points, as coverage clip(0.5 + d * W * S, 0, 1), S = 2 below 24 pixels wide and 1 from there for automatic sampling, S = 1 for the one-sample rules; measured by the same metric code against the same teacher masks",
+  "method_from": "lane term-rest, runs/term-rest-20261117/drawings/ceiling.py",
+  "applies_to": "both kinds; every counted size; automatic and one-sample rules",
+  "never_eased": [
+   "nearest_all",
+   "no_vanished"
+  ],
+  "recorded": "verdict.json lists every eased limit per group (\"eased\": rule, declared, perfect, applied) and any perfect drawing that fails nearest or vanished (\"drawing_problems\")"
+ },
+ "pixel_exact": {
+  "enabled": true,
+  "rule": "a seed passes, whatever its error-amount rules say (mae, p99, firm, iou_mean, glyph_mae), if its net puts every pixel of every character of the group on the same side of one half as the teacher's mask at every counted size with automatic sampling, and for a kind with one-sample rules also at those sizes with one sample; nearest_all and no_vanished still apply and the float64 reference check still applies",
+  "recorded": "the seed's \"verdict\" reads \"pass: pixel-exact\" when the rule decided it, \"waived\" lists the error-amount failures it set aside, and the error numbers are recorded as for any net"
+ },
+ "selection": "a group ships when seed 0 and seed 1 both pass the common gates (gates-v2.3.json), the seed with the lower mean of the mean error at 8x16, 16x32 and 48x96; a group that fails is trained once more as two groups of half its characters; a half that still fails is left out and its characters stay untrained. Under gates-v2.3 no limit is tighter than the perfect drawing's own score for the group eased by 10 per cent, and a seed that puts every pixel on the correct side at every counted size passes",
+ "gates_file": "gates-v2.3.json",
+ "gates_sha256": "2ccff8354eeda45e05525490b9fdee6ab13d4970a2389537c44af1504fc50fc4",
+ "gates_kind": "letters",
+ "gates_files_issued": {
+  "gates-v2.1.json": "214942e398f88110cd7c6044c194f0f274274aeedb07abcbe8e1a18dc2b323c0",
+  "gates-v2.2.json": "dd3cc2ea30ccb49d001c28a905bcc6e2a2d11edfcd6a741464fda91162b10e70",
+  "gates-v2.3.json": "2ccff8354eeda45e05525490b9fdee6ab13d4970a2389537c44af1504fc50fc4",
+  "gates-v2.json": "5bf1a3f8312c45df2a20b2e69d51ee3c690c58891ec5390cf0e41cbdf9f9b51b"
+ },
+ "scoring": "gates_v2.py score --kind letters --gates gates-v2.3.json, against the teacher of every character drawn for the bundle",
+ "teacher_sha256": "21aa031e2e9c063329efa2eac6374f50665e772047c3d112ec1d93c006e80de6",
+ "teacher_characters": 179,
+ "trainer": "train/split_expert.py train --mode repertoire --partition contiguous, width 64, 120000 steps, seeds 0,1, teacher grid 256",
+ "library_sha256": "429420ff1eb85a9b5c5a19cc832c958148145e122d6ce8a6e1acdbcbcfb151a2",
+ "groups": [
+  {
+   "set": "tscrmp",
+   "group": 0,
+   "scalars": [
+    "U+1D5A0",
+    "U+1D670",
+    "U+1D5A1",
+    "U+1D671",
+    "U+1D5A2",
+    "U+1D672",
+    "U+1D5A3",
+    "U+1D673",
+    "U+1D5A4",
+    "U+1D674",
+    "U+1D5A5",
+    "U+1D675"
+   ],
+   "width": 64,
+   "role": "first",
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "seeds": {
+    "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
+     "sha256": "09ec12c51258589fbdfc1b6158b03dc479a5c9428d35fb52651a63f5a327a3a8",
+     "reference_check_passed": true,
+     "gates_passed": true,
+     "failures": [],
+     "mean_established_mae": 0.0036650843814843227,
+     "counted_sizes": {
+      "6x12": {
+       "mae": 0.007897589666148027,
+       "p99": 0.05160021781921387,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9895833333333334,
+       "worst_glyph_mae": 0.012720420025289059,
+       "worst_glyph_iou": 0.9375,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 2.878559947013855
+      },
+      "8x16": {
+       "mae": 0.0067248111590743065,
+       "p99": 0.05293592810630798,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9617408906882591,
+       "worst_glyph_mae": 0.009504245594143867,
+       "worst_glyph_iou": 0.9,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 5.3092663288116455
+      },
+      "10x20": {
+       "mae": 0.002381587604759261,
+       "p99": 0.050866007804870605,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9913303909205547,
+       "worst_glyph_mae": 0.003634544089436531,
+       "worst_glyph_iou": 0.9672131147540983,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 8.757689595222473
+      },
+      "12x24": {
+       "mae": 0.00420836650300771,
+       "p99": 0.05130188539624214,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.8888855657317167,
+       "worst_glyph_mae": 0.0059166825376451015,
+       "worst_glyph_iou": 0.7346938775510204,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 12.35263454914093
+      },
+      "16x32": {
+       "mae": 0.002830773553190132,
+       "p99": 0.05035143345594406,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.984439100367752,
+       "worst_glyph_mae": 0.004526316188275814,
+       "worst_glyph_iou": 0.9746835443037974,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 21.80683922767639
+      },
+      "24x48": {
+       "mae": 0.002767176910613974,
+       "p99": 0.05117648094892502,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9979194472795792,
+       "worst_glyph_mae": 0.003705775598064065,
+       "worst_glyph_iou": 0.9893617021276596,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 49.552847266197205
+      },
+      "48x96": {
+       "mae": 0.0014396684321885307,
+       "p99": 0.04610007628798485,
+       "firm_fraction": 3.616898148148148e-05,
+       "iou_mean": 0.998253678146769,
+       "worst_glyph_mae": 0.0018654422601684928,
+       "worst_glyph_iou": 0.9958904109589041,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 202.4594355225563
+      }
+     },
+     "one_sample": {
+      "8x16": {
+       "mae": 0.010347896294357875,
+       "p99": 0.09313348680734634,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9700742240215924,
+       "worst_glyph_mae": 0.014640020206570625,
+       "worst_glyph_iou": 0.9230769230769231,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 5.289464116096497
+      },
+      "16x32": {
+       "mae": 0.0046937872539274395,
+       "p99": 0.0600569061934948,
+       "firm_fraction": 0.0009765625,
+       "iou_mean": 0.9788717898498379,
+       "worst_glyph_mae": 0.006353608798235655,
+       "worst_glyph_iou": 0.9622641509433962,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 21.545759320259094
+      },
+      "48x96": {
+       "mae": 0.0014396684321885307,
+       "p99": 0.04610007628798485,
+       "firm_fraction": 3.616898148148148e-05,
+       "iou_mean": 0.998253678146769,
+       "worst_glyph_mae": 0.0018654422601684928,
+       "worst_glyph_iou": 0.9958904109589041,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 202.4594355225563
+      }
+     }
+    },
+    "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
+     "sha256": "952adf50b402809dd80c72b902d9697d2aed49f59b0c1df6ea3e43063d0e57a8",
+     "reference_check_passed": true,
+     "gates_passed": true,
+     "failures": [],
+     "mean_established_mae": 0.0036054628322340753,
+     "counted_sizes": {
+      "6x12": {
+       "mae": 0.007867358081663648,
+       "p99": 0.053207654505968094,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9895833333333334,
+       "worst_glyph_mae": 0.01233741920441389,
+       "worst_glyph_iou": 0.9375,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 2.965973198413849
+      },
+      "8x16": {
+       "mae": 0.006593001851191123,
+       "p99": 0.05176578462123871,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9696356275303644,
+       "worst_glyph_mae": 0.009215595200657845,
+       "worst_glyph_iou": 0.9230769230769231,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 5.342768669128418
+      },
+      "10x20": {
+       "mae": 0.0024195068496434637,
+       "p99": 0.05108010396361351,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9913303909205547,
+       "worst_glyph_mae": 0.0037296502850949764,
+       "worst_glyph_iou": 0.9672131147540983,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 8.741820693016052
+      },
+      "12x24": {
+       "mae": 0.00414904565938438,
+       "p99": 0.05162738263607025,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.8954224930158706,
+       "worst_glyph_mae": 0.005788393784314394,
+       "worst_glyph_iou": 0.75,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 12.347973942756653
+      },
+      "16x32": {
+       "mae": 0.002833401464158669,
+       "p99": 0.05025119706988335,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9829778176564693,
+       "worst_glyph_mae": 0.004602416418492794,
+       "worst_glyph_iou": 0.9732142857142857,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 21.778880029916763
+      },
+      "24x48": {
+       "mae": 0.0027278585475869477,
+       "p99": 0.050176311284303665,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9976119442045485,
+       "worst_glyph_mae": 0.0036614590790122747,
+       "worst_glyph_iou": 0.9893617021276596,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 49.50637125968933
+      },
+      "48x96": {
+       "mae": 0.001389985181352434,
+       "p99": 0.045245591551065445,
+       "firm_fraction": 3.616898148148148e-05,
+       "iou_mean": 0.998350896096993,
+       "worst_glyph_mae": 0.0018011820502579212,
+       "worst_glyph_iou": 0.9945280437756497,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 202.64553844928741
+      }
+     },
+     "one_sample": {
+      "8x16": {
+       "mae": 0.010088104289025068,
+       "p99": 0.09038475900888443,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9700742240215924,
+       "worst_glyph_mae": 0.013710485771298409,
+       "worst_glyph_iou": 0.9230769230769231,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 5.280315279960632
+      },
+      "16x32": {
+       "mae": 0.004591844296858956,
+       "p99": 0.058351583778858185,
+       "firm_fraction": 0.0009765625,
+       "iou_mean": 0.9761767959811799,
+       "worst_glyph_mae": 0.006236560642719269,
+       "worst_glyph_iou": 0.9622641509433962,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 21.572213530540466
+      },
+      "48x96": {
+       "mae": 0.001389985181352434,
+       "p99": 0.045245591551065445,
+       "firm_fraction": 3.616898148148148e-05,
+       "iou_mean": 0.998350896096993,
+       "worst_glyph_mae": 0.0018011820502579212,
+       "worst_glyph_iou": 0.9945280437756497,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 202.64553844928741
+      }
+     }
+    }
+   },
+   "limits_eased": [],
+   "drawing_problems": [],
+   "both_seeds_pass_under": {
+    "gates-v2.json": true,
+    "gates-v2.1.json": true,
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
+   },
+   "shipped": true,
+   "shipped_seed": 1,
+   "file": "neuronte-term-mathalpha-v1-tscrmp-g0.json"
+  },
+  {
+   "set": "tscrmp",
+   "group": 1,
+   "scalars": [
+    "U+1D5A6",
+    "U+1D676",
+    "U+1D5A7",
+    "U+1D677",
+    "U+1D5A8",
+    "U+1D678",
+    "U+1D5A9",
+    "U+1D679",
+    "U+1D5AA",
+    "U+1D67A",
+    "U+1D5AB",
+    "U+1D67B"
+   ],
+   "width": 64,
+   "role": "first",
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "seeds": {
+    "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
+     "sha256": "3444727173ae9c3cad407a0daa25d783a9034e757969e545af8e164ca22bf33d",
+     "reference_check_passed": true,
+     "gates_passed": true,
+     "failures": [],
+     "mean_established_mae": 0.0035974054286877313,
+     "counted_sizes": {
+      "6x12": {
+       "mae": 0.008952689706347883,
+       "p99": 0.09321387112140656,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9594017094017094,
+       "worst_glyph_mae": 0.015157605521380901,
+       "worst_glyph_iou": 0.6666666666666666,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 0.9104763269424438
+      },
+      "8x16": {
+       "mae": 0.0063902234348158045,
+       "p99": 0.05320761352777481,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9604320987654321,
+       "worst_glyph_mae": 0.010055389255285263,
+       "worst_glyph_iou": 0.9166666666666666,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 1.8579380512237549
+      },
+      "10x20": {
+       "mae": 0.002001688650731618,
+       "p99": 0.03512003272771835,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9961240310077519,
+       "worst_glyph_mae": 0.0030294228345155716,
+       "worst_glyph_iou": 0.9767441860465116,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 3.3701627254486084
+      },
+      "12x24": {
+       "mae": 0.0038844619411975145,
+       "p99": 0.050459034740924835,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.8892368334192233,
+       "worst_glyph_mae": 0.005478596780449152,
+       "worst_glyph_iou": 0.7169811320754716,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 4.625
+      },
+      "16x32": {
+       "mae": 0.003060550215498855,
+       "p99": 0.05110221728682518,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9851718528240777,
+       "worst_glyph_mae": 0.005463969428092241,
+       "worst_glyph_iou": 0.9795918367346939,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 7.80925378203392
+      },
+      "24x48": {
+       "mae": 0.002923088090028614,
+       "p99": 0.05361204594373703,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9963451612883364,
+       "worst_glyph_mae": 0.004091172479093075,
+       "worst_glyph_iou": 0.9877551020408163,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 18.40625
+      },
+      "48x96": {
+       "mae": 0.0013414426357485354,
+       "p99": 0.04344756156206131,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9984158514525978,
+       "worst_glyph_mae": 0.001730612013489008,
+       "worst_glyph_iou": 0.9957671957671957,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 76.02078133821487
+      }
+     },
+     "one_sample": {
+      "8x16": {
+       "mae": 0.010102013048405448,
+       "p99": 0.09907464683055878,
+       "firm_fraction": 0.0013020833333333333,
+       "iou_mean": 0.9675925925925926,
+       "worst_glyph_mae": 0.011984224431216717,
+       "worst_glyph_iou": 0.8888888888888888,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 1.8415778875350952
+      },
+      "16x32": {
+       "mae": 0.004632124987741311,
+       "p99": 0.05510089918971062,
+       "firm_fraction": 0.0013020833333333333,
+       "iou_mean": 0.9790220915324235,
+       "worst_glyph_mae": 0.006885109469294548,
+       "worst_glyph_iou": 0.9591836734693877,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 7.81639552116394
+      },
+      "48x96": {
+       "mae": 0.0013414426357485354,
+       "p99": 0.04344756156206131,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9984158514525978,
+       "worst_glyph_mae": 0.001730612013489008,
+       "worst_glyph_iou": 0.9957671957671957,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 76.02078133821487
+      }
+     }
+    },
+    "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
+     "sha256": "35112de48874f58c68cf45f1306a70a30e9c41a536683c4d169c02621c52c259",
+     "reference_check_passed": true,
+     "gates_passed": true,
+     "failures": [],
+     "mean_established_mae": 0.0035617565121760387,
+     "counted_sizes": {
+      "6x12": {
+       "mae": 0.008921801034982005,
+       "p99": 0.09635455161333084,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9594017094017094,
+       "worst_glyph_mae": 0.015392967499792576,
+       "worst_glyph_iou": 0.6666666666666666,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 0.9036338925361633
+      },
+      "8x16": {
+       "mae": 0.006291268781448404,
+       "p99": 0.05161178112030029,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9670987654320987,
+       "worst_glyph_mae": 0.009381478652358055,
+       "worst_glyph_iou": 0.9166666666666666,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 1.8512067794799805
+      },
+      "10x20": {
+       "mae": 0.002069194810853029,
+       "p99": 0.030229616910219193,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9961240310077519,
+       "worst_glyph_mae": 0.0030934875831007957,
+       "worst_glyph_iou": 0.9767441860465116,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 3.370974063873291
+      },
+      "12x24": {
+       "mae": 0.0038632978879225752,
+       "p99": 0.050703518092632294,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9142424242424242,
+       "worst_glyph_mae": 0.0053078047931194305,
+       "worst_glyph_iou": 0.6666666666666666,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 4.625
+      },
+      "16x32": {
+       "mae": 0.0030404059410405657,
+       "p99": 0.05071612447500229,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9824396123869192,
+       "worst_glyph_mae": 0.00549518596380949,
+       "worst_glyph_iou": 0.9672131147540983,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 7.815032750368118
+      },
+      "24x48": {
+       "mae": 0.002844329826378574,
+       "p99": 0.052883993834257126,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9976816013761827,
+       "worst_glyph_mae": 0.004050846211612225,
+       "worst_glyph_iou": 0.9918367346938776,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 18.40625
+      },
+      "48x96": {
+       "mae": 0.0013535948140391458,
+       "p99": 0.04477395489811897,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9979504547661423,
+       "worst_glyph_mae": 0.0017309972317889333,
+       "worst_glyph_iou": 0.9936575052854123,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 76.22444814443588
+      }
+     },
+     "one_sample": {
+      "8x16": {
+       "mae": 0.010287788813002408,
+       "p99": 0.104060597717762,
+       "firm_fraction": 0.0013020833333333333,
+       "iou_mean": 0.9675925925925926,
+       "worst_glyph_mae": 0.012677624821662903,
+       "worst_glyph_iou": 0.8888888888888888,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 1.8544541597366333
+      },
+      "16x32": {
+       "mae": 0.004530315151593338,
+       "p99": 0.05515047535300255,
+       "firm_fraction": 0.0013020833333333333,
+       "iou_mean": 0.9774198325058355,
+       "worst_glyph_mae": 0.0069024330005049706,
+       "worst_glyph_iou": 0.9591836734693877,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 7.775658428668976
+      },
+      "48x96": {
+       "mae": 0.0013535948140391458,
+       "p99": 0.04477395489811897,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9979504547661423,
+       "worst_glyph_mae": 0.0017309972317889333,
+       "worst_glyph_iou": 0.9936575052854123,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 76.22444814443588
+      }
+     }
+    }
+   },
+   "limits_eased": [],
+   "drawing_problems": [],
+   "both_seeds_pass_under": {
+    "gates-v2.json": false,
+    "gates-v2.1.json": true,
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
+   },
+   "shipped": true,
+   "shipped_seed": 1,
+   "file": "neuronte-term-mathalpha-v1-tscrmp-g1.json"
+  },
+  {
+   "set": "tscrmp",
+   "group": 2,
+   "scalars": [
+    "U+1D5AC",
+    "U+1D67C",
+    "U+1D5AD",
+    "U+1D67D",
+    "U+1D5AF",
+    "U+1D67F",
+    "U+1D5B0",
+    "U+1D680",
+    "U+1D5B1",
+    "U+1D681",
+    "U+1D5B3",
+    "U+1D683"
+   ],
+   "width": 64,
+   "role": "first",
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "seeds": {
+    "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
+     "sha256": "87698dad5d2f99696791e5e28becc70ae9f1b46dec1124b14d650c0f9899ed3b",
+     "reference_check_passed": true,
+     "gates_passed": true,
+     "failures": [],
+     "mean_established_mae": 0.00413196834981338,
+     "counted_sizes": {
+      "6x12": {
+       "mae": 0.009489004694235822,
+       "p99": 0.0525745190680027,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9901960784313726,
+       "worst_glyph_mae": 0.01354463491588831,
+       "worst_glyph_iou": 0.9411764705882353,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 2.2312116622924805
+      },
+      "8x16": {
+       "mae": 0.007594220689497888,
+       "p99": 0.06774890422821045,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9404099462365592,
+       "worst_glyph_mae": 0.009432530030608177,
+       "worst_glyph_iou": 0.9032258064516129,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 3.830390512943268
+      },
+      "10x20": {
+       "mae": 0.0026400922312556454,
+       "p99": 0.051003001630306244,
+       "firm_fraction": 0.0,
+       "iou_mean": 1.0,
+       "worst_glyph_mae": 0.003344888798892498,
+       "worst_glyph_iou": 1.0,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 6.295702874660492
+      },
+      "12x24": {
+       "mae": 0.0043994584896912175,
+       "p99": 0.05296766385436058,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9110593512767426,
+       "worst_glyph_mae": 0.005316511262208223,
+       "worst_glyph_iou": 0.8115942028985508,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 8.979418009519577
+      },
+      "16x32": {
+       "mae": 0.003243579917276899,
+       "p99": 0.05055537447333336,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.976458324924561,
+       "worst_glyph_mae": 0.0049325888976454735,
+       "worst_glyph_iou": 0.9672131147540983,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 16.331120908260345
+      },
+      "24x48": {
+       "mae": 0.003214476106222719,
+       "p99": 0.05318332463502884,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9977697488737233,
+       "worst_glyph_mae": 0.003540684701874852,
+       "worst_glyph_iou": 0.9929078014184397,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 36.24393218755722
+      },
+      "48x96": {
+       "mae": 0.0015581044426653534,
+       "p99": 0.045867759734392166,
+       "firm_fraction": 7.233796296296296e-05,
+       "iou_mean": 0.9979084124978191,
+       "worst_glyph_mae": 0.0017905684653669596,
+       "worst_glyph_iou": 0.995417048579285,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 147.10032337903976
+      }
+     },
+     "one_sample": {
+      "8x16": {
+       "mae": 0.012531641637906432,
+       "p99": 0.12529046833515167,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9511626344086022,
+       "worst_glyph_mae": 0.015548326075077057,
+       "worst_glyph_iou": 0.90625,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 3.533806324005127
+      },
+      "16x32": {
+       "mae": 0.0055965452920645475,
+       "p99": 0.0675884410738945,
+       "firm_fraction": 0.0009765625,
+       "iou_mean": 0.9709927514454305,
+       "worst_glyph_mae": 0.006168857216835022,
+       "worst_glyph_iou": 0.9669421487603306,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 15.203905761241913
+      },
+      "48x96": {
+       "mae": 0.0015581044426653534,
+       "p99": 0.045867759734392166,
+       "firm_fraction": 7.233796296296296e-05,
+       "iou_mean": 0.9979084124978191,
+       "worst_glyph_mae": 0.0017905684653669596,
+       "worst_glyph_iou": 0.995417048579285,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 147.10032337903976
+      }
+     }
+    },
+    "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
+     "sha256": "d1a70cd6854803bb88ef0ee80e02817059f63adb5fb5864891016e5d7bd3a65e",
+     "reference_check_passed": true,
+     "gates_passed": true,
+     "failures": [],
+     "mean_established_mae": 0.004095361445150856,
+     "counted_sizes": {
+      "6x12": {
+       "mae": 0.009570838883519173,
+       "p99": 0.05537077784538269,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9901960784313726,
+       "worst_glyph_mae": 0.013477247208356857,
+       "worst_glyph_iou": 0.9411764705882353,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 2.2216193675994873
+      },
+      "8x16": {
+       "mae": 0.007503075913215677,
+       "p99": 0.06706103682518005,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9457862903225807,
+       "worst_glyph_mae": 0.009329201653599739,
+       "worst_glyph_iou": 0.90625,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 3.834093540906906
+      },
+      "10x20": {
+       "mae": 0.002623130470359077,
+       "p99": 0.04226798936724663,
+       "firm_fraction": 0.0,
+       "iou_mean": 1.0,
+       "worst_glyph_mae": 0.0032970616593956947,
+       "worst_glyph_iou": 1.0,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 6.291851282119751
+      },
+      "12x24": {
+       "mae": 0.004371564835309982,
+       "p99": 0.05234210193157196,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9009044774669775,
+       "worst_glyph_mae": 0.005274382419884205,
+       "worst_glyph_iou": 0.7878787878787878,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 8.986404567956924
+      },
+      "16x32": {
+       "mae": 0.0032087754225358367,
+       "p99": 0.05060010030865669,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9778244451431402,
+       "worst_glyph_mae": 0.005013324320316315,
+       "worst_glyph_iou": 0.97,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 16.354976922273636
+      },
+      "24x48": {
+       "mae": 0.0031820262665860355,
+       "p99": 0.05236732214689255,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9977697488737233,
+       "worst_glyph_mae": 0.003508530557155609,
+       "worst_glyph_iou": 0.9929078014184397,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 36.20912957191467
+      },
+      "48x96": {
+       "mae": 0.001574232999701053,
+       "p99": 0.04588395357131958,
+       "firm_fraction": 0.00010850694444444444,
+       "iou_mean": 0.9975747588974677,
+       "worst_glyph_mae": 0.0018716127378866076,
+       "worst_glyph_iou": 0.9954212454212454,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 147.47413408756256
+      }
+     },
+     "one_sample": {
+      "8x16": {
+       "mae": 0.012549522100016475,
+       "p99": 0.13432025909423828,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9511626344086022,
+       "worst_glyph_mae": 0.015475221909582615,
+       "worst_glyph_iou": 0.90625,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 3.5433016419410706
+      },
+      "16x32": {
+       "mae": 0.005581222668600579,
+       "p99": 0.06779409199953079,
+       "firm_fraction": 0.0009765625,
+       "iou_mean": 0.9709927514454305,
+       "worst_glyph_mae": 0.006125587970018387,
+       "worst_glyph_iou": 0.9669421487603306,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 15.253288447856903
+      },
+      "48x96": {
+       "mae": 0.001574232999701053,
+       "p99": 0.04588395357131958,
+       "firm_fraction": 0.00010850694444444444,
+       "iou_mean": 0.9975747588974677,
+       "worst_glyph_mae": 0.0018716127378866076,
+       "worst_glyph_iou": 0.9954212454212454,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 147.47413408756256
+      }
+     }
+    }
+   },
+   "limits_eased": [],
+   "drawing_problems": [],
+   "both_seeds_pass_under": {
+    "gates-v2.json": true,
+    "gates-v2.1.json": true,
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
+   },
+   "shipped": true,
+   "shipped_seed": 1,
+   "file": "neuronte-term-mathalpha-v1-tscrmp-g2.json"
+  },
+  {
+   "set": "tscrmp",
+   "group": 3,
+   "scalars": [
+    "U+1D5B4",
+    "U+1D684",
+    "U+1D5B5",
+    "U+1D685",
+    "U+1D5B6",
+    "U+1D686",
+    "U+1D5B7",
+    "U+1D687",
+    "U+1D5B8",
+    "U+1D688",
+    "U+1D5B9",
+    "U+1D689"
+   ],
+   "width": 64,
+   "role": "first",
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "seeds": {
+    "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
+     "sha256": "1ac640272c998fc85c6f511f500048d0d3a5c5436654a7647449141b8017eb74",
+     "reference_check_passed": true,
+     "gates_passed": true,
+     "failures": [],
+     "mean_established_mae": 0.0027298394173461324,
+     "counted_sizes": {
+      "6x12": {
+       "mae": 0.006084569031372666,
+       "p99": 0.05127149075269699,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9696969696969697,
+       "worst_glyph_mae": 0.011483150534331799,
+       "worst_glyph_iou": 0.8181818181818182,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 4.548204660415649
+      },
+      "8x16": {
+       "mae": 0.004614643383926402,
+       "p99": 0.05047151818871498,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9871794871794872,
+       "worst_glyph_mae": 0.006135757081210613,
+       "worst_glyph_iou": 0.9230769230769231,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 9.401443302631378
+      },
+      "10x20": {
+       "mae": 0.0023003721241063126,
+       "p99": 0.023006856441497803,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9930555555555555,
+       "worst_glyph_mae": 0.0036973999813199043,
+       "worst_glyph_iou": 0.9583333333333334,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 15.426001414656639
+      },
+      "12x24": {
+       "mae": 0.0029419133400854966,
+       "p99": 0.04945099726319313,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9509159050825717,
+       "worst_glyph_mae": 0.0045585487969219685,
+       "worst_glyph_iou": 0.8333333333333334,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 21.721817076206207
+      },
+      "16x32": {
+       "mae": 0.0024026762354575717,
+       "p99": 0.04913740232586861,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.979570783826103,
+       "worst_glyph_mae": 0.004274062346667051,
+       "worst_glyph_iou": 0.97,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 39.1011997461319
+      },
+      "24x48": {
+       "mae": 0.002284526407796269,
+       "p99": 0.04730590805411339,
+       "firm_fraction": 0.0,
+       "iou_mean": 1.0,
+       "worst_glyph_mae": 0.0037399036809802055,
+       "worst_glyph_iou": 1.0,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 88.46241611242294
+      },
+      "48x96": {
+       "mae": 0.0011721986326544236,
+       "p99": 0.03330734744668007,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9917510098726932,
+       "worst_glyph_mae": 0.001586755970492959,
+       "worst_glyph_iou": 0.9825870646766169,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 353.77500557899475
+      }
+     },
+     "one_sample": {
+      "8x16": {
+       "mae": 0.010402876728524765,
+       "p99": 0.11469341069459915,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9871794871794872,
+       "worst_glyph_mae": 0.014907198026776314,
+       "worst_glyph_iou": 0.9230769230769231,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 8.639467298984528
+      },
+      "16x32": {
+       "mae": 0.004521557847814013,
+       "p99": 0.05426383018493652,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.979570783826103,
+       "worst_glyph_mae": 0.005855138413608074,
+       "worst_glyph_iou": 0.97,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 38.58800828456879
+      },
+      "48x96": {
+       "mae": 0.0011721986326544236,
+       "p99": 0.03330734744668007,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9917510098726932,
+       "worst_glyph_mae": 0.001586755970492959,
+       "worst_glyph_iou": 0.9825870646766169,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 353.77500557899475
+      }
+     }
+    },
+    "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
+     "sha256": "38e70ecb23c93aa16fd4a54701976ed05460e205a81bb55d545fc2cc0a77deea",
+     "reference_check_passed": true,
+     "gates_passed": true,
+     "failures": [],
+     "mean_established_mae": 0.0026951826229277584,
+     "counted_sizes": {
+      "6x12": {
+       "mae": 0.00615104134582604,
+       "p99": 0.049776989966630936,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9696969696969697,
+       "worst_glyph_mae": 0.011383376084268093,
+       "worst_glyph_iou": 0.8181818181818182,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 4.55753131210804
+      },
+      "8x16": {
+       "mae": 0.004567527144293611,
+       "p99": 0.050300173461437225,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9871794871794872,
+       "worst_glyph_mae": 0.005998803302645683,
+       "worst_glyph_iou": 0.9230769230769231,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 9.430777460336685
+      },
+      "10x20": {
+       "mae": 0.002344883745536208,
+       "p99": 0.025503898039460182,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9930555555555555,
+       "worst_glyph_mae": 0.0037932449486106634,
+       "worst_glyph_iou": 0.9583333333333334,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 15.4398552775383
+      },
+      "12x24": {
+       "mae": 0.0028950233148255697,
+       "p99": 0.04933619499206543,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9550825717492385,
+       "worst_glyph_mae": 0.004419343546032906,
+       "worst_glyph_iou": 0.8333333333333334,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 21.736921593546867
+      },
+      "16x32": {
+       "mae": 0.002377100235510928,
+       "p99": 0.049678537994623184,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.979570783826103,
+       "worst_glyph_mae": 0.004294130019843578,
+       "worst_glyph_iou": 0.97,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 39.05072917044163
+      },
+      "24x48": {
+       "mae": 0.0023129133527011922,
+       "p99": 0.04701171815395355,
+       "firm_fraction": 0.0,
+       "iou_mean": 1.0,
+       "worst_glyph_mae": 0.003777905134484172,
+       "worst_glyph_iou": 1.0,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 88.32480067014694
+      },
+      "48x96": {
+       "mae": 0.001140920488978736,
+       "p99": 0.032766345888376236,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9944254162076983,
+       "worst_glyph_mae": 0.0015168482204899192,
+       "worst_glyph_iou": 0.9875,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 353.6529666185379
+      }
+     },
+     "one_sample": {
+      "8x16": {
+       "mae": 0.010374446593535444,
+       "p99": 0.10544782876968384,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9871794871794872,
+       "worst_glyph_mae": 0.014824697747826576,
+       "worst_glyph_iou": 0.9230769230769231,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 8.666715204715729
+      },
+      "16x32": {
+       "mae": 0.00449195255835851,
+       "p99": 0.053307950496673584,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.979570783826103,
+       "worst_glyph_mae": 0.005889811087399721,
+       "worst_glyph_iou": 0.97,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 38.73519104719162
+      },
+      "48x96": {
+       "mae": 0.001140920488978736,
+       "p99": 0.032766345888376236,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9944254162076983,
+       "worst_glyph_mae": 0.0015168482204899192,
+       "worst_glyph_iou": 0.9875,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 353.6529666185379
+      }
+     }
+    }
+   },
+   "limits_eased": [],
+   "drawing_problems": [],
+   "both_seeds_pass_under": {
+    "gates-v2.json": true,
+    "gates-v2.1.json": true,
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
+   },
+   "shipped": true,
+   "shipped_seed": 1,
+   "file": "neuronte-term-mathalpha-v1-tscrmp-g3.json"
+  },
+  {
+   "set": "tscrmp",
+   "group": 4,
+   "scalars": [
+    "U+1D5AE",
+    "U+1D67E",
+    "U+1D5B2",
+    "U+1D682",
+    "U+1D5C8",
+    "U+1D698",
+    "U+1D5CC",
+    "U+1D69C",
+    "U+1D7E5",
+    "U+1D7F9",
+    "U+1D7EA",
+    "U+1D7FE"
+   ],
+   "width": 64,
+   "role": "first",
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "seeds": {
+    "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
+     "sha256": "7301c65eb21ca46393ad4e0b587c396abf8739676f2df8ee240143ce34491509",
+     "reference_check_passed": true,
+     "gates_passed": true,
+     "failures": [],
+     "mean_established_mae": 0.002360432056270333,
+     "counted_sizes": {
+      "6x12": {
+       "mae": 0.005528571724426001,
+       "p99": 0.03692683205008507,
+       "firm_fraction": 0.0,
+       "iou_mean": 1.0,
+       "worst_glyph_mae": 0.007628414314240217,
+       "worst_glyph_iou": 1.0,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 2.1774699091911316
+      },
+      "8x16": {
+       "mae": 0.004037609789520502,
+       "p99": 0.03051445633172989,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.984561403508772,
+       "worst_glyph_mae": 0.0054645836353302,
+       "worst_glyph_iou": 0.9473684210526315,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 3.983365833759308
+      },
+      "10x20": {
+       "mae": 0.0028875184943899512,
+       "p99": 0.03991839662194252,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9560846560846561,
+       "worst_glyph_mae": 0.004062610678374767,
+       "worst_glyph_iou": 0.8888888888888888,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 6.066112458705902
+      },
+      "12x24": {
+       "mae": 0.002521304879337549,
+       "p99": 0.03463046997785568,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9920634920634921,
+       "worst_glyph_mae": 0.0033503517042845488,
+       "worst_glyph_iou": 0.9523809523809523,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 8.794032901525497
+      },
+      "16x32": {
+       "mae": 0.0018564332955672096,
+       "p99": 0.024825837463140488,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9896089121972774,
+       "worst_glyph_mae": 0.0021259889472275972,
+       "worst_glyph_iou": 0.9711538461538461,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 15.838682353496552
+      },
+      "24x48": {
+       "mae": 0.002297097409609705,
+       "p99": 0.04168720543384552,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9954891740176423,
+       "worst_glyph_mae": 0.003232733579352498,
+       "worst_glyph_iou": 0.9904761904761905,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 35.84044110774994
+      },
+      "48x96": {
+       "mae": 0.0011872530837232869,
+       "p99": 0.034171976149082184,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9951914335896372,
+       "worst_glyph_mae": 0.0015204253140836954,
+       "worst_glyph_iou": 0.9929178470254958,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 144.62455862760544
+      }
+     },
+     "one_sample": {
+      "8x16": {
+       "mae": 0.010451530222781003,
+       "p99": 0.09343139827251434,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9615873015873015,
+       "worst_glyph_mae": 0.015388461761176586,
+       "worst_glyph_iou": 0.8095238095238095,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 3.820149600505829
+      },
+      "16x32": {
+       "mae": 0.003661935256483654,
+       "p99": 0.0479859933257103,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.987823318764666,
+       "worst_glyph_mae": 0.004416408017277718,
+       "worst_glyph_iou": 0.97,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 15.662393927574158
+      },
+      "48x96": {
+       "mae": 0.0011872530837232869,
+       "p99": 0.034171976149082184,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9951914335896372,
+       "worst_glyph_mae": 0.0015204253140836954,
+       "worst_glyph_iou": 0.9929178470254958,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 144.62455862760544
+      }
+     }
+    },
+    "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
+     "sha256": "5e0d1d162263912cc936caa07c83f87329ca959ff043cfc97ee23c2cca21fa81",
+     "reference_check_passed": true,
+     "gates_passed": true,
+     "failures": [],
+     "mean_established_mae": 0.0023601617770812786,
+     "counted_sizes": {
+      "6x12": {
+       "mae": 0.005500475720812877,
+       "p99": 0.03904026001691818,
+       "firm_fraction": 0.0,
+       "iou_mean": 1.0,
+       "worst_glyph_mae": 0.007698777597397566,
+       "worst_glyph_iou": 1.0,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 2.1791738718748093
+      },
+      "8x16": {
+       "mae": 0.004087251514041175,
+       "p99": 0.0311270821839571,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9781511470985155,
+       "worst_glyph_mae": 0.005698940716683865,
+       "worst_glyph_iou": 0.9473684210526315,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 3.9777182936668396
+      },
+      "10x20": {
+       "mae": 0.002904517479085674,
+       "p99": 0.040100231766700745,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9560846560846561,
+       "worst_glyph_mae": 0.004008881282061338,
+       "worst_glyph_iou": 0.8888888888888888,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 6.065197631716728
+      },
+      "12x24": {
+       "mae": 0.0025265547446906567,
+       "p99": 0.03489433974027634,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9920634920634921,
+       "worst_glyph_mae": 0.0033113311510533094,
+       "worst_glyph_iou": 0.9523809523809523,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 8.774194568395615
+      },
+      "16x32": {
+       "mae": 0.001842814206611365,
+       "p99": 0.02542535401880741,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9896089121972774,
+       "worst_glyph_mae": 0.0021216715686023235,
+       "worst_glyph_iou": 0.9711538461538461,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 15.842197671532631
+      },
+      "24x48": {
+       "mae": 0.0023082164310229323,
+       "p99": 0.042273033410310745,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9941230537990631,
+       "worst_glyph_mae": 0.003164072521030903,
+       "worst_glyph_iou": 0.9904761904761905,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 35.7375727891922
+      },
+      "48x96": {
+       "mae": 0.001150419610591295,
+       "p99": 0.032040245831012726,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9949105273213447,
+       "worst_glyph_mae": 0.0014870688319206238,
+       "worst_glyph_iou": 0.9913419913419913,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 144.88407284021378
+      }
+     },
+     "one_sample": {
+      "8x16": {
+       "mae": 0.010282716558625301,
+       "p99": 0.09375205636024475,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9615873015873015,
+       "worst_glyph_mae": 0.015010303817689419,
+       "worst_glyph_iou": 0.8095238095238095,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 3.79952609539032
+      },
+      "16x32": {
+       "mae": 0.0036862255074083805,
+       "p99": 0.04806927964091301,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9894255777912541,
+       "worst_glyph_mae": 0.0044150277972221375,
+       "worst_glyph_iou": 0.97,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 15.638703465461731
+      },
+      "48x96": {
+       "mae": 0.001150419610591295,
+       "p99": 0.032040245831012726,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9949105273213447,
+       "worst_glyph_mae": 0.0014870688319206238,
+       "worst_glyph_iou": 0.9913419913419913,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 144.88407284021378
+      }
+     }
+    }
+   },
+   "limits_eased": [],
+   "drawing_problems": [],
+   "both_seeds_pass_under": {
+    "gates-v2.json": true,
+    "gates-v2.1.json": true,
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
+   },
+   "shipped": true,
+   "shipped_seed": 1,
+   "file": "neuronte-term-mathalpha-v1-tscrmp-g4.json"
+  },
+  {
+   "set": "tscrmp",
+   "group": 5,
+   "scalars": [
+    "U+1D5BA",
+    "U+1D68A",
+    "U+1D5BB",
+    "U+1D68B",
+    "U+1D5BC",
+    "U+1D68C",
+    "U+1D5BD",
+    "U+1D68D",
+    "U+1D5BE",
+    "U+1D68E",
+    "U+1D5BF",
+    "U+1D68F"
+   ],
+   "width": 64,
+   "role": "first",
+   "both_seeds_pass": true,
+   "selected_seed": 0,
+   "lower_error_seed": 0,
+   "seeds": {
+    "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
+     "sha256": "d7880ceac10f7930056413bf2ef6ffd8a737f39ac47242ef14c29490c26ae5f8",
+     "reference_check_passed": true,
+     "gates_passed": true,
+     "failures": [],
+     "mean_established_mae": 0.0024905692617822853,
+     "counted_sizes": {
+      "6x12": {
+       "mae": 0.00530485527512307,
+       "p99": 0.04879190772771835,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9451659451659452,
+       "worst_glyph_mae": 0.006761148106306791,
+       "worst_glyph_iou": 0.8333333333333334,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 2.0879781395196915
+      },
+      "8x16": {
+       "mae": 0.004355322103947401,
+       "p99": 0.05110372230410576,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.960727969348659,
+       "worst_glyph_mae": 0.006083549000322819,
+       "worst_glyph_iou": 0.8333333333333334,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 3.7657224237918854
+      },
+      "10x20": {
+       "mae": 0.002763564970033864,
+       "p99": 0.0497562550008297,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9281598375784422,
+       "worst_glyph_mae": 0.0038420932833105326,
+       "worst_glyph_iou": 0.8837209302325582,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 6.195605218410492
+      },
+      "12x24": {
+       "mae": 0.002895489849227791,
+       "p99": 0.04921206831932068,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9041541582910918,
+       "worst_glyph_mae": 0.003347035963088274,
+       "worst_glyph_iou": 0.8360655737704918,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 8.95886678993702
+      },
+      "16x32": {
+       "mae": 0.0019500713679008186,
+       "p99": 0.030226213857531548,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.993605006105006,
+       "worst_glyph_mae": 0.0024570056702941656,
+       "worst_glyph_iou": 0.9711538461538461,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 15.936113700270653
+      },
+      "24x48": {
+       "mae": 0.002172891477433344,
+       "p99": 0.041285160928964615,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9901682824218035,
+       "worst_glyph_mae": 0.0024948350619524717,
+       "worst_glyph_iou": 0.948051948051948,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 35.58508712053299
+      },
+      "48x96": {
+       "mae": 0.001166314313498636,
+       "p99": 0.03732050210237503,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9939876821907488,
+       "worst_glyph_mae": 0.0013268687762320042,
+       "worst_glyph_iou": 0.9840425531914894,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 144.95327615737915
+      }
+     },
+     "one_sample": {
+      "8x16": {
+       "mae": 0.010067444139470657,
+       "p99": 0.09642259776592255,
+       "firm_fraction": 0.0026041666666666665,
+       "iou_mean": 0.9360026946233844,
+       "worst_glyph_mae": 0.011619893833994865,
+       "worst_glyph_iou": 0.8333333333333334,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 3.4593623280525208
+      },
+      "16x32": {
+       "mae": 0.0035982251671763756,
+       "p99": 0.05267918482422829,
+       "firm_fraction": 0.0003255208333333333,
+       "iou_mean": 0.9901103798162622,
+       "worst_glyph_mae": 0.004505908116698265,
+       "worst_glyph_iou": 0.9696969696969697,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 15.299319565296173
+      },
+      "48x96": {
+       "mae": 0.001166314313498636,
+       "p99": 0.03732050210237503,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9939876821907488,
+       "worst_glyph_mae": 0.0013268687762320042,
+       "worst_glyph_iou": 0.9840425531914894,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 144.95327615737915
+      }
+     }
+    },
+    "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
+     "sha256": "a89bf49da64c5f16e9bd89cc871bda3349cc6f7f460705c3c158503683b62218",
+     "reference_check_passed": true,
+     "gates_passed": true,
+     "failures": [],
+     "mean_established_mae": 0.0025438637983623068,
+     "counted_sizes": {
+      "6x12": {
+       "mae": 0.005265086151969929,
+       "p99": 0.04842531681060791,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9603174603174603,
+       "worst_glyph_mae": 0.006864030845463276,
+       "worst_glyph_iou": 0.8333333333333334,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 2.0843325406312943
+      },
+      "8x16": {
+       "mae": 0.004456352888761709,
+       "p99": 0.05089397728443146,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.960727969348659,
+       "worst_glyph_mae": 0.005961046554148197,
+       "worst_glyph_iou": 0.8333333333333334,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 3.7669020295143127
+      },
+      "10x20": {
+       "mae": 0.0027266287458284446,
+       "p99": 0.04890641197562218,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9281598375784422,
+       "worst_glyph_mae": 0.00369863654486835,
+       "worst_glyph_iou": 0.8837209302325582,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 6.1794270277023315
+      },
+      "12x24": {
+       "mae": 0.002888239260452489,
+       "p99": 0.04973968118429184,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9240243309480425,
+       "worst_glyph_mae": 0.0034579511266201735,
+       "worst_glyph_iou": 0.85,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 8.97469212114811
+      },
+      "16x32": {
+       "mae": 0.0019685480801854283,
+       "p99": 0.03213705122470856,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9951923076923076,
+       "worst_glyph_mae": 0.002565904753282666,
+       "worst_glyph_iou": 0.9711538461538461,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 15.916435807943344
+      },
+      "24x48": {
+       "mae": 0.0021364541510896138,
+       "p99": 0.0398358516395092,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9901682824218035,
+       "worst_glyph_mae": 0.0025521637871861458,
+       "worst_glyph_iou": 0.948051948051948,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 35.56126308441162
+      },
+      "48x96": {
+       "mae": 0.001206690426139782,
+       "p99": 0.03901922330260277,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9939143265041972,
+       "worst_glyph_mae": 0.001337226014584303,
+       "worst_glyph_iou": 0.9840142095914742,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 144.37756353616714
+      }
+     },
+     "one_sample": {
+      "8x16": {
+       "mae": 0.010418884688988328,
+       "p99": 0.09859850257635117,
+       "firm_fraction": 0.0026041666666666665,
+       "iou_mean": 0.9360026946233844,
+       "worst_glyph_mae": 0.012365243397653103,
+       "worst_glyph_iou": 0.8333333333333334,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 3.4650663137435913
+      },
+      "16x32": {
+       "mae": 0.0036817149181539812,
+       "p99": 0.0551290325820446,
+       "firm_fraction": 0.0003255208333333333,
+       "iou_mean": 0.9925967823026647,
+       "worst_glyph_mae": 0.004625657573342323,
+       "worst_glyph_iou": 0.9846153846153847,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 15.290684223175049
+      },
+      "48x96": {
+       "mae": 0.001206690426139782,
+       "p99": 0.03901922330260277,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9939143265041972,
+       "worst_glyph_mae": 0.001337226014584303,
+       "worst_glyph_iou": 0.9840142095914742,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 144.37756353616714
+      }
+     }
+    }
+   },
+   "limits_eased": [],
+   "drawing_problems": [],
+   "both_seeds_pass_under": {
+    "gates-v2.json": true,
+    "gates-v2.1.json": true,
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
+   },
+   "shipped": true,
+   "shipped_seed": 0,
+   "file": "neuronte-term-mathalpha-v1-tscrmp-g5.json"
+  },
+  {
+   "set": "tscrmp",
+   "group": 6,
+   "scalars": [
+    "U+1D5C0",
+    "U+1D690",
+    "U+1D5C1",
+    "U+1D691",
+    "U+1D5C2",
+    "U+1D692",
+    "U+1D5C3",
+    "U+1D693",
+    "U+1D5C4",
+    "U+1D694",
+    "U+1D5C5",
+    "U+1D695"
+   ],
+   "width": 64,
+   "role": "first",
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "seeds": {
+    "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
+     "sha256": "b43fe9528a29a11162722a2a02628cc0cd048803b747c652c14dbdc02474b366",
+     "reference_check_passed": true,
+     "gates_passed": true,
+     "failures": [],
+     "mean_established_mae": 0.0033064004738763385,
+     "counted_sizes": {
+      "6x12": {
+       "mae": 0.007444771860415737,
+       "p99": 0.05456513166427612,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9145833333333333,
+       "worst_glyph_mae": 0.01296950038522482,
+       "worst_glyph_iou": 0.375,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 1.115978479385376
+      },
+      "8x16": {
+       "mae": 0.005710445422058304,
+       "p99": 0.053496140986680984,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.953913839783405,
+       "worst_glyph_mae": 0.007549389731138945,
+       "worst_glyph_iou": 0.8461538461538461,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 2.1551771014928818
+      },
+      "10x20": {
+       "mae": 0.0026088228138784566,
+       "p99": 0.04790817201137543,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9540518424664767,
+       "worst_glyph_mae": 0.005319569259881973,
+       "worst_glyph_iou": 0.6428571428571429,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 3.0300283432006836
+      },
+      "12x24": {
+       "mae": 0.0037006943214995167,
+       "p99": 0.051803335547447205,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9290034913372679,
+       "worst_glyph_mae": 0.004631353076547384,
+       "worst_glyph_iou": 0.8125,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 4.3308088928461075
+      },
+      "16x32": {
+       "mae": 0.0028194913757033646,
+       "p99": 0.05072369426488876,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9980842911877396,
+       "worst_glyph_mae": 0.005157751031219959,
+       "worst_glyph_iou": 0.9770114942528736,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 9.018197774887085
+      },
+      "24x48": {
+       "mae": 0.0026158943849926195,
+       "p99": 0.051794037222862244,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9943843923318858,
+       "worst_glyph_mae": 0.0038360250182449818,
+       "worst_glyph_iou": 0.9777777777777777,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 17.72566866874695
+      },
+      "48x96": {
+       "mae": 0.0013892646238673478,
+       "p99": 0.0455474890768528,
+       "firm_fraction": 1.808449074074074e-05,
+       "iou_mean": 0.9966633992009807,
+       "worst_glyph_mae": 0.0018050873186439276,
+       "worst_glyph_iou": 0.9903288201160542,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 76.12352746725082
+      }
+     },
+     "one_sample": {
+      "8x16": {
+       "mae": 0.010901723600303134,
+       "p99": 0.11545209586620331,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9030962261034725,
+       "worst_glyph_mae": 0.013960197567939758,
+       "worst_glyph_iou": 0.7391304347826086,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 1.370794415473938
+      },
+      "16x32": {
+       "mae": 0.004315941924384485,
+       "p99": 0.057056523859500885,
+       "firm_fraction": 0.0003255208333333333,
+       "iou_mean": 0.9906256788611895,
+       "worst_glyph_mae": 0.006058514583855867,
+       "worst_glyph_iou": 0.9770114942528736,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 8.258608520030975
+      },
+      "48x96": {
+       "mae": 0.0013892646238673478,
+       "p99": 0.0455474890768528,
+       "firm_fraction": 1.808449074074074e-05,
+       "iou_mean": 0.9966633992009807,
+       "worst_glyph_mae": 0.0018050873186439276,
+       "worst_glyph_iou": 0.9903288201160542,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 76.12352746725082
+      }
+     }
+    },
+    "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
+     "sha256": "994e0b08c79bee13dfd3bed25953a24c02531de879b85aa6bd541bd52db0e475",
+     "reference_check_passed": true,
+     "gates_passed": true,
+     "failures": [],
+     "mean_established_mae": 0.0032312225052414257,
+     "counted_sizes": {
+      "6x12": {
+       "mae": 0.00747919175773859,
+       "p99": 0.05224180221557617,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9145833333333333,
+       "worst_glyph_mae": 0.013100765645503998,
+       "worst_glyph_iou": 0.375,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 1.1140527129173279
+      },
+      "8x16": {
+       "mae": 0.00563820560152332,
+       "p99": 0.051433634012937546,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.953913839783405,
+       "worst_glyph_mae": 0.007333883084356785,
+       "worst_glyph_iou": 0.8461538461538461,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 2.166387587785721
+      },
+      "10x20": {
+       "mae": 0.0025904531066771597,
+       "p99": 0.049145665019750595,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9540518424664767,
+       "worst_glyph_mae": 0.005663352087140083,
+       "worst_glyph_iou": 0.6428571428571429,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 3.0487903505563736
+      },
+      "12x24": {
+       "mae": 0.003652946169798573,
+       "p99": 0.05079253017902374,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9069136889128364,
+       "worst_glyph_mae": 0.004690760746598244,
+       "worst_glyph_iou": 0.78,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 4.394042178988457
+      },
+      "16x32": {
+       "mae": 0.0027641786145977676,
+       "p99": 0.05037211626768112,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9943627722003977,
+       "worst_glyph_mae": 0.005135195329785347,
+       "worst_glyph_iou": 0.9770114942528736,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 9.000069469213486
+      },
+      "24x48": {
+       "mae": 0.002531719258210311,
+       "p99": 0.051358163356781006,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9940036979704162,
+       "worst_glyph_mae": 0.0036823218688368797,
+       "worst_glyph_iou": 0.9705882352941176,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 17.929509699344635
+      },
+      "48x96": {
+       "mae": 0.001291283299603189,
+       "p99": 0.0438043437898159,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9973173648897423,
+       "worst_glyph_mae": 0.0016188666922971606,
+       "worst_glyph_iou": 0.9922480620155039,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 76.51278483867645
+      }
+     },
+     "one_sample": {
+      "8x16": {
+       "mae": 0.010924069986989101,
+       "p99": 0.11854559928178787,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9030962261034725,
+       "worst_glyph_mae": 0.013553770259022713,
+       "worst_glyph_iou": 0.7391304347826086,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 1.436409056186676
+      },
+      "16x32": {
+       "mae": 0.004286143016846229,
+       "p99": 0.05509032681584358,
+       "firm_fraction": 0.0003255208333333333,
+       "iou_mean": 0.9898953417825377,
+       "worst_glyph_mae": 0.006173229776322842,
+       "worst_glyph_iou": 0.9770114942528736,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 8.371423482894897
+      },
+      "48x96": {
+       "mae": 0.001291283299603189,
+       "p99": 0.0438043437898159,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9973173648897423,
+       "worst_glyph_mae": 0.0016188666922971606,
+       "worst_glyph_iou": 0.9922480620155039,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 76.51278483867645
+      }
+     }
+    }
+   },
+   "limits_eased": [],
+   "drawing_problems": [],
+   "both_seeds_pass_under": {
+    "gates-v2.json": false,
+    "gates-v2.1.json": true,
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
+   },
+   "shipped": true,
+   "shipped_seed": 1,
+   "file": "neuronte-term-mathalpha-v1-tscrmp-g6.json"
+  },
+  {
+   "set": "tscrmp",
+   "group": 7,
+   "scalars": [
+    "U+1D5C6",
+    "U+1D696",
+    "U+1D5C7",
+    "U+1D697",
+    "U+1D5C9",
+    "U+1D699",
+    "U+1D5CA",
+    "U+1D69A",
+    "U+1D5CB",
+    "U+1D69B",
+    "U+1D5CD",
+    "U+1D69D"
+   ],
+   "width": 64,
+   "role": "first",
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "seeds": {
+    "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
+     "sha256": "10bc542641a73bff3f119817d381e88c2a5afcccf1478640dcc726c0478490b3",
+     "reference_check_passed": true,
+     "gates_passed": true,
+     "failures": [],
+     "mean_established_mae": 0.0029193240512136575,
+     "counted_sizes": {
+      "6x12": {
+       "mae": 0.006999956094659865,
+       "p99": 0.053035322576761246,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.888034188034188,
+       "worst_glyph_mae": 0.01528342254459858,
+       "worst_glyph_iou": 0.46153846153846156,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 2.359375
+      },
+      "8x16": {
+       "mae": 0.005234716576524079,
+       "p99": 0.052231065928936005,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9497607655502392,
+       "worst_glyph_mae": 0.008821219205856323,
+       "worst_glyph_iou": 0.8947368421052632,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 4.457866311073303
+      },
+      "10x20": {
+       "mae": 0.0021076441820090017,
+       "p99": 0.04062361642718315,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9754728132387708,
+       "worst_glyph_mae": 0.0028557535260915756,
+       "worst_glyph_iou": 0.9166666666666666,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 6.701334595680237
+      },
+      "12x24": {
+       "mae": 0.0036678638813706734,
+       "p99": 0.05074180290102959,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9058754970117976,
+       "worst_glyph_mae": 0.005967562086880207,
+       "worst_glyph_iou": 0.8461538461538461,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 9.38762292265892
+      },
+      "16x32": {
+       "mae": 0.002345486010502403,
+       "p99": 0.049822308123111725,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9962563084305452,
+       "worst_glyph_mae": 0.005172235891222954,
+       "worst_glyph_iou": 0.9873417721518988,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 17.08013144135475
+      },
+      "24x48": {
+       "mae": 0.0023974931003370634,
+       "p99": 0.04872015118598938,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9978958035288508,
+       "worst_glyph_mae": 0.004375164397060871,
+       "worst_glyph_iou": 0.9916666666666667,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 38.91213148832321
+      },
+      "48x96": {
+       "mae": 0.0011777695666144912,
+       "p99": 0.04154110699892044,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9960387505276214,
+       "worst_glyph_mae": 0.0017037098295986652,
+       "worst_glyph_iou": 0.9937434827945777,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 156.1720097064972
+      }
+     },
+     "one_sample": {
+      "8x16": {
+       "mae": 0.010008303254532317,
+       "p99": 0.10997094213962555,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9252297410192147,
+       "worst_glyph_mae": 0.016323937103152275,
+       "worst_glyph_iou": 0.8333333333333334,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 4.358804225921631
+      },
+      "16x32": {
+       "mae": 0.003874140044596667,
+       "p99": 0.052924226969480515,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9918056392739937,
+       "worst_glyph_mae": 0.006919063627719879,
+       "worst_glyph_iou": 0.9777777777777777,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 16.925215184688568
+      },
+      "48x96": {
+       "mae": 0.0011777695666144912,
+       "p99": 0.04154110699892044,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9960387505276214,
+       "worst_glyph_mae": 0.0017037098295986652,
+       "worst_glyph_iou": 0.9937434827945777,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 156.1720097064972
+      }
+     }
+    },
+    "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
+     "sha256": "929d201b9d353453defb998210decfe875d591c9fe849e5a9e2ea29614aa3100",
+     "reference_check_passed": true,
+     "gates_passed": true,
+     "failures": [],
+     "mean_established_mae": 0.0029085154771261537,
+     "counted_sizes": {
+      "6x12": {
+       "mae": 0.007064180060600241,
+       "p99": 0.051522549241781235,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.888034188034188,
+       "worst_glyph_mae": 0.015177624300122261,
+       "worst_glyph_iou": 0.46153846153846156,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 2.359375
+      },
+      "8x16": {
+       "mae": 0.005216809726941089,
+       "p99": 0.05106768384575844,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.95414673046252,
+       "worst_glyph_mae": 0.009000090882182121,
+       "worst_glyph_iou": 0.8947368421052632,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 4.453269898891449
+      },
+      "10x20": {
+       "mae": 0.0021365474385675043,
+       "p99": 0.04159011319279671,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9722222222222222,
+       "worst_glyph_mae": 0.002891389187425375,
+       "worst_glyph_iou": 0.9166666666666666,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 6.696895718574524
+      },
+      "12x24": {
+       "mae": 0.003655230024984727,
+       "p99": 0.05034005269408226,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9025659133709981,
+       "worst_glyph_mae": 0.006061943247914314,
+       "worst_glyph_iou": 0.825,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 9.382095381617546
+      },
+      "16x32": {
+       "mae": 0.002356447007817527,
+       "p99": 0.04954550787806511,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9962563084305452,
+       "worst_glyph_mae": 0.00524135772138834,
+       "worst_glyph_iou": 0.9873417721518988,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 17.080451726913452
+      },
+      "24x48": {
+       "mae": 0.0023963244554276266,
+       "p99": 0.04926140233874321,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9978958035288508,
+       "worst_glyph_mae": 0.0044581214897334576,
+       "worst_glyph_iou": 0.9916666666666667,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 38.877197444438934
+      },
+      "48x96": {
+       "mae": 0.001152289696619846,
+       "p99": 0.04055182263255119,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.996194584395005,
+       "worst_glyph_mae": 0.0016812501708045602,
+       "worst_glyph_iou": 0.99375,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 156.14811074733734
+      }
+     },
+     "one_sample": {
+      "8x16": {
+       "mae": 0.010115480438495675,
+       "p99": 0.11089151352643967,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9252297410192147,
+       "worst_glyph_mae": 0.016828732565045357,
+       "worst_glyph_iou": 0.8333333333333334,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 4.326053559780121
+      },
+      "16x32": {
+       "mae": 0.0038574314482199648,
+       "p99": 0.05291347950696945,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9918056392739937,
+       "worst_glyph_mae": 0.006990010850131512,
+       "worst_glyph_iou": 0.9777777777777777,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 16.906829297542572
+      },
+      "48x96": {
+       "mae": 0.001152289696619846,
+       "p99": 0.04055182263255119,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.996194584395005,
+       "worst_glyph_mae": 0.0016812501708045602,
+       "worst_glyph_iou": 0.99375,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 156.14811074733734
+      }
+     }
+    }
+   },
+   "limits_eased": [],
+   "drawing_problems": [],
+   "both_seeds_pass_under": {
+    "gates-v2.json": true,
+    "gates-v2.1.json": true,
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
+   },
+   "shipped": true,
+   "shipped_seed": 1,
+   "file": "neuronte-term-mathalpha-v1-tscrmp-g7.json"
+  },
+  {
+   "set": "tscrmp",
+   "group": 8,
+   "scalars": [
+    "U+1D5CE",
+    "U+1D69E",
+    "U+1D5CF",
+    "U+1D69F",
+    "U+1D5D0",
+    "U+1D6A0",
+    "U+1D5D1",
+    "U+1D6A1",
+    "U+1D5D2",
+    "U+1D6A2",
+    "U+1D5D3",
+    "U+1D6A3"
+   ],
+   "width": 64,
+   "role": "first",
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "seeds": {
+    "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
+     "sha256": "e80930ca45793250ee06d96693b18ea7c861d07876c8757395ae55f871353a7d",
+     "reference_check_passed": true,
+     "gates_passed": true,
+     "failures": [],
+     "mean_established_mae": 0.0020519286222730037,
+     "counted_sizes": {
+      "6x12": {
+       "mae": 0.004582539908975984,
+       "p99": 0.04874543473124504,
+       "firm_fraction": 0.0,
+       "iou_mean": 1.0,
+       "worst_glyph_mae": 0.00971287488937378,
+       "worst_glyph_iou": 1.0,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 2.6108329743146896
+      },
+      "8x16": {
+       "mae": 0.0033078139240387827,
+       "p99": 0.049587029963731766,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9722222222222222,
+       "worst_glyph_mae": 0.005101213231682777,
+       "worst_glyph_iou": 0.8888888888888888,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 4.7159388810396194
+      },
+      "10x20": {
+       "mae": 0.0025450928369536996,
+       "p99": 0.029157981276512146,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9593525886629335,
+       "worst_glyph_mae": 0.0036622912157326937,
+       "worst_glyph_iou": 0.8461538461538461,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 7.437952399253845
+      },
+      "12x24": {
+       "mae": 0.0024048723765493682,
+       "p99": 0.04471317306160927,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9590579884697532,
+       "worst_glyph_mae": 0.004021692555397749,
+       "worst_glyph_iou": 0.8648648648648649,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 10.836611077189445
+      },
+      "16x32": {
+       "mae": 0.00181475574693953,
+       "p99": 0.032234467566013336,
+       "firm_fraction": 0.0,
+       "iou_mean": 1.0,
+       "worst_glyph_mae": 0.0033496408723294735,
+       "worst_glyph_iou": 1.0,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 19.317133218050003
+      },
+      "24x48": {
+       "mae": 0.00217852127389051,
+       "p99": 0.04624321684241295,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9954822102168471,
+       "worst_glyph_mae": 0.0032993899658322334,
+       "worst_glyph_iou": 0.9880952380952381,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 42.96757024526596
+      },
+      "48x96": {
+       "mae": 0.001033216195840699,
+       "p99": 0.03320251777768135,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9957009227127386,
+       "worst_glyph_mae": 0.0014280352042987943,
+       "worst_glyph_iou": 0.9912917271407837,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 173.55868536233902
+      }
+     },
+     "one_sample": {
+      "8x16": {
+       "mae": 0.008546275086700916,
+       "p99": 0.09636897593736649,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9646464646464646,
+       "worst_glyph_mae": 0.01166495867073536,
+       "worst_glyph_iou": 0.8888888888888888,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 4.400671422481537
+      },
+      "16x32": {
+       "mae": 0.0034605235947916904,
+       "p99": 0.05167657881975174,
+       "firm_fraction": 0.0,
+       "iou_mean": 1.0,
+       "worst_glyph_mae": 0.0043860552832484245,
+       "worst_glyph_iou": 1.0,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 18.84500902891159
+      },
+      "48x96": {
+       "mae": 0.001033216195840699,
+       "p99": 0.03320251777768135,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9957009227127386,
+       "worst_glyph_mae": 0.0014280352042987943,
+       "worst_glyph_iou": 0.9912917271407837,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 173.55868536233902
+      }
+     }
+    },
+    "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
+     "sha256": "f19786b3be1400f009b60ad69d195db991214896e313ebe15c4e2ac6bacd4923",
+     "reference_check_passed": true,
+     "gates_passed": true,
+     "failures": [],
+     "mean_established_mae": 0.0020507696931923013,
+     "counted_sizes": {
+      "6x12": {
+       "mae": 0.004528833174845204,
+       "p99": 0.04785532131791115,
+       "firm_fraction": 0.0,
+       "iou_mean": 1.0,
+       "worst_glyph_mae": 0.009359055198729038,
+       "worst_glyph_iou": 1.0,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 2.616555705666542
+      },
+      "8x16": {
+       "mae": 0.003328785542786742,
+       "p99": 0.04937122389674187,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9722222222222222,
+       "worst_glyph_mae": 0.004976045340299606,
+       "worst_glyph_iou": 0.8888888888888888,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 4.720999613404274
+      },
+      "10x20": {
+       "mae": 0.0025211982623053095,
+       "p99": 0.028587257489562035,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9593525886629335,
+       "worst_glyph_mae": 0.0034506970550864935,
+       "worst_glyph_iou": 0.8461538461538461,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 7.427046090364456
+      },
+      "12x24": {
+       "mae": 0.0023849312662302205,
+       "p99": 0.042080871760845184,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9441667560088612,
+       "worst_glyph_mae": 0.0039794291369616985,
+       "worst_glyph_iou": 0.8421052631578947,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 10.823574498295784
+      },
+      "16x32": {
+       "mae": 0.0017887265955020364,
+       "p99": 0.0339936837553978,
+       "firm_fraction": 0.0,
+       "iou_mean": 1.0,
+       "worst_glyph_mae": 0.0033911652863025665,
+       "worst_glyph_iou": 1.0,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 19.312078341841698
+      },
+      "24x48": {
+       "mae": 0.002149921463569626,
+       "p99": 0.044708192348480225,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9956896660844029,
+       "worst_glyph_mae": 0.003220030339434743,
+       "worst_glyph_iou": 0.9856459330143541,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 42.87008595466614
+      },
+      "48x96": {
+       "mae": 0.001034796941288126,
+       "p99": 0.03294596076011658,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9948147119317773,
+       "worst_glyph_mae": 0.0013810305390506983,
+       "worst_glyph_iou": 0.9912917271407837,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 173.8647483587265
+      }
+     },
+     "one_sample": {
+      "8x16": {
+       "mae": 0.008352873226006826,
+       "p99": 0.09548701345920563,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9646464646464646,
+       "worst_glyph_mae": 0.011702882125973701,
+       "worst_glyph_iou": 0.8888888888888888,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 4.415245592594147
+      },
+      "16x32": {
+       "mae": 0.003460638593727102,
+       "p99": 0.05226550251245499,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9979166666666667,
+       "worst_glyph_mae": 0.004326964728534222,
+       "worst_glyph_iou": 0.9875,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 18.828465580940247
+      },
+      "48x96": {
+       "mae": 0.001034796941288126,
+       "p99": 0.03294596076011658,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9948147119317773,
+       "worst_glyph_mae": 0.0013810305390506983,
+       "worst_glyph_iou": 0.9912917271407837,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 173.8647483587265
+      }
+     }
+    }
+   },
+   "limits_eased": [],
+   "drawing_problems": [],
+   "both_seeds_pass_under": {
+    "gates-v2.json": true,
+    "gates-v2.1.json": true,
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
+   },
+   "shipped": true,
+   "shipped_seed": 1,
+   "file": "neuronte-term-mathalpha-v1-tscrmp-g8.json"
+  },
+  {
+   "set": "tscrmp",
+   "group": 9,
+   "scalars": [
+    "U+1D7E4",
+    "U+1D7F8",
+    "U+1D7E6",
+    "U+1D7FA",
+    "U+1D7E7",
+    "U+1D7FB",
+    "U+1D7E8",
+    "U+1D7FC",
+    "U+1D7E9",
+    "U+1D7FD",
+    "U+1D7EB",
+    "U+1D7FF"
+   ],
+   "width": 64,
+   "role": "first",
+   "both_seeds_pass": true,
+   "selected_seed": 0,
+   "lower_error_seed": 0,
+   "seeds": {
+    "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
+     "sha256": "21c56344216df3ed2c9087237607f9f45da5120e35c3cd12fc0c11d9df1e0700",
+     "reference_check_passed": true,
+     "gates_passed": true,
+     "failures": [],
+     "mean_established_mae": 0.003120511615027984,
+     "counted_sizes": {
+      "6x12": {
+       "mae": 0.00822365788432459,
+       "p99": 0.057294510304927826,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9743589743589743,
+       "worst_glyph_mae": 0.010792180895805359,
+       "worst_glyph_iou": 0.8461538461538461,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 3.52964249253273
+      },
+      "8x16": {
+       "mae": 0.005074117992383738,
+       "p99": 0.0505942665040493,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9845679012345679,
+       "worst_glyph_mae": 0.007862875238060951,
+       "worst_glyph_iou": 0.9444444444444444,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 6.18172512948513
+      },
+      "10x20": {
+       "mae": 0.0029725157170711705,
+       "p99": 0.042856961488723755,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9668478260869565,
+       "worst_glyph_mae": 0.0034604459069669247,
+       "worst_glyph_iou": 0.9130434782608695,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 10.02646416425705
+      },
+      "12x24": {
+       "mae": 0.0037139702471904457,
+       "p99": 0.050751183182001114,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9970238095238094,
+       "worst_glyph_mae": 0.0058931815437972546,
+       "worst_glyph_iou": 0.9821428571428571,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 14.447150722146034
+      },
+      "16x32": {
+       "mae": 0.0028750006264696517,
+       "p99": 0.05049559846520424,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9894355644355644,
+       "worst_glyph_mae": 0.0037769335322082043,
+       "worst_glyph_iou": 0.974025974025974,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 25.669349312782288
+      },
+      "24x48": {
+       "mae": 0.003067921643378213,
+       "p99": 0.052603770047426224,
+       "firm_fraction": 0.00014467592592592592,
+       "iou_mean": 0.9928908974049415,
+       "worst_glyph_mae": 0.003930943086743355,
+       "worst_glyph_iou": 0.9847715736040609,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 57.37331658601761
+      },
+      "48x96": {
+       "mae": 0.0014124162262305617,
+       "p99": 0.04183874651789665,
+       "firm_fraction": 3.616898148148148e-05,
+       "iou_mean": 0.9964139758834563,
+       "worst_glyph_mae": 0.0017412706511095166,
+       "worst_glyph_iou": 0.9915343915343915,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 232.6484522819519
+      }
+     },
+     "one_sample": {
+      "8x16": {
+       "mae": 0.01245366184351345,
+       "p99": 0.12640927731990814,
+       "firm_fraction": 0.0013020833333333333,
+       "iou_mean": 0.9536580915891261,
+       "worst_glyph_mae": 0.017601478844881058,
+       "worst_glyph_iou": 0.896551724137931,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 5.688715994358063
+      },
+      "16x32": {
+       "mae": 0.004718436083445947,
+       "p99": 0.059754494577646255,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9863273760332584,
+       "worst_glyph_mae": 0.006479858420789242,
+       "worst_glyph_iou": 0.972972972972973,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 24.767032265663147
+      },
+      "48x96": {
+       "mae": 0.0014124162262305617,
+       "p99": 0.04183874651789665,
+       "firm_fraction": 3.616898148148148e-05,
+       "iou_mean": 0.9964139758834563,
+       "worst_glyph_mae": 0.0017412706511095166,
+       "worst_glyph_iou": 0.9915343915343915,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 232.6484522819519
+      }
+     }
+    },
+    "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
+     "sha256": "8feb2bfb19ae6ef2fd2795b88ed0a584173816ac850decdae530a5c49980d2f9",
+     "reference_check_passed": true,
+     "gates_passed": true,
+     "failures": [],
+     "mean_established_mae": 0.0031375815257585296,
+     "counted_sizes": {
+      "6x12": {
+       "mae": 0.008221655851230025,
+       "p99": 0.05717964842915535,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9743589743589743,
+       "worst_glyph_mae": 0.01082479115575552,
+       "worst_glyph_iou": 0.8461538461538461,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 3.5343666672706604
+      },
+      "8x16": {
+       "mae": 0.005098009656649083,
+       "p99": 0.05069709196686745,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9845679012345679,
+       "worst_glyph_mae": 0.007863410748541355,
+       "worst_glyph_iou": 0.9444444444444444,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 6.161937177181244
+      },
+      "10x20": {
+       "mae": 0.00292753434041515,
+       "p99": 0.04282623156905174,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9668478260869565,
+       "worst_glyph_mae": 0.0035147429443895817,
+       "worst_glyph_iou": 0.9130434782608695,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 10.022770017385483
+      },
+      "12x24": {
+       "mae": 0.003701232587142537,
+       "p99": 0.05170348659157753,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9898785425101214,
+       "worst_glyph_mae": 0.006002257112413645,
+       "worst_glyph_iou": 0.9649122807017544,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 14.431040406227112
+      },
+      "16x32": {
+       "mae": 0.0029053709198099873,
+       "p99": 0.051102615892887115,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9893800389213233,
+       "worst_glyph_mae": 0.0038829525001347065,
+       "worst_glyph_iou": 0.9714285714285714,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 25.693988293409348
+      },
+      "24x48": {
+       "mae": 0.0030119752239746353,
+       "p99": 0.05183909833431244,
+       "firm_fraction": 0.00014467592592592592,
+       "iou_mean": 0.9928595848357555,
+       "worst_glyph_mae": 0.003858325071632862,
+       "worst_glyph_iou": 0.9847715736040609,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 57.33444422483444
+      },
+      "48x96": {
+       "mae": 0.0014093640008165191,
+       "p99": 0.04134570062160492,
+       "firm_fraction": 7.233796296296296e-05,
+       "iou_mean": 0.9964794686873252,
+       "worst_glyph_mae": 0.0017722961492836475,
+       "worst_glyph_iou": 0.9925847457627118,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 232.67657041549683
+      }
+     },
+     "one_sample": {
+      "8x16": {
+       "mae": 0.012481577616805831,
+       "p99": 0.12681400775909424,
+       "firm_fraction": 0.0013020833333333333,
+       "iou_mean": 0.9536580915891261,
+       "worst_glyph_mae": 0.018356923013925552,
+       "worst_glyph_iou": 0.896551724137931,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 5.768373489379883
+      },
+      "16x32": {
+       "mae": 0.004705880904415001,
+       "p99": 0.06222505867481232,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9855262465199645,
+       "worst_glyph_mae": 0.006300179287791252,
+       "worst_glyph_iou": 0.972972972972973,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 24.63555818796158
+      },
+      "48x96": {
+       "mae": 0.0014093640008165191,
+       "p99": 0.04134570062160492,
+       "firm_fraction": 7.233796296296296e-05,
+       "iou_mean": 0.9964794686873252,
+       "worst_glyph_mae": 0.0017722961492836475,
+       "worst_glyph_iou": 0.9925847457627118,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 232.67657041549683
+      }
+     }
+    }
+   },
+   "limits_eased": [],
+   "drawing_problems": [],
+   "both_seeds_pass_under": {
+    "gates-v2.json": true,
+    "gates-v2.1.json": true,
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
+   },
+   "shipped": true,
+   "shipped_seed": 0,
+   "file": "neuronte-term-mathalpha-v1-tscrmp-g9.json"
+  },
+  {
+   "set": "tscrmn",
+   "group": 0,
+   "scalars": [
+    "U+1D7E2",
+    "U+1D7F6",
+    "U+1D7D8",
+    "U+1D7D9",
+    "U+1D7DA",
+    "U+1D7DB",
+    "U+1D7DC"
+   ],
+   "width": 64,
+   "role": "first",
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "seeds": {
+    "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
+     "sha256": "9c4b9fdebf4233fc11d44afbb68c0f7b68a6a83e9c490bc4c3514ce4f1e175df",
+     "reference_check_passed": true,
+     "gates_passed": true,
+     "failures": [],
+     "mean_established_mae": 0.004641791179199659,
+     "counted_sizes": {
+      "6x12": {
+       "mae": 0.010445320779191596,
+       "p99": 0.08499698340892792,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.907101670259565,
+       "worst_glyph_mae": 0.0204329714179039,
+       "worst_glyph_iou": 0.6842105263157895,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 2.257677346467972
+      },
+      "8x16": {
+       "mae": 0.008365301215755088,
+       "p99": 0.06720243394374847,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9425574425574427,
+       "worst_glyph_mae": 0.012709392234683037,
+       "worst_glyph_iou": 0.7142857142857143,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 4.000967517495155
+      },
+      "10x20": {
+       "mae": 0.007114726251789502,
+       "p99": 0.05552535131573677,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.8064987617854159,
+       "worst_glyph_mae": 0.011607537046074867,
+       "worst_glyph_iou": 0.515625,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 6.407898724079132
+      },
+      "12x24": {
+       "mae": 0.005752022843807936,
+       "p99": 0.05887323617935181,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9706293706293706,
+       "worst_glyph_mae": 0.008358960971236229,
+       "worst_glyph_iou": 0.8307692307692308,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 9.234814941883087
+      },
+      "16x32": {
+       "mae": 0.003505393330539976,
+       "p99": 0.04147923365235329,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9858179003077703,
+       "worst_glyph_mae": 0.0052219294011592865,
+       "worst_glyph_iou": 0.956140350877193,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 16.49707692861557
+      },
+      "24x48": {
+       "mae": 0.004532325879803726,
+       "p99": 0.06122558191418648,
+       "firm_fraction": 0.0001240079365079365,
+       "iou_mean": 0.9761022659785216,
+       "worst_glyph_mae": 0.006806147750467062,
+       "worst_glyph_iou": 0.8992248062015504,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 37.153628885746
+      },
+      "48x96": {
+       "mae": 0.002054678991303912,
+       "p99": 0.05046844854950905,
+       "firm_fraction": 6.200396825396825e-05,
+       "iou_mean": 0.9882504638611079,
+       "worst_glyph_mae": 0.003213424701243639,
+       "worst_glyph_iou": 0.9501779359430605,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 148.24889409542084
+      }
+     },
+     "one_sample": {
+      "8x16": {
+       "mae": 0.018659787784729685,
+       "p99": 0.2520567774772644,
+       "firm_fraction": 0.0078125,
+       "iou_mean": 0.900417439703154,
+       "worst_glyph_mae": 0.027408991008996964,
+       "worst_glyph_iou": 0.6785714285714286,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 3.430360496044159
+      },
+      "16x32": {
+       "mae": 0.006413383808519159,
+       "p99": 0.07084469497203827,
+       "firm_fraction": 0.0016741071428571428,
+       "iou_mean": 0.9717609236965432,
+       "worst_glyph_mae": 0.009713609702885151,
+       "worst_glyph_iou": 0.9107142857142857,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 16.177020847797394
+      },
+      "48x96": {
+       "mae": 0.002054678991303912,
+       "p99": 0.05046844854950905,
+       "firm_fraction": 6.200396825396825e-05,
+       "iou_mean": 0.9882504638611079,
+       "worst_glyph_mae": 0.003213424701243639,
+       "worst_glyph_iou": 0.9501779359430605,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 148.24889409542084
+      }
+     }
+    },
+    "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
+     "sha256": "6c68ce355d14289ffbfa7d05c188353253b87a9560932385683366e570523ab3",
+     "reference_check_passed": true,
+     "gates_passed": true,
+     "failures": [],
+     "mean_established_mae": 0.004605089973968764,
+     "counted_sizes": {
+      "6x12": {
+       "mae": 0.010603088353361403,
+       "p99": 0.08550538122653961,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9125319125319126,
+       "worst_glyph_mae": 0.020733676850795746,
+       "worst_glyph_iou": 0.7222222222222222,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 2.2526731491088867
+      },
+      "8x16": {
+       "mae": 0.008277021082384246,
+       "p99": 0.06400304287672043,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9398432255575112,
+       "worst_glyph_mae": 0.012769481167197227,
+       "worst_glyph_iou": 0.7407407407407407,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 4.01481020450592
+      },
+      "10x20": {
+       "mae": 0.0069732761143573695,
+       "p99": 0.053680889308452606,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.8109388487137001,
+       "worst_glyph_mae": 0.010996043682098389,
+       "worst_glyph_iou": 0.515625,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 6.419359534978867
+      },
+      "12x24": {
+       "mae": 0.005727342729057584,
+       "p99": 0.05825771018862724,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9732267732267733,
+       "worst_glyph_mae": 0.008070641197264194,
+       "worst_glyph_iou": 0.8307692307692308,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 9.219077944755554
+      },
+      "16x32": {
+       "mae": 0.003479542044390525,
+       "p99": 0.039692625403404236,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9853335674830783,
+       "worst_glyph_mae": 0.005150592420250177,
+       "worst_glyph_iou": 0.9646017699115044,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 16.53466236591339
+      },
+      "24x48": {
+       "mae": 0.004453425495220082,
+       "p99": 0.06115259975194931,
+       "firm_fraction": 0.0001240079365079365,
+       "iou_mean": 0.9763979349900839,
+       "worst_glyph_mae": 0.006760016083717346,
+       "worst_glyph_iou": 0.8957528957528957,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 37.130618035793304
+      },
+      "48x96": {
+       "mae": 0.0020587067951315214,
+       "p99": 0.05049477517604828,
+       "firm_fraction": 0.00015500992063492063,
+       "iou_mean": 0.9880761387266899,
+       "worst_glyph_mae": 0.0030647283419966698,
+       "worst_glyph_iou": 0.9535714285714286,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 148.434426009655
+      }
+     },
+     "one_sample": {
+      "8x16": {
+       "mae": 0.01883128092491201,
+       "p99": 0.2538447678089142,
+       "firm_fraction": 0.0078125,
+       "iou_mean": 0.8911223423538693,
+       "worst_glyph_mae": 0.028379738330841064,
+       "worst_glyph_iou": 0.6551724137931034,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 3.587261199951172
+      },
+      "16x32": {
+       "mae": 0.006512740161269903,
+       "p99": 0.07705672085285187,
+       "firm_fraction": 0.0016741071428571428,
+       "iou_mean": 0.973047604378379,
+       "worst_glyph_mae": 0.00931578315794468,
+       "worst_glyph_iou": 0.9375,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 16.208179533481598
+      },
+      "48x96": {
+       "mae": 0.0020587067951315214,
+       "p99": 0.05049477517604828,
+       "firm_fraction": 0.00015500992063492063,
+       "iou_mean": 0.9880761387266899,
+       "worst_glyph_mae": 0.0030647283419966698,
+       "worst_glyph_iou": 0.9535714285714286,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 148.434426009655
+      }
+     }
+    }
+   },
+   "limits_eased": [
+    {
+     "rule": "10x20 iou_mean",
+     "declared": 0.7917055584426805,
+     "perfect": 0.8050589126012059,
+     "applied": 0.7855648038613264
+    },
+    {
+     "rule": "s1 8x16 p99",
+     "declared": 0.23541254103183748,
+     "perfect": 0.25444427132606506,
+     "applied": 0.2798886984586716
+    }
+   ],
+   "drawing_problems": [],
+   "both_seeds_pass_under": {
+    "gates-v2.json": false,
+    "gates-v2.1.json": false,
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
+   },
+   "shipped": true,
+   "shipped_seed": 1,
+   "file": "neuronte-term-mathalpha-v1-tscrmn-g0.json"
+  },
+  {
+   "set": "tscrmn",
+   "group": 1,
+   "scalars": [
+    "U+1D7E3",
+    "U+1D7F7",
+    "U+1D7DD",
+    "U+1D7DE",
+    "U+1D7DF",
+    "U+1D7E0",
+    "U+1D7E1"
+   ],
+   "width": 64,
+   "role": "first",
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "seeds": {
+    "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
+     "sha256": "d77736ca4ded9ce5f5ad0ed9fa9eccfd8c3a9420d99ea3c0873c1fe48d08f838",
+     "reference_check_passed": true,
+     "gates_passed": true,
+     "failures": [],
+     "mean_established_mae": 0.0037865020456679522,
+     "counted_sizes": {
+      "6x12": {
+       "mae": 0.008705263026058674,
+       "p99": 0.05710466951131821,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.8995726495726496,
+       "worst_glyph_mae": 0.01291675679385662,
+       "worst_glyph_iou": 0.75,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 1.2139043807983398
+      },
+      "8x16": {
+       "mae": 0.00606766522728971,
+       "p99": 0.045771289616823196,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9824755989352262,
+       "worst_glyph_mae": 0.007474277634173632,
+       "worst_glyph_iou": 0.9130434782608695,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 2.4682178497314453
+      },
+      "10x20": {
+       "mae": 0.005047255079261959,
+       "p99": 0.0525900237262249,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.8307805608007331,
+       "worst_glyph_mae": 0.00826858077198267,
+       "worst_glyph_iou": 0.5777777777777777,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 4.013001084327698
+      },
+      "12x24": {
+       "mae": 0.0042762479611805505,
+       "p99": 0.049120496958494186,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9899139673761502,
+       "worst_glyph_mae": 0.005610909778624773,
+       "worst_glyph_iou": 0.9622641509433962,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 5.965290606021881
+      },
+      "16x32": {
+       "mae": 0.0035347805824130774,
+       "p99": 0.05116792768239975,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9969399443626248,
+       "worst_glyph_mae": 0.004928393289446831,
+       "worst_glyph_iou": 0.9888888888888889,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 10.217795386910439
+      },
+      "24x48": {
+       "mae": 0.003937469196638891,
+       "p99": 0.05699055641889572,
+       "firm_fraction": 0.000496031746031746,
+       "iou_mean": 0.9858060938106493,
+       "worst_glyph_mae": 0.005829406902194023,
+       "worst_glyph_iou": 0.9395348837209302,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 23.77520763874054
+      },
+      "48x96": {
+       "mae": 0.001757060327301068,
+       "p99": 0.046840161085128784,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9969913276297271,
+       "worst_glyph_mae": 0.002303629880771041,
+       "worst_glyph_iou": 0.9918319719953326,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 94.7174945473671
+      }
+     },
+     "one_sample": {
+      "8x16": {
+       "mae": 0.015480359084904194,
+       "p99": 0.24214290082454681,
+       "firm_fraction": 0.0033482142857142855,
+       "iou_mean": 0.931520611576298,
+       "worst_glyph_mae": 0.02841969206929207,
+       "worst_glyph_iou": 0.7931034482758621,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 1.8681566715240479
+      },
+      "16x32": {
+       "mae": 0.006183220206626824,
+       "p99": 0.0705048143863678,
+       "firm_fraction": 0.0008370535714285714,
+       "iou_mean": 0.9890506070446339,
+       "worst_glyph_mae": 0.008027546107769012,
+       "worst_glyph_iou": 0.9693877551020408,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 9.822157621383667
+      },
+      "48x96": {
+       "mae": 0.001757060327301068,
+       "p99": 0.046840161085128784,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9969913276297271,
+       "worst_glyph_mae": 0.002303629880771041,
+       "worst_glyph_iou": 0.9918319719953326,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 94.7174945473671
+      }
+     }
+    },
+    "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
+     "sha256": "5f99c797c4bcf69bd742343c2d9c2bd5d5ebe13e8e88dd41367682994dad99ca",
+     "reference_check_passed": true,
+     "gates_passed": true,
+     "failures": [],
+     "mean_established_mae": 0.0037768084245423474,
+     "counted_sizes": {
+      "6x12": {
+       "mae": 0.008788348973861762,
+       "p99": 0.054560329765081406,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.8995726495726496,
+       "worst_glyph_mae": 0.012487857602536678,
+       "worst_glyph_iou": 0.75,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 1.2028043270111084
+      },
+      "8x16": {
+       "mae": 0.005989329423755407,
+       "p99": 0.05034203082323074,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9727993146284001,
+       "worst_glyph_mae": 0.007085295394062996,
+       "worst_glyph_iou": 0.896551724137931,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 2.4797269105911255
+      },
+      "10x20": {
+       "mae": 0.005100965366831848,
+       "p99": 0.05355580523610115,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.8194264663901604,
+       "worst_glyph_mae": 0.00838328804820776,
+       "worst_glyph_iou": 0.5777777777777777,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 4.0153796672821045
+      },
+      "12x24": {
+       "mae": 0.004340862622484565,
+       "p99": 0.04701622202992439,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9819755396264017,
+       "worst_glyph_mae": 0.005954315420240164,
+       "worst_glyph_iou": 0.9259259259259259,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 5.910934686660767
+      },
+      "16x32": {
+       "mae": 0.003552323207259178,
+       "p99": 0.0516437403857708,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9954671903125512,
+       "worst_glyph_mae": 0.004989327862858772,
+       "worst_glyph_iou": 0.979381443298969,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 10.171910613775253
+      },
+      "24x48": {
+       "mae": 0.0039177794741200546,
+       "p99": 0.05919158086180687,
+       "firm_fraction": 0.0006200396825396825,
+       "iou_mean": 0.9844969109644606,
+       "worst_glyph_mae": 0.005847455933690071,
+       "worst_glyph_iou": 0.9395348837209302,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 23.585539281368256
+      },
+      "48x96": {
+       "mae": 0.0017887726426124573,
+       "p99": 0.047655876725912094,
+       "firm_fraction": 3.1001984126984125e-05,
+       "iou_mean": 0.9969491043301542,
+       "worst_glyph_mae": 0.0023050059098750353,
+       "worst_glyph_iou": 0.9941520467836257,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 94.60932821035385
+      }
+     },
+     "one_sample": {
+      "8x16": {
+       "mae": 0.015769968341503824,
+       "p99": 0.24646006524562836,
+       "firm_fraction": 0.004464285714285714,
+       "iou_mean": 0.9265945032019137,
+       "worst_glyph_mae": 0.028525199741125107,
+       "worst_glyph_iou": 0.7586206896551724,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 1.8446094989776611
+      },
+      "16x32": {
+       "mae": 0.006168789030717952,
+       "p99": 0.06959161162376404,
+       "firm_fraction": 0.0008370535714285714,
+       "iou_mean": 0.9849981239191656,
+       "worst_glyph_mae": 0.008044440299272537,
+       "worst_glyph_iou": 0.9494949494949495,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 9.835570454597473
+      },
+      "48x96": {
+       "mae": 0.0017887726426124573,
+       "p99": 0.047655876725912094,
+       "firm_fraction": 3.1001984126984125e-05,
+       "iou_mean": 0.9969491043301542,
+       "worst_glyph_mae": 0.0023050059098750353,
+       "worst_glyph_iou": 0.9941520467836257,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 94.60932821035385
+      }
+     }
+    }
+   },
+   "limits_eased": [
+    {
+     "rule": "24x48 firm",
+     "declared": 0.0006356336805555555,
+     "perfect": 0.0006200396825396825,
+     "applied": 0.0006820436507936509
+    },
+    {
+     "rule": "s1 8x16 p99",
+     "declared": 0.23541254103183748,
+     "perfect": 0.2593749761581421,
+     "applied": 0.2853124737739563
+    }
+   ],
+   "drawing_problems": [],
+   "both_seeds_pass_under": {
+    "gates-v2.json": false,
+    "gates-v2.1.json": false,
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
+   },
+   "shipped": true,
+   "shipped_seed": 1,
+   "file": "neuronte-term-mathalpha-v1-tscrmn-g1.json"
+  },
+  {
+   "set": "tscrmdu",
+   "group": 0,
+   "scalars": [
+    "U+1D538",
+    "U+1D539",
+    "U+1D53B",
+    "U+1D53C",
+    "U+1D53D",
+    "U+1D53E",
+    "U+1D540",
+    "U+1D541",
+    "U+1D542"
+   ],
+   "width": 64,
+   "role": "first",
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "seeds": {
+    "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
+     "sha256": "37e6554adc4bc2da16be5c461d6cd95f348acfb8b08fbfacac6c20262c5fbfb6",
+     "reference_check_passed": true,
+     "gates_passed": true,
+     "failures": [],
+     "mean_established_mae": 0.007039246123491061,
+     "counted_sizes": {
+      "6x12": {
+       "mae": 0.011280001244611211,
+       "p99": 0.0665256455540657,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9372201872201872,
+       "worst_glyph_mae": 0.0158572755753994,
+       "worst_glyph_iou": 0.875,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 1.4696018695831299
+      },
+      "8x16": {
+       "mae": 0.013140067199452056,
+       "p99": 0.07102114707231522,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.7964661820279173,
+       "worst_glyph_mae": 0.018236003816127777,
+       "worst_glyph_iou": 0.36363636363636365,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 2.631934553384781
+      },
+      "10x20": {
+       "mae": 0.010380757041275501,
+       "p99": 0.056609101593494415,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.7797810068444414,
+       "worst_glyph_mae": 0.013328676111996174,
+       "worst_glyph_iou": 0.6170212765957447,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 4.125580608844757
+      },
+      "12x24": {
+       "mae": 0.006837065616208646,
+       "p99": 0.05136631056666374,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9965064548704932,
+       "worst_glyph_mae": 0.008562109433114529,
+       "worst_glyph_iou": 0.9830508474576272,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 6.628891110420227
+      },
+      "16x32": {
+       "mae": 0.005341664370563295,
+       "p99": 0.059504278004169464,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9957616748951169,
+       "worst_glyph_mae": 0.006388235371559858,
+       "worst_glyph_iou": 0.98989898989899,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 12.041149660944939
+      },
+      "24x48": {
+       "mae": 0.00522415632278555,
+       "p99": 0.061125509440898895,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9546323571585842,
+       "worst_glyph_mae": 0.006382044870406389,
+       "worst_glyph_iou": 0.7793427230046949,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 26.107218205928802
+      },
+      "48x96": {
+       "mae": 0.002636006800457835,
+       "p99": 0.058023594319820404,
+       "firm_fraction": 4.8225308641975306e-05,
+       "iou_mean": 0.9960361299502841,
+       "worst_glyph_mae": 0.0032440403010696173,
+       "worst_glyph_iou": 0.9883227176220807,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 110.64031022787094
+      }
+     },
+     "one_sample": {
+      "8x16": {
+       "mae": 0.022726196174820263,
+       "p99": 0.23203857243061066,
+       "firm_fraction": 0.008680555555555556,
+       "iou_mean": 0.754841780803961,
+       "worst_glyph_mae": 0.0272870734333992,
+       "worst_glyph_iou": 0.2727272727272727,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 1.616246223449707
+      },
+      "16x32": {
+       "mae": 0.007644003257155418,
+       "p99": 0.07503256946802139,
+       "firm_fraction": 0.0015190972222222222,
+       "iou_mean": 0.9764396787851086,
+       "worst_glyph_mae": 0.009624065831303596,
+       "worst_glyph_iou": 0.9574468085106383,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 11.332378089427948
+      },
+      "48x96": {
+       "mae": 0.002636006800457835,
+       "p99": 0.058023594319820404,
+       "firm_fraction": 4.8225308641975306e-05,
+       "iou_mean": 0.9960361299502841,
+       "worst_glyph_mae": 0.0032440403010696173,
+       "worst_glyph_iou": 0.9883227176220807,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 110.64031022787094
+      }
+     }
+    },
+    "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
+     "sha256": "ad88e4e131c1f713637b9f30fe2ad2d041185106c5513a412542445665a8a9ce",
+     "reference_check_passed": true,
+     "gates_passed": true,
+     "failures": [],
+     "mean_established_mae": 0.006928096887552076,
+     "counted_sizes": {
+      "6x12": {
+       "mae": 0.011044669999844499,
+       "p99": 0.06394452601671219,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9372201872201872,
+       "worst_glyph_mae": 0.01563677191734314,
+       "worst_glyph_iou": 0.875,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 1.4793798923492432
+      },
+      "8x16": {
+       "mae": 0.012930737601386176,
+       "p99": 0.06831754744052887,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.7964661820279173,
+       "worst_glyph_mae": 0.017675958573818207,
+       "worst_glyph_iou": 0.36363636363636365,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 2.6311725676059723
+      },
+      "10x20": {
+       "mae": 0.010483046010550525,
+       "p99": 0.05744651332497597,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.7797810068444414,
+       "worst_glyph_mae": 0.013825463131070137,
+       "worst_glyph_iou": 0.6170212765957447,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 4.086948812007904
+      },
+      "12x24": {
+       "mae": 0.0068309324690037304,
+       "p99": 0.052602026611566544,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9946546030186414,
+       "worst_glyph_mae": 0.008505409583449364,
+       "worst_glyph_iou": 0.9830508474576272,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 6.619075655937195
+      },
+      "16x32": {
+       "mae": 0.005234578003485997,
+       "p99": 0.06006063148379326,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9948583325283599,
+       "worst_glyph_mae": 0.006310688331723213,
+       "worst_glyph_iou": 0.98989898989899,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 12.061501398682594
+      },
+      "24x48": {
+       "mae": 0.005257103747377793,
+       "p99": 0.062478430569171906,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9546306008580819,
+       "worst_glyph_mae": 0.006430826149880886,
+       "worst_glyph_iou": 0.7793427230046949,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 26.065432608127594
+      },
+      "48x96": {
+       "mae": 0.002618975057784054,
+       "p99": 0.05845513939857483,
+       "firm_fraction": 2.4112654320987653e-05,
+       "iou_mean": 0.9974205094202253,
+       "worst_glyph_mae": 0.003195804310962558,
+       "worst_glyph_iou": 0.9946808510638298,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 111.0966312289238
+      }
+     },
+     "one_sample": {
+      "8x16": {
+       "mae": 0.02232733482701911,
+       "p99": 0.22990092635154724,
+       "firm_fraction": 0.008680555555555556,
+       "iou_mean": 0.754841780803961,
+       "worst_glyph_mae": 0.027483010664582253,
+       "worst_glyph_iou": 0.2727272727272727,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 1.6749178171157837
+      },
+      "16x32": {
+       "mae": 0.007731185553388463,
+       "p99": 0.07585141062736511,
+       "firm_fraction": 0.0015190972222222222,
+       "iou_mean": 0.9780132662100964,
+       "worst_glyph_mae": 0.00927493255585432,
+       "worst_glyph_iou": 0.9574468085106383,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 11.351332068443298
+      },
+      "48x96": {
+       "mae": 0.002618975057784054,
+       "p99": 0.05845513939857483,
+       "firm_fraction": 2.4112654320987653e-05,
+       "iou_mean": 0.9974205094202253,
+       "worst_glyph_mae": 0.003195804310962558,
+       "worst_glyph_iou": 0.9946808510638298,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 111.0966312289238
+      }
+     }
+    }
+   },
+   "limits_eased": [
+    {
+     "rule": "8x16 mae",
+     "declared": 0.014284084748942405,
+     "perfect": 0.013048697987364398,
+     "applied": 0.01435356778610084
+    },
+    {
+     "rule": "10x20 mae",
+     "declared": 0.008660606882767753,
+     "perfect": 0.010437715074254407,
+     "applied": 0.011481486581679847
+    },
+    {
+     "rule": "10x20 iou_mean",
+     "declared": 0.7917055584426805,
+     "perfect": 0.7778913620976539,
+     "applied": 0.7556804983074192
+    },
+    {
+     "rule": "s1 8x16 p99",
+     "declared": 0.23541254103183748,
+     "perfect": 0.23000001907348633,
+     "applied": 0.25300002098083496
+    }
+   ],
+   "drawing_problems": [],
+   "both_seeds_pass_under": {
+    "gates-v2.json": false,
+    "gates-v2.1.json": false,
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
+   },
+   "shipped": true,
+   "shipped_seed": 1,
+   "file": "neuronte-term-mathalpha-v1-tscrmdu-g0.json"
+  },
+  {
+   "set": "tscrmdu",
+   "group": 1,
+   "scalars": [
+    "U+1D543",
+    "U+1D544",
+    "U+1D546",
+    "U+1D54A",
+    "U+1D54B",
+    "U+1D54C",
+    "U+1D54D",
+    "U+1D54E",
+    "U+1D54F",
+    "U+1D550"
+   ],
+   "width": 64,
+   "role": "first",
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "seeds": {
+    "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
+     "sha256": "103477690e813672eb1b7fbda8de607aafbad708065ea91e72eadfe473afa17c",
+     "reference_check_passed": true,
+     "gates_passed": true,
+     "failures": [],
+     "mean_established_mae": 0.005457141615139941,
+     "counted_sizes": {
+      "6x12": {
+       "mae": 0.010513307061046362,
+       "p99": 0.07711108773946762,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9387908496732026,
+       "worst_glyph_mae": 0.016545603051781654,
+       "worst_glyph_iou": 0.6666666666666666,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 1.728374719619751
+      },
+      "8x16": {
+       "mae": 0.00981356855481863,
+       "p99": 0.06776358932256699,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.7814711632453568,
+       "worst_glyph_mae": 0.019826017320156097,
+       "worst_glyph_iou": 0.36363636363636365,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 3.1725459843873978
+      },
+      "10x20": {
+       "mae": 0.008687181957066059,
+       "p99": 0.05611956864595413,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.8448311249383729,
+       "worst_glyph_mae": 0.013574060052633286,
+       "worst_glyph_iou": 0.6363636363636364,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 4.245170593261719
+      },
+      "12x24": {
+       "mae": 0.005636801151558757,
+       "p99": 0.047613076865673065,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9929784429280397,
+       "worst_glyph_mae": 0.009322185069322586,
+       "worst_glyph_iou": 0.9615384615384616,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 6.611743584275246
+      },
+      "16x32": {
+       "mae": 0.004170881840400398,
+       "p99": 0.05676736310124397,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9937558273974277,
+       "worst_glyph_mae": 0.006871422287076712,
+       "worst_glyph_iou": 0.9834710743801653,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 12.012847363948822
+      },
+      "24x48": {
+       "mae": 0.005191951314918697,
+       "p99": 0.06667642295360565,
+       "firm_fraction": 0.00017361111111111112,
+       "iou_mean": 0.960802301527129,
+       "worst_glyph_mae": 0.009271049872040749,
+       "worst_glyph_iou": 0.7850467289719626,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 27.684566378593445
+      },
+      "48x96": {
+       "mae": 0.002386974450200796,
+       "p99": 0.05667135491967201,
+       "firm_fraction": 4.340277777777778e-05,
+       "iou_mean": 0.9955988987344135,
+       "worst_glyph_mae": 0.003122390480712056,
+       "worst_glyph_iou": 0.990521327014218,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 108.8548253774643
+      }
+     },
+     "one_sample": {
+      "8x16": {
+       "mae": 0.021026965882629155,
+       "p99": 0.22999124228954315,
+       "firm_fraction": 0.00625,
+       "iou_mean": 0.7325241080758322,
+       "worst_glyph_mae": 0.037202801555395126,
+       "worst_glyph_iou": 0.36363636363636365,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 2.4777871966362
+      },
+      "16x32": {
+       "mae": 0.007398592866957187,
+       "p99": 0.0886070504784584,
+       "firm_fraction": 0.0009765625,
+       "iou_mean": 0.9804629554157632,
+       "worst_glyph_mae": 0.00930989719927311,
+       "worst_glyph_iou": 0.9586776859504132,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 11.68331378698349
+      },
+      "48x96": {
+       "mae": 0.002386974450200796,
+       "p99": 0.05667135491967201,
+       "firm_fraction": 4.340277777777778e-05,
+       "iou_mean": 0.9955988987344135,
+       "worst_glyph_mae": 0.003122390480712056,
+       "worst_glyph_iou": 0.990521327014218,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 108.8548253774643
+      }
+     }
+    },
+    "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
+     "sha256": "9eeb654215530fd8c0551e5505d642b94d00c5c34bed4864286358dd193a95ef",
+     "reference_check_passed": true,
+     "gates_passed": true,
+     "failures": [],
+     "mean_established_mae": 0.0053544229866626354,
+     "counted_sizes": {
+      "6x12": {
+       "mae": 0.010290881618857384,
+       "p99": 0.06868258863687515,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.933531746031746,
+       "worst_glyph_mae": 0.016501406207680702,
+       "worst_glyph_iou": 0.6666666666666666,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 1.7317843437194824
+      },
+      "8x16": {
+       "mae": 0.009631207818165422,
+       "p99": 0.06502902507781982,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.7806969696969697,
+       "worst_glyph_mae": 0.019583411514759064,
+       "worst_glyph_iou": 0.36363636363636365,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 3.1764825880527496
+      },
+      "10x20": {
+       "mae": 0.008445611642673611,
+       "p99": 0.05737006664276123,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.8420689557350272,
+       "worst_glyph_mae": 0.013228538446128368,
+       "worst_glyph_iou": 0.6363636363636364,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 4.246144890785217
+      },
+      "12x24": {
+       "mae": 0.005615032580681145,
+       "p99": 0.04711145535111427,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9926682692307691,
+       "worst_glyph_mae": 0.009135676547884941,
+       "worst_glyph_iou": 0.9615384615384616,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 6.520094379782677
+      },
+      "16x32": {
+       "mae": 0.0041495152749121186,
+       "p99": 0.05740855634212494,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9967190508099598,
+       "worst_glyph_mae": 0.006659004837274551,
+       "worst_glyph_iou": 0.9834710743801653,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 11.98658899962902
+      },
+      "24x48": {
+       "mae": 0.004981687059625983,
+       "p99": 0.06570951640605927,
+       "firm_fraction": 0.00017361111111111112,
+       "iou_mean": 0.9613801204546769,
+       "worst_glyph_mae": 0.009080175310373306,
+       "worst_glyph_iou": 0.7850467289719626,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 27.487473785877228
+      },
+      "48x96": {
+       "mae": 0.002282545866910368,
+       "p99": 0.05345217138528824,
+       "firm_fraction": 8.680555555555556e-05,
+       "iou_mean": 0.9959677239512199,
+       "worst_glyph_mae": 0.0032411711290478706,
+       "worst_glyph_iou": 0.9918533604887984,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 109.12205213308334
+      }
+     },
+     "one_sample": {
+      "8x16": {
+       "mae": 0.020921677257865666,
+       "p99": 0.2381361424922943,
+       "firm_fraction": 0.00625,
+       "iou_mean": 0.7361530877917685,
+       "worst_glyph_mae": 0.03654613718390465,
+       "worst_glyph_iou": 0.36363636363636365,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 2.608387768268585
+      },
+      "16x32": {
+       "mae": 0.007045322423800826,
+       "p99": 0.07767938822507858,
+       "firm_fraction": 0.0009765625,
+       "iou_mean": 0.9819114058610788,
+       "worst_glyph_mae": 0.009245543740689754,
+       "worst_glyph_iou": 0.9666666666666667,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 11.703271210193634
+      },
+      "48x96": {
+       "mae": 0.002282545866910368,
+       "p99": 0.05345217138528824,
+       "firm_fraction": 8.680555555555556e-05,
+       "iou_mean": 0.9959677239512199,
+       "worst_glyph_mae": 0.0032411711290478706,
+       "worst_glyph_iou": 0.9918533604887984,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 109.12205213308334
+      }
+     }
+    }
+   },
+   "limits_eased": [
+    {
+     "rule": "10x20 mae",
+     "declared": 0.008660606882767753,
+     "perfect": 0.008526709000580012,
+     "applied": 0.009379379900638014
+    },
+    {
+     "rule": "s1 8x16 p99",
+     "declared": 0.23541254103183748,
+     "perfect": 0.25005465745925903,
+     "applied": 0.27506012320518497
+    }
+   ],
+   "drawing_problems": [],
+   "both_seeds_pass_under": {
+    "gates-v2.json": false,
+    "gates-v2.1.json": false,
+    "gates-v2.2.json": false,
+    "gates-v2.3.json": true
+   },
+   "shipped": true,
+   "shipped_seed": 1,
+   "file": "neuronte-term-mathalpha-v1-tscrmdu-g1.json"
+  },
+  {
+   "set": "tscrmdl",
+   "group": 0,
+   "scalars": [
+    "U+1D552",
+    "U+1D553",
+    "U+1D554",
+    "U+1D555",
+    "U+1D556",
+    "U+1D557",
+    "U+1D558",
+    "U+1D559"
+   ],
+   "width": 64,
+   "role": "first",
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "seeds": {
+    "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
+     "sha256": "4a046ab3ba7676566f0b7f290d7c2f0ae37bf2bcae1e3169fa1289833773bc39",
+     "reference_check_passed": true,
+     "gates_passed": true,
+     "failures": [],
+     "mean_established_mae": 0.00490747787989676,
+     "counted_sizes": {
+      "6x12": {
+       "mae": 0.011536276899278164,
+       "p99": 0.06232898682355881,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9048430735930736,
+       "worst_glyph_mae": 0.016181716695427895,
+       "worst_glyph_iou": 0.8181818181818182,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 1.487798124551773
+      },
+      "8x16": {
+       "mae": 0.007655186345800757,
+       "p99": 0.05693741887807846,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9773949579831933,
+       "worst_glyph_mae": 0.010462291538715363,
+       "worst_glyph_iou": 0.92,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 3.008352652192116
+      },
+      "10x20": {
+       "mae": 0.008576058375183493,
+       "p99": 0.06439179182052612,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.8346846429782429,
+       "worst_glyph_mae": 0.011802783235907555,
+       "worst_glyph_iou": 0.7037037037037037,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 4.956273794174194
+      },
+      "12x24": {
+       "mae": 0.006251238577533513,
+       "p99": 0.05382079258561134,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9819602196522046,
+       "worst_glyph_mae": 0.00768057769164443,
+       "worst_glyph_iou": 0.9193548387096774,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 7.116652458906174
+      },
+      "16x32": {
+       "mae": 0.004708002175902948,
+       "p99": 0.05320269241929054,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9931835524048639,
+       "worst_glyph_mae": 0.006156903691589832,
+       "worst_glyph_iou": 0.972972972972973,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 12.632182285189629
+      },
+      "24x48": {
+       "mae": 0.00518163968808949,
+       "p99": 0.06344988942146301,
+       "firm_fraction": 0.0008680555555555555,
+       "iou_mean": 0.9827115660159457,
+       "worst_glyph_mae": 0.0066923098638653755,
+       "worst_glyph_iou": 0.9611650485436893,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 28.427148163318634
+      },
+      "48x96": {
+       "mae": 0.0023592451179865748,
+       "p99": 0.05783892422914505,
+       "firm_fraction": 0.00010850694444444444,
+       "iou_mean": 0.9956719908204641,
+       "worst_glyph_mae": 0.0028238079976290464,
+       "worst_glyph_iou": 0.9945750452079566,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 116.01259368658066
+      }
+     },
+     "one_sample": {
+      "8x16": {
+       "mae": 0.018498524324968457,
+       "p99": 0.24626313149929047,
+       "firm_fraction": 0.0126953125,
+       "iou_mean": 0.877442842749748,
+       "worst_glyph_mae": 0.025119442492723465,
+       "worst_glyph_iou": 0.72,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 2.479838490486145
+      },
+      "16x32": {
+       "mae": 0.007159625820349902,
+       "p99": 0.07632455229759216,
+       "firm_fraction": 0.001220703125,
+       "iou_mean": 0.9776664276638382,
+       "worst_glyph_mae": 0.009559878148138523,
+       "worst_glyph_iou": 0.9466666666666667,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 12.270882785320282
+      },
+      "48x96": {
+       "mae": 0.0023592451179865748,
+       "p99": 0.05783892422914505,
+       "firm_fraction": 0.00010850694444444444,
+       "iou_mean": 0.9956719908204641,
+       "worst_glyph_mae": 0.0028238079976290464,
+       "worst_glyph_iou": 0.9945750452079566,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 116.01259368658066
+      }
+     }
+    },
+    "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
+     "sha256": "eb59fd6d6231370c7529ae2600eee67fe8bf4cf18312b47c86c980f98a54f763",
+     "reference_check_passed": true,
+     "gates_passed": true,
+     "failures": [],
+     "mean_established_mae": 0.004892037589646255,
+     "counted_sizes": {
+      "6x12": {
+       "mae": 0.011944881407544017,
+       "p99": 0.06354421377182007,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9048430735930736,
+       "worst_glyph_mae": 0.016856901347637177,
+       "worst_glyph_iou": 0.8181818181818182,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 1.4454244673252106
+      },
+      "8x16": {
+       "mae": 0.007772313081659377,
+       "p99": 0.05309236794710159,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9773949579831933,
+       "worst_glyph_mae": 0.010325494222342968,
+       "worst_glyph_iou": 0.92,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 3.007902354001999
+      },
+      "10x20": {
+       "mae": 0.008528286824002862,
+       "p99": 0.06050097197294235,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.8236870223116187,
+       "worst_glyph_mae": 0.011438034474849701,
+       "worst_glyph_iou": 0.6785714285714286,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 4.976627439260483
+      },
+      "12x24": {
+       "mae": 0.006182934273965657,
+       "p99": 0.054565079510211945,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.980136102908733,
+       "worst_glyph_mae": 0.007412311155349016,
+       "worst_glyph_iou": 0.9047619047619048,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 7.089183688163757
+      },
+      "16x32": {
+       "mae": 0.004647689376724884,
+       "p99": 0.05275934189558029,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9965619307832423,
+       "worst_glyph_mae": 0.0060295285657048225,
+       "worst_glyph_iou": 0.9836065573770492,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 12.677601367235184
+      },
+      "24x48": {
+       "mae": 0.005255082855001092,
+       "p99": 0.064109206199646,
+       "firm_fraction": 0.0007595486111111111,
+       "iou_mean": 0.9841527223783116,
+       "worst_glyph_mae": 0.006676964927464724,
+       "worst_glyph_iou": 0.9658536585365853,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 28.27758288383484
+      },
+      "48x96": {
+       "mae": 0.0022561103105545044,
+       "p99": 0.057386286556720734,
+       "firm_fraction": 2.712673611111111e-05,
+       "iou_mean": 0.9949002083523603,
+       "worst_glyph_mae": 0.0027505767066031694,
+       "worst_glyph_iou": 0.990990990990991,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 117.02669274806976
+      }
+     },
+     "one_sample": {
+      "8x16": {
+       "mae": 0.018336562206968665,
+       "p99": 0.2504512071609497,
+       "firm_fraction": 0.01171875,
+       "iou_mean": 0.882442842749748,
+       "worst_glyph_mae": 0.026192497462034225,
+       "worst_glyph_iou": 0.76,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 2.5451783537864685
+      },
+      "16x32": {
+       "mae": 0.007165016490034759,
+       "p99": 0.07337001711130142,
+       "firm_fraction": 0.001220703125,
+       "iou_mean": 0.9765196386730125,
+       "worst_glyph_mae": 0.009858054108917713,
+       "worst_glyph_iou": 0.9466666666666667,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 12.265619575977325
+      },
+      "48x96": {
+       "mae": 0.0022561103105545044,
+       "p99": 0.057386286556720734,
+       "firm_fraction": 2.712673611111111e-05,
+       "iou_mean": 0.9949002083523603,
+       "worst_glyph_mae": 0.0027505767066031694,
+       "worst_glyph_iou": 0.990990990990991,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 117.02669274806976
+      }
+     }
+    }
+   },
+   "limits_eased": [
+    {
+     "rule": "10x20 mae",
+     "declared": 0.008660606882767753,
+     "perfect": 0.008446059771813452,
+     "applied": 0.009290665748994799
+    },
+    {
+     "rule": "24x48 firm",
+     "declared": 0.0006356336805555555,
+     "perfect": 0.0009765625,
+     "applied": 0.00107421875
+    },
+    {
+     "rule": "s1 8x16 p99",
+     "declared": 0.23541254103183748,
+     "perfect": 0.2475000023841858,
+     "applied": 0.2722500026226044
+    },
+    {
+     "rule": "s1 8x16 firm",
+     "declared": 0.0107421875,
+     "perfect": 0.0126953125,
+     "applied": 0.01396484375
+    }
+   ],
+   "drawing_problems": [],
+   "both_seeds_pass_under": {
+    "gates-v2.json": false,
+    "gates-v2.1.json": false,
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
+   },
+   "shipped": true,
+   "shipped_seed": 1,
+   "file": "neuronte-term-mathalpha-v1-tscrmdl-g0.json"
+  },
+  {
+   "set": "tscrmdl",
+   "group": 1,
+   "scalars": [
+    "U+1D55A",
+    "U+1D55B",
+    "U+1D55C",
+    "U+1D55D",
+    "U+1D55E",
+    "U+1D55F",
+    "U+1D560",
+    "U+1D561",
+    "U+1D562"
+   ],
+   "width": 64,
+   "role": "first",
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "seeds": {
+    "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
+     "sha256": "4d80c9793ccd0ad892f915cf562b9a50a143c0567cb30c5e9f93dd7d28bfc781",
+     "reference_check_passed": true,
+     "gates_passed": true,
+     "failures": [],
+     "mean_established_mae": 0.004742163837093998,
+     "counted_sizes": {
+      "6x12": {
+       "mae": 0.011775299958470795,
+       "p99": 0.0691530853509903,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.8777112865348159,
+       "worst_glyph_mae": 0.017384128645062447,
+       "worst_glyph_iou": 0.7142857142857143,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 1.4774912595748901
+      },
+      "8x16": {
+       "mae": 0.007346716398994128,
+       "p99": 0.06045503541827202,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.8195799631048674,
+       "worst_glyph_mae": 0.013023040257394314,
+       "worst_glyph_iou": 0.3,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 3.1048614233732224
+      },
+      "10x20": {
+       "mae": 0.009178081320391761,
+       "p99": 0.05640494078397751,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.8157797664812774,
+       "worst_glyph_mae": 0.012003562413156033,
+       "worst_glyph_iou": 0.6170212765957447,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 4.812114000320435
+      },
+      "12x24": {
+       "mae": 0.006494357612811857,
+       "p99": 0.056819185614585876,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9935749116783599,
+       "worst_glyph_mae": 0.007829966023564339,
+       "worst_glyph_iou": 0.9772727272727273,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 7.14689964056015
+      },
+      "16x32": {
+       "mae": 0.004768205418561895,
+       "p99": 0.05030340328812599,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9681757243921846,
+       "worst_glyph_mae": 0.006006269250065088,
+       "worst_glyph_iou": 0.8526315789473684,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 12.721738427877426
+      },
+      "24x48": {
+       "mae": 0.0050998088748504715,
+       "p99": 0.06359651684761047,
+       "firm_fraction": 0.0006751543209876543,
+       "iou_mean": 0.9363447937001688,
+       "worst_glyph_mae": 0.007044143043458462,
+       "worst_glyph_iou": 0.7473684210526316,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 28.68203228712082
+      },
+      "48x96": {
+       "mae": 0.00211156969372597,
+       "p99": 0.05468755215406418,
+       "firm_fraction": 2.4112654320987653e-05,
+       "iou_mean": 0.9836894214556656,
+       "worst_glyph_mae": 0.0027370627503842115,
+       "worst_glyph_iou": 0.9079254079254079,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 115.74298310279846
+      }
+     },
+     "one_sample": {
+      "8x16": {
+       "mae": 0.016530632869237,
+       "p99": 0.23207131028175354,
+       "firm_fraction": 0.006944444444444444,
+       "iou_mean": 0.7415098857127842,
+       "worst_glyph_mae": 0.02322620525956154,
+       "worst_glyph_iou": 0.25,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 3.1348273158073425
+      },
+      "16x32": {
+       "mae": 0.006680478393617604,
+       "p99": 0.071149542927742,
+       "firm_fraction": 0.0006510416666666666,
+       "iou_mean": 0.9521608254678564,
+       "worst_glyph_mae": 0.00913291610777378,
+       "worst_glyph_iou": 0.8333333333333334,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 12.259967625141144
+      },
+      "48x96": {
+       "mae": 0.00211156969372597,
+       "p99": 0.05468755215406418,
+       "firm_fraction": 2.4112654320987653e-05,
+       "iou_mean": 0.9836894214556656,
+       "worst_glyph_mae": 0.0027370627503842115,
+       "worst_glyph_iou": 0.9079254079254079,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 115.74298310279846
+      }
+     }
+    },
+    "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
+     "sha256": "164aa80777f9812e1c1c34e5c9ce01800d0c3ad75c0d7627930448887975ca17",
+     "reference_check_passed": true,
+     "gates_passed": true,
+     "failures": [],
+     "mean_established_mae": 0.004709070815739257,
+     "counted_sizes": {
+      "6x12": {
+       "mae": 0.011809911009752087,
+       "p99": 0.07891236990690231,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.8777112865348159,
+       "worst_glyph_mae": 0.017259962856769562,
+       "worst_glyph_iou": 0.7142857142857143,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 1.4832642078399658
+      },
+      "8x16": {
+       "mae": 0.0072474864104555715,
+       "p99": 0.060319092124700546,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.8195799631048674,
+       "worst_glyph_mae": 0.012721149250864983,
+       "worst_glyph_iou": 0.3,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 3.1253660172224045
+      },
+      "10x20": {
+       "mae": 0.009177624092747768,
+       "p99": 0.05740191414952278,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.8108962831544655,
+       "worst_glyph_mae": 0.011750315316021442,
+       "worst_glyph_iou": 0.6170212765957447,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 4.7944284081459045
+      },
+      "12x24": {
+       "mae": 0.006442500718144907,
+       "p99": 0.05638084188103676,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9955590386624871,
+       "worst_glyph_mae": 0.007848318666219711,
+       "worst_glyph_iou": 0.9772727272727273,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 7.099110156297684
+      },
+      "16x32": {
+       "mae": 0.004774308401263422,
+       "p99": 0.050770021975040436,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9671423569427772,
+       "worst_glyph_mae": 0.00610724650323391,
+       "worst_glyph_iou": 0.84375,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 12.641773506999016
+      },
+      "24x48": {
+       "mae": 0.00504879040333132,
+       "p99": 0.0635562539100647,
+       "firm_fraction": 0.00048225308641975306,
+       "iou_mean": 0.9361128938958174,
+       "worst_glyph_mae": 0.007082449272274971,
+       "worst_glyph_iou": 0.7473684210526316,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 28.63621735572815
+      },
+      "48x96": {
+       "mae": 0.002105417635498775,
+       "p99": 0.05436860769987106,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9842653427301327,
+       "worst_glyph_mae": 0.0027264144737273455,
+       "worst_glyph_iou": 0.9068684516880093,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 116.18033421039581
+      }
+     },
+     "one_sample": {
+      "8x16": {
+       "mae": 0.016616429926620588,
+       "p99": 0.2295871376991272,
+       "firm_fraction": 0.0078125,
+       "iou_mean": 0.7316284627878831,
+       "worst_glyph_mae": 0.02290644310414791,
+       "worst_glyph_iou": 0.25,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 3.0979973673820496
+      },
+      "16x32": {
+       "mae": 0.006552410415477223,
+       "p99": 0.0660918727517128,
+       "firm_fraction": 0.0006510416666666666,
+       "iou_mean": 0.9521408594101547,
+       "worst_glyph_mae": 0.008491112850606441,
+       "worst_glyph_iou": 0.8333333333333334,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 12.295410394668579
+      },
+      "48x96": {
+       "mae": 0.002105417635498775,
+       "p99": 0.05436860769987106,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9842653427301327,
+       "worst_glyph_mae": 0.0027264144737273455,
+       "worst_glyph_iou": 0.9068684516880093,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 116.18033421039581
+      }
+     }
+    }
+   },
+   "limits_eased": [
+    {
+     "rule": "10x20 mae",
+     "declared": 0.008660606882767753,
+     "perfect": 0.009136275129599703,
+     "applied": 0.010049902642559675
+    },
+    {
+     "rule": "10x20 iou_mean",
+     "declared": 0.7917055584426805,
+     "perfect": 0.8065190138808584,
+     "applied": 0.7871709152689443
+    },
+    {
+     "rule": "24x48 firm",
+     "declared": 0.0006356336805555555,
+     "perfect": 0.0006751543209876543,
+     "applied": 0.0007426697530864198
+    },
+    {
+     "rule": "24x48 iou_mean",
+     "declared": 0.9449324959405635,
+     "perfect": 0.9354411434254494,
+     "applied": 0.9289852577679943
+    },
+    {
+     "rule": "s1 8x16 p99",
+     "declared": 0.23541254103183748,
+     "perfect": 0.23000001907348633,
+     "applied": 0.25300002098083496
+    }
+   ],
+   "drawing_problems": [],
+   "both_seeds_pass_under": {
+    "gates-v2.json": false,
+    "gates-v2.1.json": false,
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
+   },
+   "shipped": true,
+   "shipped_seed": 1,
+   "file": "neuronte-term-mathalpha-v1-tscrmdl-g1.json"
+  },
+  {
+   "set": "tscrmdl",
+   "group": 2,
+   "scalars": [
+    "U+1D563",
+    "U+1D564",
+    "U+1D565",
+    "U+1D566",
+    "U+1D567",
+    "U+1D568",
+    "U+1D569",
+    "U+1D56A",
+    "U+1D56B"
+   ],
+   "width": 64,
+   "role": "first",
+   "both_seeds_pass": true,
+   "selected_seed": 1,
+   "lower_error_seed": 1,
+   "seeds": {
+    "0": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
+     "sha256": "885e2b0533e7d7648e4ac49a8564dc6940e616c0c19bb6e619a1773d9d067218",
+     "reference_check_passed": true,
+     "gates_passed": true,
+     "failures": [],
+     "mean_established_mae": 0.004032157081248307,
+     "counted_sizes": {
+      "6x12": {
+       "mae": 0.008586774373220073,
+       "p99": 0.07248317450284958,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.7886002886002886,
+       "worst_glyph_mae": 0.013517030514776707,
+       "worst_glyph_iou": 0.5,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 2.8397301137447357
+      },
+      "8x16": {
+       "mae": 0.007268228309435977,
+       "p99": 0.060493264347314835,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9825655940207023,
+       "worst_glyph_mae": 0.012705175206065178,
+       "worst_glyph_iou": 0.9411764705882353,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 6.168276250362396
+      },
+      "10x20": {
+       "mae": 0.005831120975522531,
+       "p99": 0.05474231764674187,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.7484873166175289,
+       "worst_glyph_mae": 0.00874282605946064,
+       "worst_glyph_iou": 0.4375,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 10.026648506522179
+      },
+      "12x24": {
+       "mae": 0.004565311337096823,
+       "p99": 0.05889853462576866,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9635189288789291,
+       "worst_glyph_mae": 0.007250648457556963,
+       "worst_glyph_iou": 0.9142857142857143,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 14.820140644907951
+      },
+      "16x32": {
+       "mae": 0.003097459557466209,
+       "p99": 0.05084197595715523,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9915444078093414,
+       "worst_glyph_mae": 0.005820387974381447,
+       "worst_glyph_iou": 0.9746835443037974,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 28.264837250113487
+      },
+      "24x48": {
+       "mae": 0.003401549610619744,
+       "p99": 0.05731173977255821,
+       "firm_fraction": 0.00019290123456790122,
+       "iou_mean": 0.9500772561956325,
+       "worst_glyph_mae": 0.004456563387066126,
+       "worst_glyph_iou": 0.8457943925233645,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 62.63051217794418
+      },
+      "48x96": {
+       "mae": 0.0017307833768427372,
+       "p99": 0.04721561819314957,
+       "firm_fraction": 7.233796296296296e-05,
+       "iou_mean": 0.9941377520270953,
+       "worst_glyph_mae": 0.0022193649783730507,
+       "worst_glyph_iou": 0.9895104895104895,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 259.50665271282196
+      }
+     },
+     "one_sample": {
+      "8x16": {
+       "mae": 0.014942376253505548,
+       "p99": 0.16345199942588806,
+       "firm_fraction": 0.003472222222222222,
+       "iou_mean": 0.9477357795856247,
+       "worst_glyph_mae": 0.02127791754901409,
+       "worst_glyph_iou": 0.8421052631578947,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 5.498564541339874
+      },
+      "16x32": {
+       "mae": 0.006076862569898367,
+       "p99": 0.0800580233335495,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9887372007072643,
+       "worst_glyph_mae": 0.007576935924589634,
+       "worst_glyph_iou": 0.971830985915493,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 27.162679493427277
+      },
+      "48x96": {
+       "mae": 0.0017307833768427372,
+       "p99": 0.04721561819314957,
+       "firm_fraction": 7.233796296296296e-05,
+       "iou_mean": 0.9941377520270953,
+       "worst_glyph_mae": 0.0022193649783730507,
+       "worst_glyph_iou": 0.9895104895104895,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 259.50665271282196
+      }
+     }
+    },
+    "1": {
+     "verdict": "pass",
+     "pixel_exact": false,
+     "rules_waived": [],
+     "sha256": "82e5eb546bf594272d5622d01945e277f27c0628483de3089dcb3276e1c4e655",
+     "reference_check_passed": true,
+     "gates_passed": true,
+     "failures": [],
+     "mean_established_mae": 0.003997713146317336,
+     "counted_sizes": {
+      "6x12": {
+       "mae": 0.00840259338211682,
+       "p99": 0.06691410392522812,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.8038628038628038,
+       "worst_glyph_mae": 0.012424286454916,
+       "worst_glyph_iou": 0.5,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 2.8422188460826874
+      },
+      "8x16": {
+       "mae": 0.007206364845236142,
+       "p99": 0.05833623185753822,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9825655940207023,
+       "worst_glyph_mae": 0.012579365633428097,
+       "worst_glyph_iou": 0.9411764705882353,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 6.229606539011002
+      },
+      "10x20": {
+       "mae": 0.005628155725490715,
+       "p99": 0.053461406379938126,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.7471886602375716,
+       "worst_glyph_mae": 0.008854098618030548,
+       "worst_glyph_iou": 0.4375,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 10.033512771129608
+      },
+      "12x24": {
+       "mae": 0.004610752997299035,
+       "p99": 0.061093736439943314,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9602908773725419,
+       "worst_glyph_mae": 0.007129217032343149,
+       "worst_glyph_iou": 0.8863636363636364,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 14.822890371084213
+      },
+      "16x32": {
+       "mae": 0.0030835886201303867,
+       "p99": 0.05068409815430641,
+       "firm_fraction": 0.0,
+       "iou_mean": 0.9942099851148141,
+       "worst_glyph_mae": 0.005707301199436188,
+       "worst_glyph_iou": 0.9857142857142858,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 28.17300295829773
+      },
+      "24x48": {
+       "mae": 0.003355801674640841,
+       "p99": 0.05790666863322258,
+       "firm_fraction": 0.00019290123456790122,
+       "iou_mean": 0.9527127447809058,
+       "worst_glyph_mae": 0.004336609970778227,
+       "worst_glyph_iou": 0.8578199052132701,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 62.94238793849945
+      },
+      "48x96": {
+       "mae": 0.0017031859735854799,
+       "p99": 0.046875,
+       "firm_fraction": 7.233796296296296e-05,
+       "iou_mean": 0.9942811292214334,
+       "worst_glyph_mae": 0.0021429373882710934,
+       "worst_glyph_iou": 0.9912587412587412,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 258.57754480838776
+      }
+     },
+     "one_sample": {
+      "8x16": {
+       "mae": 0.015391488042142656,
+       "p99": 0.16067302227020264,
+       "firm_fraction": 0.003472222222222222,
+       "iou_mean": 0.9441707171970329,
+       "worst_glyph_mae": 0.022658560425043106,
+       "worst_glyph_iou": 0.8421052631578947,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 5.205890417098999
+      },
+      "16x32": {
+       "mae": 0.005961988638672564,
+       "p99": 0.07660887390375137,
+       "firm_fraction": 0.00021701388888888888,
+       "iou_mean": 0.9847860325709595,
+       "worst_glyph_mae": 0.007573309354484081,
+       "worst_glyph_iou": 0.9506172839506173,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 27.191547691822052
+      },
+      "48x96": {
+       "mae": 0.0017031859735854799,
+       "p99": 0.046875,
+       "firm_fraction": 7.233796296296296e-05,
+       "iou_mean": 0.9942811292214334,
+       "worst_glyph_mae": 0.0021429373882710934,
+       "worst_glyph_iou": 0.9912587412587412,
+       "not_nearest": [],
+       "vanished": [],
+       "min_margin": 258.57754480838776
+      }
+     }
+    }
+   },
+   "limits_eased": [
+    {
+     "rule": "10x20 iou_mean",
+     "declared": 0.7917055584426805,
+     "perfect": 0.7443344457979914,
+     "applied": 0.7187678903777905
+    }
+   ],
+   "drawing_problems": [],
+   "both_seeds_pass_under": {
+    "gates-v2.json": false,
+    "gates-v2.1.json": false,
+    "gates-v2.2.json": true,
+    "gates-v2.3.json": true
+   },
+   "shipped": true,
+   "shipped_seed": 1,
+   "file": "neuronte-term-mathalpha-v1-tscrmdl-g2.json"
+  }
+ ]
+}

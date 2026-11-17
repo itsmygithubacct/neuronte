@@ -1,0 +1,455 @@
+{
+ "schema": "neuronte.weather-colour.quality/v1",
+ "name": "neuronte-weather-colour-v1",
+ "passed": true,
+ "selected_seed": 0,
+ "selection_rule": "seed 0 is published when both seeds pass, declared before training",
+ "bundle": "neuronte-weather-colour-v1.nrt",
+ "bundle_sha256": "517cad856fc4605fdfa12c7fa3847ca0b39e8a7dba2639ce3a6b0dbaac8965d2",
+ "packed_bytes": 396956,
+ "symbols": [
+  {
+   "scalar": "U+2600",
+   "name": "BLACK SUN WITH RAYS",
+   "category": "weather",
+   "layers": 2
+  },
+  {
+   "scalar": "U+2601",
+   "name": "CLOUD",
+   "category": "weather",
+   "layers": 1
+  },
+  {
+   "scalar": "U+26C5",
+   "name": "SUN BEHIND CLOUD",
+   "category": "weather",
+   "layers": 3
+  },
+  {
+   "scalar": "U+26C8",
+   "name": "THUNDER CLOUD AND RAIN",
+   "category": "weather",
+   "layers": 3
+  },
+  {
+   "scalar": "U+1F324",
+   "name": "WHITE SUN WITH SMALL CLOUD",
+   "category": "weather",
+   "layers": 3
+  },
+  {
+   "scalar": "U+1F326",
+   "name": "WHITE SUN BEHIND CLOUD WITH RAIN",
+   "category": "weather",
+   "layers": 4
+  },
+  {
+   "scalar": "U+1F327",
+   "name": "CLOUD WITH RAIN",
+   "category": "weather",
+   "layers": 2
+  },
+  {
+   "scalar": "U+1F328",
+   "name": "CLOUD WITH SNOW",
+   "category": "weather",
+   "layers": 2
+  },
+  {
+   "scalar": "U+1F32B",
+   "name": "FOG",
+   "category": "weather",
+   "layers": 2
+  }
+ ],
+ "gates": {
+  "declared_utc": "2026-11-17T11:47:51Z",
+  "sha256_of_declaration": "0a03f44f6d7b8dbf2fa6e3c8456a6ade4c48256a652679e02b352fb5cce580b4",
+  "limits": {
+   "iou_mean_16px_per_expert_min": 0.99,
+   "sizes_px": [
+    12,
+    16,
+    32
+   ],
+   "at_each_size": {
+    "lost_layers": 0,
+    "zero_coverage_of_a_nonempty_layer": 0,
+    "positive_coverage_in_an_unused_or_empty_layer": 0,
+    "wrong_palette_head": 0,
+    "mean_rgb_error_max_of_255_each_theme": 2
+   },
+   "numpy_float64_cross_check_max": 0.001,
+   "c_compositing_max_levels": 2,
+   "packed_file_reproduces_from_json": true,
+   "inventory": "exactly 9 source scalars and 18 half labels (scalar, and 0x110000 + scalar), each owned once; the file reports every other scalar untrained"
+  },
+  "seeds": "two, 0 and 1; both must pass every limit; seed 0 is published, as in emoji-v1",
+  "perfect_drawing": {
+   "method": "weather/gates/perfect.py: the drawing's own field returned exactly and sampled as the library samples, scored as tests/check_emoji.py scores; an empty layer of a half must also stay empty when the field is .015 of a cell width nearer",
+   "meets_every_limit": true,
+   "sizes": {
+    "8": {
+     "samples": 2,
+     "nonempty_half_layers": 43,
+     "iou_mean": 0.9369961267896904,
+     "iou_min": 0.0,
+     "worst": "U+12F326 layer 0",
+     "lost": 0,
+     "zero_coverage": 0,
+     "empty_half_layers": 1,
+     "empty_positive": 0,
+     "empty_positive_if_.015_nearer": 0,
+     "mean_rgb_err": {
+      "dark": 0.7171912508886435,
+      "light": 0.43899198296998465
+     }
+    },
+    "9": {
+     "samples": 2,
+     "nonempty_half_layers": 43,
+     "iou_mean": 0.9858563486470463,
+     "iou_min": 0.8181818181818182,
+     "worst": "U+1F326 layer 0",
+     "lost": 0,
+     "zero_coverage": 0,
+     "empty_half_layers": 1,
+     "empty_positive": 0,
+     "empty_positive_if_.015_nearer": 0,
+     "mean_rgb_err": {
+      "dark": 0.7680481935024378,
+      "light": 0.4718776013004482
+     }
+    },
+    "10": {
+     "samples": 2,
+     "nonempty_half_layers": 43,
+     "iou_mean": 0.9959565843286774,
+     "iou_min": 0.9090909090909091,
+     "worst": "U+1126C8 layer 2",
+     "lost": 0,
+     "zero_coverage": 0,
+     "empty_half_layers": 1,
+     "empty_positive": 0,
+     "empty_positive_if_.015_nearer": 0,
+     "mean_rgb_err": {
+      "dark": 0.5298827908003878,
+      "light": 0.3069933429420564
+     }
+    },
+    "12": {
+     "samples": 2,
+     "nonempty_half_layers": 43,
+     "iou_mean": 0.9884633486439522,
+     "iou_min": 0.8888888888888888,
+     "worst": "U+26C8 layer 2",
+     "lost": 0,
+     "zero_coverage": 0,
+     "empty_half_layers": 1,
+     "empty_positive": 0,
+     "empty_positive_if_.015_nearer": 0,
+     "mean_rgb_err": {
+      "dark": 0.441015387637312,
+      "light": 0.2748920819708908
+     }
+    },
+    "16": {
+     "samples": 2,
+     "nonempty_half_layers": 43,
+     "iou_mean": 0.9968625642959794,
+     "iou_min": 0.971830985915493,
+     "worst": "U+1F326 layer 1",
+     "lost": 0,
+     "zero_coverage": 0,
+     "empty_half_layers": 1,
+     "empty_positive": 0,
+     "empty_positive_if_.015_nearer": 0,
+     "mean_rgb_err": {
+      "dark": 0.32370294824064355,
+      "light": 0.19679548955071427
+     }
+    },
+    "32": {
+     "samples": 1,
+     "nonempty_half_layers": 43,
+     "iou_mean": 0.9937590273016553,
+     "iou_min": 0.9655172413793104,
+     "worst": "U+1F324 layer 2",
+     "lost": 0,
+     "zero_coverage": 0,
+     "empty_half_layers": 1,
+     "empty_positive": 0,
+     "empty_positive_if_.015_nearer": 0,
+     "mean_rgb_err": {
+      "dark": 0.25714253761128125,
+      "light": 0.15949870291926663
+     }
+    }
+   },
+   "note": "as first drawn the fog bars had edges on half pixels at 16 px and a perfect net scored .9842 there, under the .990 limit; the bars were moved by at most .07 of a cell width onto the 16 px grid before this declaration, and it now scores .9970 (.9969 after the change to U+1F326)"
+  }
+ },
+ "recipe": {
+  "raw": "train/colour.py OUT.json --drawing font/weather.txt --palette font/emoji-palette.txt --wide --form A --layers 6 --head-width 64 --width 192 --seed S --steps 60000 --matmul-precision high",
+  "targets": "train/colour_calibrate.py RAW.json TARGETS.npz --prepare-targets",
+  "phase": "train/colour_calibrate.py RAW.json OUT.json --targets TARGETS.npz --steps 10000 --lr .0001 --margin .05 --margin-weight 100 --field-anchor .005 --batch-pixels 128 --device cpu (one thread)",
+  "training_commit": "e24a23d6cc959dd8f143253b1dcbf5c0453297fa",
+  "tools": "torch 2.6.0+cu124 cuda 12.4 NVIDIA GeForce RTX 3090 numpy 2.2.2",
+  "seconds": [
+   "2026-11-17T12:21:32Z raw seed 0 rc=0 seconds=283",
+   "2026-11-17T12:21:32Z raw seed 1 rc=0 seconds=283",
+   "2026-11-17T12:22:50Z phase seed 0 rc=0 seconds=78",
+   "2026-11-17T12:22:50Z phase seed 1 rc=0 seconds=78"
+  ]
+ },
+ "seeds": {
+  "0": {
+   "passed": true,
+   "net": "neuronte-weather-colour-e0-v1.json",
+   "net_sha256": "0db96f89eac54b0c6ddae3f84d75c2498c79c26b7120d58b6475649756d4cefc",
+   "packed": "neuronte-weather-colour-e0-v1.nrt",
+   "packed_sha256": "dfe659d801813956cb940da9786dcc151b45b98addc2639cb2618d4b0fd6cf37",
+   "raw_net_sha256": "10734ea7525cc5fd2fc5bff02e229df13932d59235788e1b1116c6bd18b83ed4",
+   "raw_net_file_sha256": "10734ea7525cc5fd2fc5bff02e229df13932d59235788e1b1116c6bd18b83ed4",
+   "codes": 18,
+   "scalars": 9,
+   "numpy_max_difference": 4.978979531999883e-07,
+   "composition_max_channel_difference": 1,
+   "sizes": {
+    "12": {
+     "head_wrong": 0,
+     "unused_positive": 0,
+     "empty_half_positive": 0,
+     "lost": 0,
+     "zero_coverage": 0,
+     "empty_halves": 1,
+     "dark": {
+      "mean_err": 0.6095852785640292
+     },
+     "light": {
+      "mean_err": 0.3585288561880588
+     },
+     "iou_mean": 0.9824170129570704,
+     "iou_min": 0.8809523809523809
+    },
+    "16": {
+     "head_wrong": 0,
+     "unused_positive": 0,
+     "empty_half_positive": 0,
+     "lost": 0,
+     "zero_coverage": 0,
+     "empty_halves": 1,
+     "dark": {
+      "mean_err": 0.48271827068593764
+     },
+     "light": {
+      "mean_err": 0.28157050804131556
+     },
+     "iou_mean": 1.0,
+     "iou_min": 1.0
+    },
+    "32": {
+     "head_wrong": 0,
+     "unused_positive": 0,
+     "empty_half_positive": 0,
+     "lost": 0,
+     "zero_coverage": 0,
+     "empty_halves": 1,
+     "dark": {
+      "mean_err": 0.4573511001136568
+     },
+     "light": {
+      "mean_err": 0.27090591068069136
+     },
+     "iou_mean": 0.9907823853061821,
+     "iou_min": 0.9385964912280702
+    }
+   }
+  },
+  "1": {
+   "passed": true,
+   "net": "neuronte-weather-colour-e0-v1.seed1.json",
+   "net_sha256": "d3e7b64d300731acf6a64a86ca94f5e15b10988891abcafc5e21a1749ac7a093",
+   "packed": "neuronte-weather-colour-e0-v1.seed1.nrt",
+   "packed_sha256": "a04a1758496098539cd102ccb76d7c18af07f103896ec1988c6634379eee0046",
+   "raw_net_sha256": "dd3450b0f345355dc8efd6a1120a77bebd7e1c2b1c2f68c614f8d4282f40570a",
+   "raw_net_file_sha256": "dd3450b0f345355dc8efd6a1120a77bebd7e1c2b1c2f68c614f8d4282f40570a",
+   "codes": 18,
+   "scalars": 9,
+   "numpy_max_difference": 3.526260756170352e-07,
+   "composition_max_channel_difference": 1,
+   "sizes": {
+    "12": {
+     "head_wrong": 0,
+     "unused_positive": 0,
+     "empty_half_positive": 0,
+     "lost": 0,
+     "zero_coverage": 0,
+     "empty_halves": 1,
+     "dark": {
+      "mean_err": 0.5915805945793788
+     },
+     "light": {
+      "mean_err": 0.3577525835070344
+     },
+     "iou_mean": 0.9744555857980561,
+     "iou_min": 0.8214285714285714
+    },
+    "16": {
+     "head_wrong": 0,
+     "unused_positive": 0,
+     "empty_half_positive": 0,
+     "lost": 0,
+     "zero_coverage": 0,
+     "empty_halves": 1,
+     "dark": {
+      "mean_err": 0.4682990635434787
+     },
+     "light": {
+      "mean_err": 0.2739216734965642
+     },
+     "iou_mean": 1.0,
+     "iou_min": 1.0
+    },
+    "32": {
+     "head_wrong": 0,
+     "unused_positive": 0,
+     "empty_half_positive": 0,
+     "lost": 0,
+     "zero_coverage": 0,
+     "empty_halves": 1,
+     "dark": {
+      "mean_err": 0.45535296863979763
+     },
+     "light": {
+      "mean_err": 0.2724751097460587
+     },
+     "iou_mean": 0.9894844265795136,
+     "iou_min": 0.9545454545454546
+    }
+   }
+  }
+ },
+ "bar_cells_seed0": {
+  "note": "through the bundle by neuronte_coverage_layers_half with 0 samples; dark and light are the mean difference of 255 from the drawing with the file's snapping, *_snap_off with snapping off",
+  "picture_limit_snap_off": 2.0,
+  "snapped_bound": 8.0,
+  "cells": {
+   "8x17": {
+    "halves": 18,
+    "wrong_entries": 0,
+    "entry_0_or_1_inked": 0,
+    "ink_in_unused": 0,
+    "empty_layers": 1,
+    "ink_in_empty": 0,
+    "layers_without_ink": 0
+   },
+   "9x18": {
+    "halves": 18,
+    "wrong_entries": 0,
+    "entry_0_or_1_inked": 0,
+    "ink_in_unused": 0,
+    "empty_layers": 1,
+    "ink_in_empty": 0,
+    "layers_without_ink": 0,
+    "dark": 5.995856689082253,
+    "dark_snap_off": 0.8446088077293503,
+    "light": 3.6829114821222095,
+    "light_snap_off": 0.5192918847832414
+   },
+   "10x19": {
+    "halves": 18,
+    "wrong_entries": 0,
+    "entry_0_or_1_inked": 0,
+    "ink_in_unused": 0,
+    "empty_layers": 1,
+    "ink_in_empty": 0,
+    "layers_without_ink": 0
+   },
+   "10x20": {
+    "halves": 18,
+    "wrong_entries": 0,
+    "entry_0_or_1_inked": 0,
+    "ink_in_unused": 0,
+    "empty_layers": 1,
+    "ink_in_empty": 0,
+    "layers_without_ink": 0,
+    "dark": 4.871547586388058,
+    "dark_snap_off": 0.6326490839322408,
+    "light": 2.949301082226965,
+    "light_snap_off": 0.36393868509266114
+   },
+   "12x24": {
+    "halves": 18,
+    "wrong_entries": 0,
+    "entry_0_or_1_inked": 0,
+    "ink_in_unused": 0,
+    "empty_layers": 1,
+    "ink_in_empty": 0,
+    "layers_without_ink": 0,
+    "dark": 3.9593336449729066,
+    "dark_snap_off": 0.6095852735969756,
+    "light": 2.0693784571356244,
+    "light_snap_off": 0.3585288603272703
+   },
+   "16x34": {
+    "halves": 18,
+    "wrong_entries": 0,
+    "entry_0_or_1_inked": 0,
+    "ink_in_unused": 0,
+    "empty_layers": 1,
+    "ink_in_empty": 0,
+    "layers_without_ink": 0
+   },
+   "18x36": {
+    "halves": 18,
+    "wrong_entries": 0,
+    "entry_0_or_1_inked": 0,
+    "ink_in_unused": 0,
+    "empty_layers": 1,
+    "ink_in_empty": 0,
+    "layers_without_ink": 0,
+    "dark": 0.4345137021607823,
+    "dark_snap_off": 0.4345137021607823,
+    "light": 0.26257769453028845,
+    "light_snap_off": 0.26257769453028845
+   },
+   "20x38": {
+    "halves": 18,
+    "wrong_entries": 0,
+    "entry_0_or_1_inked": 0,
+    "ink_in_unused": 0,
+    "empty_layers": 1,
+    "ink_in_empty": 0,
+    "layers_without_ink": 0
+   },
+   "20x40": {
+    "halves": 18,
+    "wrong_entries": 0,
+    "entry_0_or_1_inked": 0,
+    "ink_in_unused": 0,
+    "empty_layers": 1,
+    "ink_in_empty": 0,
+    "layers_without_ink": 0,
+    "dark": 0.4637064196997218,
+    "dark_snap_off": 0.4637064196997218,
+    "light": 0.2746054120361805,
+    "light_snap_off": 0.2746054120361805
+   },
+   "24x48": {
+    "halves": 18,
+    "wrong_entries": 0,
+    "entry_0_or_1_inked": 0,
+    "ink_in_unused": 0,
+    "empty_layers": 1,
+    "ink_in_empty": 0,
+    "layers_without_ink": 0,
+    "dark": 0.5243650260898802,
+    "dark_snap_off": 0.5243650260898802,
+    "light": 0.318385262042284,
+    "light_snap_off": 0.318385262042284
+   }
+  }
+ }
+}

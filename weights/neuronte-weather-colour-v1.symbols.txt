@@ -1,0 +1,12 @@
+# The symbols neuronte-weather-colour-v1.nrt was trained on, one a line. Each is two cells:
+# the left half is asked for by the scalar with half 0 and the right half with half 1.
+# Every other scalar is untrained in that file (tests/check_weather.py).
+U+2600  # BLACK SUN WITH RAYS
+U+2601  # CLOUD
+U+26C5  # SUN BEHIND CLOUD
+U+26C8  # THUNDER CLOUD AND RAIN
+U+1F324  # WHITE SUN WITH SMALL CLOUD
+U+1F326  # WHITE SUN BEHIND CLOUD WITH RAIN
+U+1F327  # CLOUD WITH RAIN
+U+1F328  # CLOUD WITH SNOW
+U+1F32B  # FOG

@@ -604,6 +604,49 @@ test: test-term-letters-v1
 
 .PHONY: test-term-letters-v1 pack-term-letters-v1
 
+# term-mathalpha-v1, term-syllabics-v1, term-scripts-v1: the sans-serif,
+# monospace and double-struck alphabets, Canadian syllabics and Lisu, three
+# standalone bundles of group nets used beside split-v9.
+TERM_MATHALPHA_V1 = $(shell $(PYTHON) train/build_term_scripts.py neuronte-term-mathalpha-v1 --files)
+TERM_SYLLABICS_V1 = $(shell $(PYTHON) train/build_term_scripts.py neuronte-term-syllabics-v1 --files)
+TERM_SCRIPTS_V1 = $(shell $(PYTHON) train/build_term_scripts.py neuronte-term-scripts-v1 --files)
+
+test-term-mathalpha-v1: build/libneuronte.so build/test_api
+	@set -e; for n in $(TERM_MATHALPHA_V1); do \
+		$(PYTHON) train/pack.py $$n.json build/$$(basename $$n).nrt; \
+		$(PYTHON) tests/check_reference.py build/libneuronte.so $$n.json build/$$(basename $$n).nrt; \
+	done
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_term_scripts.py build/libneuronte.so neuronte-term-mathalpha-v1
+	./build/test_api weights/neuronte-term-mathalpha-v1.nrt --standalone 1D538
+
+test-term-syllabics-v1: build/libneuronte.so build/test_api
+	@set -e; for n in $(TERM_SYLLABICS_V1); do \
+		$(PYTHON) train/pack.py $$n.json build/$$(basename $$n).nrt; \
+		$(PYTHON) tests/check_reference.py build/libneuronte.so $$n.json build/$$(basename $$n).nrt; \
+	done
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_term_scripts.py build/libneuronte.so neuronte-term-syllabics-v1
+	./build/test_api weights/neuronte-term-syllabics-v1.nrt --standalone 1401
+
+test-term-scripts-v1: build/libneuronte.so build/test_api
+	@set -e; for n in $(TERM_SCRIPTS_V1); do \
+		$(PYTHON) train/pack.py $$n.json build/$$(basename $$n).nrt; \
+		$(PYTHON) tests/check_reference.py build/libneuronte.so $$n.json build/$$(basename $$n).nrt; \
+	done
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_term_scripts.py build/libneuronte.so neuronte-term-scripts-v1
+	./build/test_api weights/neuronte-term-scripts-v1.nrt --standalone A4D0
+
+pack-term-mathalpha-v1:
+	$(PYTHON) train/build_term_scripts.py neuronte-term-mathalpha-v1
+
+pack-term-syllabics-v1:
+	$(PYTHON) train/build_term_scripts.py neuronte-term-syllabics-v1
+
+pack-term-scripts-v1:
+	$(PYTHON) train/build_term_scripts.py neuronte-term-scripts-v1
+
+.PHONY: test-term-mathalpha-v1 test-term-syllabics-v1 test-term-scripts-v1
+.PHONY: pack-term-mathalpha-v1 pack-term-syllabics-v1 pack-term-scripts-v1
+
 test-ascii-next: build/libneuronte.so build/test_api
 	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_ascii_next.py build/libneuronte.so
 	./build/test_api weights/neuronte-split-ascii-groups-v1.nrt --full --accent --pixel
@@ -625,6 +668,25 @@ test-emoji-v1: all
 	$(PYTHON) tests/check_emoji.py build/libneuronte.so $(EMOJI_V1) $(EMOJI_V1_NETS) --manifest font/emoji-manifest.json --experts 12 --target-cache build/emoji-target-cache --out build/emoji-v1-check.json
 
 .PHONY: pack-emoji-v1 test-emoji-v1
+
+# Nine weather symbols in colour for a status bar, two cells each: one net
+# behind a table of its trained scalars. Both seeds are held to emoji-v1's
+# publication gates; seed 0 is the file.
+WEATHER_V1 = weights/neuronte-weather-colour-v1.nrt
+WEATHER_V1_NET = weights/neuronte-weather-colour-e0-v1.json
+WEATHER_V1_SEED1 = weights/neuronte-weather-colour-e0-v1.seed1.json
+
+pack-weather-colour-v1: $(WEATHER_V1_NET) $(WEATHER_V1_SEED1)
+	$(PYTHON) tools/pack-bundle-members.py $(WEATHER_V1) $(WEATHER_V1_NET)
+	$(PYTHON) train/pack.py $(WEATHER_V1_SEED1) $(WEATHER_V1_SEED1:.json=.nrt)
+
+test-weather-colour-v1: all
+	sha256sum -c --quiet weights/neuronte-weather-colour-v1.sha256
+	$(PYTHON) tests/check_emoji.py build/libneuronte.so $(WEATHER_V1_NET:.json=.nrt) $(WEATHER_V1_NET) --target-cache build/weather-target-cache --out build/weather-colour-v1-check.json
+	$(PYTHON) tests/check_emoji.py build/libneuronte.so $(WEATHER_V1_SEED1:.json=.nrt) $(WEATHER_V1_SEED1) --target-cache build/weather-target-cache --out build/weather-colour-v1-seed1-check.json
+	$(PYTHON) tests/check_weather.py build/libneuronte.so $(WEATHER_V1) $(WEATHER_V1_NET) weights/neuronte-weather-colour-v1.symbols.txt font/weather-manifest.json --out build/weather-colour-v1.json
+
+.PHONY: pack-weather-colour-v1 test-weather-colour-v1
 
 # Letter edge tables (drawing member version 7): snapped letters against a
 # float64 reference, everything else byte for byte the file without one.
@@ -936,7 +998,7 @@ test-face-v0-ui43: build/libneuronte.so
 test-face-v0-uilarge: build/libneuronte.so
 	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UILARGE).nrt $(UILARGE).json font/ui-large-advances.txt
 
-test: all $(TESTS) test-bits test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7 test-face-bundle test-symbol-v1 test-split-v7-symbol test-split-v8 test-split-v9 test-term-math-v1 test-term-symbol-v1 test-term-dingbat-v1 test-faces-v1 test-faces-v1-192-256 test-known-bundle test-untrained test-standalone test-term-latin-v1 test-term-blocks-v1 test-faces-wide-v1 test-faces-v1-h512 test-colour-marks test-faces-v1-small test-emoji-v1 test-letter-snap test-ui-scaled test-ui-large-v1 test-ui-latin1
+test: all $(TESTS) test-bits test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7 test-face-bundle test-symbol-v1 test-split-v7-symbol test-split-v8 test-split-v9 test-term-math-v1 test-term-symbol-v1 test-term-dingbat-v1 test-faces-v1 test-faces-v1-192-256 test-known-bundle test-untrained test-standalone test-term-latin-v1 test-term-blocks-v1 test-faces-wide-v1 test-faces-v1-h512 test-colour-marks test-faces-v1-small test-emoji-v1 test-letter-snap test-ui-scaled test-ui-large-v1 test-ui-latin1 test-term-mathalpha-v1 test-term-syllabics-v1 test-term-scripts-v1 test-weather-colour-v1
 	cd weights && sha256sum -c --quiet SHA256SUMS
 	# The pointer net keeps its own list, with paths from the top of the tree.
 	sha256sum -c --quiet weights/neuronte-pointer-v0.sha256

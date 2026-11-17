@@ -44,6 +44,10 @@ Tiers:
              letters and presentation forms, Lao letters and vowel signs,
              and one-colour faces and moon phases, drawn there or made by
              train/term_rest.py. NAMErI is group net I of set NAME alone.
+    tchr...  the symbols neuronte-kilix-chrome-v1 holds, one tier for each
+             set of font/kilix-chrome.txt: the bell mark, title bar
+             buttons, widget symbols, the battery and weather, drawn
+             there or made by train/kilix_chrome.py.
     ui1      the desktop face, printable ASCII and U+2026, from
     ...      font/ui-EM.txt, one file for every em from 1 to 128 except
     ui128    44. Stems are one pixel wide through 16, two from 17
@@ -1297,6 +1301,9 @@ SETS["termlatin"] = list(term_latin_sets())  # every set of font/term-latin.txt
 import term_rest  # noqa: E402
 SETS.update({name: [name] for name in term_rest.sets()})  # the sets of font/term-rest.txt and each one's groups
 SETS["termrest"] = list(term_rest.primary())
+import kilix_chrome  # noqa: E402
+SETS.update({name: [name] for name in kilix_chrome.sets()})  # the sets of font/kilix-chrome.txt and each one's groups
+SETS["kilixchrome"] = list(kilix_chrome.primary())
 
 
 def tier(name):
@@ -1341,6 +1348,9 @@ def tier(name):
     if name.startswith(term_rest.PREFIX) and name in term_rest.sets():
         made = term_rest.made()
         return [(chr(c), made[chr(c)]) for c in term_rest.sets()[name]]
+    if name.startswith(kilix_chrome.PREFIX) and name in kilix_chrome.sets():
+        made = kilix_chrome.made()
+        return [(chr(c), made[chr(c)]) for c in kilix_chrome.sets()[name]]
     if name == "uilargelatin1":
         g = large_latin1()
         return [(c, g[c][0]) for c in sorted(g)]
@@ -1468,6 +1478,8 @@ def sources(name):
         files.append("font/octants.txt")
     if any(t.startswith(term_rest.PREFIX) for t in tiers):
         files += ["font/term-rest.txt", "train/term_rest.py"]
+    if any(t.startswith(kilix_chrome.PREFIX) for t in tiers):
+        files += ["font/kilix-chrome.txt", "train/kilix_chrome.py", "train/term_rest.py"]
     for em in UI:
         if f"ui{em}" in tiers:
             files.append(f"font/ui-{em}.txt")

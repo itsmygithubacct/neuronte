@@ -623,6 +623,25 @@ test-emoji-v1: all
 
 .PHONY: pack-emoji-v1 test-emoji-v1
 
+# Nine weather symbols in colour for a status bar, two cells each: one net
+# behind a table of its trained scalars. Both seeds are held to emoji-v1's
+# publication gates; seed 0 is the file.
+WEATHER_V1 = weights/neuronte-weather-colour-v1.nrt
+WEATHER_V1_NET = weights/neuronte-weather-colour-e0-v1.json
+WEATHER_V1_SEED1 = weights/neuronte-weather-colour-e0-v1.seed1.json
+
+pack-weather-colour-v1: $(WEATHER_V1_NET) $(WEATHER_V1_SEED1)
+	$(PYTHON) tools/pack-bundle-members.py $(WEATHER_V1) $(WEATHER_V1_NET)
+	$(PYTHON) train/pack.py $(WEATHER_V1_SEED1) $(WEATHER_V1_SEED1:.json=.nrt)
+
+test-weather-colour-v1: all
+	sha256sum -c --quiet weights/neuronte-weather-colour-v1.sha256
+	$(PYTHON) tests/check_emoji.py build/libneuronte.so $(WEATHER_V1_NET:.json=.nrt) $(WEATHER_V1_NET) --target-cache build/weather-target-cache --out build/weather-colour-v1-check.json
+	$(PYTHON) tests/check_emoji.py build/libneuronte.so $(WEATHER_V1_SEED1:.json=.nrt) $(WEATHER_V1_SEED1) --target-cache build/weather-target-cache --out build/weather-colour-v1-seed1-check.json
+	$(PYTHON) tests/check_weather.py build/libneuronte.so $(WEATHER_V1) $(WEATHER_V1_NET) weights/neuronte-weather-colour-v1.symbols.txt font/weather-manifest.json --out build/weather-colour-v1.json
+
+.PHONY: pack-weather-colour-v1 test-weather-colour-v1
+
 # Letter edge tables (drawing member version 7): snapped letters against a
 # float64 reference, everything else byte for byte the file without one.
 test-letter-snap: build/libneuronte.so
@@ -818,7 +837,7 @@ test-bits: build/libneuronte.so
 	$(PYTHON) tests/check_bits.py build/libneuronte.so
 .PHONY: test-bits
 
-test: all $(TESTS) test-bits test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7 test-face-bundle test-symbol-v1 test-split-v7-symbol test-split-v8 test-split-v9 test-term-math-v1 test-term-symbol-v1 test-term-dingbat-v1 test-faces-v1 test-faces-v1-192-256 test-known-bundle test-untrained test-standalone test-term-latin-v1 test-term-mathalpha-v1 test-term-syllabics-v1 test-term-scripts-v1 test-faces-wide-v1 test-faces-v1-h512 test-colour-marks test-faces-v1-small test-emoji-v1 test-letter-snap test-ui-scaled test-ui-large-v1 test-ui-latin1
+test: all $(TESTS) test-bits test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7 test-face-bundle test-symbol-v1 test-split-v7-symbol test-split-v8 test-split-v9 test-term-math-v1 test-term-symbol-v1 test-term-dingbat-v1 test-faces-v1 test-faces-v1-192-256 test-known-bundle test-untrained test-standalone test-term-latin-v1 test-term-mathalpha-v1 test-term-syllabics-v1 test-term-scripts-v1 test-weather-colour-v1 test-faces-wide-v1 test-faces-v1-h512 test-colour-marks test-faces-v1-small test-emoji-v1 test-letter-snap test-ui-scaled test-ui-large-v1 test-ui-latin1
 	cd weights && sha256sum -c --quiet SHA256SUMS
 	# The pointer net keeps its own list, with paths from the top of the tree.
 	sha256sum -c --quiet weights/neuronte-pointer-v0.sha256

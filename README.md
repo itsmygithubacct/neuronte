@@ -244,6 +244,16 @@ as fast as v0 on the same library build. It trades a little overlap at 12 and
 32 px for 16 px, as v0's calibrated expert does. It is not a default. See
 [its recipe, gates and speed](weights/neuronte-emoji-v1.md).
 
+`neuronte-weather-colour-v1.nrt` draws nine weather symbols in colour for a
+status bar: sun, sun with small cloud, sun behind cloud, cloud, fog, sun
+behind rain cloud, cloud with rain, cloud with snow, and thunder cloud with
+rain (`weights/neuronte-weather-colour-v1.symbols.txt`). Each is two cells,
+drawn through the same half API and palette as the emoji, from one 192-wide
+net behind a table of its nine scalars; every other scalar is untrained in
+it. The drawings are the project's own (`train/weather.py`). It is 396,956
+bytes. Both seeds pass the gates emoji-v1 was held to. It is not a default.
+See [its drawings, gates and sizes](weights/neuronte-weather-colour-v1.md).
+
 The [17 additional desktop italic faces](weights/neuronte-italic-v0.md) complete
 native sizes 3–32 while preserving the 13 earlier faces. Both matching seeds
 reproduce all 96 source glyphs and their regular/bold masks and advances exactly

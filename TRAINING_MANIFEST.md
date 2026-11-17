@@ -17,7 +17,7 @@ fails if this file is out of date.
   of its input and of the tool that made it.
 - **JSON, packed**: the first 16 hex digits of the SHA-256 of the weight
   file and of its packed `.nrt`, if one is shipped. The full hashes of
-  the 6129 files it lists are in `weights/SHA256SUMS`. The pointer net's
+  the 6186 files it lists are in `weights/SHA256SUMS`. The pointer net's
   files are not in that list; theirs are in
   `weights/neuronte-pointer-v0.sha256`.
 
@@ -32,7 +32,7 @@ fails if this file is out of date.
 - No training run has been repeated by a third party. Two seeds were
   trained by the project for the models whose `seed1` files are here.
 
-## Weight files (5579)
+## Weight files (5619)
 
 | Weight file | Set or drawing | Steps | Seed | Unlabelled weight | Pen radius | Sources hashed | After training | JSON | Packed |
 |---|---|---:|---:|---:|---:|---|---|---|---|
@@ -268,6 +268,44 @@ fails if this file is out of date.
 | `neuronte-term-math-v1-tmath8-g7.json` | tmath8-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `font/symbols.txt`, `font/term-math-partition.json`, `font/term-math.txt`, `train/glyphs.py`, `train/strokes.py`, `train/term_glyphs.py` | - | `b3af508c4e0a208c` | - |
 | `neuronte-term-math-v1-tmath8-g8.json` | tmath8-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `font/symbols.txt`, `font/term-math-partition.json`, `font/term-math.txt`, `train/glyphs.py`, `train/strokes.py`, `train/term_glyphs.py` | - | `b23564e510093d8a` | - |
 | `neuronte-term-math-v1-tmath8-g9.json` | tmath8-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `font/symbols.txt`, `font/term-math-partition.json`, `font/term-math.txt`, `train/glyphs.py`, `train/strokes.py`, `train/term_glyphs.py` | - | `c38b269b460e3689` | - |
+| `neuronte-term-mathalpha-v1-tscrmdl-g0.json` | tscrmdl-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `font/term-scripts.txt`, `train/glyphs.py`, `train/strokes.py`, `train/term_scripts.py` | - | `eb59fd6d6231370c` | - |
+| `neuronte-term-mathalpha-v1-tscrmdl-g1.json` | tscrmdl-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `font/term-scripts.txt`, `train/glyphs.py`, `train/strokes.py`, `train/term_scripts.py` | - | `164aa80777f9812e` | - |
+| `neuronte-term-mathalpha-v1-tscrmdl-g2.json` | tscrmdl-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `font/term-scripts.txt`, `train/glyphs.py`, `train/strokes.py`, `train/term_scripts.py` | - | `82e5eb546bf59427` | - |
+| `neuronte-term-mathalpha-v1-tscrmdu-g0.json` | tscrmdu-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `font/term-scripts.txt`, `train/glyphs.py`, `train/strokes.py`, `train/term_scripts.py` | - | `ad88e4e131c1f713` | - |
+| `neuronte-term-mathalpha-v1-tscrmdu-g1.json` | tscrmdu-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `font/term-scripts.txt`, `train/glyphs.py`, `train/strokes.py`, `train/term_scripts.py` | - | `9eeb654215530fd8` | - |
+| `neuronte-term-mathalpha-v1-tscrmn-g0.json` | tscrmn-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `font/term-scripts.txt`, `train/glyphs.py`, `train/strokes.py`, `train/term_scripts.py` | - | `6c68ce355d14289f` | - |
+| `neuronte-term-mathalpha-v1-tscrmn-g1.json` | tscrmn-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `font/term-scripts.txt`, `train/glyphs.py`, `train/strokes.py`, `train/term_scripts.py` | - | `5f99c797c4bcf69b` | - |
+| `neuronte-term-mathalpha-v1-tscrmp-g0.json` | tscrmp-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `font/term-scripts.txt`, `train/glyphs.py`, `train/strokes.py`, `train/term_scripts.py` | - | `952adf50b402809d` | - |
+| `neuronte-term-mathalpha-v1-tscrmp-g1.json` | tscrmp-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `font/term-scripts.txt`, `train/glyphs.py`, `train/strokes.py`, `train/term_scripts.py` | - | `35112de48874f58c` | - |
+| `neuronte-term-mathalpha-v1-tscrmp-g2.json` | tscrmp-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `font/term-scripts.txt`, `train/glyphs.py`, `train/strokes.py`, `train/term_scripts.py` | - | `d1a70cd6854803bb` | - |
+| `neuronte-term-mathalpha-v1-tscrmp-g3.json` | tscrmp-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `font/term-scripts.txt`, `train/glyphs.py`, `train/strokes.py`, `train/term_scripts.py` | - | `38e70ecb23c93aa1` | - |
+| `neuronte-term-mathalpha-v1-tscrmp-g4.json` | tscrmp-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `font/term-scripts.txt`, `train/glyphs.py`, `train/strokes.py`, `train/term_scripts.py` | - | `5e0d1d162263912c` | - |
+| `neuronte-term-mathalpha-v1-tscrmp-g5.json` | tscrmp-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `font/term-scripts.txt`, `train/glyphs.py`, `train/strokes.py`, `train/term_scripts.py` | - | `d7880ceac10f7930` | - |
+| `neuronte-term-mathalpha-v1-tscrmp-g6.json` | tscrmp-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `font/term-scripts.txt`, `train/glyphs.py`, `train/strokes.py`, `train/term_scripts.py` | - | `994e0b08c79bee13` | - |
+| `neuronte-term-mathalpha-v1-tscrmp-g7.json` | tscrmp-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `font/term-scripts.txt`, `train/glyphs.py`, `train/strokes.py`, `train/term_scripts.py` | - | `929d201b9d353453` | - |
+| `neuronte-term-mathalpha-v1-tscrmp-g8.json` | tscrmp-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `font/term-scripts.txt`, `train/glyphs.py`, `train/strokes.py`, `train/term_scripts.py` | - | `f19786b3be1400f0` | - |
+| `neuronte-term-mathalpha-v1-tscrmp-g9.json` | tscrmp-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `font/term-scripts.txt`, `train/glyphs.py`, `train/strokes.py`, `train/term_scripts.py` | - | `21c56344216df3ed` | - |
+| `neuronte-term-scripts-v1-tscrl-g0.json` | tscrl-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `font/term-scripts.txt`, `train/glyphs.py`, `train/strokes.py`, `train/term_scripts.py` | - | `c7954b76bd10698e` | - |
+| `neuronte-term-scripts-v1-tscrl-g1.json` | tscrl-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `font/term-scripts.txt`, `train/glyphs.py`, `train/strokes.py`, `train/term_scripts.py` | - | `f746b51b8cab0229` | - |
+| `neuronte-term-scripts-v1-tscrl-g2.json` | tscrl-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `font/term-scripts.txt`, `train/glyphs.py`, `train/strokes.py`, `train/term_scripts.py` | - | `fa28b9a4781e89c1` | - |
+| `neuronte-term-scripts-v1-tscrl-g3.json` | tscrl-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `font/term-scripts.txt`, `train/glyphs.py`, `train/strokes.py`, `train/term_scripts.py` | - | `3e714a7a86878454` | - |
+| `neuronte-term-scripts-v1-tscrl-g4.json` | tscrl-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `font/term-scripts.txt`, `train/glyphs.py`, `train/strokes.py`, `train/term_scripts.py` | - | `8b7bf4d670911dcf` | - |
+| `neuronte-term-scripts-v1-tscrl-g5.json` | tscrl-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `font/term-scripts.txt`, `train/glyphs.py`, `train/strokes.py`, `train/term_scripts.py` | - | `ed75326430a618d9` | - |
+| `neuronte-term-syllabics-v1-tscrsa-g0.json` | tscrsa-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `font/term-scripts.txt`, `train/glyphs.py`, `train/strokes.py`, `train/term_scripts.py` | - | `18e8a0f787e4ee25` | - |
+| `neuronte-term-syllabics-v1-tscrsa-g1.json` | tscrsa-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `font/term-scripts.txt`, `train/glyphs.py`, `train/strokes.py`, `train/term_scripts.py` | - | `fef6e6eaa194b639` | - |
+| `neuronte-term-syllabics-v1-tscrsa-g10.json` | tscrsa-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `font/term-scripts.txt`, `train/glyphs.py`, `train/strokes.py`, `train/term_scripts.py` | - | `072e6f4d04fde27a` | - |
+| `neuronte-term-syllabics-v1-tscrsa-g11.json` | tscrsa-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `font/term-scripts.txt`, `train/glyphs.py`, `train/strokes.py`, `train/term_scripts.py` | - | `0f550409a9ce9fa6` | - |
+| `neuronte-term-syllabics-v1-tscrsa-g2.json` | tscrsa-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `font/term-scripts.txt`, `train/glyphs.py`, `train/strokes.py`, `train/term_scripts.py` | - | `646595aff628d280` | - |
+| `neuronte-term-syllabics-v1-tscrsa-g3.json` | tscrsa-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `font/term-scripts.txt`, `train/glyphs.py`, `train/strokes.py`, `train/term_scripts.py` | - | `c9fcf44685e909fb` | - |
+| `neuronte-term-syllabics-v1-tscrsa-g4.json` | tscrsa-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `font/term-scripts.txt`, `train/glyphs.py`, `train/strokes.py`, `train/term_scripts.py` | - | `c0f567215f2c3b45` | - |
+| `neuronte-term-syllabics-v1-tscrsa-g5.json` | tscrsa-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `font/term-scripts.txt`, `train/glyphs.py`, `train/strokes.py`, `train/term_scripts.py` | - | `c282fc4be651b90d` | - |
+| `neuronte-term-syllabics-v1-tscrsa-g6.json` | tscrsa-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `font/term-scripts.txt`, `train/glyphs.py`, `train/strokes.py`, `train/term_scripts.py` | - | `21246e8f934ef90d` | - |
+| `neuronte-term-syllabics-v1-tscrsa-g7.json` | tscrsa-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `font/term-scripts.txt`, `train/glyphs.py`, `train/strokes.py`, `train/term_scripts.py` | - | `3b3de43d6abd5c91` | - |
+| `neuronte-term-syllabics-v1-tscrsa-g8.json` | tscrsa-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `font/term-scripts.txt`, `train/glyphs.py`, `train/strokes.py`, `train/term_scripts.py` | - | `d9a13daefa5b1f8f` | - |
+| `neuronte-term-syllabics-v1-tscrsa-g9.json` | tscrsa-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `font/term-scripts.txt`, `train/glyphs.py`, `train/strokes.py`, `train/term_scripts.py` | - | `3e96a56cacc72d1b` | - |
+| `neuronte-term-syllabics-v1-tscrsb-g0.json` | tscrsb-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `font/term-scripts.txt`, `train/glyphs.py`, `train/strokes.py`, `train/term_scripts.py` | - | `02a0291624b88094` | - |
+| `neuronte-term-syllabics-v1-tscrsb-g1.json` | tscrsb-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `font/term-scripts.txt`, `train/glyphs.py`, `train/strokes.py`, `train/term_scripts.py` | - | `1b0d968fb42a6903` | - |
+| `neuronte-term-syllabics-v1-tscrsb-g2.json` | tscrsb-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `font/term-scripts.txt`, `train/glyphs.py`, `train/strokes.py`, `train/term_scripts.py` | - | `b6bc6b32d4090970` | - |
 | `neuronte-term-symbol-v1-tsym10-g0.json` | tsym10-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/strokes.txt`, `font/symbols.txt`, `font/term-sym-partition.json`, `font/term-sym.txt`, `train/glyphs.py`, `train/strokes.py`, `train/term_glyphs.py` | - | `7eb3afa753f29556` | - |
 | `neuronte-term-symbol-v1-tsym10-g1.json` | tsym10-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/strokes.txt`, `font/symbols.txt`, `font/term-sym-partition.json`, `font/term-sym.txt`, `train/glyphs.py`, `train/strokes.py`, `train/term_glyphs.py` | - | `cbc92ace8e3bde0c` | - |
 | `neuronte-term-symbol-v1-tsym10-g2.json` | tsym10-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/strokes.txt`, `font/symbols.txt`, `font/term-sym-partition.json`, `font/term-sym.txt`, `train/glyphs.py`, `train/strokes.py`, `train/term_glyphs.py` | - | `3f8578af545cb1d9` | - |
@@ -5615,6 +5653,8 @@ fails if this file is out of date.
 | `neuronte-ui9-v1.seed1-g95.json` | ui9 | - | - | - | - | - | - | `3217239cb0a0a65c` | - |
 | `neuronte-video-ascii-v0.json` | - | 20000 | 0 | 1.0 | 0.075 | `font/strokes.txt` | - | `8a388678b2c57dcd` | - |
 | `neuronte-video-pixel-v1.json` | pixel | 20000 | 0 | 1.0 | 0.075 | `font/octants.txt`, `train/glyphs.py`, `train/strokes.py` | - | `ccafc4a0207bfbb8` | - |
+| `neuronte-weather-colour-e0-v1.json` | weather | 60000 | 0 | - | 0.075 | `font/code-masks.txt`, `font/emoji-palette.txt`, `font/weather.txt`, `train/checkpoint.py`, `train/colour.py`, `train/colour_sources.py`, `train/glyphs.py`, `train/strokes.py` | coverage_calibration | `0db96f89eac54b0c` | `dfe659d801813956` |
+| `neuronte-weather-colour-e0-v1.seed1.json` | weather | 60000 | 1 | - | 0.075 | `font/code-masks.txt`, `font/emoji-palette.txt`, `font/weather.txt`, `train/checkpoint.py`, `train/colour.py`, `train/colour_sources.py`, `train/glyphs.py`, `train/strokes.py` | coverage_calibration | `d3e7b64d300731ac` | `a04a175849609853` |
 
 ## Recorded training commits
 

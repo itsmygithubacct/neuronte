@@ -17,7 +17,7 @@ fails if this file is out of date.
   of its input and of the tool that made it.
 - **JSON, packed**: the first 16 hex digits of the SHA-256 of the weight
   file and of its packed `.nrt`, if one is shipped. The full hashes of
-  the 6345 files it lists are in `weights/SHA256SUMS`. The pointer net's
+  the 6365 files it lists are in `weights/SHA256SUMS`. The pointer net's
   files are not in that list; theirs are in
   `weights/neuronte-pointer-v0.sha256`.
 
@@ -32,7 +32,7 @@ fails if this file is out of date.
 - No training run has been repeated by a third party. Two seeds were
   trained by the project for the models whose `seed1` files are here.
 
-## Weight files (5760)
+## Weight files (5768)
 
 | Weight file | Set or drawing | Steps | Seed | Unlabelled weight | Pen radius | Sources hashed | After training | JSON | Packed |
 |---|---|---:|---:|---:|---:|---|---|---|---|
@@ -89,6 +89,14 @@ fails if this file is out of date.
 | `neuronte-kilix-chrome-v1-tchrp-g0.json` | tchrp-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/kilix-chrome.txt`, `train/glyphs.py`, `train/kilix_chrome.py`, `train/strokes.py`, `train/term_rest.py` | - | `501a9314fad88f90` | - |
 | `neuronte-kilix-chrome-v1-tchrp-g1.json` | tchrp-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/kilix-chrome.txt`, `train/glyphs.py`, `train/kilix_chrome.py`, `train/strokes.py`, `train/term_rest.py` | - | `b1eb8c742a3ec571` | - |
 | `neuronte-kilix-chrome-v1-tchrx-g0.json` | tchrx-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/kilix-chrome.txt`, `train/glyphs.py`, `train/kilix_chrome.py`, `train/strokes.py`, `train/term_rest.py` | - | `3ee62397714deb13` | - |
+| `neuronte-kilix-chrome-v2-tchwa-g0.json` | tchwa-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/kilix-chrome-2.txt`, `font/kilix-chrome.txt`, `train/glyphs.py`, `train/kilix_chrome.py`, `train/kilix_chrome2.py`, `train/strokes.py`, `train/term_rest.py` | - | `2d71a1394c5f1357` | - |
+| `neuronte-kilix-chrome-v2-tchwbr0-g0.json` | tchwbr0-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/kilix-chrome-2.txt`, `font/kilix-chrome.txt`, `train/glyphs.py`, `train/kilix_chrome.py`, `train/kilix_chrome2.py`, `train/strokes.py`, `train/term_rest.py` | - | `45dd36e00587ea16` | - |
+| `neuronte-kilix-chrome-v2-tchwbr0-g1.json` | tchwbr0-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/kilix-chrome-2.txt`, `font/kilix-chrome.txt`, `train/glyphs.py`, `train/kilix_chrome.py`, `train/kilix_chrome2.py`, `train/strokes.py`, `train/term_rest.py` | - | `361fbe82afda066b` | - |
+| `neuronte-kilix-chrome-v2-tchwbr1-g0.json` | tchwbr1-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/kilix-chrome-2.txt`, `font/kilix-chrome.txt`, `train/glyphs.py`, `train/kilix_chrome.py`, `train/kilix_chrome2.py`, `train/strokes.py`, `train/term_rest.py` | - | `b8be85fe5cafed6f` | - |
+| `neuronte-kilix-chrome-v2-tchwbr1-g1.json` | tchwbr1-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/kilix-chrome-2.txt`, `font/kilix-chrome.txt`, `train/glyphs.py`, `train/kilix_chrome.py`, `train/kilix_chrome2.py`, `train/strokes.py`, `train/term_rest.py` | - | `69c4560d598d8560` | - |
+| `neuronte-kilix-chrome-v2-tchwp-g0.json` | tchwp-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/kilix-chrome-2.txt`, `font/kilix-chrome.txt`, `train/glyphs.py`, `train/kilix_chrome.py`, `train/kilix_chrome2.py`, `train/strokes.py`, `train/term_rest.py` | - | `ae0cf666ac0fbb89` | - |
+| `neuronte-kilix-chrome-v2-tchwp-g1.json` | tchwp-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/kilix-chrome-2.txt`, `font/kilix-chrome.txt`, `train/glyphs.py`, `train/kilix_chrome.py`, `train/kilix_chrome2.py`, `train/strokes.py`, `train/term_rest.py` | - | `c664deb852b1fca9` | - |
+| `neuronte-kilix-chrome-v2-tchwx-g0.json` | tchwx-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/kilix-chrome-2.txt`, `font/kilix-chrome.txt`, `train/glyphs.py`, `train/kilix_chrome.py`, `train/kilix_chrome2.py`, `train/strokes.py`, `train/term_rest.py` | - | `afb5079a06581446` | - |
 | `neuronte-pixel-groups-v1-p0.json` | pixel-repertoire | 60000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/octants.txt`, `train/glyphs.py`, `train/strokes.py` | - | `4719f823fac374df` | - |
 | `neuronte-pixel-groups-v1-p1.json` | pixel-repertoire | 60000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/octants.txt`, `train/glyphs.py`, `train/strokes.py` | - | `b74f22343bbd00c1` | - |
 | `neuronte-pixel-groups-v1-p2.json` | pixel-repertoire | 60000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/octants.txt`, `train/glyphs.py`, `train/strokes.py` | - | `e9d16c5fb7079155` | - |

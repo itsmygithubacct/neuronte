@@ -1,6 +1,79 @@
 # Changes
 
-## Unreleased
+## 0.1.6
+
+Every file of 0.1.5 is still here byte for byte and draws the same pixels
+and advances. No default changes. `src/neuronte.c` and `include/neuronte.h`
+are unchanged byte for byte; the library gains one translation unit.
+
+### New nets
+
+Six more terminal bundles for 1,714 characters that DejaVu Sans Mono or
+DejaVu Sans has and no earlier bundle was trained on. With them the
+terminal set is 4,919 characters and shares 4,617 of DejaVu's 6,065, up
+from 2,903; of DejaVu Sans Mono's 3,322 it shares 2,755, up from 2,174.
+
+Each is a standalone bundle, opened beside `neuronte-split-v9` as the
+bundles of 0.1.5 are, with its set as text in `weights/NAME.list.txt`.
+
+- `neuronte-term-letters-v1`: 812 more letters of Latin, Greek and
+  Cyrillic: the rest of Latin Extended-B, IPA and phonetic letters, small
+  capitals, modifier letters, Latin Extended-C and -D, the rest of Greek
+  and Coptic and of Cyrillic. 103 group nets, 5,882,132 bytes. Four
+  characters of the list, U+1DB4 to U+1DB7, are left out: their group
+  failed, and so did their half when it was trained again. 73 shapes were
+  drawn from the character's name alone and are marked unsure in
+  `font/term-letters.txt`. [Card](weights/neuronte-term-letters-v1.md).
+- `neuronte-term-blocks-v1`: 310 characters of four blocks made by rule:
+  64 Yijing hexagrams, 87 Tai Xuan Jing figures, 100 domino tiles and 59
+  playing cards. Five tiled nets and one group net, 849,696 bytes.
+  [Card](weights/neuronte-term-blocks-v1.md).
+- `neuronte-term-mathalpha-v1`: 179 letters and digits of the sans-serif,
+  monospace and double-struck mathematical alphabets. 17 group nets,
+  971,056 bytes. [Card](weights/neuronte-term-mathalpha-v1.md).
+- `neuronte-term-syllabics-v1`: 168 Canadian syllabics. 15 group nets,
+  856,824 bytes. [Card](weights/neuronte-term-syllabics-v1.md).
+- `neuronte-term-scripts-v1`: the 48 characters of Lisu. 6 group nets,
+  343,188 bytes. [Card](weights/neuronte-term-scripts-v1.md).
+- `neuronte-term-rest-v1`: 197 characters: Hebrew letters, presentation
+  forms and punctuation, Lao letters and vowel signs, the baht sign, and
+  faces and moon phases in one colour and one cell. 26 group nets,
+  1,484,956 bytes. The Lao letters are drawn from memory of their general
+  shape and should be checked by a reader of Lao.
+  [Card](weights/neuronte-term-rest-v1.md).
+
+Three bundles for a terminal's own bars, none of them a terminal bundle
+and none in the count above:
+
+- `neuronte-kilix-chrome-v1`: the 39 symbols the Kilix terminal prints on
+  its bars, one cell each. 6 group nets, 343,224 bytes.
+  [Card](weights/neuronte-kilix-chrome-v1.md).
+- `neuronte-kilix-chrome-v2`: 41 of those symbols drawn for a box of two
+  cells. 8 group nets, 457,336 bytes.
+  [Card](weights/neuronte-kilix-chrome-v2.md).
+- `neuronte-weather-colour-v1`: nine weather symbols in colour, two cells
+  each, asked for by halves as an emoji is. One colour net of width 192
+  behind a table, 396,956 bytes. In half cells under 14 pixels wide the
+  library snaps edges, and the picture then differs from the drawing by 4
+  to 6 of 255 on average. [Card](weights/neuronte-weather-colour-v1.md).
+
+Every net in these nine files passed the limits that gave its verdict,
+with both seeds, and the rule was automatic: a group that failed was
+trained once more as two halves, and a half that failed again was left
+out. The limits were declared before training (`gates-v2.json`) and
+amended three times while the nets were scored, after a perfect drawing
+was shown to fail some of the rules; the verdicts are those of
+`gates-v2.3.json`, and each card says which limits were eased for its
+nets and by how much.
+
+Uncached, the new terminal characters draw 2.2 to 4.2 times as fast as
+split-v9 drew them from its fallback net, measured on an Intel Core
+i7-6820HQ and an Intel Core i7-10700F: 4.2 times for the letters, 2.7 for
+term-rest, 2.6 for the mathematical alphabets, 2.5 for Lisu, 2.4 for the
+syllabics and 2.2 for the blocks made by rule. Each card has its table.
+
+No drawing was made by reading a font file. DejaVu was used only for its
+list of code points.
 
 ### Cells files
 
@@ -14,6 +87,18 @@ it in place of asking the nets at its first use of a character.
 `src/neuronte.c` and `include/neuronte.h` are unchanged byte for byte,
 and no existing call behaves differently. `make test-cells` is in `make
 test`.
+
+### Tests
+
+- The 54 checks of a hand-drawn face against its drawing are each a target
+  of their own (`test-face-v0-ui1` and so on), so `make -jN test` runs
+  them side by side; one after another they were most of the time of the
+  whole test.
+- `tests/check_emoji.py` writes its cache files under another name and
+  renames them, so two targets run side by side no longer read a file the
+  other is still writing.
+- One test target for each new bundle, run by `make test`, and
+  `tests/check_weather.py` for the bar's own call of the weather net.
 
 ## 0.1.5
 

@@ -1,5 +1,6 @@
 /* Loader refusals, drawing, clipping, blending and bundles. MIT licence.
  * usage: test_api WEIGHTS.nrt [--full] [--accent] [--pixel] [--colour [--trained]]
+ *        test_api BUNDLE.nrt --standalone HEX
  * --full adds checks of box drawing, blocks and Braille, --accent of
  * accented letters, and --pixel of the sextants and octants, for weights
  * trained on them. Given a one-net file, it also checks the loader's
@@ -10,7 +11,10 @@
  * may be more than 3, and a scalar outside the labelled set may return any
  * entry, since only the fixture's head is built to return 0 for it.
  * Either way it checks the advance table and the drawing file on images
- * it builds. */
+ * it builds. --standalone HEX is for a bundle of group nets with no ASCII
+ * (train/standalone_bundle.py): the drawing checks that want ink use the
+ * trained scalar HEX in place of A and #, and a character never trained
+ * must be blank and reported untrained, where any other bundle inks it. */
 #define _POSIX_C_SOURCE 200809L
 #include "neuronte.h"
 
@@ -23,6 +27,8 @@
 
 static int failed;
 static int trained_net; /* --trained: a trained colour net, not the fixture */
+static uint32_t ink_char = 'A', clip_char = '#'; /* --standalone: both the trained scalar given */
+static int standalone;
 #define FAIL(...) (printf("FAIL " __VA_ARGS__), putchar('\n'), failed = 1)
 
 static unsigned char *slurp(const char *path, size_t *len)
@@ -1476,11 +1482,15 @@ int main(int argc, char **argv)
             colour = 1;
         else if (strcmp(argv[i], "--trained") == 0)
             trained_net = 1;
-        else
+        else if (strcmp(argv[i], "--standalone") == 0 && i + 1 < argc) {
+            ink_char = clip_char = (uint32_t)strtoul(argv[++i], NULL, 16);
+            standalone = 1;
+        } else
             argc = 0;
     }
     if (argc < 2 || (trained_net && !colour)) {
-        fprintf(stderr, "usage: %s WEIGHTS.nrt [--full] [--accent] [--pixel] [--colour [--trained]]\n", argv[0]);
+        fprintf(stderr, "usage: %s WEIGHTS.nrt [--full] [--accent] [--pixel] [--colour [--trained]] | "
+                        "BUNDLE.nrt --standalone HEX\n", argv[0]);
         return 2;
     }
     data = slurp(argv[1], &len);
@@ -1600,10 +1610,12 @@ drawing:
     }
 
     /* The same character twice gives the same cell, bit for bit. */
-    neuronte_coverage(n, 'A', CW, CH, 0, cov);
-    neuronte_coverage(n, 'A', CW, CH, 0, cov2);
+    neuronte_coverage(n, ink_char, CW, CH, 0, cov);
+    neuronte_coverage(n, ink_char, CW, CH, 0, cov2);
     if (memcmp(cov, cov2, sizeof cov) != 0)
         FAIL("A drawn twice differs");
+    if (standalone && (neuronte_untrained(n, ink_char) != 0 || neuronte_untrained(n, 'A') != 1))
+        FAIL("a standalone bundle must have U+%04X trained and A untrained", (unsigned)ink_char);
     {
         float mx = 0, sum = 0;
         for (i = 0; i < CW * CH; i++) {
@@ -1629,14 +1641,17 @@ drawing:
     neuronte_coverage(n, 0x110000, CW, CH, 0, cov2);
     if (memcmp(cov, cov2, sizeof cov) != 0)
         FAIL("U+110000 not drawn as U+FFFD");
-    /* A character never trained still gets ink. */
+    /* A character never trained still gets ink; in a standalone bundle
+     * it goes to the blank net and is reported untrained. */
     neuronte_coverage(n, 0x4E2D, CW, CH, 0, cov);
     {
         float sum = 0;
         for (i = 0; i < CW * CH; i++)
             sum += cov[i];
-        if (sum < 0.01f * CW * CH)
+        if (!standalone && sum < 0.01f * CW * CH)
             FAIL("U+4E2D is blank");
+        if (standalone && (sum != 0 || neuronte_untrained(n, 0x4E2D) != 1))
+            FAIL("U+4E2D is not blank and untrained in a standalone bundle (ink %g)", sum);
     }
     if (neuronte_coverage(n, 'A', 0, CH, 0, cov) != NEURONTE_ERR_ARG ||
         neuronte_coverage(n, 'A', CW, CH, 9, cov) != NEURONTE_ERR_ARG)
@@ -1668,8 +1683,8 @@ drawing:
      * buffer, and the guard columns of a narrower width stay untouched. */
     for (i = 0; i < BW * BH; i++)
         buf[i] = 0xFF000000u;
-    neuronte_draw_scalar(n, buf, BW, BW - 8, BH, -5, -7, CW, CH, '#', 0xFFFFFFFFu);
-    neuronte_draw_scalar(n, buf, BW, BW - 8, BH, BW - 8 - 6, BH - 10, CW, CH, '#', 0xFFFFFFFFu);
+    neuronte_draw_scalar(n, buf, BW, BW - 8, BH, -5, -7, CW, CH, clip_char, 0xFFFFFFFFu);
+    neuronte_draw_scalar(n, buf, BW, BW - 8, BH, BW - 8 - 6, BH - 10, CW, CH, clip_char, 0xFFFFFFFFu);
     for (i = 0; i < BH; i++) {
         int c;
         for (c = BW - 8; c < BW; c++)

@@ -1,0 +1,6140 @@
+{
+ "schema": "neuronte.kilix-chrome-2.validation/v1",
+ "bundle": "neuronte-kilix-chrome-v2.nrt",
+ "bundle_sha256": "8583eadf252d499fe5b8b3ae5c28c4716cdd502c6f509f5a5c473dd033e9519c",
+ "gates": "gates-v2.3.json",
+ "gates_sha256": "2ccff8354eeda45e05525490b9fdee6ab13d4970a2389537c44af1504fc50fc4",
+ "gates_note": "gates v2 with no limit tighter than the score of the drawing itself (a perfect net) with 10% of room, and a seed that puts every pixel on the right side at every counted size passing the error-amount rules; the owner decided it on 2026-11-17 after the first scores of this lane, on the evidence that some limits measured the sampling and not the net",
+ "earlier_gates_sha256": {
+  "gates-v2.1.json": "214942e398f88110cd7c6044c194f0f274274aeedb07abcbe8e1a18dc2b323c0",
+  "gates-v2.2.json": "dd3cc2ea30ccb49d001c28a905bcc6e2a2d11edfcd6a741464fda91162b10e70",
+  "gates-v2.json": "5bf1a3f8312c45df2a20b2e69d51ee3c690c58891ec5390cf0e41cbdf9f9b51b"
+ },
+ "scoring_command_sha256": "572d573b643f5f7074ceca1fd4505eee9cc8da05bbebdf5e391d1689a9d31f2c",
+ "metric_code_sha256": "7c3baaba1a8a0433f147bfaae84c5868e8f2377617a96d1f216a69533dbd32d4",
+ "teacher": {
+  "set": "kilixchrome2",
+  "characters": 41,
+  "sha256": "0e08bff43631c1990a7d04b8ada8691210c7277272282eee4a5781b9943e59cd",
+  "what": "every drawn character as one set; a character's nearest drawing is looked for among all of them"
+ },
+ "library_sha256": "429420ff1eb85a9b5c5a19cc832c958148145e122d6ce8a6e1acdbcbcfb151a2",
+ "groups_trained": 6,
+ "groups_passing": 4,
+ "groups_halved": 2,
+ "halves_passing": 4,
+ "halves_trained_not_used": [],
+ "limits_eased": 53,
+ "limits_eased_what": "limits applied to a net in the bundle at the perfect drawing's own score with 10% of room, where that is looser than the declared limit; each is listed with the net (rule, declared, perfect, applied)",
+ "seeds_passing_pixel_exact": 0,
+ "nets_shipped": 8,
+ "nets_left_out": 0,
+ "characters_drawn": 41,
+ "characters_listed": 41,
+ "characters_left_untrained": [],
+ "selection": "a net ships when seed 0 and seed 1 both pass the declared gates, the seed with the lower mean of the mean error at 8x16, 16x32 and 48x96; a group that fails is trained once more as two nets of half its characters each; a half that fails is left out and its characters stay untrained; nothing that failed ships",
+ "trainer": "train/split_expert.py train --mode repertoire --partition contiguous, width 64, 120000 steps, seeds 0,1, teacher grid 256",
+ "sets": [
+  {
+   "set": "tchwa",
+   "characters": 7,
+   "group_nets": 1,
+   "groups": [
+    {
+     "set": "tchwa",
+     "group": 0,
+     "kind": "symbols",
+     "scalars": [
+      "U+F0731",
+      "U+F0737",
+      "U+F072E",
+      "U+F0734",
+      "U+EAB9",
+      "U+F0293",
+      "U+F0156"
+     ],
+     "both_seeds_pass": true,
+     "selected_seed": 1,
+     "rules_skipped": [],
+     "limits_eased": [
+      {
+       "rule": "10x20 p99",
+       "declared": 0.07114832893013955,
+       "perfect": 0.0659722089767456,
+       "applied": 0.07256942987442017
+      }
+     ],
+     "drawing_problems": [],
+     "lower_error_seed": 1,
+     "seeds": {
+      "0": {
+       "pixel_exact": false,
+       "waived": [],
+       "sha256": "3ed8a64c2c717b24bfca6e5b9f26765ff2ee28173cf90b56dc6bdd418ca120e2",
+       "packed_sha256": "8ace828a207d41e3cbc5d7d8d80def613f6801dd0005e08bd871058d6bbd17a8",
+       "reference_check_passed": true,
+       "gates_passed": true,
+       "failures": [],
+       "mean_established_mae": 0.0036125317980934464,
+       "counted_sizes": {
+        "6x12": {
+         "mae": 0.011718221341392823,
+         "p99": 0.04423258826136589,
+         "firm_fraction": 0.0,
+         "iou_mean": 1.0,
+         "worst_glyph_mae": 0.02491721138358116,
+         "worst_glyph_iou": 1.0,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 3.849328100681305
+        },
+        "8x16": {
+         "mae": 0.005208021462229746,
+         "p99": 0.047785934060811996,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9357142857142857,
+         "worst_glyph_mae": 0.01290876604616642,
+         "worst_glyph_iou": 0.75,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 7.290585488080978
+        },
+        "10x20": {
+         "mae": 0.005332761676982045,
+         "p99": 0.05801777541637421,
+         "firm_fraction": 0.0,
+         "iou_mean": 1.0,
+         "worst_glyph_mae": 0.011563855223357677,
+         "worst_glyph_iou": 1.0,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 11.874056845903397
+        },
+        "12x24": {
+         "mae": 0.005543732217379979,
+         "p99": 0.0447322279214859,
+         "firm_fraction": 0.0,
+         "iou_mean": 1.0,
+         "worst_glyph_mae": 0.013346514664590359,
+         "worst_glyph_iou": 1.0,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 16.412156760692596
+        },
+        "16x32": {
+         "mae": 0.003841657690437777,
+         "p99": 0.05721578374505043,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.8730101079980015,
+         "worst_glyph_mae": 0.009467871859669685,
+         "worst_glyph_iou": 0.711864406779661,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 30.268112272024155
+        },
+        "24x48": {
+         "mae": 0.0037892084302646773,
+         "p99": 0.04836972802877426,
+         "firm_fraction": 0.000496031746031746,
+         "iou_mean": 0.9958592132505176,
+         "worst_glyph_mae": 0.0073744142428040504,
+         "worst_glyph_iou": 0.9855072463768116,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 70.06563818454742
+        },
+        "48x96": {
+         "mae": 0.0017879162416128175,
+         "p99": 0.04581177234649658,
+         "firm_fraction": 0.0001240079365079365,
+         "iou_mean": 0.9838542875268556,
+         "worst_glyph_mae": 0.003477345686405897,
+         "worst_glyph_iou": 0.8989690721649485,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 285.9338231086731
+        }
+       },
+       "one_sample": {},
+       "other_sizes": {
+        "1x2": {
+         "mae": 0.13807889819145203,
+         "p99": 0.2516011893749237,
+         "firm_fraction": 0.14285714285714285,
+         "iou_mean": 0.7142857142857143,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "2x4": {
+         "mae": 0.02918797984187092,
+         "p99": 0.08460158109664917,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.7142857142857143,
+         "not_nearest": [
+          "U+F0293->U+EAB9"
+         ],
+         "vanished": []
+        },
+        "3x6": {
+         "mae": 0.02070872937994344,
+         "p99": 0.09369327127933502,
+         "firm_fraction": 0.0,
+         "iou_mean": 1.0,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "4x8": {
+         "mae": 0.013375404756516218,
+         "p99": 0.07009910047054291,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.8724489795918366,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "5x9": {
+         "mae": 0.010260622615792922,
+         "p99": 0.060145750641822815,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9220779220779222,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "7x13": {
+         "mae": 0.009223864214228732,
+         "p99": 0.05657785385847092,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.7166199813258637,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "7x14": {
+         "mae": 0.009027341646807534,
+         "p99": 0.06033380329608917,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.7899665551839465,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "9x18": {
+         "mae": 0.0025505744519510438,
+         "p99": 0.02569158561527729,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9307370743460969,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "11x21": {
+         "mae": 0.0056188400901321855,
+         "p99": 0.05728544667363167,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9522293754987557,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "13x27": {
+         "mae": 0.004575191681007189,
+         "p99": 0.05679495632648468,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.8363404955478125,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "15x30": {
+         "mae": 0.004421881516464055,
+         "p99": 0.044616784900426865,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9777806258069416,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "16x48": {
+         "mae": 0.0046308120945468545,
+         "p99": 0.07089176774024963,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9389901823281906,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "17x35": {
+         "mae": 0.002149030067292707,
+         "p99": 0.029125388711690903,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9734155443518268,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "20x40": {
+         "mae": 0.0029816734687691288,
+         "p99": 0.05664074420928955,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9569133826484177,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "23x46": {
+         "mae": 0.002612793818116188,
+         "p99": 0.05716152489185333,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9875555060104416,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "23x47": {
+         "mae": 0.003009857510083488,
+         "p99": 0.05775268375873566,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9841538270231959,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "25x49": {
+         "mae": 0.003790306891979916,
+         "p99": 0.05953718721866608,
+         "firm_fraction": 0.0006997084548104956,
+         "iou_mean": 0.9090821269032369,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "25x50": {
+         "mae": 0.003543031235624637,
+         "p99": 0.05936231091618538,
+         "firm_fraction": 0.00045714285714285713,
+         "iou_mean": 0.9286362297839675,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "31x62": {
+         "mae": 0.0026407649274915457,
+         "p99": 0.05707968771457672,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9363117873802683,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "33x61": {
+         "mae": 0.0029198628118527786,
+         "p99": 0.05316786468029022,
+         "firm_fraction": 0.00021290185224611454,
+         "iou_mean": 0.9632355066680675,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "40x80": {
+         "mae": 0.001952269097923168,
+         "p99": 0.05469420924782753,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9589056966572637,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "64x128": {
+         "mae": 0.0010883010025801404,
+         "p99": 0.036150816828012466,
+         "firm_fraction": 0.0001220703125,
+         "iou_mean": 0.9991371525181154,
+         "not_nearest": [],
+         "vanished": []
+        }
+       }
+      },
+      "1": {
+       "pixel_exact": false,
+       "waived": [],
+       "sha256": "2d71a1394c5f13572841a6883df33fc7bec6fb0a69864f786f4ffa190307f6f0",
+       "packed_sha256": "0a1fbf8b9aa437bbe0222c9e32220f8fb9dc6944a1e1ca149803186b5b795ccc",
+       "reference_check_passed": true,
+       "gates_passed": true,
+       "failures": [],
+       "mean_established_mae": 0.003600916952737385,
+       "counted_sizes": {
+        "6x12": {
+         "mae": 0.011842782875256879,
+         "p99": 0.04393640533089638,
+         "firm_fraction": 0.0,
+         "iou_mean": 1.0,
+         "worst_glyph_mae": 0.024804672226309776,
+         "worst_glyph_iou": 1.0,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 3.8307897448539734
+        },
+        "8x16": {
+         "mae": 0.005173157168818372,
+         "p99": 0.050973597913980484,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9357142857142857,
+         "worst_glyph_mae": 0.012916851788759232,
+         "worst_glyph_iou": 0.75,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 7.29667255282402
+        },
+        "10x20": {
+         "mae": 0.005325591191649437,
+         "p99": 0.058770522475242615,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9972527472527473,
+         "worst_glyph_mae": 0.011569337919354439,
+         "worst_glyph_iou": 0.9807692307692307,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 11.831747084856033
+        },
+        "12x24": {
+         "mae": 0.005482123266639454,
+         "p99": 0.04467250406742096,
+         "firm_fraction": 0.0,
+         "iou_mean": 1.0,
+         "worst_glyph_mae": 0.013224564492702484,
+         "worst_glyph_iou": 1.0,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 16.402085721492767
+        },
+        "16x32": {
+         "mae": 0.0038364133631278363,
+         "p99": 0.057502374053001404,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.8747634686058331,
+         "worst_glyph_mae": 0.009472740814089775,
+         "worst_glyph_iou": 0.7241379310344828,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 30.21692982316017
+        },
+        "24x48": {
+         "mae": 0.003762889054736921,
+         "p99": 0.04898817837238312,
+         "firm_fraction": 0.000496031746031746,
+         "iou_mean": 0.9963711650668172,
+         "worst_glyph_mae": 0.007307499647140503,
+         "worst_glyph_iou": 0.9855072463768116,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 70.31902158260345
+        },
+        "48x96": {
+         "mae": 0.0017931803262659482,
+         "p99": 0.04576359689235687,
+         "firm_fraction": 0.0001240079365079365,
+         "iou_mean": 0.9842521767943689,
+         "worst_glyph_mae": 0.003368706675246358,
+         "worst_glyph_iou": 0.9036269430051813,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 285.8192946910858
+        }
+       },
+       "one_sample": {},
+       "other_sizes": {
+        "1x2": {
+         "mae": 0.13808393265519822,
+         "p99": 0.24957451224327087,
+         "firm_fraction": 0.07142857142857142,
+         "iou_mean": 0.8571428571428571,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "2x4": {
+         "mae": 0.029312885499426296,
+         "p99": 0.08859486132860184,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.7142857142857143,
+         "not_nearest": [
+          "U+F0293->U+EAB9"
+         ],
+         "vanished": []
+        },
+        "3x6": {
+         "mae": 0.020687700116208622,
+         "p99": 0.09223786741495132,
+         "firm_fraction": 0.0,
+         "iou_mean": 1.0,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "4x8": {
+         "mae": 0.013453111651220493,
+         "p99": 0.07415906339883804,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9183673469387755,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "5x9": {
+         "mae": 0.01025089668110013,
+         "p99": 0.058771662414073944,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.8903318903318904,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "7x13": {
+         "mae": 0.009258759740207876,
+         "p99": 0.05849606916308403,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.7024178092289547,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "7x14": {
+         "mae": 0.009129745553114585,
+         "p99": 0.06059820204973221,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.8143380429094715,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "9x18": {
+         "mae": 0.0025787464110180736,
+         "p99": 0.02609439380466938,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.930998667840773,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "11x21": {
+         "mae": 0.005616768861987761,
+         "p99": 0.05533137917518616,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9566643882433356,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "13x27": {
+         "mae": 0.004555031524172851,
+         "p99": 0.05688001587986946,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.8366631178216544,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "15x30": {
+         "mae": 0.004474673037683325,
+         "p99": 0.04491439089179039,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9849689488799765,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "16x48": {
+         "mae": 0.004648115386122039,
+         "p99": 0.07136574387550354,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9389901823281906,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "17x35": {
+         "mae": 0.002185286920783775,
+         "p99": 0.029216250404715538,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9711846978563967,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "20x40": {
+         "mae": 0.0030135344131849706,
+         "p99": 0.05689828842878342,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9569133826484177,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "23x46": {
+         "mae": 0.0026462156924286057,
+         "p99": 0.05701557174324989,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9869584019650617,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "23x47": {
+         "mae": 0.0030221239098214676,
+         "p99": 0.05822174251079559,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.979735978624806,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "25x49": {
+         "mae": 0.0037171015782015665,
+         "p99": 0.05982040613889694,
+         "firm_fraction": 0.0003498542274052478,
+         "iou_mean": 0.9094993036239306,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "25x50": {
+         "mae": 0.003497733036056161,
+         "p99": 0.0601978600025177,
+         "firm_fraction": 0.00011428571428571428,
+         "iou_mean": 0.9308320899351837,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "31x62": {
+         "mae": 0.0026062064903921317,
+         "p99": 0.056811168789863586,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9385333360019196,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "33x61": {
+         "mae": 0.0028679888429386275,
+         "p99": 0.05299050360918045,
+         "firm_fraction": 7.096728408203818e-05,
+         "iou_mean": 0.964419792498733,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "40x80": {
+         "mae": 0.0019581186518605265,
+         "p99": 0.054829299449920654,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9594671739036381,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "64x128": {
+         "mae": 0.001080046732178224,
+         "p99": 0.0358528196811676,
+         "firm_fraction": 5.231584821428571e-05,
+         "iou_mean": 0.9994203895682982,
+         "not_nearest": [],
+         "vanished": []
+        }
+       }
+      }
+     },
+     "halved": false,
+     "shipped": true,
+     "file": "neuronte-kilix-chrome-v2-tchwa-g0.json",
+     "shipped_seed": 1,
+     "shipped_because": "both seeds passed the declared gates; lower-error seed"
+    }
+   ]
+  },
+  {
+   "set": "tchwb",
+   "characters": 13,
+   "group_nets": 2,
+   "groups": [
+    {
+     "set": "tchwb",
+     "group": 0,
+     "kind": "symbols",
+     "scalars": [
+      "U+1F56D",
+      "U+F0219",
+      "U+F030C",
+      "U+F035B",
+      "U+F08AE",
+      "U+F2C9"
+     ],
+     "both_seeds_pass": false,
+     "selected_seed": null,
+     "rules_skipped": [],
+     "limits_eased": [
+      {
+       "rule": "6x12 mae",
+       "declared": 0.017632740107364955,
+       "perfect": 0.020316075688848894,
+       "applied": 0.022347683257733786
+      },
+      {
+       "rule": "6x12 p99",
+       "declared": 0.11412998884916306,
+       "perfect": 0.1666666865348816,
+       "applied": 0.18333335518836977
+      },
+      {
+       "rule": "6x12 firm",
+       "declared": 0.0005,
+       "perfect": 0.0023148148148148147,
+       "applied": 0.0025462962962962965
+      },
+      {
+       "rule": "8x16 mae",
+       "declared": 0.013056604482699187,
+       "perfect": 0.017238153610378504,
+       "applied": 0.018961968971416356
+      },
+      {
+       "rule": "8x16 p99",
+       "declared": 0.08183252587914468,
+       "perfect": 0.2222222089767456,
+       "applied": 0.2444444298744202
+      },
+      {
+       "rule": "8x16 glyph_mae U+F08AE",
+       "declared": 0.029228511825203897,
+       "perfect": 0.02730943262577057,
+       "applied": 0.03004037588834763
+      },
+      {
+       "rule": "10x20 mae",
+       "declared": 0.008225137833505869,
+       "perfect": 0.014188345754519105,
+       "applied": 0.015607180329971018
+      },
+      {
+       "rule": "10x20 p99",
+       "declared": 0.07114832893013955,
+       "perfect": 0.19128501415252686,
+       "applied": 0.21041351556777957
+      },
+      {
+       "rule": "10x20 glyph_mae U+F035B",
+       "declared": 0.021369570158421995,
+       "perfect": 0.019486382603645325,
+       "applied": 0.02143502086400986
+      },
+      {
+       "rule": "10x20 glyph_mae U+F08AE",
+       "declared": 0.021369570158421995,
+       "perfect": 0.0228097066283226,
+       "applied": 0.025090677291154863
+      },
+      {
+       "rule": "12x24 mae",
+       "declared": 0.008731306431582198,
+       "perfect": 0.010529352895294627,
+       "applied": 0.011582288184824091
+      },
+      {
+       "rule": "12x24 p99",
+       "declared": 0.08151596114039422,
+       "perfect": 0.1666666865348816,
+       "applied": 0.18333335518836977
+      },
+      {
+       "rule": "16x32 mae",
+       "declared": 0.0067491031193640085,
+       "perfect": 0.008603639008166889,
+       "applied": 0.009464002908983579
+      },
+      {
+       "rule": "24x48 mae",
+       "declared": 0.006368378823390231,
+       "perfect": 0.007620868040248752,
+       "applied": 0.008382954844273628
+      },
+      {
+       "rule": "24x48 p99",
+       "declared": 0.08273293972015382,
+       "perfect": 0.139297753572464,
+       "applied": 0.1532275289297104
+      },
+      {
+       "rule": "24x48 firm",
+       "declared": 0.0009548611111111112,
+       "perfect": 0.0014467592592592592,
+       "applied": 0.0015914351851851853
+      },
+      {
+       "rule": "48x96 mae",
+       "declared": 0.002969703065173235,
+       "perfect": 0.003647153925461074,
+       "applied": 0.004011869318007182
+      },
+      {
+       "rule": "48x96 firm",
+       "declared": 0.0005288071533923304,
+       "perfect": 0.0005787037037037037,
+       "applied": 0.0006365740740740741
+      }
+     ],
+     "drawing_problems": [],
+     "lower_error_seed": 0,
+     "seeds": {
+      "0": {
+       "pixel_exact": false,
+       "waived": [],
+       "sha256": "8e134bf2fb0d43140208c462afb198ca524c2fa819ec5e57c40ae4d7099eb048",
+       "packed_sha256": "5f9f4d4897ad36d28bd311aa604ef3fba19a95fd517f7456c1d2294a47dee13e",
+       "reference_check_passed": true,
+       "gates_passed": false,
+       "failures": [
+        "24x48 mae"
+       ],
+       "mean_established_mae": 0.009880131802573387,
+       "counted_sizes": {
+        "6x12": {
+         "mae": 0.020586669600258272,
+         "p99": 0.16892215609550476,
+         "firm_fraction": 0.0023148148148148147,
+         "iou_mean": 0.974074074074074,
+         "worst_glyph_mae": 0.031495850533246994,
+         "worst_glyph_iou": 0.9,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 4.913219407200813
+        },
+        "8x16": {
+         "mae": 0.017243233043700457,
+         "p99": 0.21556024253368378,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9264134205393604,
+         "worst_glyph_mae": 0.02742728218436241,
+         "worst_glyph_iou": 0.8461538461538461,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 11.903974816203117
+        },
+        "10x20": {
+         "mae": 0.01410595568207403,
+         "p99": 0.18701735138893127,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9422259884684389,
+         "worst_glyph_mae": 0.02270486392080784,
+         "worst_glyph_iou": 0.85,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 21.242142871022224
+        },
+        "12x24": {
+         "mae": 0.011098593007773161,
+         "p99": 0.16760390996932983,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9965986394557823,
+         "worst_glyph_mae": 0.01796172372996807,
+         "worst_glyph_iou": 0.9795918367346939,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 30.698815122246742
+        },
+        "16x32": {
+         "mae": 0.008545952150598168,
+         "p99": 0.06693515181541443,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9446131617398663,
+         "worst_glyph_mae": 0.012394875288009644,
+         "worst_glyph_iou": 0.8191489361702128,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 55.83417089283466
+        },
+        "24x48": {
+         "mae": 0.008468912409928938,
+         "p99": 0.14663180708885193,
+         "firm_fraction": 0.0014467592592592592,
+         "iou_mean": 0.9835400487989622,
+         "worst_glyph_mae": 0.016035066917538643,
+         "worst_glyph_iou": 0.9279279279279279,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 127.24917471408844
+        },
+        "48x96": {
+         "mae": 0.0038512102134215334,
+         "p99": 0.06423323601484299,
+         "firm_fraction": 0.0005787037037037037,
+         "iou_mean": 0.9954711474373531,
+         "worst_glyph_mae": 0.007267144042998552,
+         "worst_glyph_iou": 0.9863325740318907,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 516.559306204319
+        }
+       },
+       "one_sample": {},
+       "other_sizes": {
+        "1x2": {
+         "mae": 0.12192673732837041,
+         "p99": 0.20934897661209106,
+         "firm_fraction": 0.16666666666666666,
+         "iou_mean": 0.8333333333333334,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "2x4": {
+         "mae": 0.04892229444036881,
+         "p99": 0.14015068113803864,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.625,
+         "not_nearest": [
+          "U+F035B->U+F08AE"
+         ],
+         "vanished": []
+        },
+        "3x6": {
+         "mae": 0.031080822149912517,
+         "p99": 0.13006533682346344,
+         "firm_fraction": 0.009259259259259259,
+         "iou_mean": 0.7777777777777778,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "4x8": {
+         "mae": 0.027070637481908005,
+         "p99": 0.11224484443664551,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.8551587301587302,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "5x9": {
+         "mae": 0.02035631115237872,
+         "p99": 0.15125800669193268,
+         "firm_fraction": 0.003703703703703704,
+         "iou_mean": 0.9326599326599326,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "7x13": {
+         "mae": 0.020327786759783823,
+         "p99": 0.11192012578248978,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.8754540831153735,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "7x14": {
+         "mae": 0.019028842293967802,
+         "p99": 0.10628332197666168,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.8974575476123464,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "9x18": {
+         "mae": 0.005706169370872279,
+         "p99": 0.05611654371023178,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.8840221623240492,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "11x21": {
+         "mae": 0.011110518670951327,
+         "p99": 0.08311111479997635,
+         "firm_fraction": 0.0007215007215007215,
+         "iou_mean": 0.9618478440068166,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "13x27": {
+         "mae": 0.008660547318868339,
+         "p99": 0.11240384727716446,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.8775251966995324,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "15x30": {
+         "mae": 0.008733324861774841,
+         "p99": 0.153131902217865,
+         "firm_fraction": 0.00037037037037037035,
+         "iou_mean": 0.9727280967359458,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "16x48": {
+         "mae": 0.010307719465345144,
+         "p99": 0.08859172463417053,
+         "firm_fraction": 0.00021701388888888888,
+         "iou_mean": 0.9380678276047094,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "17x35": {
+         "mae": 0.008375228149816394,
+         "p99": 0.14448966085910797,
+         "firm_fraction": 0.0005602240896358543,
+         "iou_mean": 0.9501981085340042,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "20x40": {
+         "mae": 0.006941553593302767,
+         "p99": 0.06728165596723557,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9390295112677949,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "23x46": {
+         "mae": 0.006221055286005139,
+         "p99": 0.07124760001897812,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9891011008143306,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "23x47": {
+         "mae": 0.006214177740427355,
+         "p99": 0.06822887808084488,
+         "firm_fraction": 0.0003083564600678384,
+         "iou_mean": 0.9837467631355888,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "25x49": {
+         "mae": 0.009135814306015769,
+         "p99": 0.18064545094966888,
+         "firm_fraction": 0.0014965986394557824,
+         "iou_mean": 0.9490269618448712,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "25x50": {
+         "mae": 0.00898197665810585,
+         "p99": 0.15148821473121643,
+         "firm_fraction": 0.0014666666666666667,
+         "iou_mean": 0.9589993387224958,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "31x62": {
+         "mae": 0.005819928172665338,
+         "p99": 0.10127533227205276,
+         "firm_fraction": 0.001040582726326743,
+         "iou_mean": 0.9388394949805207,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "33x61": {
+         "mae": 0.006483922246843576,
+         "p99": 0.08533117175102234,
+         "firm_fraction": 8.279516476237788e-05,
+         "iou_mean": 0.9758988127538825,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "40x80": {
+         "mae": 0.004479938807586829,
+         "p99": 0.07914821058511734,
+         "firm_fraction": 0.000625,
+         "iou_mean": 0.9455903635715143,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "64x128": {
+         "mae": 0.002839104699281355,
+         "p99": 0.06277265399694443,
+         "firm_fraction": 0.0001220703125,
+         "iou_mean": 0.9877926107533851,
+         "not_nearest": [],
+         "vanished": []
+        }
+       }
+      },
+      "1": {
+       "pixel_exact": false,
+       "waived": [],
+       "sha256": "60f425aff4e0d96bb5865a51693499be89b5c3fe792014d2c232a6254fda5b4b",
+       "packed_sha256": "63a34a2adfb0853568da0a4750164fb45fb7292ebadad4099d96efff1805937b",
+       "reference_check_passed": true,
+       "gates_passed": false,
+       "failures": [
+        "24x48 mae",
+        "24x48 p99"
+       ],
+       "mean_established_mae": 0.009925522699227763,
+       "counted_sizes": {
+        "6x12": {
+         "mae": 0.020890057863046724,
+         "p99": 0.16571058332920074,
+         "firm_fraction": 0.0023148148148148147,
+         "iou_mean": 0.974074074074074,
+         "worst_glyph_mae": 0.03175932914018631,
+         "worst_glyph_iou": 0.9,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 4.943242892622948
+        },
+        "8x16": {
+         "mae": 0.017305943028380472,
+         "p99": 0.2165186107158661,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9264134205393604,
+         "worst_glyph_mae": 0.027498267590999603,
+         "worst_glyph_iou": 0.8461538461538461,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 11.969750970602036
+        },
+        "10x20": {
+         "mae": 0.014136795420199633,
+         "p99": 0.18537090718746185,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9375643409599267,
+         "worst_glyph_mae": 0.022641750052571297,
+         "worst_glyph_iou": 0.85,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 21.21052375435829
+        },
+        "12x24": {
+         "mae": 0.011068257774847249,
+         "p99": 0.1681467741727829,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9965986394557823,
+         "worst_glyph_mae": 0.017998404800891876,
+         "worst_glyph_iou": 0.9795918367346939,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 30.72433450818062
+        },
+        "16x32": {
+         "mae": 0.008516487549059093,
+         "p99": 0.06643112748861313,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9437965470699051,
+         "worst_glyph_mae": 0.012436609715223312,
+         "worst_glyph_iou": 0.8191489361702128,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 55.8842047303915
+        },
+        "24x48": {
+         "mae": 0.0084266591972361,
+         "p99": 0.17404159903526306,
+         "firm_fraction": 0.0014467592592592592,
+         "iou_mean": 0.9851146478117238,
+         "worst_glyph_mae": 0.015718556940555573,
+         "worst_glyph_iou": 0.9409090909090909,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 127.27316039800644
+        },
+        "48x96": {
+         "mae": 0.003954137520243724,
+         "p99": 0.06362611800432205,
+         "firm_fraction": 0.0006148726851851852,
+         "iou_mean": 0.9952807785493883,
+         "worst_glyph_mae": 0.007251352071762085,
+         "worst_glyph_iou": 0.9851936218678815,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 516.0779001712799
+        }
+       },
+       "one_sample": {},
+       "other_sizes": {
+        "1x2": {
+         "mae": 0.12223804742097855,
+         "p99": 0.20919737219810486,
+         "firm_fraction": 0.16666666666666666,
+         "iou_mean": 0.8333333333333334,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "2x4": {
+         "mae": 0.04918836367626985,
+         "p99": 0.13949941098690033,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.625,
+         "not_nearest": [
+          "U+F035B->U+F08AE"
+         ],
+         "vanished": []
+        },
+        "3x6": {
+         "mae": 0.03167727682739496,
+         "p99": 0.12677332758903503,
+         "firm_fraction": 0.009259259259259259,
+         "iou_mean": 0.7450396825396824,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "4x8": {
+         "mae": 0.026351867864529293,
+         "p99": 0.10880683362483978,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.8551587301587302,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "5x9": {
+         "mae": 0.021010119157532852,
+         "p99": 0.14916223287582397,
+         "firm_fraction": 0.003703703703703704,
+         "iou_mean": 0.9196969696969698,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "7x13": {
+         "mae": 0.019942537415772676,
+         "p99": 0.10585176199674606,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.868509638670929,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "7x14": {
+         "mae": 0.01917348289862275,
+         "p99": 0.10055435448884964,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.8974575476123464,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "9x18": {
+         "mae": 0.005987667245790362,
+         "p99": 0.05533178523182869,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.8847061155714143,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "11x21": {
+         "mae": 0.011073231309031447,
+         "p99": 0.07875537872314453,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9642448285368509,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "13x27": {
+         "mae": 0.008721297839656472,
+         "p99": 0.11104947328567505,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.8756594400067943,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "15x30": {
+         "mae": 0.0087963497499004,
+         "p99": 0.15635646879673004,
+         "firm_fraction": 0.00037037037037037035,
+         "iou_mean": 0.9813253208260049,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "16x48": {
+         "mae": 0.010444092680700123,
+         "p99": 0.08893795311450958,
+         "firm_fraction": 0.00043402777777777775,
+         "iou_mean": 0.9397356944052326,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "17x35": {
+         "mae": 0.008395604750451943,
+         "p99": 0.14482738077640533,
+         "firm_fraction": 0.00028011204481792715,
+         "iou_mean": 0.950240688739628,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "20x40": {
+         "mae": 0.006989959510974586,
+         "p99": 0.06948584318161011,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9368312614889,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "23x46": {
+         "mae": 0.006234077115853627,
+         "p99": 0.0685712918639183,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.986976331733649,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "23x47": {
+         "mae": 0.006227090333898862,
+         "p99": 0.06955231726169586,
+         "firm_fraction": 0.0001541782300339192,
+         "iou_mean": 0.9820338154033298,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "25x49": {
+         "mae": 0.009163382230326533,
+         "p99": 0.17418242990970612,
+         "firm_fraction": 0.0013605442176870747,
+         "iou_mean": 0.9479939552643168,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "25x50": {
+         "mae": 0.008928325880939761,
+         "p99": 0.1453068107366562,
+         "firm_fraction": 0.0013333333333333333,
+         "iou_mean": 0.9563633286727503,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "31x62": {
+         "mae": 0.005841862177476287,
+         "p99": 0.0995168685913086,
+         "firm_fraction": 0.0009538674991328477,
+         "iou_mean": 0.9396195672205607,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "33x61": {
+         "mae": 0.006538332168323298,
+         "p99": 0.09007090330123901,
+         "firm_fraction": 0.00016559032952475575,
+         "iou_mean": 0.973448113995233,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "40x80": {
+         "mae": 0.004402044597857942,
+         "p99": 0.073117196559906,
+         "firm_fraction": 0.000625,
+         "iou_mean": 0.9458383622600163,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "64x128": {
+         "mae": 0.002816407436815401,
+         "p99": 0.06562443822622299,
+         "firm_fraction": 8.138020833333333e-05,
+         "iou_mean": 0.9880115192375142,
+         "not_nearest": [],
+         "vanished": []
+        }
+       }
+      }
+     },
+     "halved": true,
+     "shipped": false,
+     "halves": [
+      {
+       "set": "tchwbr0",
+       "group": 0,
+       "kind": "symbols",
+       "scalars": [
+        "U+1F56D",
+        "U+F0219",
+        "U+F030C"
+       ],
+       "both_seeds_pass": true,
+       "selected_seed": 1,
+       "rules_skipped": [],
+       "limits_eased": [
+        {
+         "rule": "6x12 mae",
+         "declared": 0.017632740107364955,
+         "perfect": 0.017966944724321365,
+         "applied": 0.019763639196753502
+        },
+        {
+         "rule": "8x16 mae",
+         "declared": 0.013056604482699187,
+         "perfect": 0.014616631592313448,
+         "applied": 0.016078294751544795
+        },
+        {
+         "rule": "10x20 mae",
+         "declared": 0.008225137833505869,
+         "perfect": 0.012346273598571619,
+         "applied": 0.013580900958428782
+        },
+        {
+         "rule": "10x20 p99",
+         "declared": 0.07114832893013955,
+         "perfect": 0.06470651924610138,
+         "applied": 0.07117717117071153
+        },
+        {
+         "rule": "12x24 mae",
+         "declared": 0.008731306431582198,
+         "perfect": 0.009065549355000257,
+         "applied": 0.009972104290500284
+        },
+        {
+         "rule": "12x24 p99",
+         "declared": 0.08151596114039422,
+         "perfect": 0.0921160876750946,
+         "applied": 0.10132769644260407
+        },
+        {
+         "rule": "16x32 mae",
+         "declared": 0.0067491031193640085,
+         "perfect": 0.009023526217788458,
+         "applied": 0.009925878839567304
+        },
+        {
+         "rule": "24x48 firm",
+         "declared": 0.0009548611111111112,
+         "perfect": 0.0011574074074074073,
+         "applied": 0.0012731481481481483
+        },
+        {
+         "rule": "48x96 firm",
+         "declared": 0.0005288071533923304,
+         "perfect": 0.0007957175925925925,
+         "applied": 0.0008752893518518519
+        }
+       ],
+       "drawing_problems": [],
+       "lower_error_seed": 1,
+       "seeds": {
+        "0": {
+         "pixel_exact": false,
+         "waived": [],
+         "sha256": "3ae6e5f9ad2ace98c30ef59811c1c78fdb8dffe48baf3a7bc1ddc6f643fe4cf4",
+         "packed_sha256": "1ea8ca631925f1169db48db3dd01d4c722f4817a4ca32a7d61a906c0aec815be",
+         "reference_check_passed": true,
+         "gates_passed": true,
+         "failures": [],
+         "mean_established_mae": 0.008751956280320883,
+         "counted_sizes": {
+          "6x12": {
+           "mae": 0.018262503668665886,
+           "p99": 0.09120208024978638,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9666666666666667,
+           "worst_glyph_mae": 0.027140546590089798,
+           "worst_glyph_iou": 0.9,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 6.844896093010902
+          },
+          "8x16": {
+           "mae": 0.014615815132856369,
+           "p99": 0.0714605376124382,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9039632047150844,
+           "worst_glyph_mae": 0.018367379903793335,
+           "worst_glyph_iou": 0.8461538461538461,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 12.753841564059258
+          },
+          "10x20": {
+           "mae": 0.012428663826237122,
+           "p99": 0.06701502948999405,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9359274605176244,
+           "worst_glyph_mae": 0.016610469669103622,
+           "worst_glyph_iou": 0.8717948717948718,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 21.19977594912052
+          },
+          "12x24": {
+           "mae": 0.00938877851391832,
+           "p99": 0.08806487172842026,
+           "firm_fraction": 0.0,
+           "iou_mean": 1.0,
+           "worst_glyph_mae": 0.014168087393045425,
+           "worst_glyph_iou": 1.0,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 30.697266802191734
+          },
+          "16x32": {
+           "mae": 0.0089528930063049,
+           "p99": 0.05986986681818962,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9259876795781051,
+           "worst_glyph_mae": 0.01245375070720911,
+           "worst_glyph_iou": 0.8191489361702128,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 55.808460637927055
+          },
+          "24x48": {
+           "mae": 0.00590818685789903,
+           "p99": 0.058002933859825134,
+           "firm_fraction": 0.0011574074074074073,
+           "iou_mean": 0.9720773404983931,
+           "worst_glyph_mae": 0.008360926993191242,
+           "worst_glyph_iou": 0.9279279279279279,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 127.22554385662079
+          },
+          "48x96": {
+           "mae": 0.0026871607018013797,
+           "p99": 0.048990461975336075,
+           "firm_fraction": 0.0007957175925925925,
+           "iou_mean": 0.9942792016840379,
+           "worst_glyph_mae": 0.003817439079284668,
+           "worst_glyph_iou": 0.9897142857142858,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 516.6696973443031
+          }
+         },
+         "one_sample": {},
+         "other_sizes": {
+          "1x2": {
+           "mae": 0.14030854900678,
+           "p99": 0.20951712131500244,
+           "firm_fraction": 0.3333333333333333,
+           "iou_mean": 0.6666666666666666,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "2x4": {
+           "mae": 0.05365066478649775,
+           "p99": 0.12417092174291611,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.3333333333333333,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "3x6": {
+           "mae": 0.028759765749176342,
+           "p99": 0.08595261722803116,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.8333333333333334,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "4x8": {
+           "mae": 0.028482011208931606,
+           "p99": 0.20766374468803406,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.8888888888888888,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "5x9": {
+           "mae": 0.01955744220564763,
+           "p99": 0.15061381459236145,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9583333333333334,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "7x13": {
+           "mae": 0.02245524898171425,
+           "p99": 0.10440905392169952,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.793918918918919,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "7x14": {
+           "mae": 0.020236944158871967,
+           "p99": 0.10081706941127777,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.8555211558307533,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "9x18": {
+           "mae": 0.005141041241586208,
+           "p99": 0.04869018495082855,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.8089368258859784,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "11x21": {
+           "mae": 0.011706007178872824,
+           "p99": 0.0651731938123703,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9841269841269842,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "13x27": {
+           "mae": 0.00726808359225591,
+           "p99": 0.05707249417901039,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.8699763593380615,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "15x30": {
+           "mae": 0.007121692644432187,
+           "p99": 0.047747571021318436,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9532567049808428,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "16x48": {
+           "mae": 0.010910889987523356,
+           "p99": 0.0842273160815239,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9284212739121296,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "17x35": {
+           "mae": 0.007257365621626377,
+           "p99": 0.060427792370319366,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.973193237691116,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "20x40": {
+           "mae": 0.0070671087596565485,
+           "p99": 0.05902817100286484,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9224080426910616,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "23x46": {
+           "mae": 0.0054844726497928304,
+           "p99": 0.056610699743032455,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9858710436160966,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "23x47": {
+           "mae": 0.005546128959394991,
+           "p99": 0.059485699981451035,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9983818770226538,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "25x49": {
+           "mae": 0.0070050302892923355,
+           "p99": 0.08458457142114639,
+           "firm_fraction": 0.0013605442176870747,
+           "iou_mean": 0.936128199286094,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "25x50": {
+           "mae": 0.006510006419072549,
+           "p99": 0.06514847278594971,
+           "firm_fraction": 0.0002666666666666667,
+           "iou_mean": 0.9471175523349437,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "31x62": {
+           "mae": 0.005108395513767998,
+           "p99": 0.06036168709397316,
+           "firm_fraction": 0.0015608740894901144,
+           "iou_mean": 0.9381212318513695,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "33x61": {
+           "mae": 0.004498717064658801,
+           "p99": 0.060098517686128616,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9569109772423025,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "40x80": {
+           "mae": 0.0038233911230539284,
+           "p99": 0.05809694156050682,
+           "firm_fraction": 0.0011458333333333333,
+           "iou_mean": 0.9476565275501251,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "64x128": {
+           "mae": 0.0021798252516115704,
+           "p99": 0.0521155446767807,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9866034808897056,
+           "not_nearest": [],
+           "vanished": []
+          }
+         }
+        },
+        "1": {
+         "pixel_exact": false,
+         "waived": [],
+         "sha256": "45dd36e00587ea16c4d86811532322f7a69841d5c0dc54ad1a435664b2939d14",
+         "packed_sha256": "c451585c970b537837d23166fa4b19c6bb135ef7d9b3a1b9ebf17e3e4b0a17a2",
+         "reference_check_passed": true,
+         "gates_passed": true,
+         "failures": [],
+         "mean_established_mae": 0.008728649493099915,
+         "counted_sizes": {
+          "6x12": {
+           "mae": 0.018142765077451866,
+           "p99": 0.09089016169309616,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9666666666666667,
+           "worst_glyph_mae": 0.02704962156713009,
+           "worst_glyph_iou": 0.9,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 6.8502316027879715
+          },
+          "8x16": {
+           "mae": 0.01461932435631752,
+           "p99": 0.07323907315731049,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9039632047150844,
+           "worst_glyph_mae": 0.018688444048166275,
+           "worst_glyph_iou": 0.8461538461538461,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 12.781205296516418
+          },
+          "10x20": {
+           "mae": 0.012298293722172579,
+           "p99": 0.06661248207092285,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9306392532198983,
+           "worst_glyph_mae": 0.016640804708003998,
+           "worst_glyph_iou": 0.8717948717948718,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 21.208745002746582
+          },
+          "12x24": {
+           "mae": 0.009253358468413353,
+           "p99": 0.0894382894039154,
+           "firm_fraction": 0.0,
+           "iou_mean": 1.0,
+           "worst_glyph_mae": 0.014068086631596088,
+           "worst_glyph_iou": 1.0,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 30.640170335769653
+          },
+          "16x32": {
+           "mae": 0.008925735640029112,
+           "p99": 0.05789777636528015,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9294599018003273,
+           "worst_glyph_mae": 0.012492056004703045,
+           "worst_glyph_iou": 0.8191489361702128,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 55.825051575899124
+          },
+          "24x48": {
+           "mae": 0.005884424240017931,
+           "p99": 0.056751593947410583,
+           "firm_fraction": 0.0011574074074074073,
+           "iou_mean": 0.9720773404983931,
+           "worst_glyph_mae": 0.008410118520259857,
+           "worst_glyph_iou": 0.9279279279279279,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 127.16155880689621
+          },
+          "48x96": {
+           "mae": 0.002640888482953111,
+           "p99": 0.0480034202337265,
+           "firm_fraction": 0.0007957175925925925,
+           "iou_mean": 0.9954141951309579,
+           "worst_glyph_mae": 0.0037251312751322985,
+           "worst_glyph_iou": 0.9931192660550459,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 516.658879160881
+          }
+         },
+         "one_sample": {},
+         "other_sizes": {
+          "1x2": {
+           "mae": 0.14078149696191153,
+           "p99": 0.20997177064418793,
+           "firm_fraction": 0.3333333333333333,
+           "iou_mean": 0.6666666666666666,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "2x4": {
+           "mae": 0.053835379580656685,
+           "p99": 0.12362699210643768,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.6666666666666666,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "3x6": {
+           "mae": 0.02896261711915334,
+           "p99": 0.084326833486557,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.8095238095238094,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "4x8": {
+           "mae": 0.02874527871608734,
+           "p99": 0.20961131155490875,
+           "firm_fraction": 0.0,
+           "iou_mean": 1.0,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "5x9": {
+           "mae": 0.019834186571339767,
+           "p99": 0.1570945531129837,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9583333333333334,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "7x13": {
+           "mae": 0.02243594452738762,
+           "p99": 0.09922190010547638,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.793918918918919,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "7x14": {
+           "mae": 0.020205178608496983,
+           "p99": 0.0999860167503357,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.8555211558307533,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "9x18": {
+           "mae": 0.004765970865264535,
+           "p99": 0.04672742635011673,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.8244916003536694,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "11x21": {
+           "mae": 0.011676546962310871,
+           "p99": 0.06930001080036163,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9841269841269842,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "13x27": {
+           "mae": 0.007429054860646526,
+           "p99": 0.05663023889064789,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.875912408759124,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "15x30": {
+           "mae": 0.007011701896165808,
+           "p99": 0.046293485909700394,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9594733149856997,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "16x48": {
+           "mae": 0.010929440536225835,
+           "p99": 0.08484936505556107,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9331161095928806,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "17x35": {
+           "mae": 0.007304903740684192,
+           "p99": 0.0590096078813076,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.973193237691116,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "20x40": {
+           "mae": 0.007068781182169914,
+           "p99": 0.05837640538811684,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9211454164284353,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "23x46": {
+           "mae": 0.0054890369065105915,
+           "p99": 0.056957826018333435,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9832142020378244,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "23x47": {
+           "mae": 0.005544702212015788,
+           "p99": 0.059657659381628036,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9983818770226538,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "25x49": {
+           "mae": 0.00701545908426245,
+           "p99": 0.07741247862577438,
+           "firm_fraction": 0.0013605442176870747,
+           "iou_mean": 0.936128199286094,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "25x50": {
+           "mae": 0.0065202229501058655,
+           "p99": 0.0645686611533165,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9457623857623858,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "31x62": {
+           "mae": 0.005078104712689917,
+           "p99": 0.06205667927861214,
+           "firm_fraction": 0.0015608740894901144,
+           "iou_mean": 0.9381212318513695,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "33x61": {
+           "mae": 0.004437357885763049,
+           "p99": 0.058796171098947525,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9551314038589487,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "40x80": {
+           "mae": 0.003774141698765258,
+           "p99": 0.057020001113414764,
+           "firm_fraction": 0.0009375,
+           "iou_mean": 0.947043041915499,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "64x128": {
+           "mae": 0.002129969846767684,
+           "p99": 0.05096636712551117,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9866034808897056,
+           "not_nearest": [],
+           "vanished": []
+          }
+         }
+        }
+       },
+       "shipped": true,
+       "file": "neuronte-kilix-chrome-v2-tchwbr0-g0.json",
+       "shipped_seed": 1,
+       "shipped_because": "both seeds passed the declared gates; lower-error seed"
+      },
+      {
+       "set": "tchwbr0",
+       "group": 1,
+       "kind": "symbols",
+       "scalars": [
+        "U+F035B",
+        "U+F08AE",
+        "U+F2C9"
+       ],
+       "both_seeds_pass": true,
+       "selected_seed": 1,
+       "rules_skipped": [],
+       "limits_eased": [
+        {
+         "rule": "6x12 mae",
+         "declared": 0.017632740107364955,
+         "perfect": 0.02266520665337642,
+         "applied": 0.024931727318714063
+        },
+        {
+         "rule": "6x12 p99",
+         "declared": 0.11412998884916306,
+         "perfect": 0.1666666865348816,
+         "applied": 0.18333335518836977
+        },
+        {
+         "rule": "6x12 firm",
+         "declared": 0.0005,
+         "perfect": 0.004629629629629629,
+         "applied": 0.005092592592592593
+        },
+        {
+         "rule": "8x16 mae",
+         "declared": 0.013056604482699187,
+         "perfect": 0.019859675628443558,
+         "applied": 0.021845643191287914
+        },
+        {
+         "rule": "8x16 p99",
+         "declared": 0.08183252587914468,
+         "perfect": 0.2222222089767456,
+         "applied": 0.2444444298744202
+        },
+        {
+         "rule": "8x16 glyph_mae U+F08AE",
+         "declared": 0.029228511825203897,
+         "perfect": 0.02730943262577057,
+         "applied": 0.03004037588834763
+        },
+        {
+         "rule": "10x20 mae",
+         "declared": 0.008225137833505869,
+         "perfect": 0.016030417910466593,
+         "applied": 0.017633459701513254
+        },
+        {
+         "rule": "10x20 p99",
+         "declared": 0.07114832893013955,
+         "perfect": 0.2222222089767456,
+         "applied": 0.2444444298744202
+        },
+        {
+         "rule": "10x20 glyph_mae U+F035B",
+         "declared": 0.021369570158421995,
+         "perfect": 0.019486382603645325,
+         "applied": 0.02143502086400986
+        },
+        {
+         "rule": "10x20 glyph_mae U+F08AE",
+         "declared": 0.021369570158421995,
+         "perfect": 0.0228097066283226,
+         "applied": 0.025090677291154863
+        },
+        {
+         "rule": "12x24 mae",
+         "declared": 0.008731306431582198,
+         "perfect": 0.011993156435588995,
+         "applied": 0.013192472079147895
+        },
+        {
+         "rule": "12x24 p99",
+         "declared": 0.08151596114039422,
+         "perfect": 0.1666666865348816,
+         "applied": 0.18333335518836977
+        },
+        {
+         "rule": "16x32 mae",
+         "declared": 0.0067491031193640085,
+         "perfect": 0.008183751798545321,
+         "applied": 0.009002126978399855
+        },
+        {
+         "rule": "16x32 p99",
+         "declared": 0.0710161928832531,
+         "perfect": 0.0763888955116272,
+         "applied": 0.08402778506278992
+        },
+        {
+         "rule": "24x48 mae",
+         "declared": 0.006368378823390231,
+         "perfect": 0.009824458897734681,
+         "applied": 0.01080690478750815
+        },
+        {
+         "rule": "24x48 p99",
+         "declared": 0.08273293972015382,
+         "perfect": 0.3333333134651184,
+         "applied": 0.3666666448116303
+        },
+        {
+         "rule": "24x48 firm",
+         "declared": 0.0009548611111111112,
+         "perfect": 0.001736111111111111,
+         "applied": 0.0019097222222222224
+        },
+        {
+         "rule": "48x96 mae",
+         "declared": 0.002969703065173235,
+         "perfect": 0.004741731798276305,
+         "applied": 0.005215904978103936
+        },
+        {
+         "rule": "48x96 p99",
+         "declared": 0.06682996675372124,
+         "perfect": 0.09895831346511841,
+         "applied": 0.10885414481163026
+        }
+       ],
+       "drawing_problems": [],
+       "lower_error_seed": 1,
+       "seeds": {
+        "0": {
+         "pixel_exact": false,
+         "waived": [],
+         "sha256": "5a330b6ed51bfcc6db55b7f6435efb4b765e0fddf805efd9c64652a893fec57c",
+         "packed_sha256": "48827335c33996e89b9d78c85a2011d77f44f26859bc95b98d5411d83149f6b4",
+         "reference_check_passed": true,
+         "gates_passed": true,
+         "failures": [],
+         "mean_established_mae": 0.011011386484218141,
+         "counted_sizes": {
+          "6x12": {
+           "mae": 0.02314455124239127,
+           "p99": 0.16824057698249817,
+           "firm_fraction": 0.0,
+           "iou_mean": 1.0,
+           "worst_glyph_mae": 0.03130430355668068,
+           "worst_glyph_iou": 1.0,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 4.906503066420555
+          },
+          "8x16": {
+           "mae": 0.01989353820681572,
+           "p99": 0.2227586805820465,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9488636363636364,
+           "worst_glyph_mae": 0.027461834251880646,
+           "worst_glyph_iou": 0.9090909090909091,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 11.9262143522501
+          },
+          "10x20": {
+           "mae": 0.015886159303287666,
+           "p99": 0.2167789787054062,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9517543859649122,
+           "worst_glyph_mae": 0.023122301325201988,
+           "worst_glyph_iou": 0.9078947368421053,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 22.26586626470089
+          },
+          "12x24": {
+           "mae": 0.012492313593005141,
+           "p99": 0.1698905974626541,
+           "firm_fraction": 0.0,
+           "iou_mean": 1.0,
+           "worst_glyph_mae": 0.017772585153579712,
+           "worst_glyph_iou": 1.0,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 32.4738692343235
+          },
+          "16x32": {
+           "mae": 0.00820738022836546,
+           "p99": 0.07877527922391891,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9581104387734222,
+           "worst_glyph_mae": 0.011095329187810421,
+           "worst_glyph_iou": 0.9060773480662984,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 59.593333542346954
+          },
+          "24x48": {
+           "mae": 0.010381951617697874,
+           "p99": 0.3348856568336487,
+           "firm_fraction": 0.001736111111111111,
+           "iou_mean": 0.9950027570995313,
+           "worst_glyph_mae": 0.015691198408603668,
+           "worst_glyph_iou": 0.9903846153846154,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 134.18710803985596
+          },
+          "48x96": {
+           "mae": 0.00493324101747324,
+           "p99": 0.09289036691188812,
+           "firm_fraction": 0.0003616898148148148,
+           "iou_mean": 0.9977881543432069,
+           "worst_glyph_mae": 0.007340440526604652,
+           "worst_glyph_iou": 0.9963833634719711,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 534.714014172554
+          }
+         },
+         "one_sample": {},
+         "other_sizes": {
+          "1x2": {
+           "mae": 0.10367220143477122,
+           "p99": 0.13942548632621765,
+           "firm_fraction": 0.0,
+           "iou_mean": 1.0,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "2x4": {
+           "mae": 0.045316666985551514,
+           "p99": 0.1400420367717743,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.5833333333333334,
+           "not_nearest": [
+            "U+F035B->U+F08AE"
+           ],
+           "vanished": []
+          },
+          "3x6": {
+           "mae": 0.03357465316851934,
+           "p99": 0.16518890857696533,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.7777777777777778,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "4x8": {
+           "mae": 0.02399381312231223,
+           "p99": 0.09409594535827637,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.75,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "5x9": {
+           "mae": 0.02216694721331199,
+           "p99": 0.14839288592338562,
+           "firm_fraction": 0.007407407407407408,
+           "iou_mean": 0.9393939393939394,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "7x13": {
+           "mae": 0.018063710692028206,
+           "p99": 0.10465794801712036,
+           "firm_fraction": 0.003663003663003663,
+           "iou_mean": 0.9292114695340502,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "7x14": {
+           "mae": 0.018169423565268517,
+           "p99": 0.09591937065124512,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9393939393939394,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "9x18": {
+           "mae": 0.004441872471943498,
+           "p99": 0.03605012223124504,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9666666666666667,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "11x21": {
+           "mae": 0.010727006010711193,
+           "p99": 0.09944962710142136,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9484197972570065,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "13x27": {
+           "mae": 0.009886021570612987,
+           "p99": 0.11478132754564285,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.875912408759124,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "15x30": {
+           "mae": 0.010236639762297273,
+           "p99": 0.1709430068731308,
+           "firm_fraction": 0.0007407407407407407,
+           "iou_mean": 0.9921994884910487,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "16x48": {
+           "mae": 0.00975007563829422,
+           "p99": 0.09736698865890503,
+           "firm_fraction": 0.00043402777777777775,
+           "iou_mean": 0.9529209888861335,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "17x35": {
+           "mae": 0.009872131127243241,
+           "p99": 0.20231014490127563,
+           "firm_fraction": 0.0005602240896358543,
+           "iou_mean": 0.9303532381202283,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "20x40": {
+           "mae": 0.006690344074741006,
+           "p99": 0.07590772211551666,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9521870758951874,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "23x46": {
+           "mae": 0.0070427521131932735,
+           "p99": 0.11760193109512329,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9933793760419148,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "23x47": {
+           "mae": 0.00677020459746321,
+           "p99": 0.1132822036743164,
+           "firm_fraction": 0.0003083564600678384,
+           "iou_mean": 0.970059159666817,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "25x49": {
+           "mae": 0.011015312823777398,
+           "p99": 0.37864989042282104,
+           "firm_fraction": 0.0016326530612244899,
+           "iou_mean": 0.9612075058918017,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "25x50": {
+           "mae": 0.01120812197526296,
+           "p99": 0.4092424213886261,
+           "firm_fraction": 0.0024,
+           "iou_mean": 0.9697118876040444,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "31x62": {
+           "mae": 0.006074699107557535,
+           "p99": 0.11236033588647842,
+           "firm_fraction": 0.001040582726326743,
+           "iou_mean": 0.9393105432823926,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "33x61": {
+           "mae": 0.008424251650770506,
+           "p99": 0.32792288064956665,
+           "firm_fraction": 0.0003311806590495115,
+           "iou_mean": 0.9944525740300388,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "40x80": {
+           "mae": 0.004834739336123069,
+           "p99": 0.10946109145879745,
+           "firm_fraction": 0.00020833333333333335,
+           "iou_mean": 0.944952937210534,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "64x128": {
+           "mae": 0.0033938872317473092,
+           "p99": 0.06824009865522385,
+           "firm_fraction": 0.00016276041666666666,
+           "iou_mean": 0.989501340481846,
+           "not_nearest": [],
+           "vanished": []
+          }
+         }
+        },
+        "1": {
+         "pixel_exact": false,
+         "waived": [],
+         "sha256": "361fbe82afda066b2c18880e57e66616fce809fa0878cd0dcb343bb347023b8d",
+         "packed_sha256": "099c519f4f5349ecaba5c8d1f2ebfc3942a634d372a46639838310c85023ea9b",
+         "reference_check_passed": true,
+         "gates_passed": true,
+         "failures": [],
+         "mean_established_mae": 0.01093150326050818,
+         "counted_sizes": {
+          "6x12": {
+           "mae": 0.02324613928794861,
+           "p99": 0.16815710067749023,
+           "firm_fraction": 0.0,
+           "iou_mean": 1.0,
+           "worst_glyph_mae": 0.031062820926308632,
+           "worst_glyph_iou": 1.0,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 4.922242343425751
+          },
+          "8x16": {
+           "mae": 0.01974175808330377,
+           "p99": 0.21973064541816711,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9488636363636364,
+           "worst_glyph_mae": 0.027438528835773468,
+           "worst_glyph_iou": 0.9090909090909091,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 11.93334074318409
+          },
+          "10x20": {
+           "mae": 0.015932034856329363,
+           "p99": 0.2194485366344452,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9557894736842106,
+           "worst_glyph_mae": 0.022943221032619476,
+           "worst_glyph_iou": 0.92,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 22.26575957238674
+          },
+          "12x24": {
+           "mae": 0.012526945521434149,
+           "p99": 0.17056359350681305,
+           "firm_fraction": 0.0,
+           "iou_mean": 1.0,
+           "worst_glyph_mae": 0.017848826944828033,
+           "worst_glyph_iou": 1.0,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 32.45967569947243
+          },
+          "16x32": {
+           "mae": 0.008240553550422192,
+           "p99": 0.07746955007314682,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9581104387734222,
+           "worst_glyph_mae": 0.011112741194665432,
+           "worst_glyph_iou": 0.9060773480662984,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 59.61040876805782
+          },
+          "24x48": {
+           "mae": 0.010421293244386712,
+           "p99": 0.332833856344223,
+           "firm_fraction": 0.001736111111111111,
+           "iou_mean": 0.9938249007980001,
+           "worst_glyph_mae": 0.015621958300471306,
+           "worst_glyph_iou": 0.9903846153846154,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 134.2213483452797
+          },
+          "48x96": {
+           "mae": 0.004812198147798578,
+           "p99": 0.08959197252988815,
+           "firm_fraction": 0.0003616898148148148,
+           "iou_mean": 0.9983909270978782,
+           "worst_glyph_mae": 0.007132722996175289,
+           "worst_glyph_iou": 0.9975728155339806,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 534.9316933751106
+          }
+         },
+         "one_sample": {},
+         "other_sizes": {
+          "1x2": {
+           "mae": 0.10375191768010457,
+           "p99": 0.1391676515340805,
+           "firm_fraction": 0.0,
+           "iou_mean": 1.0,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "2x4": {
+           "mae": 0.04547841909031073,
+           "p99": 0.14153458178043365,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.5833333333333334,
+           "not_nearest": [
+            "U+F035B->U+F08AE"
+           ],
+           "vanished": []
+          },
+          "3x6": {
+           "mae": 0.03422804114719232,
+           "p99": 0.1653236746788025,
+           "firm_fraction": 0.018518518518518517,
+           "iou_mean": 0.6805555555555555,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "4x8": {
+           "mae": 0.024056820198893547,
+           "p99": 0.09590674936771393,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.75,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "5x9": {
+           "mae": 0.02240351028740406,
+           "p99": 0.14423753321170807,
+           "firm_fraction": 0.007407407407407408,
+           "iou_mean": 0.9393939393939394,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "7x13": {
+           "mae": 0.017810289127131302,
+           "p99": 0.10516028106212616,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.943100358422939,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "7x14": {
+           "mae": 0.018140091250340145,
+           "p99": 0.09930595755577087,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9393939393939394,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "9x18": {
+           "mae": 0.004750878317281604,
+           "p99": 0.03913826495409012,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9666666666666667,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "11x21": {
+           "mae": 0.010541904717683792,
+           "p99": 0.10066678375005722,
+           "firm_fraction": 0.001443001443001443,
+           "iou_mean": 0.9487063324272627,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "13x27": {
+           "mae": 0.00989939427624146,
+           "p99": 0.1155090183019638,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.8719806763285024,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "15x30": {
+           "mae": 0.01003173536931475,
+           "p99": 0.16744962334632874,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9946504688832055,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "16x48": {
+           "mae": 0.009856085681046048,
+           "p99": 0.09508363157510757,
+           "firm_fraction": 0.0008680555555555555,
+           "iou_mean": 0.9499797215907987,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "17x35": {
+           "mae": 0.009800121964265903,
+           "p99": 0.20317189395427704,
+           "firm_fraction": 0.0005602240896358543,
+           "iou_mean": 0.9303532381202283,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "20x40": {
+           "mae": 0.006716777880986531,
+           "p99": 0.08159329742193222,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9503278820777007,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "23x46": {
+           "mae": 0.007017077257235845,
+           "p99": 0.11653769761323929,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9963147513754801,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "23x47": {
+           "mae": 0.006749586512645085,
+           "p99": 0.11290597170591354,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9696910547813328,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "25x49": {
+           "mae": 0.010944298468530178,
+           "p99": 0.36563655734062195,
+           "firm_fraction": 0.0019047619047619048,
+           "iou_mean": 0.9612075058918017,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "25x50": {
+           "mae": 0.01117761037312448,
+           "p99": 0.40429383516311646,
+           "firm_fraction": 0.0026666666666666666,
+           "iou_mean": 0.9689402826657729,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "31x62": {
+           "mae": 0.006271263894935449,
+           "p99": 0.1181153804063797,
+           "firm_fraction": 0.0008671522719389525,
+           "iou_mean": 0.9387567739221314,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "33x61": {
+           "mae": 0.008515313112487396,
+           "p99": 0.3239515423774719,
+           "firm_fraction": 0.0003311806590495115,
+           "iou_mean": 0.9944566143361323,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "40x80": {
+           "mae": 0.00486308344018956,
+           "p99": 0.11127676069736481,
+           "firm_fraction": 0.00020833333333333335,
+           "iou_mean": 0.9453711709368173,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "64x128": {
+           "mae": 0.003416488878428936,
+           "p99": 0.07132580131292343,
+           "firm_fraction": 0.000244140625,
+           "iou_mean": 0.9892803986528488,
+           "not_nearest": [],
+           "vanished": []
+          }
+         }
+        }
+       },
+       "shipped": true,
+       "file": "neuronte-kilix-chrome-v2-tchwbr0-g1.json",
+       "shipped_seed": 1,
+       "shipped_because": "both seeds passed the declared gates; lower-error seed"
+      }
+     ]
+    },
+    {
+     "set": "tchwb",
+     "group": 1,
+     "kind": "symbols",
+     "scalars": [
+      "U+F028",
+      "U+F05CB",
+      "U+F036C",
+      "U+F036D",
+      "U+F1EB",
+      "U+F073",
+      "U+F0E7"
+     ],
+     "both_seeds_pass": false,
+     "selected_seed": null,
+     "rules_skipped": [],
+     "limits_eased": [
+      {
+       "rule": "6x12 firm",
+       "declared": 0.0005,
+       "perfect": 0.007936507936507936,
+       "applied": 0.00873015873015873
+      },
+      {
+       "rule": "24x48 firm",
+       "declared": 0.0009548611111111112,
+       "perfect": 0.0011160714285714285,
+       "applied": 0.0012276785714285714
+      }
+     ],
+     "drawing_problems": [],
+     "lower_error_seed": 1,
+     "seeds": {
+      "0": {
+       "pixel_exact": false,
+       "waived": [],
+       "sha256": "845213885f5523b495899d2784735bdbd9b6bc87de9bae458be1b07d69d69fd5",
+       "packed_sha256": "10dc0cb5130ff1f135ff13d4931dcae3fb1b0d9d9392b0929811ea1c77600cd9",
+       "reference_check_passed": true,
+       "gates_passed": false,
+       "failures": [
+        "24x48 firm"
+       ],
+       "mean_established_mae": 0.004870835370162413,
+       "counted_sizes": {
+        "6x12": {
+         "mae": 0.012497880296515567,
+         "p99": 0.09181738644838333,
+         "firm_fraction": 0.003968253968253968,
+         "iou_mean": 0.9476042590949423,
+         "worst_glyph_mae": 0.030784398317337036,
+         "worst_glyph_iou": 0.8260869565217391,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 6.169374614953995
+        },
+        "8x16": {
+         "mae": 0.008150112449324556,
+         "p99": 0.06715076416730881,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9274078862314157,
+         "worst_glyph_mae": 0.015466430224478245,
+         "worst_glyph_iou": 0.7058823529411765,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 13.514243751764297
+        },
+        "10x20": {
+         "mae": 0.0058591111030961785,
+         "p99": 0.059319667518138885,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9895470383275261,
+         "worst_glyph_mae": 0.012520653195679188,
+         "worst_glyph_iou": 0.926829268292683,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 21.867566779255867
+        },
+        "12x24": {
+         "mae": 0.0061675808392465115,
+         "p99": 0.06202968955039978,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9896935664010428,
+         "worst_glyph_mae": 0.016649359837174416,
+         "worst_glyph_iou": 0.9642857142857143,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 31.098263546824455
+        },
+        "16x32": {
+         "mae": 0.0041452474626047274,
+         "p99": 0.0548718199133873,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9558117349153589,
+         "worst_glyph_mae": 0.010286512784659863,
+         "worst_glyph_iou": 0.845360824742268,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 56.18383885920048
+        },
+        "24x48": {
+         "mae": 0.005233244937179344,
+         "p99": 0.06794294714927673,
+         "firm_fraction": 0.001240079365079365,
+         "iou_mean": 0.9826740705109452,
+         "worst_glyph_mae": 0.011426209472119808,
+         "worst_glyph_iou": 0.9672131147540983,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 127.17321044206619
+        },
+        "48x96": {
+         "mae": 0.002317146198557956,
+         "p99": 0.05171027407050133,
+         "firm_fraction": 0.0003410218253968254,
+         "iou_mean": 0.9950059514605657,
+         "worst_glyph_mae": 0.005006744526326656,
+         "worst_glyph_iou": 0.9918367346938776,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 518.5254430770874
+        }
+       },
+       "one_sample": {},
+       "other_sizes": {
+        "1x2": {
+         "mae": 0.14894539649997438,
+         "p99": 0.22685202956199646,
+         "firm_fraction": 0.14285714285714285,
+         "iou_mean": 0.8571428571428571,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "2x4": {
+         "mae": 0.03673865606210062,
+         "p99": 0.10588640719652176,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.7619047619047619,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "3x6": {
+         "mae": 0.024851270552192415,
+         "p99": 0.10218948870897293,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.8214285714285714,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "4x8": {
+         "mae": 0.020227463516805853,
+         "p99": 0.11144032329320908,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.6110544217687075,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "5x9": {
+         "mae": 0.015040173860532897,
+         "p99": 0.11724459379911423,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.945578231292517,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "7x13": {
+         "mae": 0.010451507488531726,
+         "p99": 0.09815759211778641,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.8786841765660764,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "7x14": {
+         "mae": 0.01090337016752788,
+         "p99": 0.08660121262073517,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9591836734693878,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "9x18": {
+         "mae": 0.004864806475649987,
+         "p99": 0.049191705882549286,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9440879382055852,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "11x21": {
+         "mae": 0.006005483945565564,
+         "p99": 0.05927800014615059,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9836393750213318,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "13x27": {
+         "mae": 0.004825582012667188,
+         "p99": 0.05699679255485535,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9418506493506493,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "15x30": {
+         "mae": 0.004994663908811552,
+         "p99": 0.04769004136323929,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9923965285105316,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "16x48": {
+         "mae": 0.004959866071918181,
+         "p99": 0.07038560509681702,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9593564708913799,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "17x35": {
+         "mae": 0.0035188472330836312,
+         "p99": 0.05506023019552231,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9713426029752561,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "20x40": {
+         "mae": 0.0033833167648741175,
+         "p99": 0.05573899298906326,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.973770745534642,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "23x46": {
+         "mae": 0.00308964097140623,
+         "p99": 0.055754050612449646,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.983649937305826,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "23x47": {
+         "mae": 0.003060228091531566,
+         "p99": 0.05650230497121811,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9931477735760561,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "25x49": {
+         "mae": 0.004289869551679918,
+         "p99": 0.06569524109363556,
+         "firm_fraction": 0.0004664723032069971,
+         "iou_mean": 0.964472677624847,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "25x50": {
+         "mae": 0.003989700327760407,
+         "p99": 0.061680085957050323,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.976943333352233,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "31x62": {
+         "mae": 0.0033958289838795152,
+         "p99": 0.05905071645975113,
+         "firm_fraction": 0.0001486546751895347,
+         "iou_mean": 0.9647837400196485,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "33x61": {
+         "mae": 0.0035061037966183256,
+         "p99": 0.060561176389455795,
+         "firm_fraction": 0.00014193456816407636,
+         "iou_mean": 0.985607232998045,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "40x80": {
+         "mae": 0.0026423284684174825,
+         "p99": 0.05736883729696274,
+         "firm_fraction": 4.464285714285714e-05,
+         "iou_mean": 0.9711850357758162,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "64x128": {
+         "mae": 0.0016962025131631111,
+         "p99": 0.04795387387275696,
+         "firm_fraction": 1.743861607142857e-05,
+         "iou_mean": 0.9924273947691569,
+         "not_nearest": [],
+         "vanished": []
+        }
+       }
+      },
+      "1": {
+       "pixel_exact": false,
+       "waived": [],
+       "sha256": "fb460b0dda43fd28564dfefd3adfba216119fbfb44965f5d5abcd25c88aeea71",
+       "packed_sha256": "37d065d6fc591d1aabf8cba94a6f69bd74eac3a014aabefd66a19d2156cdca4d",
+       "reference_check_passed": true,
+       "gates_passed": true,
+       "failures": [],
+       "mean_established_mae": 0.004849727659131445,
+       "counted_sizes": {
+        "6x12": {
+         "mae": 0.012475411274603434,
+         "p99": 0.09278279542922974,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9631725417439704,
+         "worst_glyph_mae": 0.030790559947490692,
+         "worst_glyph_iou": 0.8636363636363636,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 6.125659346580505
+        },
+        "8x16": {
+         "mae": 0.00814193014853767,
+         "p99": 0.0671740248799324,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9274078862314157,
+         "worst_glyph_mae": 0.015944771468639374,
+         "worst_glyph_iou": 0.7058823529411765,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 13.51719081401825
+        },
+        "10x20": {
+         "mae": 0.005879767638232026,
+         "p99": 0.05978664010763168,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9879518072289156,
+         "worst_glyph_mae": 0.012885971926152706,
+         "worst_glyph_iou": 0.9156626506024096,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 21.9174242913723
+        },
+        "12x24": {
+         "mae": 0.006263489834964275,
+         "p99": 0.06534872204065323,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9876240818908208,
+         "worst_glyph_mae": 0.01721271127462387,
+         "worst_glyph_iou": 0.9642857142857143,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 31.150648579001427
+        },
+        "16x32": {
+         "mae": 0.004128503712958523,
+         "p99": 0.055697593837976456,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9545018122511778,
+         "worst_glyph_mae": 0.010125281289219856,
+         "worst_glyph_iou": 0.845360824742268,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 56.16115294396877
+        },
+        "24x48": {
+         "mae": 0.005167637652318392,
+         "p99": 0.06638006865978241,
+         "firm_fraction": 0.0011160714285714285,
+         "iou_mean": 0.9839302104623744,
+         "worst_glyph_mae": 0.011351446621119976,
+         "worst_glyph_iou": 0.963265306122449,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 127.4231589436531
+        },
+        "48x96": {
+         "mae": 0.002278749115898141,
+         "p99": 0.05025818943977356,
+         "firm_fraction": 0.0003720238095238095,
+         "iou_mean": 0.993852112126378,
+         "worst_glyph_mae": 0.004897912964224815,
+         "worst_glyph_iou": 0.9905123339658444,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 518.596172273159
+        }
+       },
+       "one_sample": {},
+       "other_sizes": {
+        "1x2": {
+         "mae": 0.14924880755799158,
+         "p99": 0.2331005185842514,
+         "firm_fraction": 0.21428571428571427,
+         "iou_mean": 0.7142857142857143,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "2x4": {
+         "mae": 0.037037830001541545,
+         "p99": 0.10835756361484528,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.7619047619047619,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "3x6": {
+         "mae": 0.025398058284606253,
+         "p99": 0.10598094761371613,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.8214285714285714,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "4x8": {
+         "mae": 0.01990505467568125,
+         "p99": 0.11143966019153595,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.6439909297052154,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "5x9": {
+         "mae": 0.014616270715902959,
+         "p99": 0.102760449051857,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.923469387755102,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "7x13": {
+         "mae": 0.010526493989995547,
+         "p99": 0.09577526897192001,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.8839751818570818,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "7x14": {
+         "mae": 0.010974770810987269,
+         "p99": 0.0861949622631073,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9637813746188131,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "9x18": {
+         "mae": 0.005089244871799435,
+         "p99": 0.04945722967386246,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9598609120348252,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "11x21": {
+         "mae": 0.005986300496650594,
+         "p99": 0.057312142103910446,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9861008859414895,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "13x27": {
+         "mae": 0.005016797388504658,
+         "p99": 0.05790366977453232,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9398385769160418,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "15x30": {
+         "mae": 0.005051632494931775,
+         "p99": 0.04728146269917488,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.989362123482543,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "16x48": {
+         "mae": 0.00498000648804009,
+         "p99": 0.07049864530563354,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9600773874963638,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "17x35": {
+         "mae": 0.0036058806581422687,
+         "p99": 0.054590560495853424,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9732862375719519,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "20x40": {
+         "mae": 0.0033663472360266106,
+         "p99": 0.05533846095204353,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9723282828652929,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "23x46": {
+         "mae": 0.0030507890041917562,
+         "p99": 0.05624331533908844,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.983948731386346,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "23x47": {
+         "mae": 0.0031008534216588096,
+         "p99": 0.05646654590964317,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9944405932924695,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "25x49": {
+         "mae": 0.004363339893253786,
+         "p99": 0.06635315716266632,
+         "firm_fraction": 0.0005830903790087463,
+         "iou_mean": 0.9633234638169654,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "25x50": {
+         "mae": 0.004022118718629437,
+         "p99": 0.063888318836689,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9753139596754974,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "31x62": {
+         "mae": 0.0034875959889697178,
+         "p99": 0.061134520918130875,
+         "firm_fraction": 7.432733759476735e-05,
+         "iou_mean": 0.9653789472219769,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "33x61": {
+         "mae": 0.0034898591859798345,
+         "p99": 0.05965298414230347,
+         "firm_fraction": 0.00021290185224611454,
+         "iou_mean": 0.9854518365921517,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "40x80": {
+         "mae": 0.002641625087043004,
+         "p99": 0.05788613110780716,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9708297708365424,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "64x128": {
+         "mae": 0.0016663077985867858,
+         "p99": 0.04705291613936424,
+         "firm_fraction": 1.743861607142857e-05,
+         "iou_mean": 0.9916516201424941,
+         "not_nearest": [],
+         "vanished": []
+        }
+       }
+      }
+     },
+     "halved": true,
+     "shipped": false,
+     "halves": [
+      {
+       "set": "tchwbr1",
+       "group": 0,
+       "kind": "symbols",
+       "scalars": [
+        "U+F028",
+        "U+F05CB",
+        "U+F036C"
+       ],
+       "both_seeds_pass": true,
+       "selected_seed": 0,
+       "rules_skipped": [],
+       "limits_eased": [],
+       "drawing_problems": [],
+       "lower_error_seed": 0,
+       "seeds": {
+        "0": {
+         "pixel_exact": false,
+         "waived": [],
+         "sha256": "b8be85fe5cafed6f49ade92b846b1034f4de56d5b4d3d872062f176547e5acc2",
+         "packed_sha256": "1af7969973c5da102d611474eddcde502b11c47654834853d6ba5aeb8502f2bd",
+         "reference_check_passed": true,
+         "gates_passed": true,
+         "failures": [],
+         "mean_established_mae": 0.0043539876868534414,
+         "counted_sizes": {
+          "6x12": {
+           "mae": 0.00999552384018898,
+           "p99": 0.07097851485013962,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9420289855072465,
+           "worst_glyph_mae": 0.011599932797253132,
+           "worst_glyph_iou": 0.8260869565217391,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 6.178550660610199
+          },
+          "8x16": {
+           "mae": 0.007860828191041946,
+           "p99": 0.0603821836411953,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.8852941176470588,
+           "worst_glyph_mae": 0.010266185738146305,
+           "worst_glyph_iou": 0.7058823529411765,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 14.44627359509468
+          },
+          "10x20": {
+           "mae": 0.005103553490092357,
+           "p99": 0.055960509926080704,
+           "firm_fraction": 0.0,
+           "iou_mean": 1.0,
+           "worst_glyph_mae": 0.006250104866921902,
+           "worst_glyph_iou": 1.0,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 24.00444793701172
+          },
+          "12x24": {
+           "mae": 0.004855218653877576,
+           "p99": 0.043264202773571014,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9830276196500106,
+           "worst_glyph_mae": 0.006110198330134153,
+           "worst_glyph_iou": 0.9705882352941176,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 33.885068103671074
+          },
+          "16x32": {
+           "mae": 0.0035041742958128452,
+           "p99": 0.04203665629029274,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.961499423964519,
+           "worst_glyph_mae": 0.003844552906230092,
+           "worst_glyph_iou": 0.9137931034482759,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 64.4232974499464
+          },
+          "24x48": {
+           "mae": 0.004036295926198363,
+           "p99": 0.05493868887424469,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9910559495665878,
+           "worst_glyph_mae": 0.0047609093599021435,
+           "worst_glyph_iou": 0.9787234042553191,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 148.31955176591873
+          },
+          "48x96": {
+           "mae": 0.0016969605737055342,
+           "p99": 0.04103182628750801,
+           "firm_fraction": 0.00014467592592592592,
+           "iou_mean": 0.9947516013730547,
+           "worst_glyph_mae": 0.0020388199482113123,
+           "worst_glyph_iou": 0.9914529914529915,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 607.9421644210815
+          }
+         },
+         "one_sample": {},
+         "other_sizes": {
+          "1x2": {
+           "mae": 0.13773068288962045,
+           "p99": 0.22159694135189056,
+           "firm_fraction": 0.0,
+           "iou_mean": 1.0,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "2x4": {
+           "mae": 0.03506660150984923,
+           "p99": 0.10366330295801163,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.4444444444444444,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "3x6": {
+           "mae": 0.02319207911690076,
+           "p99": 0.10173926502466202,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.8333333333333334,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "4x8": {
+           "mae": 0.0176994822298487,
+           "p99": 0.10696619749069214,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.5388888888888889,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "5x9": {
+           "mae": 0.012494100568195185,
+           "p99": 0.0758315846323967,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9166666666666666,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "7x13": {
+           "mae": 0.007875401992350817,
+           "p99": 0.04500313475728035,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9376543209876543,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "7x14": {
+           "mae": 0.008440662951519093,
+           "p99": 0.053475309163331985,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9726327312534209,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "9x18": {
+           "mae": 0.00432130570213,
+           "p99": 0.035294704139232635,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9346966647498562,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "11x21": {
+           "mae": 0.004446726602812608,
+           "p99": 0.04203665629029274,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9954337899543378,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "13x27": {
+           "mae": 0.004574522065619628,
+           "p99": 0.05606311187148094,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9443181818181818,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "15x30": {
+           "mae": 0.003948591649532318,
+           "p99": 0.04424264654517174,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9884135472370766,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "16x48": {
+           "mae": 0.004007217086230715,
+           "p99": 0.06581753492355347,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9866626467970253,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "17x35": {
+           "mae": 0.0031265028131504855,
+           "p99": 0.05415058135986328,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9547619047619048,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "20x40": {
+           "mae": 0.0026543012354522943,
+           "p99": 0.03815833479166031,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.97921361415856,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "23x46": {
+           "mae": 0.0025496953167021275,
+           "p99": 0.04539928212761879,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9969135802469135,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "23x47": {
+           "mae": 0.002705272442350785,
+           "p99": 0.048051804304122925,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9979859013091641,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "25x49": {
+           "mae": 0.0032367476572593055,
+           "p99": 0.05426520109176636,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9860293611455321,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "25x50": {
+           "mae": 0.0030982930523653827,
+           "p99": 0.05233169347047806,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9800875934577471,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "31x62": {
+           "mae": 0.002720663712049524,
+           "p99": 0.05040404945611954,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9785167320399314,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "33x61": {
+           "mae": 0.0029082019658138356,
+           "p99": 0.05047886446118355,
+           "firm_fraction": 0.0003311806590495115,
+           "iou_mean": 0.9887773888252136,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "40x80": {
+           "mae": 0.002098622809474667,
+           "p99": 0.043980054557323456,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9814552949559244,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "64x128": {
+           "mae": 0.0013047225850944717,
+           "p99": 0.03874611854553223,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9936279031058303,
+           "not_nearest": [],
+           "vanished": []
+          }
+         }
+        },
+        "1": {
+         "pixel_exact": false,
+         "waived": [],
+         "sha256": "aa77a06bc55d4ca5e372fcd7dd85ab6fd3842c5034526703fb763284e90465ef",
+         "packed_sha256": "0d57cd6e1a091a20ba7c90a1dcc046ee8cfafeee3bd755b90b24bff5e8deb826",
+         "reference_check_passed": true,
+         "gates_passed": true,
+         "failures": [],
+         "mean_established_mae": 0.004391920507057673,
+         "counted_sizes": {
+          "6x12": {
+           "mae": 0.009839290597786507,
+           "p99": 0.06888512521982193,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9420289855072465,
+           "worst_glyph_mae": 0.011508098803460598,
+           "worst_glyph_iou": 0.8260869565217391,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 6.180923715233803
+          },
+          "8x16": {
+           "mae": 0.007926153019070625,
+           "p99": 0.05798999220132828,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.8852941176470588,
+           "worst_glyph_mae": 0.0102262943983078,
+           "worst_glyph_iou": 0.7058823529411765,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 14.489234507083893
+          },
+          "10x20": {
+           "mae": 0.005283845899005731,
+           "p99": 0.05531131103634834,
+           "firm_fraction": 0.0,
+           "iou_mean": 1.0,
+           "worst_glyph_mae": 0.006505455821752548,
+           "worst_glyph_iou": 1.0,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 23.959992915391922
+          },
+          "12x24": {
+           "mae": 0.0048971474170684814,
+           "p99": 0.042509231716394424,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9866118490406915,
+           "worst_glyph_mae": 0.0060941544361412525,
+           "worst_glyph_iou": 0.9705882352941176,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 33.93849320709705
+          },
+          "16x32": {
+           "mae": 0.0035480319056659937,
+           "p99": 0.04191088676452637,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9574845690011546,
+           "worst_glyph_mae": 0.003767276182770729,
+           "worst_glyph_iou": 0.9137931034482759,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 64.52367885410786
+          },
+          "24x48": {
+           "mae": 0.004082044741759698,
+           "p99": 0.053668469190597534,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9910559495665878,
+           "worst_glyph_mae": 0.004720746539533138,
+           "worst_glyph_iou": 0.9787234042553191,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 148.40921545028687
+          },
+          "48x96": {
+           "mae": 0.0017015765964364011,
+           "p99": 0.04135339334607124,
+           "firm_fraction": 0.00014467592592592592,
+           "iou_mean": 0.9937566235121617,
+           "worst_glyph_mae": 0.002064269036054611,
+           "worst_glyph_iou": 0.9914529914529915,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 607.2920731902122
+          }
+         },
+         "one_sample": {},
+         "other_sizes": {
+          "1x2": {
+           "mae": 0.13778253893057504,
+           "p99": 0.22144947946071625,
+           "firm_fraction": 0.0,
+           "iou_mean": 1.0,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "2x4": {
+           "mae": 0.03478202037513256,
+           "p99": 0.10181877762079239,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.4444444444444444,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "3x6": {
+           "mae": 0.02314341813325882,
+           "p99": 0.10057590901851654,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.8333333333333334,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "4x8": {
+           "mae": 0.018141158235569794,
+           "p99": 0.10786506533622742,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.48333333333333334,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "5x9": {
+           "mae": 0.012904677540063858,
+           "p99": 0.08297718316316605,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9166666666666666,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "7x13": {
+           "mae": 0.007762812543660402,
+           "p99": 0.044524483382701874,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9500000000000001,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "7x14": {
+           "mae": 0.008681782521307468,
+           "p99": 0.05018477141857147,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9726327312534209,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "9x18": {
+           "mae": 0.004174550141518314,
+           "p99": 0.030623503029346466,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9411721504112808,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "11x21": {
+           "mae": 0.004393683203185598,
+           "p99": 0.0439891554415226,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9954337899543378,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "13x27": {
+           "mae": 0.0045469896867871284,
+           "p99": 0.05616721138358116,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9443181818181818,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "15x30": {
+           "mae": 0.003994488933434089,
+           "p99": 0.042641256004571915,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9884135472370766,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "16x48": {
+           "mae": 0.004021283860007922,
+           "p99": 0.06765003502368927,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9866626467970253,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "17x35": {
+           "mae": 0.0031235195541133485,
+           "p99": 0.05395402014255524,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9547619047619048,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "20x40": {
+           "mae": 0.002674052336563667,
+           "p99": 0.040516093373298645,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.97921361415856,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "23x46": {
+           "mae": 0.002557583386078477,
+           "p99": 0.046111129224300385,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9969135802469135,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "23x47": {
+           "mae": 0.0026590450822065272,
+           "p99": 0.051984965801239014,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.998989898989899,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "25x49": {
+           "mae": 0.0031783949428548417,
+           "p99": 0.05416013300418854,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9847993827160494,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "25x50": {
+           "mae": 0.003080662184705337,
+           "p99": 0.05223148688673973,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.983530647620638,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "31x62": {
+           "mae": 0.0026785917580127716,
+           "p99": 0.05050215497612953,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.980344631793271,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "33x61": {
+           "mae": 0.002909788629040122,
+           "p99": 0.05060092359781265,
+           "firm_fraction": 0.0003311806590495115,
+           "iou_mean": 0.9894973108598579,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "40x80": {
+           "mae": 0.002075501795237263,
+           "p99": 0.04371398687362671,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9833382738323264,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "64x128": {
+           "mae": 0.0012936553684994578,
+           "p99": 0.03910023719072342,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9942826169058399,
+           "not_nearest": [],
+           "vanished": []
+          }
+         }
+        }
+       },
+       "shipped": true,
+       "file": "neuronte-kilix-chrome-v2-tchwbr1-g0.json",
+       "shipped_seed": 0,
+       "shipped_because": "both seeds passed the declared gates; lower-error seed"
+      },
+      {
+       "set": "tchwbr1",
+       "group": 1,
+       "kind": "symbols",
+       "scalars": [
+        "U+F036D",
+        "U+F1EB",
+        "U+F073",
+        "U+F0E7"
+       ],
+       "both_seeds_pass": true,
+       "selected_seed": 1,
+       "rules_skipped": [],
+       "limits_eased": [
+        {
+         "rule": "6x12 p99",
+         "declared": 0.11412998884916306,
+         "perfect": 0.109375,
+         "applied": 0.12031250000000002
+        },
+        {
+         "rule": "6x12 firm",
+         "declared": 0.0005,
+         "perfect": 0.013888888888888888,
+         "applied": 0.015277777777777779
+        },
+        {
+         "rule": "10x20 p99",
+         "declared": 0.07114832893013955,
+         "perfect": 0.0659722089767456,
+         "applied": 0.07256942987442017
+        },
+        {
+         "rule": "12x24 p99",
+         "declared": 0.08151596114039422,
+         "perfect": 0.0921160876750946,
+         "applied": 0.10132769644260407
+        },
+        {
+         "rule": "24x48 mae",
+         "declared": 0.006368378823390231,
+         "perfect": 0.005842784361448139,
+         "applied": 0.006427062797592953
+        },
+        {
+         "rule": "24x48 p99",
+         "declared": 0.08273293972015382,
+         "perfect": 0.08239138126373291,
+         "applied": 0.0906305193901062
+        },
+        {
+         "rule": "24x48 firm",
+         "declared": 0.0009548611111111112,
+         "perfect": 0.001953125,
+         "applied": 0.0021484375
+        },
+        {
+         "rule": "48x96 firm",
+         "declared": 0.0005288071533923304,
+         "perfect": 0.0005967881944444445,
+         "applied": 0.0006564670138888889
+        }
+       ],
+       "drawing_problems": [],
+       "lower_error_seed": 1,
+       "seeds": {
+        "0": {
+         "pixel_exact": false,
+         "waived": [],
+         "sha256": "bbfde0a6583b78622a10d57f5bec526956350b6f729495105d51f7336da35088",
+         "packed_sha256": "5abdc153e6822e4e9484bf88743604ee9ed7e216b88801df8663505be1fc6835",
+         "reference_check_passed": true,
+         "gates_passed": true,
+         "failures": [],
+         "mean_established_mae": 0.0052062299801036716,
+         "counted_sizes": {
+          "6x12": {
+           "mae": 0.014016808127053082,
+           "p99": 0.10797479003667831,
+           "firm_fraction": 0.010416666666666666,
+           "iou_mean": 0.9517857142857142,
+           "worst_glyph_mae": 0.03087315894663334,
+           "worst_glyph_iou": 0.8571428571428571,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 6.278447270393372
+          },
+          "8x16": {
+           "mae": 0.008470830915030092,
+           "p99": 0.07144593447446823,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9541855203619909,
+           "worst_glyph_mae": 0.015914293006062508,
+           "worst_glyph_iou": 0.8461538461538461,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 13.492835938930511
+          },
+          "10x20": {
+           "mae": 0.006148633663542569,
+           "p99": 0.06437599658966064,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9817073170731707,
+           "worst_glyph_mae": 0.012177322059869766,
+           "worst_glyph_iou": 0.926829268292683,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 21.906092643737793
+          },
+          "12x24": {
+           "mae": 0.007152829319238663,
+           "p99": 0.08437058329582214,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9910714285714286,
+           "worst_glyph_mae": 0.01703551970422268,
+           "worst_glyph_iou": 0.9642857142857143,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 31.127927854657173
+          },
+          "16x32": {
+           "mae": 0.00459810410393402,
+           "p99": 0.057890985161066055,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9525248643977539,
+           "worst_glyph_mae": 0.010354465804994106,
+           "worst_glyph_iou": 0.845360824742268,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 56.21799358725548
+          },
+          "24x48": {
+           "mae": 0.005860939738340676,
+           "p99": 0.0784802958369255,
+           "firm_fraction": 0.001953125,
+           "iou_mean": 0.9783436237220637,
+           "worst_glyph_mae": 0.01122877188026905,
+           "worst_glyph_iou": 0.9711934156378601,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 127.43197071552277
+          },
+          "48x96": {
+           "mae": 0.002549754921346903,
+           "p99": 0.05147382244467735,
+           "firm_fraction": 0.0005967881944444445,
+           "iou_mean": 0.9953767036705705,
+           "worst_glyph_mae": 0.005131195764988661,
+           "worst_glyph_iou": 0.9938650306748467,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 519.2095565795898
+          }
+         },
+         "one_sample": {},
+         "other_sizes": {
+          "1x2": {
+           "mae": 0.15739744529128075,
+           "p99": 0.2289724349975586,
+           "firm_fraction": 0.25,
+           "iou_mean": 0.75,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "2x4": {
+           "mae": 0.038342836778610945,
+           "p99": 0.10720685124397278,
+           "firm_fraction": 0.0,
+           "iou_mean": 1.0,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "3x6": {
+           "mae": 0.026597870513796806,
+           "p99": 0.10915123671293259,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.8125,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "4x8": {
+           "mae": 0.021169421961531043,
+           "p99": 0.11249008774757385,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.8214285714285714,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "5x9": {
+           "mae": 0.015989068197086453,
+           "p99": 0.13158391416072845,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.8928571428571429,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "7x13": {
+           "mae": 0.012470766669139266,
+           "p99": 0.10640221834182739,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.8607723577235773,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "7x14": {
+           "mae": 0.012424157001078129,
+           "p99": 0.09033612906932831,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9571428571428572,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "9x18": {
+           "mae": 0.004870155069511384,
+           "p99": 0.05009199678897858,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9621212121212122,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "11x21": {
+           "mae": 0.007056005648337305,
+           "p99": 0.06637999415397644,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9847830261136713,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "13x27": {
+           "mae": 0.004854548431467265,
+           "p99": 0.05825721099972725,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9364788732394367,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "15x30": {
+           "mae": 0.0056722419103607535,
+           "p99": 0.04756879433989525,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.997787610619469,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "16x48": {
+           "mae": 0.005644341465085745,
+           "p99": 0.07176473736763,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9437013933168932,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "17x35": {
+           "mae": 0.0038309380470309407,
+           "p99": 0.05723095312714577,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9854671584123639,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "20x40": {
+           "mae": 0.003762732434552163,
+           "p99": 0.05755436420440674,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9724095161414001,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "23x46": {
+           "mae": 0.00335166382137686,
+           "p99": 0.057525407522916794,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9724619289340102,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "23x47": {
+           "mae": 0.0032323863415513188,
+           "p99": 0.05828234925866127,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9905891034531811,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "25x49": {
+           "mae": 0.004824455769266933,
+           "p99": 0.06681035459041595,
+           "firm_fraction": 0.0008163265306122449,
+           "iou_mean": 0.9506936100099012,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "25x50": {
+           "mae": 0.00439570561866276,
+           "p99": 0.06709767878055573,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9708487226975973,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "31x62": {
+           "mae": 0.0037910061073489487,
+           "p99": 0.06393138319253922,
+           "firm_fraction": 0.00026014568158168577,
+           "iou_mean": 0.954900974688568,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "33x61": {
+           "mae": 0.0037963924114592373,
+           "p99": 0.058371562510728836,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9850560237784554,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "40x80": {
+           "mae": 0.0028150302241556346,
+           "p99": 0.05879256874322891,
+           "firm_fraction": 0.00015625,
+           "iou_mean": 0.9618763137768533,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "64x128": {
+           "mae": 0.0016384686168748885,
+           "p99": 0.04473403841257095,
+           "firm_fraction": 3.0517578125e-05,
+           "iou_mean": 0.9919997851931783,
+           "not_nearest": [],
+           "vanished": []
+          }
+         }
+        },
+        "1": {
+         "pixel_exact": false,
+         "waived": [],
+         "sha256": "69c4560d598d85609d8c436d2bed1539fbe1d47747de1a72c1ffb5043459c41f",
+         "packed_sha256": "edd29cc39f611102d256db0745028368bf32aa71c10c461a06e0e524839e8d33",
+         "reference_check_passed": true,
+         "gates_passed": true,
+         "failures": [],
+         "mean_established_mae": 0.0051914404320996255,
+         "counted_sizes": {
+          "6x12": {
+           "mae": 0.014288788777776062,
+           "p99": 0.10678903013467789,
+           "firm_fraction": 0.006944444444444444,
+           "iou_mean": 0.9404761904761905,
+           "worst_glyph_mae": 0.03125372901558876,
+           "worst_glyph_iou": 0.8571428571428571,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 6.227514028549194
+          },
+          "8x16": {
+           "mae": 0.00856781448237598,
+           "p99": 0.07353115826845169,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9541855203619909,
+           "worst_glyph_mae": 0.01594654470682144,
+           "worst_glyph_iou": 0.8461538461538461,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 13.485212057828903
+          },
+          "10x20": {
+           "mae": 0.006155047856736928,
+           "p99": 0.06332367658615112,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9817073170731707,
+           "worst_glyph_mae": 0.012140975333750248,
+           "worst_glyph_iou": 0.926829268292683,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 21.904766008257866
+          },
+          "12x24": {
+           "mae": 0.007165090530179441,
+           "p99": 0.08652734756469727,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9910714285714286,
+           "worst_glyph_mae": 0.016940167173743248,
+           "worst_glyph_iou": 0.9642857142857143,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 31.109964847564697
+          },
+          "16x32": {
+           "mae": 0.004457144415937364,
+           "p99": 0.057048384100198746,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9545571093510122,
+           "worst_glyph_mae": 0.00996946170926094,
+           "worst_glyph_iou": 0.845360824742268,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 56.230076521635056
+          },
+          "24x48": {
+           "mae": 0.005861803365405649,
+           "p99": 0.08460138738155365,
+           "firm_fraction": 0.001953125,
+           "iou_mean": 0.9809005472915089,
+           "worst_glyph_mae": 0.011403103359043598,
+           "worst_glyph_iou": 0.9672131147540983,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 127.55384826660156
+          },
+          "48x96": {
+           "mae": 0.002549362397985533,
+           "p99": 0.05178404599428177,
+           "firm_fraction": 0.0005967881944444445,
+           "iou_mean": 0.9962892332454337,
+           "worst_glyph_mae": 0.005200494546443224,
+           "worst_glyph_iou": 0.9938650306748467,
+           "not_nearest": [],
+           "vanished": [],
+           "min_margin": 518.6647740006447
+          }
+         },
+         "one_sample": {},
+         "other_sizes": {
+          "1x2": {
+           "mae": 0.15772976353764534,
+           "p99": 0.2317674607038498,
+           "firm_fraction": 0.25,
+           "iou_mean": 0.75,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "2x4": {
+           "mae": 0.03857834963127971,
+           "p99": 0.10809605568647385,
+           "firm_fraction": 0.0,
+           "iou_mean": 1.0,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "3x6": {
+           "mae": 0.026948715094476938,
+           "p99": 0.11346054077148438,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.8125,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "4x8": {
+           "mae": 0.021272744052112103,
+           "p99": 0.11933033168315887,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.7708333333333334,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "5x9": {
+           "mae": 0.015668751613702625,
+           "p99": 0.13015587627887726,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.875,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "7x13": {
+           "mae": 0.012386593851260841,
+           "p99": 0.10624202340841293,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.8468834688346883,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "7x14": {
+           "mae": 0.01216755632776767,
+           "p99": 0.08829458057880402,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9415178571428572,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "9x18": {
+           "mae": 0.004974497656803578,
+           "p99": 0.04940309375524521,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9621212121212122,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "11x21": {
+           "mae": 0.007260839454829693,
+           "p99": 0.06613899022340775,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9747935638215774,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "13x27": {
+           "mae": 0.004833529586903751,
+           "p99": 0.057704851031303406,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9364788732394367,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "15x30": {
+           "mae": 0.005671523627825081,
+           "p99": 0.04744226112961769,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.997787610619469,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "16x48": {
+           "mae": 0.005642378266202286,
+           "p99": 0.07079267501831055,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9437013933168932,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "17x35": {
+           "mae": 0.0038520808739122003,
+           "p99": 0.056401725858449936,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9854671584123639,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "20x40": {
+           "mae": 0.0037878623115830123,
+           "p99": 0.05753398686647415,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.970895061728395,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "23x46": {
+           "mae": 0.0033806043793447316,
+           "p99": 0.05795161426067352,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9730964467005077,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "23x47": {
+           "mae": 0.0032256612030323595,
+           "p99": 0.058165982365608215,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9908759124087592,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "25x49": {
+           "mae": 0.004848308220971376,
+           "p99": 0.06781776994466782,
+           "firm_fraction": 0.0008163265306122449,
+           "iou_mean": 0.9538399282022625,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "25x50": {
+           "mae": 0.004281109519070014,
+           "p99": 0.06359320133924484,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9707325865725136,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "31x62": {
+           "mae": 0.0037349466292653233,
+           "p99": 0.062491368502378464,
+           "firm_fraction": 0.00026014568158168577,
+           "iou_mean": 0.9525220247906947,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "33x61": {
+           "mae": 0.0037793066585436463,
+           "p99": 0.05792247876524925,
+           "firm_fraction": 0.0,
+           "iou_mean": 0.9851194198656875,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "40x80": {
+           "mae": 0.002815010870108381,
+           "p99": 0.059804998338222504,
+           "firm_fraction": 7.8125e-05,
+           "iou_mean": 0.9631476792126064,
+           "not_nearest": [],
+           "vanished": []
+          },
+          "64x128": {
+           "mae": 0.0016025611257646233,
+           "p99": 0.04386518523097038,
+           "firm_fraction": 3.0517578125e-05,
+           "iou_mean": 0.9915121499443955,
+           "not_nearest": [],
+           "vanished": []
+          }
+         }
+        }
+       },
+       "shipped": true,
+       "file": "neuronte-kilix-chrome-v2-tchwbr1-g1.json",
+       "shipped_seed": 1,
+       "shipped_because": "both seeds passed the declared gates; lower-error seed"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "set": "tchwp",
+   "characters": 12,
+   "group_nets": 2,
+   "groups": [
+    {
+     "set": "tchwp",
+     "group": 0,
+     "kind": "symbols",
+     "scalars": [
+      "U+F007A",
+      "U+F007B",
+      "U+F007C",
+      "U+F007D",
+      "U+F007E",
+      "U+F007F"
+     ],
+     "both_seeds_pass": true,
+     "selected_seed": 0,
+     "rules_skipped": [],
+     "limits_eased": [
+      {
+       "rule": "6x12 mae",
+       "declared": 0.017632740107364955,
+       "perfect": 0.01750182422498862,
+       "applied": 0.019252006647487486
+      },
+      {
+       "rule": "8x16 mae",
+       "declared": 0.013056604482699187,
+       "perfect": 0.013908410755296549,
+       "applied": 0.015299251830826205
+      },
+      {
+       "rule": "8x16 p99",
+       "declared": 0.08183252587914468,
+       "perfect": 0.1440972089767456,
+       "applied": 0.15850692987442017
+      },
+      {
+       "rule": "10x20 mae",
+       "declared": 0.008225137833505869,
+       "perfect": 0.012482641109575828,
+       "applied": 0.013730905220533413
+      },
+      {
+       "rule": "10x20 p99",
+       "declared": 0.07114832893013955,
+       "perfect": 0.10479229688644409,
+       "applied": 0.1152715265750885
+      },
+      {
+       "rule": "16x32 mae",
+       "declared": 0.0067491031193640085,
+       "perfect": 0.009760328568518162,
+       "applied": 0.010736361425369979
+      },
+      {
+       "rule": "24x48 firm",
+       "declared": 0.0009548611111111112,
+       "perfect": 0.003472222222222222,
+       "applied": 0.0038194444444444448
+      }
+     ],
+     "drawing_problems": [],
+     "lower_error_seed": 0,
+     "seeds": {
+      "0": {
+       "pixel_exact": false,
+       "waived": [],
+       "sha256": "ae0cf666ac0fbb89d8621863c722f954c7698aac5468a5f3df5f6705b9f5f6a9",
+       "packed_sha256": "27f6d47cba643194099aff5042e54da28106de700eae277ade5d49fc284235cf",
+       "reference_check_passed": true,
+       "gates_passed": true,
+       "failures": [],
+       "mean_established_mae": 0.008571923509912772,
+       "counted_sizes": {
+        "6x12": {
+         "mae": 0.01731346920132637,
+         "p99": 0.09170602262020111,
+         "firm_fraction": 0.0,
+         "iou_mean": 1.0,
+         "worst_glyph_mae": 0.01805552840232849,
+         "worst_glyph_iou": 1.0,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 1.0
+        },
+        "8x16": {
+         "mae": 0.01391332596540451,
+         "p99": 0.1435621678829193,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9912280701754387,
+         "worst_glyph_mae": 0.014854466542601585,
+         "worst_glyph_iou": 0.9473684210526315,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 1.8694190979003906
+        },
+        "10x20": {
+         "mae": 0.012436952441930771,
+         "p99": 0.10059743374586105,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9405722217735565,
+         "worst_glyph_mae": 0.013493413105607033,
+         "worst_glyph_iou": 0.9310344827586207,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 2.7066572308540344
+        },
+        "12x24": {
+         "mae": 0.007810383103787899,
+         "p99": 0.04263617843389511,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9820075757575758,
+         "worst_glyph_mae": 0.00819103978574276,
+         "worst_glyph_iou": 0.9375,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 4.493601307272911
+        },
+        "16x32": {
+         "mae": 0.00979992359255751,
+         "p99": 0.06074712052941322,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9920486851457001,
+         "worst_glyph_mae": 0.010649959556758404,
+         "worst_glyph_iou": 0.9701492537313433,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 7.722673714160919
+        },
+        "24x48": {
+         "mae": 0.004728223585213224,
+         "p99": 0.042953360825777054,
+         "firm_fraction": 0.003472222222222222,
+         "iou_mean": 0.9893901759293655,
+         "worst_glyph_mae": 0.00487148854881525,
+         "worst_glyph_iou": 0.9879518072289156,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 18.468083560466766
+        },
+        "48x96": {
+         "mae": 0.002002520971776297,
+         "p99": 0.04265940561890602,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9983285577841451,
+         "worst_glyph_mae": 0.00212286738678813,
+         "worst_glyph_iou": 0.9899713467048711,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 75.68095326423645
+        }
+       },
+       "one_sample": {},
+       "other_sizes": {
+        "1x2": {
+         "mae": 0.2288844088713328,
+         "p99": 0.30147120356559753,
+         "firm_fraction": 0.5,
+         "iou_mean": 0.0,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "2x4": {
+         "mae": 0.03751422061274449,
+         "p99": 0.07191614806652069,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.6666666666666666,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "3x6": {
+         "mae": 0.03037595997254054,
+         "p99": 0.0511162169277668,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9444444444444445,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "4x8": {
+         "mae": 0.02324257915218671,
+         "p99": 0.08728580921888351,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.7611111111111111,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "5x9": {
+         "mae": 0.010795539322619637,
+         "p99": 0.05639755725860596,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.7353524743230625,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "7x13": {
+         "mae": 0.022420027914146583,
+         "p99": 0.13581158220767975,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.7685576630971368,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "7x14": {
+         "mae": 0.02046558850755294,
+         "p99": 0.1021437868475914,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9547882921284456,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "9x18": {
+         "mae": 0.0012819317635148764,
+         "p99": 0.02545185014605522,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9811039489610919,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "11x21": {
+         "mae": 0.012860694744934639,
+         "p99": 0.0565299428999424,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.6636997429546215,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "13x27": {
+         "mae": 0.005242121949171026,
+         "p99": 0.05374506488442421,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9689664181044787,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "15x30": {
+         "mae": 0.006689904490485787,
+         "p99": 0.0435665100812912,
+         "firm_fraction": 0.0,
+         "iou_mean": 1.0,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "16x48": {
+         "mae": 0.010599081870168447,
+         "p99": 0.08412034064531326,
+         "firm_fraction": 0.0026041666666666665,
+         "iou_mean": 0.9779182978684058,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "17x35": {
+         "mae": 0.006192955110842983,
+         "p99": 0.04426500201225281,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.990295117912919,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "20x40": {
+         "mae": 0.007857521918291846,
+         "p99": 0.056906767189502716,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.7433199409286365,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "23x46": {
+         "mae": 0.003928579273633659,
+         "p99": 0.05485233664512634,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9961622807017544,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "23x47": {
+         "mae": 0.004519150126725435,
+         "p99": 0.060711175203323364,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9970389170896784,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "25x49": {
+         "mae": 0.007316206116229296,
+         "p99": 0.1290857344865799,
+         "firm_fraction": 0.00027210884353741496,
+         "iou_mean": 0.9448640049720388,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "25x50": {
+         "mae": 0.007752382041265567,
+         "p99": 0.11134283989667892,
+         "firm_fraction": 0.0,
+         "iou_mean": 1.0,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "31x62": {
+         "mae": 0.003857435309328139,
+         "p99": 0.04810294881463051,
+         "firm_fraction": 0.0001734304543877905,
+         "iou_mean": 0.9953534040937336,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "33x61": {
+         "mae": 0.003572530229575932,
+         "p99": 0.05120961368083954,
+         "firm_fraction": 0.0,
+         "iou_mean": 1.0,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "40x80": {
+         "mae": 0.0029047249893968305,
+         "p99": 0.0441756471991539,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9978638365466997,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "64x128": {
+         "mae": 0.0022152439147854843,
+         "p99": 0.04220934957265854,
+         "firm_fraction": 4.0690104166666664e-05,
+         "iou_mean": 0.9909991789751968,
+         "not_nearest": [],
+         "vanished": []
+        }
+       }
+      },
+      "1": {
+       "pixel_exact": false,
+       "waived": [],
+       "sha256": "846c544a22440fb9abeefdac3e3025f6b70ddb379d713cb7ccbb124a8692f2bb",
+       "packed_sha256": "d7c5eae02d8471e1668471cbc396b57143453210f2dad480176d45dc808e5ce0",
+       "reference_check_passed": true,
+       "gates_passed": true,
+       "failures": [],
+       "mean_established_mae": 0.008580761211406853,
+       "counted_sizes": {
+        "6x12": {
+         "mae": 0.017441355623304844,
+         "p99": 0.09244556725025177,
+         "firm_fraction": 0.0,
+         "iou_mean": 1.0,
+         "worst_glyph_mae": 0.01819252222776413,
+         "worst_glyph_iou": 1.0,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 1.0
+        },
+        "8x16": {
+         "mae": 0.01390434910232822,
+         "p99": 0.1445832997560501,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9912280701754387,
+         "worst_glyph_mae": 0.014890208840370178,
+         "worst_glyph_iou": 0.9473684210526315,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 1.875414490699768
+        },
+        "10x20": {
+         "mae": 0.012471750689049562,
+         "p99": 0.10300402343273163,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9405722217735565,
+         "worst_glyph_mae": 0.013505734503269196,
+         "worst_glyph_iou": 0.9310344827586207,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 2.69040846824646
+        },
+        "12x24": {
+         "mae": 0.007861357259874543,
+         "p99": 0.042748332023620605,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9820075757575758,
+         "worst_glyph_mae": 0.008237195201218128,
+         "worst_glyph_iou": 0.9375,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 4.489497348666191
+        },
+        "16x32": {
+         "mae": 0.009809916373342276,
+         "p99": 0.06055818870663643,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9920486851457001,
+         "worst_glyph_mae": 0.010623866692185402,
+         "worst_glyph_iou": 0.9701492537313433,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 7.726373791694641
+        },
+        "24x48": {
+         "mae": 0.004775853206713994,
+         "p99": 0.04388473182916641,
+         "firm_fraction": 0.003472222222222222,
+         "iou_mean": 0.9893901759293655,
+         "worst_glyph_mae": 0.005033254623413086,
+         "worst_glyph_iou": 0.9879518072289156,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 18.5023353099823
+        },
+        "48x96": {
+         "mae": 0.0020280181585500636,
+         "p99": 0.04314170405268669,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9983285577841451,
+         "worst_glyph_mae": 0.0021481900475919247,
+         "worst_glyph_iou": 0.9899713467048711,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 75.68006426095963
+        }
+       },
+       "one_sample": {},
+       "other_sizes": {
+        "1x2": {
+         "mae": 0.2288388138016065,
+         "p99": 0.3017057180404663,
+         "firm_fraction": 0.5,
+         "iou_mean": 0.0,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "2x4": {
+         "mae": 0.03728463935355345,
+         "p99": 0.07173867523670197,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.6666666666666666,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "3x6": {
+         "mae": 0.03010449279099703,
+         "p99": 0.04575634002685547,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9444444444444445,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "4x8": {
+         "mae": 0.023148495703935623,
+         "p99": 0.0874803438782692,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.7611111111111111,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "5x9": {
+         "mae": 0.010836277234678468,
+         "p99": 0.05614522099494934,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.7353524743230625,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "7x13": {
+         "mae": 0.022417605233689148,
+         "p99": 0.13617071509361267,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.7685576630971368,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "7x14": {
+         "mae": 0.02030693336079518,
+         "p99": 0.10219599306583405,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9547882921284456,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "9x18": {
+         "mae": 0.0012599877469862502,
+         "p99": 0.0241092536598444,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9937106918238993,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "11x21": {
+         "mae": 0.01281397727628549,
+         "p99": 0.056299950927495956,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.6636997429546215,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "13x27": {
+         "mae": 0.005240782707308729,
+         "p99": 0.05236726254224777,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9689664181044787,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "15x30": {
+         "mae": 0.006714078442504008,
+         "p99": 0.04392188414931297,
+         "firm_fraction": 0.0,
+         "iou_mean": 1.0,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "16x48": {
+         "mae": 0.010516414884477854,
+         "p99": 0.08357160538434982,
+         "firm_fraction": 0.0026041666666666665,
+         "iou_mean": 0.9779182978684058,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "17x35": {
+         "mae": 0.006199034784610073,
+         "p99": 0.04390513151884079,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.990295117912919,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "20x40": {
+         "mae": 0.007828934350982308,
+         "p99": 0.05681314691901207,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.7433199409286365,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "23x46": {
+         "mae": 0.003882177251701554,
+         "p99": 0.0528390035033226,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9961622807017544,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "23x47": {
+         "mae": 0.004477467155084014,
+         "p99": 0.06066799536347389,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9970389170896784,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "25x49": {
+         "mae": 0.00732642668299377,
+         "p99": 0.12612630426883698,
+         "firm_fraction": 0.00027210884353741496,
+         "iou_mean": 0.9448640049720388,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "25x50": {
+         "mae": 0.00778469971070687,
+         "p99": 0.11583580076694489,
+         "firm_fraction": 0.0,
+         "iou_mean": 1.0,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "31x62": {
+         "mae": 0.0038897688888634243,
+         "p99": 0.05008479580283165,
+         "firm_fraction": 0.0001734304543877905,
+         "iou_mean": 0.9953534040937336,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "33x61": {
+         "mae": 0.003576189667607347,
+         "p99": 0.05066877603530884,
+         "firm_fraction": 0.0,
+         "iou_mean": 1.0,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "40x80": {
+         "mae": 0.0029568549167985716,
+         "p99": 0.04696302488446236,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9978638365466997,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "64x128": {
+         "mae": 0.0022094081699227295,
+         "p99": 0.04396557807922363,
+         "firm_fraction": 4.0690104166666664e-05,
+         "iou_mean": 0.9909991789751968,
+         "not_nearest": [],
+         "vanished": []
+        }
+       }
+      }
+     },
+     "halved": false,
+     "shipped": true,
+     "file": "neuronte-kilix-chrome-v2-tchwp-g0.json",
+     "shipped_seed": 0,
+     "shipped_because": "both seeds passed the declared gates; lower-error seed"
+    },
+    {
+     "set": "tchwp",
+     "group": 1,
+     "kind": "symbols",
+     "scalars": [
+      "U+F0080",
+      "U+F0081",
+      "U+F0082",
+      "U+F0079",
+      "U+F0083",
+      "U+F0091"
+     ],
+     "both_seeds_pass": true,
+     "selected_seed": 0,
+     "rules_skipped": [],
+     "limits_eased": [
+      {
+       "rule": "6x12 mae",
+       "declared": 0.017632740107364955,
+       "perfect": 0.01918823489298423,
+       "applied": 0.021107058382282655
+      },
+      {
+       "rule": "8x16 mae",
+       "declared": 0.013056604482699187,
+       "perfect": 0.013998334606488546,
+       "applied": 0.015398168067137402
+      },
+      {
+       "rule": "8x16 p99",
+       "declared": 0.08183252587914468,
+       "perfect": 0.1440972089767456,
+       "applied": 0.15850692987442017
+      },
+      {
+       "rule": "10x20 mae",
+       "declared": 0.008225137833505869,
+       "perfect": 0.012367192811022202,
+       "applied": 0.013603912092124424
+      },
+      {
+       "rule": "10x20 p99",
+       "declared": 0.07114832893013955,
+       "perfect": 0.10479229688644409,
+       "applied": 0.1152715265750885
+      },
+      {
+       "rule": "12x24 mae",
+       "declared": 0.008731306431582198,
+       "perfect": 0.008666258848582705,
+       "applied": 0.009532884733440977
+      },
+      {
+       "rule": "16x32 mae",
+       "declared": 0.0067491031193640085,
+       "perfect": 0.009536532064278921,
+       "applied": 0.010490185270706814
+      },
+      {
+       "rule": "16x32 p99",
+       "declared": 0.0710161928832531,
+       "perfect": 0.0659722089767456,
+       "applied": 0.07256942987442017
+      },
+      {
+       "rule": "24x48 firm",
+       "declared": 0.0009548611111111112,
+       "perfect": 0.003472222222222222,
+       "applied": 0.0038194444444444448
+      }
+     ],
+     "drawing_problems": [],
+     "lower_error_seed": 0,
+     "seeds": {
+      "0": {
+       "pixel_exact": false,
+       "waived": [],
+       "sha256": "c664deb852b1fca937a5cc35424ea8e3f4628938d70619952b70ac3011e5f8e4",
+       "packed_sha256": "c5abcdc6cda9f558e59b860036ca4d21c2db3424ef56408c83ebf9b62cb24966",
+       "reference_check_passed": true,
+       "gates_passed": true,
+       "failures": [],
+       "mean_established_mae": 0.008703545447335476,
+       "counted_sizes": {
+        "6x12": {
+         "mae": 0.01903238520026207,
+         "p99": 0.09657251834869385,
+         "firm_fraction": 0.0,
+         "iou_mean": 1.0,
+         "worst_glyph_mae": 0.021376853808760643,
+         "worst_glyph_iou": 1.0,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 0.3356589078903198
+        },
+        "8x16": {
+         "mae": 0.01400321846206983,
+         "p99": 0.14438270032405853,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9790849673202615,
+         "worst_glyph_mae": 0.019694026559591293,
+         "worst_glyph_iou": 0.9333333333333333,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 1.0368351638317108
+        },
+        "10x20": {
+         "mae": 0.012397038439909617,
+         "p99": 0.10203929245471954,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9205000193100886,
+         "worst_glyph_mae": 0.017593488097190857,
+         "worst_glyph_iou": 0.78125,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 2.7115659713745117
+        },
+        "12x24": {
+         "mae": 0.008741364271069566,
+         "p99": 0.043277084827423096,
+         "firm_fraction": 0.0,
+         "iou_mean": 1.0,
+         "worst_glyph_mae": 0.010589076206088066,
+         "worst_glyph_iou": 1.0,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 3.61625075340271
+        },
+        "16x32": {
+         "mae": 0.009614470259596905,
+         "p99": 0.06794298440217972,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9928168813944676,
+         "worst_glyph_mae": 0.011616191826760769,
+         "worst_glyph_iou": 0.978021978021978,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 7.314497232437134
+        },
+        "24x48": {
+         "mae": 0.005652366826931636,
+         "p99": 0.0473378449678421,
+         "firm_fraction": 0.003472222222222222,
+         "iou_mean": 0.9906479869114085,
+         "worst_glyph_mae": 0.006828205659985542,
+         "worst_glyph_iou": 0.9885714285714285,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 13.465003490447998
+        },
+        "48x96": {
+         "mae": 0.0024929476203396916,
+         "p99": 0.04284074902534485,
+         "firm_fraction": 7.233796296296296e-05,
+         "iou_mean": 0.9984285183005216,
+         "worst_glyph_mae": 0.003006684361025691,
+         "worst_glyph_iou": 0.9921348314606742,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 67.36869728565216
+        }
+       },
+       "one_sample": {},
+       "other_sizes": {
+        "1x2": {
+         "mae": 0.1910064493616422,
+         "p99": 0.3025616705417633,
+         "firm_fraction": 0.5,
+         "iou_mean": 0.0,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "2x4": {
+         "mae": 0.03149857403089603,
+         "p99": 0.0591370090842247,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.3333333333333333,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "3x6": {
+         "mae": 0.03518300068875154,
+         "p99": 0.14699585735797882,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.8333333333333334,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "4x8": {
+         "mae": 0.021816698213418324,
+         "p99": 0.11879515647888184,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9015151515151515,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "5x9": {
+         "mae": 0.010060496861115098,
+         "p99": 0.055222541093826294,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.8037280701754387,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "7x13": {
+         "mae": 0.022618671568731468,
+         "p99": 0.13433444499969482,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.8178020909678089,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "7x14": {
+         "mae": 0.020169174298644066,
+         "p99": 0.12061087042093277,
+         "firm_fraction": 0.0,
+         "iou_mean": 1.0,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "9x18": {
+         "mae": 0.0017582387711930398,
+         "p99": 0.02417270466685295,
+         "firm_fraction": 0.0,
+         "iou_mean": 1.0,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "11x21": {
+         "mae": 0.012806541907290617,
+         "p99": 0.06466731429100037,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.6923043903493548,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "13x27": {
+         "mae": 0.004983130221565564,
+         "p99": 0.04704566299915314,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9720097674924356,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "15x30": {
+         "mae": 0.007446873389805357,
+         "p99": 0.06843533366918564,
+         "firm_fraction": 0.0,
+         "iou_mean": 1.0,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "16x48": {
+         "mae": 0.0105361541112264,
+         "p99": 0.086541548371315,
+         "firm_fraction": 0.001736111111111111,
+         "iou_mean": 0.9846325975170253,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "17x35": {
+         "mae": 0.006564894303058584,
+         "p99": 0.05627293512225151,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9963126843657818,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "20x40": {
+         "mae": 0.007790495563919346,
+         "p99": 0.057827726006507874,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.7680695475422398,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "23x46": {
+         "mae": 0.004037706569458048,
+         "p99": 0.05720038339495659,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9979767184883852,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "23x47": {
+         "mae": 0.004391039488837123,
+         "p99": 0.06268241256475449,
+         "firm_fraction": 0.0,
+         "iou_mean": 1.0,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "25x49": {
+         "mae": 0.00752057150627176,
+         "p99": 0.14608365297317505,
+         "firm_fraction": 0.00027210884353741496,
+         "iou_mean": 0.9509165810298659,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "25x50": {
+         "mae": 0.007827936438843608,
+         "p99": 0.11636978387832642,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9994571118349619,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "31x62": {
+         "mae": 0.004074506655645867,
+         "p99": 0.05331328883767128,
+         "firm_fraction": 0.0001734304543877905,
+         "iou_mean": 0.9968288443036313,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "33x61": {
+         "mae": 0.003925924771465361,
+         "p99": 0.05295056477189064,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9944765973083459,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "40x80": {
+         "mae": 0.0030423532783364258,
+         "p99": 0.04806598648428917,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9983962358440205,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "64x128": {
+         "mae": 0.002402085248225679,
+         "p99": 0.04597038775682449,
+         "firm_fraction": 0.0001220703125,
+         "iou_mean": 0.9856145197917344,
+         "not_nearest": [],
+         "vanished": []
+        }
+       }
+      },
+      "1": {
+       "pixel_exact": false,
+       "waived": [],
+       "sha256": "798506af81bd704048d7a3175eb22b017a40200e28210c0cd6c756dab5fbc679",
+       "packed_sha256": "6fd819c3f0c586870a7a5955fc63bc9b1b2b46d6bfda57b683ae2940aa2e2b0c",
+       "reference_check_passed": true,
+       "gates_passed": true,
+       "failures": [],
+       "mean_established_mae": 0.00871731299493048,
+       "counted_sizes": {
+        "6x12": {
+         "mae": 0.0190385930861036,
+         "p99": 0.09682226181030273,
+         "firm_fraction": 0.0,
+         "iou_mean": 1.0,
+         "worst_glyph_mae": 0.02136661298573017,
+         "worst_glyph_iou": 1.0,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 0.3320639133453369
+        },
+        "8x16": {
+         "mae": 0.014076172684629759,
+         "p99": 0.14465317130088806,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9790849673202615,
+         "worst_glyph_mae": 0.019918302074074745,
+         "worst_glyph_iou": 0.9333333333333333,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 0.9772703051567078
+        },
+        "10x20": {
+         "mae": 0.012343000620603561,
+         "p99": 0.10139644891023636,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9205000193100886,
+         "worst_glyph_mae": 0.01743244379758835,
+         "worst_glyph_iou": 0.78125,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 2.699059545993805
+        },
+        "12x24": {
+         "mae": 0.008807177500178417,
+         "p99": 0.04410633072257042,
+         "firm_fraction": 0.0,
+         "iou_mean": 1.0,
+         "worst_glyph_mae": 0.010598055087029934,
+         "worst_glyph_iou": 1.0,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 3.660159707069397
+        },
+        "16x32": {
+         "mae": 0.00956785585731268,
+         "p99": 0.06941457092761993,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9900163748680697,
+         "worst_glyph_mae": 0.011450551450252533,
+         "worst_glyph_iou": 0.9745762711864406,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 7.299918174743652
+        },
+        "24x48": {
+         "mae": 0.005649962152043979,
+         "p99": 0.04627734422683716,
+         "firm_fraction": 0.003472222222222222,
+         "iou_mean": 0.9901963837200793,
+         "worst_glyph_mae": 0.006886480376124382,
+         "worst_glyph_iou": 0.9863013698630136,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 13.640639066696167
+        },
+        "48x96": {
+         "mae": 0.0025079104428490004,
+         "p99": 0.04410873353481293,
+         "firm_fraction": 7.233796296296296e-05,
+         "iou_mean": 0.998168711826844,
+         "worst_glyph_mae": 0.003015937516465783,
+         "worst_glyph_iou": 0.9921348314606742,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 67.41894233226776
+        }
+       },
+       "one_sample": {},
+       "other_sizes": {
+        "1x2": {
+         "mae": 0.19069834798574448,
+         "p99": 0.30203762650489807,
+         "firm_fraction": 0.5,
+         "iou_mean": 0.0,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "2x4": {
+         "mae": 0.03178717102855444,
+         "p99": 0.059625644236803055,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.3333333333333333,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "3x6": {
+         "mae": 0.03516165632754564,
+         "p99": 0.14588524401187897,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.8055555555555555,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "4x8": {
+         "mae": 0.02171320530275504,
+         "p99": 0.11801981925964355,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9154040404040403,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "5x9": {
+         "mae": 0.010066001132751504,
+         "p99": 0.05671146884560585,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.8037280701754387,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "7x13": {
+         "mae": 0.022636855642000835,
+         "p99": 0.13343901932239532,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.8178020909678089,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "7x14": {
+         "mae": 0.02026134915649891,
+         "p99": 0.11646539717912674,
+         "firm_fraction": 0.0,
+         "iou_mean": 1.0,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "9x18": {
+         "mae": 0.0019266269518993795,
+         "p99": 0.03718067705631256,
+         "firm_fraction": 0.0,
+         "iou_mean": 1.0,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "11x21": {
+         "mae": 0.01278870397557815,
+         "p99": 0.0656392052769661,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.692251409769196,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "13x27": {
+         "mae": 0.004906701079259316,
+         "p99": 0.04507986456155777,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9619701644402275,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "15x30": {
+         "mae": 0.007433049458389481,
+         "p99": 0.06755109131336212,
+         "firm_fraction": 0.0,
+         "iou_mean": 1.0,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "16x48": {
+         "mae": 0.010491544070343176,
+         "p99": 0.08663134276866913,
+         "firm_fraction": 0.002170138888888889,
+         "iou_mean": 0.9828404828216848,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "17x35": {
+         "mae": 0.006537765730172396,
+         "p99": 0.057387758046388626,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9963126843657818,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "20x40": {
+         "mae": 0.0078025028730432195,
+         "p99": 0.05875217169523239,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.7680695475422398,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "23x46": {
+         "mae": 0.004070092419472833,
+         "p99": 0.05674200877547264,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9974762270968371,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "23x47": {
+         "mae": 0.004342504699404041,
+         "p99": 0.060176413506269455,
+         "firm_fraction": 0.0,
+         "iou_mean": 1.0,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "25x49": {
+         "mae": 0.0075407742988318205,
+         "p99": 0.13727857172489166,
+         "firm_fraction": 0.00027210884353741496,
+         "iou_mean": 0.9516364493967929,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "25x50": {
+         "mae": 0.007824419687191645,
+         "p99": 0.11930493265390396,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9994571118349619,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "31x62": {
+         "mae": 0.004130862226399283,
+         "p99": 0.05607549846172333,
+         "firm_fraction": 0.0001734304543877905,
+         "iou_mean": 0.9968288443036313,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "33x61": {
+         "mae": 0.003939512340972821,
+         "p99": 0.05267202854156494,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9944765973083459,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "40x80": {
+         "mae": 0.003027365969804426,
+         "p99": 0.04847981408238411,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.998020441119223,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "64x128": {
+         "mae": 0.0024128663547647498,
+         "p99": 0.04866843298077583,
+         "firm_fraction": 0.0001220703125,
+         "iou_mean": 0.9854111423617079,
+         "not_nearest": [],
+         "vanished": []
+        }
+       }
+      }
+     },
+     "halved": false,
+     "shipped": true,
+     "file": "neuronte-kilix-chrome-v2-tchwp-g1.json",
+     "shipped_seed": 0,
+     "shipped_because": "both seeds passed the declared gates; lower-error seed"
+    }
+   ]
+  },
+  {
+   "set": "tchwx",
+   "characters": 9,
+   "group_nets": 1,
+   "groups": [
+    {
+     "set": "tchwx",
+     "group": 0,
+     "kind": "symbols",
+     "scalars": [
+      "U+2600",
+      "U+2601",
+      "U+1F324",
+      "U+26C5",
+      "U+1F32B",
+      "U+1F326",
+      "U+1F327",
+      "U+1F328",
+      "U+26C8"
+     ],
+     "both_seeds_pass": true,
+     "selected_seed": 0,
+     "rules_skipped": [],
+     "limits_eased": [],
+     "drawing_problems": [],
+     "lower_error_seed": 0,
+     "seeds": {
+      "0": {
+       "pixel_exact": false,
+       "waived": [],
+       "sha256": "afb5079a06581446d9db4b8b135e640ad76fe4b7703ec3b7615d62ef051c278e",
+       "packed_sha256": "ca040ee3083a6ff786e7d7ee6c7d05ed058b776e75103da1aa98d732e758b813",
+       "reference_check_passed": true,
+       "gates_passed": true,
+       "failures": [],
+       "mean_established_mae": 0.0037901658431143946,
+       "counted_sizes": {
+        "6x12": {
+         "mae": 0.009534338644395271,
+         "p99": 0.06887825578451157,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9615209046581595,
+         "worst_glyph_mae": 0.014865713194012642,
+         "worst_glyph_iou": 0.8235294117647058,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 2.9826180040836334
+        },
+        "8x16": {
+         "mae": 0.0064801051695313715,
+         "p99": 0.05483705550432205,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9624234879136839,
+         "worst_glyph_mae": 0.010413282550871372,
+         "worst_glyph_iou": 0.7777777777777778,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 5.955737739801407
+        },
+        "10x20": {
+         "mae": 0.0050702586821797825,
+         "p99": 0.0557132214307785,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9518915404746752,
+         "worst_glyph_mae": 0.007758343126624823,
+         "worst_glyph_iou": 0.7777777777777778,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 10.717066019773483
+        },
+        "12x24": {
+         "mae": 0.004220169736072421,
+         "p99": 0.04554837942123413,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9966970248937462,
+         "worst_glyph_mae": 0.006890584714710712,
+         "worst_glyph_iou": 0.9836065573770492,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 18.185421392321587
+        },
+        "16x32": {
+         "mae": 0.0030289009834329286,
+         "p99": 0.04225977510213852,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9781523538424568,
+         "worst_glyph_mae": 0.005089601501822472,
+         "worst_glyph_iou": 0.9461538461538461,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 36.18944075703621
+        },
+        "24x48": {
+         "mae": 0.0038039982448228532,
+         "p99": 0.06107904016971588,
+         "firm_fraction": 9.645061728395061e-05,
+         "iou_mean": 0.9901416444805543,
+         "worst_glyph_mae": 0.005481778644025326,
+         "worst_glyph_iou": 0.967741935483871,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 86.62460136413574
+        },
+        "48x96": {
+         "mae": 0.0018614913763788838,
+         "p99": 0.04726440832018852,
+         "firm_fraction": 2.4112654320987653e-05,
+         "iou_mean": 0.9930358754642543,
+         "worst_glyph_mae": 0.002480322727933526,
+         "worst_glyph_iou": 0.9788519637462235,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 361.8038837313652
+        }
+       },
+       "one_sample": {},
+       "other_sizes": {
+        "1x2": {
+         "mae": 0.1452226142088572,
+         "p99": 0.24523819983005524,
+         "firm_fraction": 0.1111111111111111,
+         "iou_mean": 0.8888888888888888,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "2x4": {
+         "mae": 0.05112400164620744,
+         "p99": 0.16113604605197906,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.7777777777777778,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "3x6": {
+         "mae": 0.02880687380416526,
+         "p99": 0.14579400420188904,
+         "firm_fraction": 0.006172839506172839,
+         "iou_mean": 0.8981481481481483,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "4x8": {
+         "mae": 0.016820529061887,
+         "p99": 0.09110527485609055,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.8951058201058201,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "5x9": {
+         "mae": 0.010525466615541114,
+         "p99": 0.07704871147871017,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9054152637485972,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "7x13": {
+         "mae": 0.008752456452283595,
+         "p99": 0.0626339539885521,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9501735521599698,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "7x14": {
+         "mae": 0.008354713493544195,
+         "p99": 0.05795067176222801,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9570039682539684,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "9x18": {
+         "mae": 0.005316087355216344,
+         "p99": 0.05011099576950073,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9941520467836258,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "11x21": {
+         "mae": 0.004679033894919687,
+         "p99": 0.0481988750398159,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9867826317972681,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "13x27": {
+         "mae": 0.0037831756182842785,
+         "p99": 0.03985382243990898,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.967285119257205,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "15x30": {
+         "mae": 0.0032449118120388854,
+         "p99": 0.043860968202352524,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9922088078950824,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "16x48": {
+         "mae": 0.003990193945355713,
+         "p99": 0.07221817970275879,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9827938471533911,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "17x35": {
+         "mae": 0.003022993694887393,
+         "p99": 0.048405807465314865,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9819947375065404,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "20x40": {
+         "mae": 0.002419793027608345,
+         "p99": 0.03959332033991814,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9806147509887807,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "23x46": {
+         "mae": 0.0021553216437395248,
+         "p99": 0.0396738164126873,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.981513177131743,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "23x47": {
+         "mae": 0.0021580126291761794,
+         "p99": 0.03950568288564682,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9895067270785923,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "25x49": {
+         "mae": 0.0034339393670153287,
+         "p99": 0.0600893534719944,
+         "firm_fraction": 0.00036281179138321996,
+         "iou_mean": 0.9786400296154798,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "25x50": {
+         "mae": 0.003513541305437684,
+         "p99": 0.06419043987989426,
+         "firm_fraction": 0.00017777777777777779,
+         "iou_mean": 0.9834829106907867,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "31x62": {
+         "mae": 0.0027964673030914534,
+         "p99": 0.05445141717791557,
+         "firm_fraction": 0.00011562030292519366,
+         "iou_mean": 0.9783671745952583,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "33x61": {
+         "mae": 0.0027563676962422,
+         "p99": 0.056085020303726196,
+         "firm_fraction": 5.5196776508251916e-05,
+         "iou_mean": 0.9815419917414887,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "40x80": {
+         "mae": 0.002165432696023749,
+         "p99": 0.0501711443066597,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9891301366764983,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "64x128": {
+         "mae": 0.0015886767650954425,
+         "p99": 0.04747720807790756,
+         "firm_fraction": 1.3563368055555555e-05,
+         "iou_mean": 0.9928188862352751,
+         "not_nearest": [],
+         "vanished": []
+        }
+       }
+      },
+      "1": {
+       "pixel_exact": false,
+       "waived": [],
+       "sha256": "7effd7c16d8cdeec80e6dc4dcc48e29d291ab213002f32875b1c891568476a4d",
+       "packed_sha256": "7e93121018a9b09e0ec6cf7d332aff12229dbc447a32de979a660a40ed728fdf",
+       "reference_check_passed": true,
+       "gates_passed": true,
+       "failures": [],
+       "mean_established_mae": 0.0038483686232077025,
+       "counted_sizes": {
+        "6x12": {
+         "mae": 0.009475674195629027,
+         "p99": 0.07291963696479797,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9676937441643323,
+         "worst_glyph_mae": 0.014612128026783466,
+         "worst_glyph_iou": 0.8235294117647058,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 2.8751850724220276
+        },
+        "8x16": {
+         "mae": 0.006591786759802037,
+         "p99": 0.05379670113325119,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9655047204066811,
+         "worst_glyph_mae": 0.010354224592447281,
+         "worst_glyph_iou": 0.7777777777777778,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 5.948145121335983
+        },
+        "10x20": {
+         "mae": 0.00503998371358547,
+         "p99": 0.05297282338142395,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9499770319812194,
+         "worst_glyph_mae": 0.007602293509989977,
+         "worst_glyph_iou": 0.7777777777777778,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 10.715898528695107
+        },
+        "12x24": {
+         "mae": 0.004220907214201159,
+         "p99": 0.04482722282409668,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9966970248937462,
+         "worst_glyph_mae": 0.007011087611317635,
+         "worst_glyph_iou": 0.9836065573770492,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 18.270178511738777
+        },
+        "16x32": {
+         "mae": 0.003068408721850978,
+         "p99": 0.04444802552461624,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.983429014890079,
+         "worst_glyph_mae": 0.0051850611343979836,
+         "worst_glyph_iou": 0.9534883720930233,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 36.191228091716766
+        },
+        "24x48": {
+         "mae": 0.00370580800032864,
+         "p99": 0.0613875687122345,
+         "firm_fraction": 9.645061728395061e-05,
+         "iou_mean": 0.9892962605021631,
+         "worst_glyph_mae": 0.0058021629229187965,
+         "worst_glyph_iou": 0.9642857142857143,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 86.4490796327591
+        },
+        "48x96": {
+         "mae": 0.0018849103879700932,
+         "p99": 0.04870341718196869,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9920848228509394,
+         "worst_glyph_mae": 0.002559213899075985,
+         "worst_glyph_iou": 0.9788519637462235,
+         "not_nearest": [],
+         "vanished": [],
+         "min_margin": 362.15194964408875
+        }
+       },
+       "one_sample": {},
+       "other_sizes": {
+        "1x2": {
+         "mae": 0.1461576239930259,
+         "p99": 0.2453330159187317,
+         "firm_fraction": 0.1111111111111111,
+         "iou_mean": 0.8888888888888888,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "2x4": {
+         "mae": 0.05031759767896599,
+         "p99": 0.15580427646636963,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.7777777777777778,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "3x6": {
+         "mae": 0.02931513192339076,
+         "p99": 0.1472301036119461,
+         "firm_fraction": 0.006172839506172839,
+         "iou_mean": 0.8981481481481483,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "4x8": {
+         "mae": 0.016457857460611396,
+         "p99": 0.09281772375106812,
+         "firm_fraction": 0.003472222222222222,
+         "iou_mean": 0.8743827160493827,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "5x9": {
+         "mae": 0.010263793610243334,
+         "p99": 0.07709146291017532,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.8979597562930896,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "7x13": {
+         "mae": 0.008670226567321353,
+         "p99": 0.06499584764242172,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9321382435933521,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "7x14": {
+         "mae": 0.008461479951317111,
+         "p99": 0.06090974435210228,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9519534632034632,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "9x18": {
+         "mae": 0.005232685167963306,
+         "p99": 0.0521419532597065,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9941520467836258,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "11x21": {
+         "mae": 0.004601656174701121,
+         "p99": 0.04464119300246239,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9907596072028149,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "13x27": {
+         "mae": 0.0038572130595437354,
+         "p99": 0.04021606594324112,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9659942414603031,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "15x30": {
+         "mae": 0.003287485373827318,
+         "p99": 0.044370267540216446,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9891074547937292,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "16x48": {
+         "mae": 0.004021150823165145,
+         "p99": 0.0721953883767128,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9856789326860067,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "17x35": {
+         "mae": 0.0029964886424649092,
+         "p99": 0.045498885214328766,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9811645435449733,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "20x40": {
+         "mae": 0.0024300785929275057,
+         "p99": 0.0408930629491806,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.980769299027407,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "23x46": {
+         "mae": 0.0022155750905060107,
+         "p99": 0.041369132697582245,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9788487294454278,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "23x47": {
+         "mae": 0.0021859511422614255,
+         "p99": 0.04067510738968849,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9896851864536084,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "25x49": {
+         "mae": 0.0034266852566765416,
+         "p99": 0.05971076712012291,
+         "firm_fraction": 0.00036281179138321996,
+         "iou_mean": 0.9785856743836762,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "25x50": {
+         "mae": 0.0034113975836791927,
+         "p99": 0.06279794871807098,
+         "firm_fraction": 0.00044444444444444447,
+         "iou_mean": 0.9820128137075351,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "31x62": {
+         "mae": 0.002753994246530864,
+         "p99": 0.055025748908519745,
+         "firm_fraction": 5.781015146259683e-05,
+         "iou_mean": 0.9785692661228629,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "33x61": {
+         "mae": 0.002705322901925279,
+         "p99": 0.0551452599465847,
+         "firm_fraction": 5.5196776508251916e-05,
+         "iou_mean": 0.9807703371874281,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "40x80": {
+         "mae": 0.002176925488230255,
+         "p99": 0.05127188563346863,
+         "firm_fraction": 0.0,
+         "iou_mean": 0.9876841045900083,
+         "not_nearest": [],
+         "vanished": []
+        },
+        "64x128": {
+         "mae": 0.0016371800059763093,
+         "p99": 0.04891819506883621,
+         "firm_fraction": 5.425347222222222e-05,
+         "iou_mean": 0.9921037444093531,
+         "not_nearest": [],
+         "vanished": []
+        }
+       }
+      }
+     },
+     "halved": false,
+     "shipped": true,
+     "file": "neuronte-kilix-chrome-v2-tchwx-g0.json",
+     "shipped_seed": 0,
+     "shipped_because": "both seeds passed the declared gates; lower-error seed"
+    }
+   ]
+  }
+ ]
+}

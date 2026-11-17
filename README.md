@@ -34,6 +34,7 @@ letter. Desktop adapters fall back for unsupported strings and styles.
 | `neuronte-term-latin-v1` | 596 letters with marks that split-v9 was not trained on, alone in a standalone bundle to open beside split-v9: Vietnamese, Latin letters with one or two marks above or a mark below, polytonic Greek, Cyrillic with breve, diaeresis or macron; 71 of its 74 group nets failed their declared gates and were shipped by the owner's choice after review; not a default; [recipe, checks and speed](weights/neuronte-term-latin-v1.md) | 596, over 74 group nets, a table and a blank net | 64 and 96 | 1,065,306 in the group nets | 4,280,128 bytes |
 | `neuronte-term-rest-v1` | 197 characters that split-v9 was not trained on, alone in a standalone bundle to open beside split-v9: the Hebrew letters and their pointed and wide presentation forms, Hebrew punctuation, Lao letters and the vowel signs that stand alone, the Thai baht sign, and the faces, animal faces and moon phases of Emoticons and Miscellaneous Symbols and Pictographs in one colour, one cell each; every group net passed gates v2.3 with both seeds (one group as two halves); the Lao letters are drawn from memory and unchecked by a reader of Lao; not a default; [recipe, checks and speed](weights/neuronte-term-rest-v1.md) | 197, over 26 group nets, a table and a blank net | 64 | 369,642 in the group nets | 1,484,956 bytes |
 | `neuronte-kilix-chrome-v1` | The 39 symbols the Kilix terminal prints on its own bars, alone in a standalone bundle: a ringing bell, title bar buttons, widget symbols, a battery at ten levels and seven weather symbols, most at private-use code points used only as numbers, each drawn for this project from what it means on the bar; every group net passed gates v2.3 with both seeds; not a default; [recipe and checks](weights/neuronte-kilix-chrome-v1.md) | 39, over 6 group nets, a table and a blank net | 64 | 85,302 in the group nets | 343,224 bytes |
+| `neuronte-kilix-chrome-v2` | The same symbols and the sun and the cloud drawn again for the box of two cells that Kilix gives a symbol with a blank cell after it (40 of them; the ringing bell stays one cell), with pens of 1/9 of the box, in a standalone bundle of its own; a program asks for a box W×H as the cell W×2H and averages each pair of rows; every net in it passed gates v2.3 with both seeds, 4 of the 6 groups as trained and 2 after being halved once; not a default; [recipe and checks](weights/neuronte-kilix-chrome-v2.md) | 41, over 8 group nets, a table and a blank net | 64 | 113,736 in the group nets | 457,336 bytes |
 | `neuronte-split-v4` | the default before Greek and Russian, kept; most measurements below were made on it | 1,061, over six nets and a router | 48, 128 and 192 | 329,356 | 1,319,616 bytes |
 | `neuronte-full-v3` | explicit RC9 monolithic font; [quality and baseline comparison](weights/neuronte-full-v3.md) | 878, including the Greek and Russian additions | 384 | 331,009 | 1,324,240 bytes |
 | `neuronte-full-v2` | the baseline `split` is measured against | 763 of them in one net, all but the sextants and octants | 320 | 234,881 | 939,728 bytes |
@@ -203,6 +204,20 @@ reported untrained. All six of its group nets passed gates v2.3 with both
 seeds. Rebuild it with `make pack-kilix-chrome-v1`; see
 [its recipe and checks](weights/neuronte-kilix-chrome-v1.md).
 
+`neuronte-kilix-chrome-v2.nrt` draws the same code points, and the sun and
+the cloud, for the box of two cells Kilix gives a symbol that has a blank
+cell after it: 41 symbols, all but the ringing bell twice a cell wide, on a
+grid of 18 by 18 with pens of 2 (`font/kilix-chrome-2.txt`,
+`train/kilix_chrome2.py`). A program asks for a box W×H as the cell W×2H and
+averages each pair of rows; asked as W×H, level edges come out wrong by half
+a pixel. It shares its code points with v1 on purpose, so its list is
+`neuronte-kilix-chrome-v2.symbols.txt` and not a `.list.txt`, and
+`tests/check_kilix_chrome_v2.py` holds it to that list. Every net in it
+passed gates v2.3 with both seeds, 4 of the 6 groups as trained and 2 after
+being halved once. v1 stays for a symbol in one cell. Rebuild it with `make
+pack-kilix-chrome-v2`; see [its recipe and
+checks](weights/neuronte-kilix-chrome-v2.md).
+
 RC9 also ships the separate `neuronte-emoji-v0.nrt` colour bundle: 300 original
 single-scalar emoji, 600 left/right half labels, three experts, and up to six
 layers with dark/light palettes. The 7,011,412-byte bundle is used through the
@@ -298,6 +313,7 @@ a letter and a mark, such as ß æ œ ð þ ø ł đ ħ ŋ ĳ, are drawn in
 | `font/term-latin.txt` | The code points of `neuronte-term-latin-v1`, by training set: letters with one to three marks, composed by `train/glyphs.py` from letters drawn before and `font/marks.txt` |
 | `font/term-rest.txt` | The drawings of `neuronte-term-rest-v1`, by training set: Hebrew letters and punctuation, Lao letters, the baht sign, and the lists of pointed and wide Hebrew letters, faces and moons that `train/term_rest.py` makes from parts. Written for this project; a `# note` line marks each drawing whose shape is not sure |
 | `font/kilix-chrome.txt` | The drawings of `neuronte-kilix-chrome-v1`, by training set, each with a `# note` line saying what the symbol means on the Kilix bar; `train/kilix_chrome.py` makes the batteries and six weather symbols. Written for this project |
+| `font/kilix-chrome-2.txt` | The drawings of `neuronte-kilix-chrome-v2` for a box of two cells, on a grid of 18 by 18 units, by training set, each with a `# note` line; `train/kilix_chrome2.py` puts them in the net's cell, turns strokes into outlines so they are as thick lying as standing, and makes the batteries and eight weather symbols. Written for this project |
 | `font/letters.txt` | The Latin letters beyond ASCII that are not a letter plus a mark, and the Greek and Russian Cyrillic letters. The 49 Greek and 66 Russian Cyrillic letters are trained in RC9 accent-v2 and explicit split-v5 |
 | `font/ui-1.txt` to `font/ui-128.txt` | A proportional face for binary desktop text, printable ASCII and the ellipsis, drawn as pixels for every em from 1 to 128 except 44, each character with its advance in pixels. Stems are one pixel wide through 16, two from 17 through 26, and three from 27. Written for this project. `train/train.py --set ui10` and so on train one net each, and score it pixel by pixel at its size. `train/pack.py --advances` packs a file's advances, bold one pixel more. The nets so far are `neuronte-ui1-v0` through `neuronte-ui39-v0`, one for every em, and `neuronte-ui43-v0`. `font/ui-EM-italic.txt` is that face sheared on the grid so the top sits to the right of the bottom, trained as `uiEMi`. The packed `neuronte-uiEM-italic-v0` nets now cover every integer em from 3 through 32; [paired validation and small-grid limits](weights/neuronte-italic-v0.md) accompany the additional 17 faces |
 | `font/ui-large.txt`, `font/ui-large-advances.txt` | The same face above 32 pixels: the first-pass strokes the pixel faces were fitted to, drawn once for every em with a pen 3/32 em wide, the 32 px drawing's three-pixel stem, and blended. The advances are the 32 px drawing's in em, bold 0.2 design units (0.02 em) more. `train/train.py --set uilarge` trains the net and scores it by overlap at 32, 48, 64 and 96 pixels. The net is `neuronte-ui-large-v0` |

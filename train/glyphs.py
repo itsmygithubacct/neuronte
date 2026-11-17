@@ -48,6 +48,13 @@ Tiers:
              neuronte-term-symbol-v1, drawn in font/term-sym.txt and made by
              train/term_glyphs.py the same way; tsym12, tsym10 and tsym8 are
              its training sets, in the order of font/term-sym-partition.json.
+    tl...    the letters neuronte-term-latin-v1 adds, one tier for each
+             line name of font/term-latin.txt (tlvu, tlgl and so on): a
+             letter drawn before with one to three marks of
+             font/marks.txt, by the Unicode decomposition, and the Greek
+             marks alone. Two marks above are stacked; Greek capitals
+             take their marks before the letter. No set made before
+             holds any of them.
     ui1      the desktop face, printable ASCII and U+2026, from
     ...      font/ui-EM.txt, one file for every em from 1 to 128 except
     ui128    44. Stems are one pixel wide through 16, two from 17
@@ -66,7 +73,8 @@ Sets, each a list of tiers: ascii; draw (box, block, shade, braille);
 symbol; accent; full, which is all of those; tsymbol, tgreek,
 tcyrillic, tletter (the two scripts) and terminal (all three); and three sets for choosing
 how the mosaics join the bundle: pixel (block, mosaic), pixelbraille
-(block, mosaic, braille) and boxshade (box, shade). The sets ui1 to
+(block, mosaic, braille) and boxshade (box, shade); the sets of
+font/term-latin.txt, each its tier alone, and termlatin, all of them. The sets ui1 to
 ui128, except ui44, the italic sets ui3i to ui32i, and uilarge, are each their
 tier alone. tmath, tsym and tding are their tiers; tmath12, tmath10 and
 tmath8 divide the first, and the sets of the others are named the same way.
@@ -744,6 +752,219 @@ def terminal_letters():
     return out
 
 
+# The composed letters neuronte-term-latin-v1 adds: a letter the terminal
+# bundle has, and one to three marks, by the Unicode decomposition. The
+# list is font/term-latin.txt, one line per training set. Nothing here
+# changes a set made before.
+TERM_LATIN = os.path.join(strokes.ROOT, "font", "term-latin.txt")
+MORE_ABOVE = {0x309, 0x30F, 0x311, 0x313, 0x314, 0x342}
+MORE_BELOW = {0x323, 0x324, 0x325, 0x32D, 0x32E, 0x330, 0x331, 0x345}
+HORN = 0x31B
+# Where the horn leaves each letter, before the letter is shortened.
+HORN_AT = {"O": (0.74, 0.50), "U": (0.8, 0.46), "o": (0.74, 0.87), "u": (0.8, 0.86)}
+BREATHINGS = {0x313, 0x314}
+GREEK_ACCENTS = {0x300, 0x301, 0x342}
+# Two marks above stand one over the other, drawn with a thinner pen,
+# STACK_PEN, so that both keep their shape. The lower one's lowest stroke
+# is at STACK_BOTTOM over a small letter; the upper one's lowest stroke is
+# STACK_GAP above the lower one's highest, two pens and a gap; and both
+# are squeezed alike, each onto its own bottom, until the upper one's
+# highest stroke is at STACK_TOP or below, a pen under the cell's top.
+STACK_PEN = 0.058
+STACK_BOTTOM, STACK_TOP, STACK_GAP = 0.60, 0.068, 0.161
+CAPITAL_TOP2 = 0.70      # where a capital under two marks starts
+# An acute, a grave or a hook over a breve is narrowed and stands a little
+# way into its cup.
+NESTED, NEST_NARROW, NEST_DEPTH = {0x300, 0x301, 0x309}, 0.6, 0.8
+# Small letters whose ascender is where a mark would sit: the mark goes
+# above the ascender instead, at the x given.
+RAISED_SMALL = {"t": 0.42, "f": 0.5, "l": 0.5, "\u017f": 0.5}
+RAISE_SMALL = 0.17
+# Polytonic Greek. A breathing and an acute or grave stand side by side
+# over a small letter, the accent narrowed. Before a capital, as the tonos
+# is, the marks stand in a column at the left, the accent over the
+# breathing, both with the thinner pen.
+BESIDE_BREATHING, BESIDE_ACCENT, BESIDE_NARROW = -0.15, 0.135, 0.7
+COLUMN_SQUEEZE, COLUMN_TOP, COLUMN_GAP = 1.0, 0.52, 0.32
+PERISPOMENI_X, PERISPOMENI_NARROW = 0.16, 0.42
+# Where a mark below hangs when the middle of the letter is taken.
+BELOW_X = {"y": 0.7, "\u03b7": 0.4}
+TERM_CENTRE_X = {**TERMINAL_CENTRE_X, "\u03b7": 0.47, "\u03c1": 0.5, "h": 0.56}
+
+
+def term_latin_sets():
+    """{set: [code points]} from font/term-latin.txt, in the file's order."""
+    out = {}
+    with open(TERM_LATIN, encoding="utf-8") as fh:
+        for num, raw in enumerate(fh, 1):
+            line = raw.split("#")[0].split()
+            if not line:
+                continue
+            name, cps = line[0], line[1:]
+            if not name.startswith("tl") or not cps or any(not c.startswith("U+") for c in cps):
+                raise ValueError(f"{TERM_LATIN}:{num}: a line is a set named tl... and its U+XXXX")
+            out.setdefault(name, []).extend(int(c[2:], 16) for c in cps)
+    seen = [c for cps in out.values() for c in cps]
+    if len(set(seen)) != len(seen):
+        raise ValueError(f"{TERM_LATIN}: a character is listed twice")
+    return out
+
+
+def _span(shapes, axis):
+    v = [p[axis] for p in points(shapes)]
+    return min(v), max(v)
+
+
+def _onto(shapes, bottom, k=1.0, narrow=1.0, x=None):
+    """The mark with its lowest stroke at bottom, its height times k, and
+    its width times narrow about its middle, which moves to x if given."""
+    x0, x1 = _span(shapes, 0)
+    mid = (x0 + x1) / 2
+    to = mid if x is None else x
+    low = _span(shapes, 1)[1]
+    return moved(shapes, lambda px, py: (to + (px - mid) * narrow, bottom - (low - py) * k))
+
+
+def _height(shapes):
+    y0, y1 = _span(shapes, 1)
+    return y1 - y0
+
+
+def stacked(lower, upper, bottom, nested=False):
+    """Two marks around x 0.5, upper over lower, the lower one's lowest
+    stroke at bottom. nested: the upper stands in the lower one's cup."""
+    h_lower = _height(lower) * (NEST_DEPTH if nested else 1.0)
+    room = bottom - STACK_TOP - STACK_GAP
+    k = min(1.0, room / max(h_lower + _height(upper), 1e-9))
+    return _with_pen(_onto(lower, bottom, 1.0 if nested else k) +
+                     _onto(upper, bottom - h_lower * k - STACK_GAP, k, NEST_NARROW if nested else 1.0), STACK_PEN)
+
+
+def marks_above(above, marks, greek, bottom):
+    """Two marks above, lowest first, around x 0.5."""
+    lower, upper = above
+    if greek and lower in BREATHINGS and upper in (0x300, 0x301):
+        return (_onto(marks[lower], 0.56, x=0.5 + BESIDE_BREATHING) +
+                _onto(marks[upper], 0.56, narrow=BESIDE_NARROW, x=0.5 + BESIDE_ACCENT))
+    if greek and lower == 0x308 and upper == 0x301:
+        return marks[0x344]
+    if greek and lower == 0x308 and upper == 0x300:
+        return moved(marks[0x344], lambda x, y: (1 - x, y))
+    return stacked(marks[lower], marks[upper], bottom, lower == 0x306 and upper in NESTED)
+
+
+def marks_before(above, marks):
+    """The marks of a Greek capital, in a column at the left of the cell."""
+    def one(mark, bottom, k):
+        if mark == 0x342:
+            return _onto(marks[mark], bottom, k, PERISPOMENI_NARROW, PERISPOMENI_X)
+        return _onto(marks[mark], bottom, k, 1.0 if mark in BREATHINGS else TONOS_NARROW, TONOS_X)
+    if len(above) == 1:
+        return one(above[0], 0.56 + TONOS_DY, 1.0)
+    breathing, accent = above
+    k = COLUMN_SQUEEZE
+    return _with_pen(one(accent, COLUMN_TOP, k) +
+                     one(breathing, COLUMN_TOP + COLUMN_GAP + _height(marks[breathing]) * k, k), STACK_PEN)
+
+
+def _shorten(shapes, capital, top):
+    """shortened()'s map for a letter that must start at top."""
+    first = min((y for _, y in points(shapes)), default=top)
+    if first >= top:
+        return lambda x, y: (x, y)
+    if capital:
+        k = (BASELINE - top) / (BASELINE - first)
+        return lambda x, y: (x, BASELINE - (BASELINE - y) * k)
+    k = (XHEIGHT - top) / (XHEIGHT - first)
+    return lambda x, y: (x, XHEIGHT - (XHEIGHT - y) * k if y < XHEIGHT else y)
+
+
+def composed(letter, ms, base, marks, greek=False):
+    """The shapes of letter (None for marks alone in the cell) with the
+    marks ms, in the order of the Unicode decomposition."""
+    above = [m for m in ms if m in ABOVE or m in MORE_ABOVE]
+    below = [m for m in ms if m in BELOW or m in MORE_BELOW]
+    horn = [m for m in ms if m == HORN]
+    if len(above) + len(below) + len(horn) != len(ms) or len(above) > 2 or len(below) > 1 or len(horn) > 1:
+        raise ValueError(f"no rule for {letter!r} with " + " ".join(f"U+{m:04X}" for m in ms))
+    capital = letter is not None and letter.isupper()
+    drawn = DOTLESS.get(letter, letter) if above else letter
+    shapes = [] if letter is None else base[drawn]
+    anchor = HORN_AT.get(letter)
+    out = []
+    if greek and capital and set(above) & (BREATHINGS | GREEK_ACCENTS):
+        shapes = moved(shapes, lambda x, y: (TONOS_RIGHT - (TONOS_RIGHT - x) * TONOS_SQUEEZE, y))
+        out += marks_before(above, marks)
+    elif above:
+        two = len(above) == 2
+        raised = capital or letter in RAISED_SMALL
+        top = CAPITAL_TOP2 if capital and two else SHORT_TOP
+        f = _shorten(shapes, capital, top)
+        shapes = moved(shapes, f)
+        if anchor:
+            anchor = f(*anchor)
+        if letter is None:
+            at = 0.5
+        elif letter in RAISED_SMALL:
+            at = RAISED_SMALL[letter]
+        elif drawn in TERM_CENTRE_X:
+            at = TERM_CENTRE_X[drawn]
+        else:
+            x0, x1 = _span(shapes, 0)
+            at = (x0 + x1) / 2
+        if two:
+            block = marks_above(above, marks, greek, top - STACK_GAP if raised else STACK_BOTTOM)
+        else:
+            dy = -RAISE if capital else -RAISE_SMALL if raised else 0.0
+            block = moved(marks[above[0]], lambda x, y: (x, y + dy))
+        out += moved(block, lambda x, y: (x + at - 0.5, y))
+    for m in below:
+        if letter is None:
+            at = 0.5
+        elif m in BELOW:
+            at = bottom_x(shapes, right=m == 0x328)
+        elif letter in BELOW_X:
+            at = BELOW_X[letter]
+        else:
+            x0, x1 = _span(shapes, 0)
+            at = (x0 + x1) / 2
+        out += moved(marks[m], lambda x, y: (x + at - 0.5, y))
+    if horn:
+        if not anchor:
+            raise ValueError(f"no place for a horn on {letter!r}")
+        out += moved(marks[HORN], lambda x, y: (x + anchor[0], y + anchor[1]))
+    return shapes + out
+
+
+def term_latin():
+    """{char: shapes} for every character in font/term-latin.txt. A
+    character whose canonical composition is a character drawn before
+    (the Greek oxia forms, the angstrom sign) has that one's drawing."""
+    base = strokes.parse(strokes.STROKES)
+    base.update(strokes.parse(LETTERS))
+    marks = {ord(c): m for c, m in strokes.parse(MARKS).items()}
+    older = {**accents(), **terminal_letters()}
+    out = {}
+    for cps in term_latin_sets().values():
+        for c in cps:
+            ch = chr(c)
+            nfc = unicodedata.normalize("NFC", ch)
+            if nfc != ch and nfc in older:
+                out[ch] = older[nfc]
+                continue
+            alone = unicodedata.normalize("NFKD", ch)
+            if alone[0] == " ":
+                letter, ms = None, alone[1:]
+            else:
+                nfd = unicodedata.normalize("NFD", ch)
+                letter, ms = nfd[0], nfd[1:]
+            if ch in older or (letter is not None and letter not in base) or not ms:
+                raise ValueError(f"U+{c:04X} {unicodedata.name(ch)}: not a letter drawn before and marks")
+            greek = 0x370 <= c <= 0x3FF or 0x1F00 <= c <= 0x1FFF
+            out[ch] = composed(letter, [ord(m) for m in ms], base, marks, greek)
+    return out
+
+
 
 # Latin-1 letters for uilarge (set uilargex), composed like the accent tier:
 # a uilarge letter and a mark of font/marks.txt, by the Unicode
@@ -1119,6 +1340,8 @@ SETS = {
     "uilargex": ["uilarge", "uilargelatin1"],
     "uilargel1": ["uilargelatin1"],
 }
+SETS.update({name: [name] for name in term_latin_sets()})
+SETS["termlatin"] = list(term_latin_sets())  # every set of font/term-latin.txt
 
 
 def tier(name):
@@ -1159,6 +1382,9 @@ def tier(name):
         return [(c, made[c]) for c in sorted(made)]
     if name in TERM_SETS:
         return term_tier(name)
+    if name.startswith("tl") and name in term_latin_sets():
+        made = term_latin()
+        return [(chr(c), made[chr(c)]) for c in term_latin_sets()[name]]
     if name == "uilargelatin1":
         g = large_latin1()
         return [(c, g[c][0]) for c in sorted(g)]
@@ -1279,6 +1505,9 @@ def sources(name):
         files.append("font/symbols.txt")
     if {"accent", "tgreek", "tcyrillic"} & set(tiers):
         files += ["font/letters.txt", "font/marks.txt"]
+    if any(t in term_latin_sets() for t in tiers):
+        files += [f for f in ("font/strokes.txt", "font/letters.txt", "font/marks.txt", "font/term-latin.txt")
+                  if f not in files]
     if "mosaic" in tiers:
         files.append("font/octants.txt")
     for t in tiers:

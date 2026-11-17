@@ -31,6 +31,7 @@ letter. Desktop adapters fall back for unsupported strings and styles.
 | `neuronte-split-v7-symbol-v1` | split-v7 with the symbol character groups added: tiled Braille, `neuronte-ascii-groups-v1` and `neuronte-symbol-v1`; not a default; [recipe and checks](weights/neuronte-split-v7-symbol-v1.md) | 1,176, over fourteen nets and a router | 6, 32, 64, 128, 192 and 256 | 461,296 | 1,850,412 bytes |
 | `neuronte-split-v8` | split-v7 with the symbol, pixel and accent character groups added: tiled Braille, `neuronte-ascii-groups-v1`, `neuronte-symbol-v1`, `neuronte-pixel-groups-v1` and `neuronte-accent-groups-v1`; the pixel and accent groups failed their declared strict gates and were chosen by visual review; not a default; [recipe, checks and speed](weights/neuronte-split-v8.md) | 1,176, over twenty-one nets and a router | 6, 32, 64, 128, 192 and 256 | 699,511 | 2,805,688 bytes |
 | `neuronte-split-v9` | split-v8 with 165 terminal characters added on fourteen group nets: 113 symbols (✓ ✗, arrows, ± ≤ ≥ ≠, € £ ¥ ₽ ₴, super- and subscripts, maths and keyboard signs) in `neuronte-tsymbol-v1`, 20 Greek letters with tonos in `neuronte-tgreek-v1`, 32 Cyrillic letters beyond Russian in `neuronte-tcyrillic-v1`; every group failed its declared gates and was chosen by visual review; not a default; [recipe, checks and speed](weights/neuronte-split-v9.md) | 1,341, over thirty-five nets and a router | 6, 32, 64, 128, 192 and 256 | 898,437 | 3,607,088 bytes |
+| `neuronte-term-latin-v1` | 596 letters with marks that split-v9 was not trained on, alone in a standalone bundle to open beside split-v9: Vietnamese, Latin letters with one or two marks above or a mark below, polytonic Greek, Cyrillic with breve, diaeresis or macron; 71 of its 74 group nets failed their declared gates and were shipped by the owner's choice after review; not a default; [recipe, checks and speed](weights/neuronte-term-latin-v1.md) | 596, over 74 group nets, a table and a blank net | 64 and 96 | 1,065,306 in the group nets | 4,280,128 bytes |
 | `neuronte-split-v4` | the default before Greek and Russian, kept; most measurements below were made on it | 1,061, over six nets and a router | 48, 128 and 192 | 329,356 | 1,319,616 bytes |
 | `neuronte-full-v3` | explicit RC9 monolithic font; [quality and baseline comparison](weights/neuronte-full-v3.md) | 878, including the Greek and Russian additions | 384 | 331,009 | 1,324,240 bytes |
 | `neuronte-full-v2` | the baseline `split` is measured against | 763 of them in one net, all but the sextants and octants | 320 | 234,881 | 939,728 bytes |
@@ -148,6 +149,23 @@ default; to use it, load it instead of split-v8 or split-v5, and nothing else
 changes. Rebuild it with `make pack-split-v9`; see
 [its recipe, checks and speed](weights/neuronte-split-v9.md).
 
+`neuronte-term-latin-v1.nrt` is a bundle of its own for 596 letters with marks that
+split-v9 has the letter for but was never trained on: the Vietnamese
+letters, Latin letters with one or two marks above or a mark below,
+polytonic Greek, and Cyrillic letters with a breve, diaeresis or macron.
+Each is composed from a letter split-v9 already draws and one to three marks
+of `font/marks.txt`; `font/term-latin.txt` lists them. It holds no copy of
+split-v9. A program opens both files and draws a character with this one
+when `neuronte_untrained()` says it was trained on it, and with split-v9
+otherwise; a scalar outside its list draws blank through it and is reported
+untrained (`train/standalone_bundle.py`). 3 of its 74 group nets passed
+the gates declared before training; the others failed, about half the
+misses on binary overlap and most of the rest on the one-sample rules,
+also on the one declared retry at width 96, and were shipped at width 64 by the owner's choice after a side-by-side review. On a rented AMD EPYC 7B13 it draws these characters
+about 3.1 times as fast as split-v9's fallback does. It is not a default.
+Rebuild it with `make pack-term-latin-v1`; see
+[its recipe, checks and speed](weights/neuronte-term-latin-v1.md).
+
 RC9 also ships the separate `neuronte-emoji-v0.nrt` colour bundle: 300 original
 single-scalar emoji, 600 left/right half labels, three experts, and up to six
 layers with dark/light palettes. The 7,011,412-byte bundle is used through the
@@ -240,6 +258,7 @@ a letter and a mark, such as ß æ œ ð þ ø ł đ ħ ŋ ĳ, are drawn in
 | `font/strokes.txt` | The ASCII face: each character as pen strokes on a 10 × 20 grid. Written for this project |
 | `font/symbols.txt` | The symbols of the full set, in the same form |
 | `font/marks.txt` | The diacritic marks, keyed by their combining code points |
+| `font/term-latin.txt` | The code points of `neuronte-term-latin-v1`, by training set: letters with one to three marks, composed by `train/glyphs.py` from letters drawn before and `font/marks.txt` |
 | `font/letters.txt` | The Latin letters beyond ASCII that are not a letter plus a mark, and the Greek and Russian Cyrillic letters. The 49 Greek and 66 Russian Cyrillic letters are trained in RC9 accent-v2 and explicit split-v5 |
 | `font/ui-1.txt` to `font/ui-128.txt` | A proportional face for binary desktop text, printable ASCII and the ellipsis, drawn as pixels for every em from 1 to 128 except 44, each character with its advance in pixels. Stems are one pixel wide through 16, two from 17 through 26, and three from 27. Written for this project. `train/train.py --set ui10` and so on train one net each, and score it pixel by pixel at its size. `train/pack.py --advances` packs a file's advances, bold one pixel more. The nets so far are `neuronte-ui1-v0` through `neuronte-ui39-v0`, one for every em, and `neuronte-ui43-v0`. `font/ui-EM-italic.txt` is that face sheared on the grid so the top sits to the right of the bottom, trained as `uiEMi`. The packed `neuronte-uiEM-italic-v0` nets now cover every integer em from 3 through 32; [paired validation and small-grid limits](weights/neuronte-italic-v0.md) accompany the additional 17 faces |
 | `font/ui-large.txt`, `font/ui-large-advances.txt` | The same face above 32 pixels: the first-pass strokes the pixel faces were fitted to, drawn once for every em with a pen 3/32 em wide, the 32 px drawing's three-pixel stem, and blended. The advances are the 32 px drawing's in em, bold 0.2 design units (0.02 em) more. `train/train.py --set uilarge` trains the net and scores it by overlap at 32, 48, 64 and 96 pixels. The net is `neuronte-ui-large-v0` |

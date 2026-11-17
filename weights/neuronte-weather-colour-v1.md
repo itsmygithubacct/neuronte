@@ -47,7 +47,7 @@ Both seeds were trained from commit e24a23d on a rented NVIDIA GeForce RTX 3090 
 
 ## Gates
 
-The gates are those emoji-v1 was held to, as its card states them, run by the same `tests/check_emoji.py` on the net's packed file with snapping off. They were written down with their hash before any training, with a check that a perfect net on these drawings meets every one (it scores .9969 at 16 px). Two seeds; both must pass; seed 0 is published.
+The gates are those emoji-v1 was held to, as its card states them, run by the same `tests/check_emoji.py` on the net's packed file with snapping off. They were written down with their hash before any training, with a check that a perfect net on these drawings meets every one (it scores .9969 at 16 px). Two seeds; both must pass; seed 0 is published. The nets were scored with `tests/check_emoji.py` as it was in 0.1.5 (sha256 `7d44d572e11e6d731b32e663f860137de57fdc38bf6053ec0dc844368f23d366`). In 0.1.6 that file changed in one place, how it writes its cache of the drawings (under another name, then renamed, so two test targets run side by side can share it); no gate and no measurement changed, `make test` scores both seeds again with the file as it is now, and the hash list holds that file.
 
 | Limit | Value | Seed 0 (published) | Seed 1 |
 |---|---|---|---|

@@ -1342,6 +1342,9 @@ SETS = {
 }
 SETS.update({name: [name] for name in term_latin_sets()})
 SETS["termlatin"] = list(term_latin_sets())  # every set of font/term-latin.txt
+import term_blocks  # noqa: E402  (the systematic blocks of font/term-blocks.txt, made by train/term_blocks.py)
+SETS.update({name: [name] for name in term_blocks.sets()})
+SETS["tblk"] = list(term_blocks.sets())  # every set of font/term-blocks.txt
 
 
 def tier(name):
@@ -1385,6 +1388,9 @@ def tier(name):
     if name.startswith("tl") and name in term_latin_sets():
         made = term_latin()
         return [(chr(c), made[chr(c)]) for c in term_latin_sets()[name]]
+    if name.startswith("tblk") and name in term_blocks.sets():
+        made = term_blocks.drawings()
+        return [(chr(c), made[chr(c)]) for c in term_blocks.sets()[name]]
     if name == "uilargelatin1":
         g = large_latin1()
         return [(c, g[c][0]) for c in sorted(g)]
@@ -1508,6 +1514,8 @@ def sources(name):
     if any(t in term_latin_sets() for t in tiers):
         files += [f for f in ("font/strokes.txt", "font/letters.txt", "font/marks.txt", "font/term-latin.txt")
                   if f not in files]
+    if any(t.startswith("tblk") for t in tiers):
+        files += [f for f in ("font/strokes.txt", "font/term-blocks.txt", "train/term_blocks.py") if f not in files]
     if "mosaic" in tiers:
         files.append("font/octants.txt")
     for t in tiers:

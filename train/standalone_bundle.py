@@ -7,7 +7,8 @@ usage: python3 train/standalone_bundle.py OUT.nrt --list LIST.txt
 known_bundle.add_known() adds group nets to a copy of a bundle that
 already draws everything else. This packs the group nets alone, for a
 program that opens several bundles and asks each which characters it was
-trained on.
+trained on. A NET.json may be a tiled net (train/tile_member.py): it is
+one member, and the table sends it the characters it was trained on.
 
 - The table sends every trained scalar to its group net, as in any
   bundle. There is no gate.
@@ -100,7 +101,7 @@ def standalone(nets, listed, apart=()):
     """(bundle bytes, record) for group net JSON paths and the list's scalars."""
     if not 1 <= len(nets) <= 127:
         raise SystemExit("a standalone bundle holds 1 to 127 group nets")
-    images = [pack.pack_v1(p) for p in nets]
+    images = [pack.pack(p) for p in nets]     # a group net, or a tiled net: one member either way
     ranges = pack.table(nets)        # refuses a scalar two nets were trained on
     trained = {v for first, last, _ in ranges for v in range(first, last + 1)}
     want = set(listed)

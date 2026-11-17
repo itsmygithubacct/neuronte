@@ -558,6 +558,32 @@ pack-term-latin-v1:
 
 .PHONY: test-term-latin-v1 pack-term-latin-v1
 
+# term-blocks-v1: Yijing hexagrams, Tai Xuan Jing figures, domino tiles and
+# playing cards, drawn by rule; a standalone bundle of tiled nets and group
+# nets used beside split-v9.
+TERM_BLOCKS_V1 = $(shell $(PYTHON) train/build_term_blocks_v1.py --files)
+TERM_BLOCKS_V1_TILED = $(shell $(PYTHON) train/build_term_blocks_v1.py --tiled)
+TERM_BLOCKS_V1_INK = 4DC0
+
+test-term-blocks-v1: build/libneuronte.so build/stream/libneuronte.so build/test_api
+	$(PYTHON) train/term_blocks.py
+	@set -e; for n in $(TERM_BLOCKS_V1); do \
+		$(PYTHON) train/pack.py $$n.json build/$$(basename $$n).nrt; \
+		$(PYTHON) tests/check_reference.py build/libneuronte.so $$n.json build/$$(basename $$n).nrt; \
+	done
+	@set -e; for n in $(TERM_BLOCKS_V1_TILED); do \
+		$(PYTHON) train/pack.py $$n.json build/$$(basename $$n).nrt; \
+	done
+	$(PYTHON) tests/check_tiled.py build/libneuronte.so --stream build/stream/libneuronte.so \
+		$(foreach n,$(TERM_BLOCKS_V1_TILED),--tiled $(n).json build/$(notdir $(n)).nrt)
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_term_blocks_v1.py build/libneuronte.so
+	./build/test_api weights/neuronte-term-blocks-v1.nrt --standalone $(TERM_BLOCKS_V1_INK)
+
+pack-term-blocks-v1:
+	$(PYTHON) train/build_term_blocks_v1.py
+
+.PHONY: test-term-blocks-v1 pack-term-blocks-v1
+
 test-ascii-next: build/libneuronte.so build/test_api
 	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_ascii_next.py build/libneuronte.so
 	./build/test_api weights/neuronte-split-ascii-groups-v1.nrt --full --accent --pixel
@@ -780,6 +806,7 @@ test-bits: build/libneuronte.so
 # time of the whole test.
 FACE_V0_TESTS = test-face-v0-ui1 test-face-v0-ui2 test-face-v0-ui3 test-face-v0-ui4 test-face-v0-ui5 test-face-v0-ui6 test-face-v0-ui7 test-face-v0-ui8 test-face-v0-ui9 test-face-v0-ui10 test-face-v0-ui10i test-face-v0-ui11 test-face-v0-ui11i test-face-v0-ui12 test-face-v0-ui12i test-face-v0-ui13 test-face-v0-ui14 test-face-v0-ui14i test-face-v0-ui15 test-face-v0-ui16 test-face-v0-ui16i test-face-v0-ui17 test-face-v0-ui18 test-face-v0-ui18i test-face-v0-ui19 test-face-v0-ui20 test-face-v0-ui20i test-face-v0-ui21 test-face-v0-ui22 test-face-v0-ui22i test-face-v0-ui23 test-face-v0-ui24 test-face-v0-ui24i test-face-v0-ui25 test-face-v0-ui26 test-face-v0-ui26i test-face-v0-ui27 test-face-v0-ui28 test-face-v0-ui29 test-face-v0-ui30 test-face-v0-ui28i test-face-v0-ui30i test-face-v0-ui32i test-face-v0-ui31 test-face-v0-ui32 test-face-v0-ui33 test-face-v0-ui34 test-face-v0-ui35 test-face-v0-ui36 test-face-v0-ui37 test-face-v0-ui38 test-face-v0-ui39 test-face-v0-ui43 test-face-v0-uilarge
 .PHONY: $(FACE_V0_TESTS)
+test: $(FACE_V0_TESTS)
 test-face-v0-ui1: build/libneuronte.so
 	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UI1).nrt $(UI1).json font/ui-1.txt
 test-face-v0-ui2: build/libneuronte.so
@@ -889,7 +916,7 @@ test-face-v0-ui43: build/libneuronte.so
 test-face-v0-uilarge: build/libneuronte.so
 	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UILARGE).nrt $(UILARGE).json font/ui-large-advances.txt
 
-test: all $(TESTS) test-bits test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7 test-face-bundle test-symbol-v1 test-split-v7-symbol test-split-v8 test-split-v9 test-term-math-v1 test-term-symbol-v1 test-term-dingbat-v1 test-faces-v1 test-faces-v1-192-256 test-known-bundle test-untrained test-standalone test-term-latin-v1 test-faces-wide-v1 test-faces-v1-h512 test-colour-marks test-faces-v1-small test-emoji-v1 test-letter-snap test-ui-scaled test-ui-large-v1 test-ui-latin1 $(FACE_V0_TESTS)
+test: all $(TESTS) test-bits test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7 test-face-bundle test-symbol-v1 test-split-v7-symbol test-split-v8 test-split-v9 test-term-math-v1 test-term-symbol-v1 test-term-dingbat-v1 test-faces-v1 test-faces-v1-192-256 test-known-bundle test-untrained test-standalone test-term-latin-v1 test-term-blocks-v1 test-faces-wide-v1 test-faces-v1-h512 test-colour-marks test-faces-v1-small test-emoji-v1 test-letter-snap test-ui-scaled test-ui-large-v1 test-ui-latin1
 	cd weights && sha256sum -c --quiet SHA256SUMS
 	# The pointer net keeps its own list, with paths from the top of the tree.
 	sha256sum -c --quiet weights/neuronte-pointer-v0.sha256

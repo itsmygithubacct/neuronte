@@ -1,0 +1,56 @@
+# The characters of neuronte-term-blocks-v1: four blocks whose every
+# character is made from a few parts by rule. train/term_blocks.py makes
+# each drawing from this file. No font was read: the shapes come from the
+# characters' Unicode names, the Unicode charts as remembered, and this
+# project's own strokes (the ranks of the cards are font/strokes.txt's
+# letters and digits, made small).
+#
+# set NAME U+XXXX or U+XXXX..U+YYYY ...   a training set and its characters
+#
+# Yijing hexagrams (64): six lines, each whole or broken.
+set tblkhex U+4DC0..U+4DFF
+# Tai Xuan Jing: the monogram and the five digrams (6), and the tetragrams
+# (81): four lines, each whole, broken once or broken twice.
+set tblkdig U+1D300..U+1D305
+set tblktet U+1D306..U+1D356
+# Domino tiles (100): the back and the 49 tiles, lying and standing.
+set tblkdomh U+1F030..U+1F061
+set tblkdomv U+1F062..U+1F093
+# Playing cards (59): the back, four suits of fourteen, two jokers.
+set tblkcard U+1F0A0..U+1F0AE U+1F0B1..U+1F0BE U+1F0C1..U+1F0CF U+1F0D1..U+1F0DF
+#
+# The hexagrams in code point order, which is the King Wen order: the
+# upper trigram over the lower. A trigram's lines are written from the
+# bottom up, 1 whole and 0 broken.
+trigram heaven 111
+trigram earth 000
+trigram thunder 100
+trigram water 010
+trigram mountain 001
+trigram wind 011
+trigram fire 101
+trigram lake 110
+hexagrams heaven/heaven earth/earth water/thunder mountain/water water/heaven heaven/water earth/water water/earth
+hexagrams wind/heaven heaven/lake earth/heaven heaven/earth heaven/fire fire/heaven earth/mountain thunder/earth
+hexagrams lake/thunder mountain/wind earth/lake wind/earth fire/thunder mountain/fire mountain/earth earth/thunder
+hexagrams heaven/thunder mountain/heaven mountain/thunder lake/wind water/water fire/fire lake/mountain thunder/wind
+hexagrams heaven/mountain thunder/heaven fire/earth earth/fire wind/fire fire/lake water/mountain thunder/water
+hexagrams mountain/lake wind/thunder lake/heaven heaven/wind lake/earth earth/wind lake/water water/wind
+hexagrams lake/fire fire/wind thunder/thunder mountain/mountain wind/mountain thunder/lake thunder/fire fire/mountain
+hexagrams wind/wind lake/lake wind/water water/lake wind/lake thunder/mountain water/fire fire/water
+#
+# The Tai Xuan Jing digrams: the upper line and the lower, 0 whole, 1
+# broken once, 2 broken twice. The monogram is one line broken twice.
+digram U+1D301 0 2
+digram U+1D302 1 2
+digram U+1D303 2 0
+digram U+1D304 2 1
+digram U+1D305 2 2
+#
+# The suits, in the stroke syntax of font/strokes.txt (10 grid units to
+# the cell width), each drawn about 5,10. Hearts and diamonds are shown in
+# outline, spades and clubs filled.
+part spade F 5,6 8.12,10.06 6.6,11.2 3.4,11.2 1.88,10.06 | O 3.4,11.2 1.9,1.9 | O 6.6,11.2 1.9,1.9 | F 5,10.8 6.3,14 3.7,14
+part heart F 1.88,9.44 3.4,8.3 6.6,8.3 8.12,9.44 5,13.6 | O 3.4,8.3 1.9,1.9 | O 6.6,8.3 1.9,1.9
+part diamond F 5,6 7.9,10 5,14 2.1,10
+part club O 5,7.7 1.75,1.75 | O 3.1,10.6 1.75,1.75 | O 6.9,10.6 1.75,1.75 | F 5,7.7 6.9,10.6 3.1,10.6 | F 5,10 6.3,14 3.7,14

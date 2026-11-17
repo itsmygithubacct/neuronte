@@ -1,0 +1,15 @@
+# The characters neuronte-term-blocks-v1.nrt was trained on, in the order of
+# font/term-blocks.txt, one line for each member. A bundle's table must be
+# exactly its list (tests/check_bundle_lists.py).
+# tblkhex
+U+4DC0..U+4DFF
+# tblkdig group 0
+U+1D300..U+1D305
+# tblktet
+U+1D306..U+1D356
+# tblkdomh
+U+1F030..U+1F061
+# tblkdomv
+U+1F062..U+1F093
+# tblkcard
+U+1F0A0..U+1F0AE U+1F0B1..U+1F0BE U+1F0C1..U+1F0CF U+1F0D1..U+1F0DF

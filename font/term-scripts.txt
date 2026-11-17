@@ -126,3 +126,74 @@ tscrmdu U+1D543 U+1D544 U+1D546 U+1D54A U+1D54B U+1D54C U+1D54D U+1D54E U+1D54F 
 tscrmdl U+1D552 U+1D553 U+1D554 U+1D555 U+1D556 U+1D557 U+1D558 U+1D559
 tscrmdl U+1D55A U+1D55B U+1D55C U+1D55D U+1D55E U+1D55F U+1D560 U+1D561 U+1D562
 tscrmdl U+1D563 U+1D564 U+1D565 U+1D566 U+1D567 U+1D568 U+1D569 U+1D56A U+1D56B
+#
+# ---------------------------------------------------------------------
+# neuronte-term-syllabics-v1: Unified Canadian Aboriginal Syllabics.
+# ---------------------------------------------------------------------
+#
+# A syllabic is its consonant's shape turned for its vowel, by rule
+# (train/term_scripts.py, SYLLABIC): these seven parts, on a grid of their
+# own, x and y 0..10, which the rule sets in the syllabic's box. The vowels,
+# p and t are drawn as their e form, which points down; k, c, m and n as
+# their a form, the stem or bar with its loop, hook or foot at the lower
+# right. Dots are added by the rule: above for a long vowel, at mid height
+# before the shape for w, after it in the West Cree forms; a final is the
+# a form, small and raised.
+part syl-vowel P 0,0 10,0 5,10 0,0
+part syl-p P 0,0 5,10 10,0
+part syl-t P 0,0 0,5 | E 5,5 5,5 180 0 | P 10,5 10,0
+part syl-k P 0,0 0,10 | E 5,7 5,3 0 360
+part syl-c P 0,0 0,6.2 | E 5,6.2 5,3.8 180 20
+part syl-m P 0,0 0,10 10,10
+# n: a bar with a hook at its end. Drawn from memory of the shape and not
+# certain: how large the hook is and how far it closes.
+part syl-n P 3.6,10 10,10 | E 3.6,5 3.6,5 90 330
+#
+# The finals that are marks of their own, raised, from their Unicode names:
+# acute, grave, bottom, top and right half rings, ring, double acute, two
+# short vertical strokes, middle dot, short horizontal stroke, plus, down
+# tack.
+U+141F P 4,8.6 6,4.6
+U+1420 P 4,4.6 6,8.6
+U+1421 E 5,5.4 2,2.8 0 180
+U+1422 E 5,8.2 2,2.8 180 360
+U+1423 E 4.1,6.6 2.4,2.2 270 450
+U+1424 E 5,6.6 1.8,2 0 360
+U+1425 P 2.9,8.6 4.9,4.6 | P 5.3,8.6 7.3,4.6
+U+1426 P 3.9,4.6 3.9,8.2 | P 6.1,4.6 6.1,8.2
+U+1427 P 5,10.5 5,11.1
+U+1428 P 3.3,7 6.7,7
+U+1429 P 3.2,6.8 6.8,6.8 | P 5,4.6 5,9
+U+142A P 3.2,5 6.8,5 | P 5,5 5,9
+# West Cree final p, a short raised stroke; West Cree final m, a small
+# raised arc open to the right; the full stop, a small cross on the
+# baseline.
+U+144A P 5,4.6 5,8.2
+U+14BC E 5.4,7 2,2.4 50 310
+U+166E P 3.3,11 6.7,15 | P 6.7,11 3.3,15
+#
+# Training sets. tscrsa: the vowels, p, t, k, c and m, 22 each, two group
+# nets a series: the e and i forms with o and oo, then the other o forms
+# and the a forms.
+# vowels.
+tscrsa U+1401 U+140C U+140D U+1403 U+1404 U+140E U+140F U+1410 U+1411 U+1405 U+1406
+tscrsa U+1407 U+1412 U+1413 U+1414 U+1415 U+140A U+140B U+1417 U+1418 U+1419 U+141A
+# p.
+tscrsa U+142F U+143A U+143B U+1431 U+1432 U+143C U+143D U+143E U+143F U+1433 U+1434
+tscrsa U+1435 U+1440 U+1441 U+1442 U+1443 U+1438 U+1439 U+1444 U+1445 U+1446 U+1447
+# t.
+tscrsa U+144C U+1457 U+1458 U+144E U+144F U+1459 U+145A U+145B U+145C U+1450 U+1451
+tscrsa U+1452 U+145D U+145E U+145F U+1460 U+1455 U+1456 U+1461 U+1462 U+1463 U+1464
+# k.
+tscrsa U+146B U+1474 U+1475 U+146D U+146E U+1476 U+1477 U+1478 U+1479 U+146F U+1470
+tscrsa U+1471 U+147A U+147B U+147C U+147D U+1472 U+1473 U+147E U+147F U+1480 U+1481
+# c.
+tscrsa U+1489 U+1492 U+1493 U+148B U+148C U+1494 U+1495 U+1496 U+1497 U+148D U+148E
+tscrsa U+148F U+1498 U+1499 U+149A U+149B U+1490 U+1491 U+149C U+149D U+149E U+149F
+# m.
+tscrsa U+14A3 U+14AC U+14AD U+14A5 U+14A6 U+14AE U+14AF U+14B0 U+14B1 U+14A7 U+14A8
+tscrsa U+14A9 U+14B2 U+14B3 U+14B4 U+14B5 U+14AA U+14AB U+14B6 U+14B7 U+14B8 U+14B9
+# tscrsb: n; then the last two of n, the finals that are small shapes and the full stop; then the finals that are marks.
+tscrsb U+14C0 U+14C2 U+14C3 U+14C4 U+14C5 U+14C6 U+14C7 U+14C8 U+14C9 U+14CA U+14CB U+14CC
+tscrsb U+14CD U+14CE U+1449 U+144A U+1466 U+1483 U+1484 U+14A1 U+14BB U+14BC U+14D0 U+166E
+tscrsb U+141F U+1420 U+1421 U+1422 U+1423 U+1424 U+1425 U+1426 U+1427 U+1428 U+1429 U+142A

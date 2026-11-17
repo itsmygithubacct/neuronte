@@ -39,6 +39,12 @@ Tiers:
              marks alone. Two marks above are stacked; Greek capitals
              take their marks before the letter. No set made before
              holds any of them.
+    tlet...  the letters neuronte-term-letters-v1 adds, one tier for each
+             set line of font/term-letters.txt (tletlu, tletcl and so on):
+             new letters of Latin, Greek and Cyrillic, made by
+             train/term_letters.py from the strokes drawn before (turned,
+             mirrored, made small, with a hook, a bar or a tail) or drawn
+             in that file. No set made before holds any of them.
     ui1      the desktop face, printable ASCII and U+2026, from
     ...      font/ui-EM.txt, one file for every em from 1 to 128 except
     ui128    44. Stems are one pixel wide through 16, two from 17
@@ -58,7 +64,8 @@ symbol; accent; full, which is all of those; tsymbol, tgreek,
 tcyrillic, tletter (the two scripts) and terminal (all three); and three sets for choosing
 how the mosaics join the bundle: pixel (block, mosaic), pixelbraille
 (block, mosaic, braille) and boxshade (box, shade); the sets of
-font/term-latin.txt, each its tier alone, and termlatin, all of them. The sets ui1 to
+font/term-latin.txt, each its tier alone, and termlatin, all of them; the sets of
+font/term-letters.txt, each its tier alone, and termletters, all of them. The sets ui1 to
 ui128, except ui44, the italic sets ui3i to ui32i, and uilarge, are each their
 tier alone. They share their scalars with ascii and with each other, so
 they join no other set, and their nets no bundle.
@@ -948,6 +955,29 @@ def term_latin():
 
 
 
+# The letters neuronte-term-letters-v1 adds. train/term_letters.py makes
+# the drawings; only the names of the sets are read here.
+TERM_LETTERS = os.path.join(strokes.ROOT, "font", "term-letters.txt")
+
+
+def term_letters_sets():
+    """{set: [code points]} from the tlet... lines of font/term-letters.txt, in the file's order."""
+    out = {}
+    with open(TERM_LETTERS, encoding="utf-8") as fh:
+        for num, raw in enumerate(fh, 1):
+            line = raw.split("  # ")[0].split()
+            if not line or not line[0].startswith("tlet"):
+                continue
+            name, cps = line[0], line[1:]
+            if not cps or any(not c.startswith("U+") for c in cps):
+                raise ValueError(f"{TERM_LETTERS}:{num}: a set line is tlet... and its U+XXXX")
+            out.setdefault(name, []).extend(int(c[2:], 16) for c in cps)
+    seen = [c for cps in out.values() for c in cps]
+    if len(set(seen)) != len(seen):
+        raise ValueError(f"{TERM_LETTERS}: a character is listed twice")
+    return out
+
+
 # Latin-1 letters for uilarge (set uilargex), composed like the accent tier:
 # a uilarge letter and a mark of font/marks.txt, by the Unicode
 # decomposition. The marks are drawn for strokes.txt's letters, so they are
@@ -1289,6 +1319,8 @@ SETS = {
 }
 SETS.update({name: [name] for name in term_latin_sets()})
 SETS["termlatin"] = list(term_latin_sets())  # every set of font/term-latin.txt
+SETS.update({name: [name] for name in term_letters_sets()})
+SETS["termletters"] = list(term_letters_sets())  # every set of font/term-letters.txt
 
 
 def tier(name):
@@ -1330,6 +1362,10 @@ def tier(name):
     if name.startswith("tl") and name in term_latin_sets():
         made = term_latin()
         return [(chr(c), made[chr(c)]) for c in term_latin_sets()[name]]
+    if name in term_letters_sets():
+        import term_letters
+        made = term_letters.letters()
+        return [(chr(c), made[chr(c)]) for c in term_letters_sets()[name]]
     if name == "uilargelatin1":
         g = large_latin1()
         return [(c, g[c][0]) for c in sorted(g)]
@@ -1453,6 +1489,9 @@ def sources(name):
     if any(t in term_latin_sets() for t in tiers):
         files += [f for f in ("font/strokes.txt", "font/letters.txt", "font/marks.txt", "font/term-latin.txt")
                   if f not in files]
+    if any(t in term_letters_sets() for t in tiers):
+        files += [f for f in ("font/strokes.txt", "font/symbols.txt", "font/letters.txt", "font/marks.txt",
+                              "font/term-letters.txt", "train/term_letters.py") if f not in files]
     if "mosaic" in tiers:
         files.append("font/octants.txt")
     for em in UI:

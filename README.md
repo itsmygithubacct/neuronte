@@ -172,7 +172,7 @@ Rebuild it with `make pack-term-latin-v1`; see
 `neuronte-term-mathalpha-v1.nrt` is a bundle of its own for 179 characters no earlier bundle was
 trained on: the sans-serif, monospace and double-struck letters and digits of Mathematical Alphanumeric Symbols. Monospace is this face's own ASCII strokes, sans-serif the same but for six characters, and the double-struck ones are drawn by hand; `font/term-scripts.txt` lists them. It holds no
 copy of split-v9 and is opened beside it, as `neuronte-term-latin-v1.nrt` is.
-The common gates of the coverage phases judged it automatically: every group net passed the common gates (gates-v2.3) with both seeds. On an Intel Core i7-6820HQ and an Intel Core i7-10700F it draws these characters about 2.4 times as fast as split-v9's fallback does.
+The common gates of the coverage phases judged it automatically: every group net passed the common gates (gates-v2.3) with both seeds. On an Intel Core i7-6820HQ and an Intel Core i7-10700F it draws these characters about 2.6 times as fast as split-v9's fallback does.
 It is not a default. Rebuild it with `make pack-term-mathalpha-v1`; see
 [its recipe, checks and speed](weights/neuronte-term-mathalpha-v1.md).
 

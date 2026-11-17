@@ -100,33 +100,33 @@ kilix-bench e21e5cd on two x86 hosts, Intel Core i7-6820HQ and Intel Core i7-107
 
 | µs per character, Intel Core i7-6820HQ | split-v9 | term-syllabics-v1 | split-v9 / term-syllabics-v1 |
 |---|---:|---:|---:|
-| Coverage, uncached, 8×16 | 478.3 | 199.8 | 2.39 |
-| Coverage, uncached, 16×32 | 1867.3 | 768.1 | 2.43 |
-| Coverage, uncached, 48×96 | 4137.7 | 1715.6 | 2.41 |
-| Draw, cold, 8×16 | 484.7 | 203.0 | 2.39 |
-| Draw, cold, 16×32 | 1868.6 | 775.9 | 2.41 |
-| Draw, cold, 48×96 | 4202.5 | 1747.3 | 2.41 |
-| Draw, warm, 8×16 | 3.6 | 0.9 | 3.85 |
+| Coverage, uncached, 8×16 | 475.9 | 200.0 | 2.38 |
+| Coverage, uncached, 16×32 | 1865.6 | 767.6 | 2.43 |
+| Coverage, uncached, 48×96 | 4163.3 | 1709.0 | 2.44 |
+| Draw, cold, 8×16 | 485.7 | 202.8 | 2.40 |
+| Draw, cold, 16×32 | 1874.9 | 775.6 | 2.42 |
+| Draw, cold, 48×96 | 4191.7 | 1746.7 | 2.40 |
+| Draw, warm, 8×16 | 3.6 | 0.9 | 3.84 |
 | Draw, warm, 16×32 | 6.1 | 2.8 | 2.16 |
-| Draw, warm, 48×96 | 26.2 | 20.5 | 1.28 |
+| Draw, warm, 48×96 | 26.2 | 20.6 | 1.27 |
 
-On the Intel Core i7-6820HQ: a lookup takes 12 ns in this bundle's table against 1225 ns for split-v9's gate; opening the file takes 1.2 ms against 4.8 ms for split-v9 (a program that opens both pays both).
+On the Intel Core i7-6820HQ: a lookup takes 12 ns in this bundle's table against 1224 ns for split-v9's gate; opening the file takes 1.2 ms against 4.8 ms for split-v9 (a program that opens both pays both).
 
 | µs per character, Intel Core i7-10700F | split-v9 | term-syllabics-v1 | split-v9 / term-syllabics-v1 |
 |---|---:|---:|---:|
-| Coverage, uncached, 8×16 | 360.3 | 153.0 | 2.36 |
-| Coverage, uncached, 16×32 | 1415.8 | 586.2 | 2.42 |
-| Coverage, uncached, 48×96 | 3126.6 | 1310.7 | 2.39 |
-| Draw, cold, 8×16 | 362.6 | 153.8 | 2.36 |
-| Draw, cold, 16×32 | 1413.4 | 591.5 | 2.39 |
-| Draw, cold, 48×96 | 3161.4 | 1328.4 | 2.38 |
-| Draw, warm, 8×16 | 2.7 | 0.7 | 3.98 |
-| Draw, warm, 16×32 | 4.4 | 2.0 | 2.18 |
-| Draw, warm, 48×96 | 18.6 | 14.4 | 1.29 |
+| Coverage, uncached, 8×16 | 357.9 | 151.6 | 2.36 |
+| Coverage, uncached, 16×32 | 1408.9 | 581.3 | 2.42 |
+| Coverage, uncached, 48×96 | 3120.5 | 1294.3 | 2.41 |
+| Draw, cold, 8×16 | 366.1 | 151.7 | 2.41 |
+| Draw, cold, 16×32 | 1397.2 | 587.8 | 2.38 |
+| Draw, cold, 48×96 | 3142.7 | 1316.9 | 2.39 |
+| Draw, warm, 8×16 | 2.7 | 0.7 | 3.96 |
+| Draw, warm, 16×32 | 4.4 | 2.0 | 2.21 |
+| Draw, warm, 48×96 | 18.4 | 14.1 | 1.30 |
 
-On the Intel Core i7-10700F: a lookup takes 7 ns in this bundle's table against 899 ns for split-v9's gate; opening the file takes 0.8 ms against 3.7 ms for split-v9 (a program that opens both pays both).
+On the Intel Core i7-10700F: a lookup takes 7 ns in this bundle's table against 888 ns for split-v9's gate; opening the file takes 0.8 ms against 3.3 ms for split-v9 (a program that opens both pays both).
 
-Uncached, term-syllabics-v1 draws these characters 2.4 times as fast as split-v9's fallback does (geometric mean over both hosts and the three cells; per host 2.4 on the Intel Core i7-6820HQ, 2.4 on the Intel Core i7-10700F). Cold draw: 2.4, 2.4; warm draw: 2.20, 2.24. The pixels are identical on both hosts.
+Uncached, term-syllabics-v1 draws these characters 2.4 times as fast as split-v9's fallback does (geometric mean over both hosts and the three cells; per host 2.4 on the Intel Core i7-6820HQ, 2.4 on the Intel Core i7-10700F). Cold draw: 2.4, 2.4; warm draw: 2.19, 2.25. The pixels are identical on both hosts.
 
 A handle caches 1,024 drawn cells. A screen that shows more distinct cells than that redraws some each frame, whichever bundle draws them.
 

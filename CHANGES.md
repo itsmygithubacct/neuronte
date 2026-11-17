@@ -1,5 +1,69 @@
 # Changes
 
+## 0.1.5
+
+Every file of 0.1.4 is still here byte for byte and draws the same pixels
+and advances. No default changes, and the library's source is unchanged.
+
+### New nets
+
+Four terminal bundles for 1,864 characters that DejaVu Sans Mono or DejaVu
+Sans has and `neuronte-split-v9` was not trained on. With them the terminal
+set shares 2,903 of DejaVu's 6,065 characters, up from 1,039.
+
+Each is a **standalone bundle**: a table, the group nets, and a blank net
+for every other character. It holds no copy of split-v9 and does not
+replace it. A program opens it beside split-v9 and draws a character with
+the bundle whose `neuronte_untrained()` is 0 for it;
+`weights/NAME.list.txt` is the same set as text.
+
+- `neuronte-term-latin-v1`: 596 letters made of a letter Neuronte already
+  had and one or more marks: Vietnamese, Latin with one or two marks above
+  or a mark below, polytonic Greek, Cyrillic with breve, diaeresis or
+  macron. 74 group nets, 4,280,128 bytes.
+  [Card](weights/neuronte-term-latin-v1.md).
+- `neuronte-term-math-v1`: 465 arrows and mathematical operators. 47 group
+  nets, 2,686,120 bytes. [Card](weights/neuronte-term-math-v1.md).
+- `neuronte-term-symbol-v1`: 480 punctuation marks, superscripts and
+  subscripts, currency signs, letterlike symbols, number forms, technical
+  symbols, enclosed digits and geometric shapes. 48 group nets, 2,743,740
+  bytes. [Card](weights/neuronte-term-symbol-v1.md).
+- `neuronte-term-dingbat-v1`: 323 Miscellaneous Symbols and Dingbats. 35
+  group nets, 2,000,188 bytes. [Card](weights/neuronte-term-dingbat-v1.md).
+
+**Most of these nets missed the limits declared for them before training.**
+3 of the 74 letter groups passed, and 55 of the 130 symbol groups. The other
+146 ship by the owner's choice after a side-by-side review of every group;
+each card lists which groups missed and on which rule. In every group each
+character is nearest its own drawing at every size counted, and none
+vanishes.
+
+Uncached, the new characters draw 2.7 to 3.1 times as fast as split-v9
+drew them from its fallback net: 3.1 times for the letters, measured on a
+rented AMD EPYC 7B13, and about 2.7 times for each symbol bundle, measured
+on an i7-6820HQ and an i7-10700F. Each card has its table.
+
+No drawing was made by reading a font file. The letters are composed by
+code from the project's own strokes and marks; the symbols are the
+project's own strokes in `font/term-math.txt`, `font/term-sym.txt` and
+`font/term-ding.txt`, with families turned, mirrored, filled or negated by
+`train/term_glyphs.py`. DejaVu was used only for its list of code points.
+
+### Training and packing
+
+- `train/standalone_bundle.py` packs group nets as a standalone bundle.
+- `train/glyphs.py` composes a letter with several marks above, marks
+  below and the Greek breathings; `font/marks.txt` has the new marks.
+
+### Tests
+
+- `tests/check_bundle_lists.py`: a listed bundle's table must be exactly
+  its `weights/NAME.list.txt`, and no two listed bundles, nor a listed
+  bundle and split-v9, may claim the same character.
+- `test_api --standalone` checks a standalone bundle through a trained
+  character.
+- One test target for each new bundle, run by `make test`.
+
 ## 0.1.4
 
 Every file of 0.1.3 is still here byte for byte and draws the same pixels

@@ -5,7 +5,7 @@ UTF-8. The net writes that character's pixels into a buffer the caller
 owns. No font file, glyph table or bitmap atlas is consulted. The
 weights are the font.
 
-This is version 0.1.4. [CHANGES.md](CHANGES.md) lists what is new since
+This is version 0.1.5. [CHANGES.md](CHANGES.md) lists what is new since
 0.1.1.
 
 Version-1 distance models accept any integer hidden width from 1 to

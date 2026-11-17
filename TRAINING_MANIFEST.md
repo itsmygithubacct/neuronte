@@ -17,7 +17,7 @@ fails if this file is out of date.
   of its input and of the tool that made it.
 - **JSON, packed**: the first 16 hex digits of the SHA-256 of the weight
   file and of its packed `.nrt`, if one is shipped. The full hashes of
-  the 5850 files it lists are in `weights/SHA256SUMS`. The pointer net's
+  the 5984 files it lists are in `weights/SHA256SUMS`. The pointer net's
   files are not in that list; theirs are in
   `weights/neuronte-pointer-v0.sha256`.
 
@@ -32,7 +32,7 @@ fails if this file is out of date.
 - No training run has been repeated by a third party. Two seeds were
   trained by the project for the models whose `seed1` files are here.
 
-## Weight files (5331)
+## Weight files (5449)
 
 | Weight file | Set or drawing | Steps | Seed | Unlabelled weight | Pen radius | Sources hashed | After training | JSON | Packed |
 |---|---|---:|---:|---:|---:|---|---|---|---|
@@ -112,6 +112,80 @@ fails if this file is out of date.
 | `neuronte-tcyrillic-v1-g1.seed1.json` | tcyrillic-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `train/glyphs.py`, `train/strokes.py` | - | `2a4a41f3202811b8` | - |
 | `neuronte-tcyrillic-v1-g2.json` | tcyrillic-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `train/glyphs.py`, `train/strokes.py` | - | `f0ef4c1040b50ae9` | - |
 | `neuronte-tcyrillic-v1-g2.seed1.json` | tcyrillic-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `train/glyphs.py`, `train/strokes.py` | - | `f64812ee10d0caad` | - |
+| `neuronte-term-latin-v1-tl2l-g0.json` | tl2l-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `51cbd9653364e30a` | - |
+| `neuronte-term-latin-v1-tl2l-g1.json` | tl2l-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `4a6fc68dd7d90850` | - |
+| `neuronte-term-latin-v1-tl2l-g2.json` | tl2l-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `6f0914c433ffa921` | - |
+| `neuronte-term-latin-v1-tl2u-g0.json` | tl2u-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `e98cc8db014ae186` | - |
+| `neuronte-term-latin-v1-tl2u-g1.json` | tl2u-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `9097e91c814c2a0d` | - |
+| `neuronte-term-latin-v1-tl2u-g2.json` | tl2u-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `546a78d380c7e8f5` | - |
+| `neuronte-term-latin-v1-tlal-g0.json` | tlal-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `71bf02a6d048f019` | - |
+| `neuronte-term-latin-v1-tlal-g1.json` | tlal-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `b83b03d1e20764ae` | - |
+| `neuronte-term-latin-v1-tlal-g2.json` | tlal-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `5f7d8526c9234f7b` | - |
+| `neuronte-term-latin-v1-tlal-g3.json` | tlal-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `dffe49f1327a7c40` | - |
+| `neuronte-term-latin-v1-tlal-g4.json` | tlal-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `2e0d9068d4bdca4e` | - |
+| `neuronte-term-latin-v1-tlal-g5.json` | tlal-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `20146161af16486a` | - |
+| `neuronte-term-latin-v1-tlau-g0.json` | tlau-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `8bfffce6dcba1604` | - |
+| `neuronte-term-latin-v1-tlau-g1.json` | tlau-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `6ec155f8c413e9ab` | - |
+| `neuronte-term-latin-v1-tlau-g2.json` | tlau-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `016a637d690959b3` | - |
+| `neuronte-term-latin-v1-tlau-g3.json` | tlau-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `2d6b409844382e8d` | - |
+| `neuronte-term-latin-v1-tlau-g4.json` | tlau-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `4aa6dad9a730cb6d` | - |
+| `neuronte-term-latin-v1-tlau-g5.json` | tlau-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `7c40d62562483507` | - |
+| `neuronte-term-latin-v1-tlbl-g0.json` | tlbl-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `7636d04c2742c29e` | - |
+| `neuronte-term-latin-v1-tlbl-g1.json` | tlbl-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `b4b5ce1784b85314` | - |
+| `neuronte-term-latin-v1-tlbl-g2.json` | tlbl-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `a8f6c2578b44cbd2` | - |
+| `neuronte-term-latin-v1-tlbl-g3.json` | tlbl-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `e0117e5b73db6dff` | - |
+| `neuronte-term-latin-v1-tlbl-g4.json` | tlbl-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `58ce8ecd0fa6dae8` | - |
+| `neuronte-term-latin-v1-tlbu-g0.json` | tlbu-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `8afd901f832f9921` | - |
+| `neuronte-term-latin-v1-tlbu-g1.json` | tlbu-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `70eec8a5b758a725` | - |
+| `neuronte-term-latin-v1-tlbu-g2.json` | tlbu-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `f947a783568a15e9` | - |
+| `neuronte-term-latin-v1-tlbu-g3.json` | tlbu-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `f5f3eedd98313e72` | - |
+| `neuronte-term-latin-v1-tlbu-g4.json` | tlbu-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `95f4422c80327786` | - |
+| `neuronte-term-latin-v1-tlcl-g0.json` | tlcl-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `b78ee3ffb3352b0b` | - |
+| `neuronte-term-latin-v1-tlcl-g1.json` | tlcl-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `15cd7bef5b0b440b` | - |
+| `neuronte-term-latin-v1-tlcu-g0.json` | tlcu-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `c1a746ade7ff37d9` | - |
+| `neuronte-term-latin-v1-tlcu-g1.json` | tlcu-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `77ca24d6ad7b9574` | - |
+| `neuronte-term-latin-v1-tlgl-g0.json` | tlgl-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `aafb04b36ba67b0c` | - |
+| `neuronte-term-latin-v1-tlgl-g1.json` | tlgl-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `783d32b813d5d050` | - |
+| `neuronte-term-latin-v1-tlgl-g10.json` | tlgl-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `5b8ab8c61a6c1892` | - |
+| `neuronte-term-latin-v1-tlgl-g11.json` | tlgl-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `56517f41be1d9e50` | - |
+| `neuronte-term-latin-v1-tlgl-g12.json` | tlgl-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `ebcacbd23433bd0d` | - |
+| `neuronte-term-latin-v1-tlgl-g13.json` | tlgl-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `189a6fc2ddafc5e5` | - |
+| `neuronte-term-latin-v1-tlgl-g14.json` | tlgl-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `2a8960f343cfcb59` | - |
+| `neuronte-term-latin-v1-tlgl-g15.json` | tlgl-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `d70144c20d124ece` | - |
+| `neuronte-term-latin-v1-tlgl-g2.json` | tlgl-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `2b05c38e789bb9a3` | - |
+| `neuronte-term-latin-v1-tlgl-g3.json` | tlgl-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `1cbdc8853b54538c` | - |
+| `neuronte-term-latin-v1-tlgl-g4.json` | tlgl-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `8f5f15c3ec9b0c34` | - |
+| `neuronte-term-latin-v1-tlgl-g5.json` | tlgl-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `c87036f0389de31e` | - |
+| `neuronte-term-latin-v1-tlgl-g6.json` | tlgl-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `131a50e91d7c3e4a` | - |
+| `neuronte-term-latin-v1-tlgl-g7.json` | tlgl-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `be79b5fb91ea8092` | - |
+| `neuronte-term-latin-v1-tlgl-g8.json` | tlgl-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `6955399bc830d271` | - |
+| `neuronte-term-latin-v1-tlgl-g9.json` | tlgl-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `8befe6e9dbe282e9` | - |
+| `neuronte-term-latin-v1-tlgs-g0.json` | tlgs-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `7a6f013fe14572c8` | - |
+| `neuronte-term-latin-v1-tlgs-g1.json` | tlgs-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `6c63fe4d2c72f813` | - |
+| `neuronte-term-latin-v1-tlgu-g0.json` | tlgu-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `bf76bf09a6938ebd` | - |
+| `neuronte-term-latin-v1-tlgu-g1.json` | tlgu-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `f82909a136dfbda7` | - |
+| `neuronte-term-latin-v1-tlgu-g10.json` | tlgu-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `b4c9acca932c38c0` | - |
+| `neuronte-term-latin-v1-tlgu-g11.json` | tlgu-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `337e1be697f5f1d5` | - |
+| `neuronte-term-latin-v1-tlgu-g2.json` | tlgu-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `cbd890cb4ba4ef15` | - |
+| `neuronte-term-latin-v1-tlgu-g3.json` | tlgu-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `3f06d211ccb91b2a` | - |
+| `neuronte-term-latin-v1-tlgu-g4.json` | tlgu-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `7f290cb03d3ae73c` | - |
+| `neuronte-term-latin-v1-tlgu-g5.json` | tlgu-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `7df1d91a25eb3d19` | - |
+| `neuronte-term-latin-v1-tlgu-g6.json` | tlgu-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `b4dbf61fe5868330` | - |
+| `neuronte-term-latin-v1-tlgu-g7.json` | tlgu-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `fbbb21a1ec7e28ca` | - |
+| `neuronte-term-latin-v1-tlgu-g8.json` | tlgu-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `ad239171c103f489` | - |
+| `neuronte-term-latin-v1-tlgu-g9.json` | tlgu-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `c538966ab885bbb0` | - |
+| `neuronte-term-latin-v1-tlvl-g0.json` | tlvl-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `e7aae6d855e44046` | - |
+| `neuronte-term-latin-v1-tlvl-g1.json` | tlvl-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `b5387146883ba3c8` | - |
+| `neuronte-term-latin-v1-tlvl-g2.json` | tlvl-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `a5091646b0db9f07` | - |
+| `neuronte-term-latin-v1-tlvl-g3.json` | tlvl-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `add69f4b9b89cba2` | - |
+| `neuronte-term-latin-v1-tlvl-g4.json` | tlvl-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `e634b6a765e7c8b7` | - |
+| `neuronte-term-latin-v1-tlvl-g5.json` | tlvl-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `d2a1712ad68ef7e8` | - |
+| `neuronte-term-latin-v1-tlvu-g0.json` | tlvu-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `8760cc9e81614b00` | - |
+| `neuronte-term-latin-v1-tlvu-g1.json` | tlvu-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `cee6e16fc670b468` | - |
+| `neuronte-term-latin-v1-tlvu-g2.json` | tlvu-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `d0b7841b2e57e441` | - |
+| `neuronte-term-latin-v1-tlvu-g3.json` | tlvu-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `60ab2afd8807aae2` | - |
+| `neuronte-term-latin-v1-tlvu-g4.json` | tlvu-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `9204d4bb5a95194a` | - |
+| `neuronte-term-latin-v1-tlvu-g5.json` | tlvu-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `font/term-latin.txt`, `train/glyphs.py`, `train/strokes.py` | - | `e475e14ba954c01a` | - |
 | `neuronte-tgreek-v1-g0.json` | tgreek-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `train/glyphs.py`, `train/strokes.py` | - | `edd296605e902fbc` | - |
 | `neuronte-tgreek-v1-g0.seed1.json` | tgreek-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `train/glyphs.py`, `train/strokes.py` | - | `06a47a71fc03088e` | - |
 | `neuronte-tgreek-v1-g1.json` | tgreek-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/letters.txt`, `font/marks.txt`, `font/strokes.txt`, `train/glyphs.py`, `train/strokes.py` | - | `76b72dcd3f4f88b5` | - |
@@ -135,6 +209,50 @@ fails if this file is out of date.
 | `neuronte-tsymbol-v1-g8.json` | tsymbol-repertoire | 120000 | 0 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `font/symbols.txt`, `train/glyphs.py`, `train/strokes.py` | - | `f40274fd9232ca8c` | - |
 | `neuronte-tsymbol-v1-g8.seed1.json` | tsymbol-repertoire | 120000 | 1 | 1.0 | 0.075 | `font/code-masks.txt`, `font/strokes.txt`, `font/symbols.txt`, `train/glyphs.py`, `train/strokes.py` | - | `410bf36d32e13f64` | - |
 | `neuronte-ui-large-v0.json` | uilarge | 20000 | 0 | 0.0 | 0.046875 | `font/ui-large.txt`, `train/glyphs.py`, `train/strokes.py` | - | `2b914704f7c4b81f` | `00736e339edc6eda` |
+| `neuronte-ui-large-v1-g0.json` | uilarge | - | - | - | - | - | - | `1cb262a1cdf68929` | - |
+| `neuronte-ui-large-v1-g1.json` | uilarge | - | - | - | - | - | - | `218e066a36452ec0` | - |
+| `neuronte-ui-large-v1-g2.json` | uilarge | - | - | - | - | - | - | `4ebd830eee35e65d` | - |
+| `neuronte-ui-large-v1-g3.json` | uilarge | - | - | - | - | - | - | `834ccb8ad35a4870` | - |
+| `neuronte-ui-large-v1.seed1-g0.json` | uilarge | - | - | - | - | - | - | `907b07abe5dfdb54` | - |
+| `neuronte-ui-large-v1.seed1-g1.json` | uilarge | - | - | - | - | - | - | `3cba6821c7cbe7a7` | - |
+| `neuronte-ui-large-v1.seed1-g2.json` | uilarge | - | - | - | - | - | - | `7ef827dcffcef7e5` | - |
+| `neuronte-ui-large-v1.seed1-g3.json` | uilarge | - | - | - | - | - | - | `75fb91445e5e3aeb` | - |
+| `neuronte-ui-latin1-v0-g0.json` | uilargel1 | - | - | - | - | - | - | `d8cf9671c1cb96e3` | - |
+| `neuronte-ui-latin1-v0-g1.json` | uilargel1 | - | - | - | - | - | - | `4f01491f632d82c0` | - |
+| `neuronte-ui-latin1-v0.seed1-g0.json` | uilargel1 | - | - | - | - | - | - | `7a30bed02add5f91` | - |
+| `neuronte-ui-latin1-v0.seed1-g1.json` | uilargel1 | - | - | - | - | - | - | `e322c60f7d1237e6` | - |
+| `neuronte-ui-scaled-v0-g0.json` | uilarge | - | - | - | - | - | - | `996c4db0a3b5dcce` | - |
+| `neuronte-ui-scaled-v0-g1.json` | uilarge | - | - | - | - | - | - | `e9c1097d201d9238` | - |
+| `neuronte-ui-scaled-v0-g10.json` | uilarge | - | - | - | - | - | - | `a1c0a549632017f6` | - |
+| `neuronte-ui-scaled-v0-g11.json` | uilarge | - | - | - | - | - | - | `83f0b0116bbf6e11` | - |
+| `neuronte-ui-scaled-v0-g12.json` | uilarge | - | - | - | - | - | - | `7c3ff069bbc2f205` | - |
+| `neuronte-ui-scaled-v0-g13.json` | uilarge | - | - | - | - | - | - | `4704f3d521bb2ebd` | - |
+| `neuronte-ui-scaled-v0-g14.json` | uilarge | - | - | - | - | - | - | `2c97af981ef7b5bf` | - |
+| `neuronte-ui-scaled-v0-g15.json` | uilarge | - | - | - | - | - | - | `7b954a7ccfeb6d60` | - |
+| `neuronte-ui-scaled-v0-g2.json` | uilarge | - | - | - | - | - | - | `bd675f814f5cc8df` | - |
+| `neuronte-ui-scaled-v0-g3.json` | uilarge | - | - | - | - | - | - | `b54210a63ed3d11b` | - |
+| `neuronte-ui-scaled-v0-g4.json` | uilarge | - | - | - | - | - | - | `d30bcb0ec5000838` | - |
+| `neuronte-ui-scaled-v0-g5.json` | uilarge | - | - | - | - | - | - | `689797fedf0d08bf` | - |
+| `neuronte-ui-scaled-v0-g6.json` | uilarge | - | - | - | - | - | - | `704b84f2948b82c0` | - |
+| `neuronte-ui-scaled-v0-g7.json` | uilarge | - | - | - | - | - | - | `c2d5e0d0cb5a0032` | - |
+| `neuronte-ui-scaled-v0-g8.json` | uilarge | - | - | - | - | - | - | `bb0430bb9bebbb39` | - |
+| `neuronte-ui-scaled-v0-g9.json` | uilarge | - | - | - | - | - | - | `24c0157a1e4a2cc3` | - |
+| `neuronte-ui-scaled-v0.seed1-g0.json` | uilarge | - | - | - | - | - | - | `6bdd52b381e89efd` | - |
+| `neuronte-ui-scaled-v0.seed1-g1.json` | uilarge | - | - | - | - | - | - | `2df25a200aa9100e` | - |
+| `neuronte-ui-scaled-v0.seed1-g10.json` | uilarge | - | - | - | - | - | - | `11295c9377f3a367` | - |
+| `neuronte-ui-scaled-v0.seed1-g11.json` | uilarge | - | - | - | - | - | - | `1e981b7a6d825efa` | - |
+| `neuronte-ui-scaled-v0.seed1-g12.json` | uilarge | - | - | - | - | - | - | `21f5c450f5a117c9` | - |
+| `neuronte-ui-scaled-v0.seed1-g13.json` | uilarge | - | - | - | - | - | - | `665fb2a02511a054` | - |
+| `neuronte-ui-scaled-v0.seed1-g14.json` | uilarge | - | - | - | - | - | - | `46f7e6be6125f349` | - |
+| `neuronte-ui-scaled-v0.seed1-g15.json` | uilarge | - | - | - | - | - | - | `69d04c72ce3f3ca3` | - |
+| `neuronte-ui-scaled-v0.seed1-g2.json` | uilarge | - | - | - | - | - | - | `ec118e78ff58cb4d` | - |
+| `neuronte-ui-scaled-v0.seed1-g3.json` | uilarge | - | - | - | - | - | - | `0d1a34cc26e71252` | - |
+| `neuronte-ui-scaled-v0.seed1-g4.json` | uilarge | - | - | - | - | - | - | `c655faa6548830a0` | - |
+| `neuronte-ui-scaled-v0.seed1-g5.json` | uilarge | - | - | - | - | - | - | `0ea534322c810511` | - |
+| `neuronte-ui-scaled-v0.seed1-g6.json` | uilarge | - | - | - | - | - | - | `25f189253256cab1` | - |
+| `neuronte-ui-scaled-v0.seed1-g7.json` | uilarge | - | - | - | - | - | - | `9704c17302231721` | - |
+| `neuronte-ui-scaled-v0.seed1-g8.json` | uilarge | - | - | - | - | - | - | `2758e4be0a557b37` | - |
+| `neuronte-ui-scaled-v0.seed1-g9.json` | uilarge | - | - | - | - | - | - | `7bd99bee970b27cb` | - |
 | `neuronte-ui1-v0.json` | ui1 | 20000 | 0 | 0.0 | 0.55 | `font/ui-1.txt`, `train/glyphs.py`, `train/strokes.py` | - | `589a33bbdac6d0b6` | `74792e9cf615c7d1` |
 | `neuronte-ui1-v1-g0.json` | ui1 | - | - | - | - | - | - | `e4cc643b322738e9` | - |
 | `neuronte-ui1-v1.seed1-g0.json` | ui1 | - | - | - | - | - | - | `37498ead02269379` | - |

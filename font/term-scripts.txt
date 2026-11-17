@@ -197,3 +197,204 @@ tscrsa U+14A9 U+14B2 U+14B3 U+14B4 U+14B5 U+14AA U+14AB U+14B6 U+14B7 U+14B8 U+1
 tscrsb U+14C0 U+14C2 U+14C3 U+14C4 U+14C5 U+14C6 U+14C7 U+14C8 U+14C9 U+14CA U+14CB U+14CC
 tscrsb U+14CD U+14CE U+1449 U+144A U+1466 U+1483 U+1484 U+14A1 U+14BB U+14BC U+14D0 U+166E
 tscrsb U+141F U+1420 U+1421 U+1422 U+1423 U+1424 U+1425 U+1426 U+1427 U+1428 U+1429 U+142A
+#
+# ---------------------------------------------------------------------
+# neuronte-term-scripts-v1: Lisu, Ogham, Old Italic, and the letters of
+# Tifinagh and Armenian whose shapes are known for sure or nearly so.
+# ---------------------------------------------------------------------
+#
+# Lisu (Fraser): the Latin capitals, fifteen of them turned half round,
+# as the alphabet was made. ba pa da ta ga ka ja ca dza tsa ma na la sa
+# zha ha xa wa sha ya a e i o u are B P D T G K J C Z F M N L S R V H W X Y
+# A E I O U.
+as U+A4D0 U+0042
+as U+A4D1 U+0050
+as U+A4D3 U+0044
+as U+A4D4 U+0054
+as U+A4D6 U+0047
+as U+A4D7 U+004B
+as U+A4D9 U+004A
+as U+A4DA U+0043
+as U+A4DC U+005A
+as U+A4DD U+0046
+as U+A4DF U+004D
+as U+A4E0 U+004E
+as U+A4E1 U+004C
+as U+A4E2 U+0053
+as U+A4E3 U+0052
+as U+A4E6 U+0056
+as U+A4E7 U+0048
+as U+A4EA U+0057
+as U+A4EB U+0058
+as U+A4EC U+0059
+as U+A4EE U+0041
+as U+A4F0 U+0045
+as U+A4F2 U+0049
+as U+A4F3 U+004F
+as U+A4F4 U+0055
+# pha tha kha cha tsha za nga hha fa gha ae eu ue uh oe: P T K C F R V G J
+# B A E U L D turned.
+as U+A4D2 U+0050 turned
+as U+A4D5 U+0054 turned
+as U+A4D8 U+004B turned
+as U+A4DB U+0043 turned
+as U+A4DE U+0046 turned
+as U+A4E4 U+0052 turned
+as U+A4E5 U+0056 turned
+as U+A4E8 U+0047 turned
+as U+A4E9 U+004A turned
+as U+A4ED U+0042 turned
+as U+A4EF U+0041 turned
+as U+A4F1 U+0045 turned
+as U+A4F5 U+0055 turned
+as U+A4F6 U+004C turned
+as U+A4F7 U+0044 turned
+# The tone marks and punctuation are written with a full stop, comma,
+# semicolon, colon, hyphen and equals sign: . , .. ., ; : -. =
+as U+A4F8 U+002E
+as U+A4F9 U+002C
+U+A4FA P 3.2,14.3 3.2,14.9 | P 6.8,14.3 6.8,14.9
+U+A4FB P 3.2,14.3 3.2,14.9 | P 6.8,14.5 6.8,15.3 5.8,17.5
+as U+A4FC U+003B
+as U+A4FD U+003A
+U+A4FE P 1.8,10.5 5.6,10.5 | P 7.8,14.3 7.8,14.9
+as U+A4FF U+003D
+#
+# Ogham: the twenty letters are made by rule (train/term_scripts.py,
+# OGHAM). Drawn here: eabhadh, a cross on the stemline; or, a lozenge on
+# it; and the feather marks that open and close a text, an arrowhead
+# before the stemline and one after it. Uilleann, ifin, eamhancholl and
+# peith are left out: their shapes are not known well enough.
+U+1695 P@0.55 0,10 10,10 | P@0.55 2.2,5.8 7.8,14.2 | P@0.55 7.8,5.8 2.2,14.2
+U+1696 P@0.55 0,10 10,10 | P@0.55 5,6 8.2,10 5,14 1.8,10 5,6
+U+169B P@0.55 2.5,6 6,10 2.5,14 | P@0.55 6,10 10,10
+U+169C P@0.55 7.5,6 4,10 7.5,14 | P@0.55 0,10 4,10
+#
+# Old Italic, written left to right. a be de e ve ka te eks are the shapes
+# of A B D E F K T X; ze the I with its bars; she M; u V; ke C; ef 8.
+as U+10300 U+0041
+as U+10301 U+0042
+as U+10302 U+0043
+as U+10303 U+0044
+as U+10304 U+0045
+as U+10305 U+0046
+as U+10306 U+0049
+# he: a box with a bar across. the: a circle with a cross in it.
+U+10307 P 2.5,4 7.5,4 7.5,15 2.5,15 2.5,4 | P 2.5,9.5 7.5,9.5
+U+10308 E 5,9.5 3,4.5 0 360 | P 2.9,6.3 7.1,12.7 | P 7.1,6.3 2.9,12.7
+U+10309 P 5,4 5,15
+as U+1030A U+004B
+# el: a stem with its foot slanting up. em, en: the first stem long, the
+# other strokes short, at the top.
+U+1030B P 3,4 3,15 7.5,11
+U+1030C P 2,15 2,4 4,9 6,4 8,9
+U+1030D P 2.5,15 2.5,4 6.5,9.5 6.5,4
+as U+1030F U+004F
+# pe: a stem, a bar and a short stroke down from its end.
+U+10310 P 3,15 3,4 7,4 7,8
+as U+10311 U+004D
+# ku: a ring on a stem. es: three strokes. khe: a stem with two arms.
+U+10312 E 5,7.5 2.8,3.5 0 360 | P 5,11 5,15
+U+10314 P 7.5,4 2.5,7.7 7.5,11.3 2.5,15
+as U+10315 U+0054
+as U+10316 U+0056
+as U+10317 U+0058
+U+10318 P 5,4 5,15 | E 5,9.5 3,3.3 0 360
+U+10319 P 5,4 5,15 | P 2,4 5,10 8,4
+as U+1031A U+0038
+# The numerals: one a stroke, five a gable, ten a cross, fifty an arrow.
+U+10320 P 5,4 5,15
+U+10321 P 2,15 5,4 8,15
+as U+10322 U+0058
+U+10323 P 5,15 5,4.5 | P 2,7.5 5,4.5 8,7.5
+#
+# Tifinagh, the letters of the Moroccan standard alphabet that are known:
+# ya a small ring; yab, yah and yass a ring with a bar across, upright and
+# slanting; yar a large ring, yarr with a tail, yas with a dot; yash C; yaw
+# U; yu two dots.
+U+2D30 E 5,12.4 2.5,2.6 0 360
+U+2D31 E 5,9.5 3,4.5 0 360 | P 2,9.5 8,9.5
+U+2D40 E 5,9.5 3,4.5 0 360 | P 5,5 5,14
+as U+2D54 U+004F
+as U+2D55 U+0051
+U+2D59 E 5,9.5 3,5.5 0 360 | P 5,9.2 5,9.8
+U+2D5A E 5,9.5 3,5.5 0 360 | P 7.1,5.6 2.9,13.4
+as U+2D5B U+0043
+as U+2D61 U+0055
+U+2D53 P 5,6.3 5,6.9 | P 5,12.3 5,12.9
+# yad a gable; yadd E; yahh a lambda; yaq Z; yi a sigma; yazh I with its
+# bars; yam a square bracket; yan a stroke; yat a plus; yay 5; yaz a stem
+# with a cup above and a cap below.
+U+2D37 P 2,15 5,4 8,15
+as U+2D39 U+0045
+U+2D43 P 2.5,4 3.5,4 8,15 | P 5.4,8.6 2,15
+as U+2D47 U+005A
+U+2D49 P 8,4 2,4 5.5,9.5 2,15 8,15
+as U+2D4A U+0049
+U+2D4E P 8,4 2,4 2,15 8,15
+U+2D4F P 5,4 5,15
+as U+2D5C U+002B
+as U+2D62 U+0035
+U+2D63 P 5,4 5,15 | E 5,4 3,3.5 0 180 | E 5,15 3,3.5 180 360
+#
+# Armenian, the letters that are known. Capitals: oh O, seh U, vo an arch,
+# liwn L, tiwn S, piwr a ring on a stem; keh P with a bar; reh a stem and
+# an arch; ech a stem that turns at the foot, and a bar; yi a 3 with a flat
+# top.
+as U+0555 U+004F
+as U+054D U+0055
+U+0548 P 2,15 2,7.5 | E 5,7.5 3,3.5 180 360 | P 8,7.5 8,15
+as U+053C U+004C
+as U+054F U+0053
+U+0553 P 5,4 5,15 | E 5,9.5 3,3.3 0 360
+as U+0554 U+0050 | P 0.6,12.4 4.6,12.4
+U+0550 P 2.5,15 2.5,6.5 | E 5.2,6.5 2.7,2.5 180 385
+U+0535 P 2.5,4 2.5,11.5 | E 5.4,11.5 2.9,3.5 180 -15 | P 2.5,8.3 7,8.3
+U+0545 P 2.5,4 7.5,4 4.5,8.5 | E 4.8,11.75 3.1,3.25 265 500
+# Smalls: oh o, seh u, vo n, ho h, yi j without its dot, co g, za q, keh
+# p with a bar.
+as U+0585 U+006F
+as U+057D U+0075
+as U+0578 U+006E
+as U+0570 U+0068
+U+0575 P 4,8 6.5,8 6.5,16.5 | E 4,16.5 2.5,2.5 0 140
+as U+0581 U+0067
+as U+0566 U+0071
+as U+0584 U+0070 | P 0.4,17 4,17
+# reh; ra, n with a foot; ini, h with its stem carried down; ech; yiwn.
+U+0580 P 2.5,15 2.5,10.2 | E 5.2,10.2 2.7,2.2 180 385
+as U+057C U+006E | P 8,15 9.7,15
+U+056B P 2,3.5 2,19 | E 5,11 3,3 180 360 | P 8,11 8,15
+U+0565 P 2.5,3.5 2.5,12.2 | E 5.3,12.2 2.8,2.8 180 -10 | P 2.5,8 7,8
+U+0582 P 4,8 4,13 | E 6,13 2,2 180 90 | P 6,15 7,15
+# The full stop, two dots; the apostrophe and the left half ring; the
+# emphasis mark and the comma, raised strokes.
+as U+0589 U+003A
+U+055A E 4.6,5.2 1.4,1.8 270 450
+U+0559 E 5.4,5.2 1.4,1.8 90 270
+U+055B P 4,6.5 6,3.5
+U+055D P 4,3.5 6,6.5
+#
+# Training sets. tscrl, Lisu: eight to a net.
+tscrl U+A4D0 U+A4D1 U+A4D3 U+A4D4 U+A4D6 U+A4D7 U+A4D9 U+A4DA
+tscrl U+A4DC U+A4DD U+A4DF U+A4E0 U+A4E1 U+A4E2 U+A4E3 U+A4E6
+tscrl U+A4E7 U+A4EA U+A4EB U+A4EC U+A4EE U+A4F0 U+A4F2 U+A4F3
+tscrl U+A4F4 U+A4D2 U+A4D5 U+A4D8 U+A4DB U+A4DE U+A4E4 U+A4E5
+tscrl U+A4E8 U+A4E9 U+A4ED U+A4EF U+A4F1 U+A4F5 U+A4F6 U+A4F7
+tscrl U+A4F8 U+A4F9 U+A4FA U+A4FB U+A4FC U+A4FD U+A4FE U+A4FF
+# tscroo, Ogham: strokes to one side and the feather marks; strokes across,
+# the cross and the lozenge.
+tscroo U+1681 U+1682 U+1683 U+1684 U+1685 U+1686 U+1687 U+1688 U+1689 U+168A U+169B U+169C
+tscroo U+168B U+168C U+168D U+168E U+168F U+1690 U+1691 U+1692 U+1693 U+1694 U+1695 U+1696
+# tscroi, Old Italic: 7 7 7 8.
+tscroi U+10300 U+10301 U+10303 U+10304 U+10305 U+1030A U+10310
+tscroi U+10309 U+10306 U+10315 U+1030B U+10320 U+10323 U+10319
+tscroi U+1030C U+1030D U+10311 U+10314 U+10316 U+10321 U+10317
+tscroi U+10322 U+10302 U+10307 U+10308 U+1030F U+10312 U+10318 U+1031A
+# tscrt, Tifinagh: the round ones, 10; the straight ones, 11.
+tscrt U+2D30 U+2D31 U+2D40 U+2D54 U+2D55 U+2D59 U+2D5A U+2D5B U+2D61 U+2D53
+tscrt U+2D37 U+2D39 U+2D43 U+2D47 U+2D49 U+2D4A U+2D4E U+2D4F U+2D5C U+2D62 U+2D63
+# tscra, Armenian: 9 9 10.
+tscra U+0555 U+054D U+0548 U+053C U+054F U+0553 U+0554 U+0550 U+0535
+tscra U+0545 U+0585 U+057D U+0578 U+0570 U+0575 U+0581 U+0566 U+0584
+tscra U+0580 U+057C U+056B U+0565 U+0582 U+0589 U+055A U+0559 U+055B U+055D

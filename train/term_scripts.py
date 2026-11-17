@@ -7,9 +7,12 @@ Three standalone bundles to open beside neuronte-split-v9:
     neuronte-term-scripts-v1     Armenian, Georgian, Tifinagh, Lisu, Ogham
                                  and Old Italic (sets tscra... and so on)
 
-font/term-scripts.txt has three kinds of line:
+font/term-scripts.txt has four kinds of line:
 
     U+XXXX strokes           a drawing, in the syntax of train/strokes.py
+    as U+XXXX U+YYYY         the strokes font/strokes.txt has for U+YYYY;
+                             "turned" after it turns them half round in the
+                             capital's box; " | strokes" after that adds more
     part NAME strokes        a named shape that the code here builds on
     tscrNAME U+XXXX ...      a training set and its characters, in the
                              order the group nets take them
@@ -28,6 +31,10 @@ here by rule, from the project's own strokes:
     shape for w (after it in the West Cree forms), and a raised small
     shape for a final: SYLLABIC below, from the Unicode names.
 
+    Ogham letters (U+1681..U+1694) are a stemline with one to five
+    strokes below it, above it, slanting across it or straight across
+    it: OGHAM below.
+
 No font file was read to make any of them. glyphs.py lists each set as a
 tier and a set of its own; no set made before holds any of these
 characters.
@@ -44,11 +51,12 @@ _cache = {}
 
 
 def read(path=FILE):
-    """(drawn {char: shapes}, parts {name: shapes}, sets {name: [code points]})."""
+    """(drawn {char: shapes}, parts {name: shapes}, sets {name: [code points]},
+    alias {char: (character of font/strokes.txt, turned, added shapes)})."""
     key = (path, os.path.getmtime(path))
     if key in _cache:
         return _cache[key]
-    drawn, parts, sets = {}, {}, {}
+    drawn, parts, sets, alias = {}, {}, {}, {}
     with open(path, encoding="utf-8") as fh:
         for num, raw in enumerate(fh, 1):
             line = raw.rstrip("\n")
@@ -61,6 +69,15 @@ def read(path=FILE):
                 if ch in drawn:
                     raise ValueError(f"{where}: {head} is drawn twice")
                 drawn[ch] = _shapes(rest, head)
+            elif head == "as":
+                tok, _, more = rest.partition("|")
+                tok = tok.split()
+                if len(tok) not in (2, 3) or tok[2:] not in ([], ["turned"]) or not all(t.startswith("U+") for t in tok[:2]):
+                    raise ValueError(f"{where}: as U+XXXX U+YYYY [turned] [| strokes]")
+                ch = chr(int(tok[0][2:], 16))
+                if ch in drawn or ch in alias:
+                    raise ValueError(f"{where}: {tok[0]} is drawn twice")
+                alias[ch] = (chr(int(tok[1][2:], 16)), len(tok) == 3, _shapes(more, tok[0]))
             elif head == "part":
                 name, _, rest = rest.partition(" ")
                 if name in parts:
@@ -72,12 +89,15 @@ def read(path=FILE):
                     raise ValueError(f"{where}: a set line is a name and its U+XXXX")
                 sets.setdefault(head, []).extend(int(c[2:], 16) for c in cps)
             else:
-                raise ValueError(f"{where}: a line starts with U+XXXX, part or {PREFIX}...")
+                raise ValueError(f"{where}: a line starts with U+XXXX, as, part or {PREFIX}...")
     for name, cps in sets.items():
         if len(set(cps)) != len(cps):
             raise ValueError(f"{path}: set {name} lists a character twice")
+    both = sorted(set(drawn) & set(alias))
+    if both:
+        raise ValueError(f"{path}: U+{ord(both[0]):04X} is drawn twice")
     _cache.clear()
-    _cache[key] = (drawn, parts, sets)
+    _cache[key] = (drawn, parts, sets, alias)
     return _cache[key]
 
 
@@ -151,6 +171,52 @@ SYL_TURNS = {  # on the unit square, y down
 }
 
 
+def _turned(shapes):
+    """Half a turn about the middle of the capital's box (x 0..10, y 4..15)."""
+    out = []
+    for sh in shapes:
+        if sh[0] != "seg":
+            raise ValueError("only strokes are turned")
+        out.append(("seg", 1 - sh[1], 1.9 - sh[2], 1 - sh[3], 1.9 - sh[4], sh[5]))
+    return out
+
+
+# Ogham. The stemline runs the width of the cell, so letters join. The
+# first five letters have one to five strokes below it, the next five
+# above, the next five slanting across, the vowels short and straight
+# across. A thinner pen keeps five strokes apart.
+OGHAM_Y = 10.0          # the stemline
+OGHAM_LONG = 4.5        # a stroke to one side
+OGHAM_SHORT = 3.3       # a vowel's stroke, each side
+OGHAM_GAP = 2.0         # between strokes
+OGHAM_SLANT = 1.5       # how far a slanting stroke leans, each side
+OGHAM_SLANT_GAP = 1.75
+OGHAM_PEN = 0.055
+
+
+def ogham(c):
+    """The shapes of one of the twenty Ogham letters, or None."""
+    if not 0x1681 <= c <= 0x1694:
+        return None
+    group, n = divmod(c - 0x1681, 5)
+    n += 1
+    y = OGHAM_Y
+    gap = OGHAM_SLANT_GAP if group == 2 else OGHAM_GAP
+    out = [("seg", 0, y / 10, 1, y / 10, OGHAM_PEN)]
+    for i in range(n):
+        x = 5 + (i - (n - 1) / 2) * gap
+        if group == 0:
+            a, b = (x, y), (x, y + OGHAM_LONG)
+        elif group == 1:
+            a, b = (x, y - OGHAM_LONG), (x, y)
+        elif group == 2:
+            a, b = (x - OGHAM_SLANT, y + OGHAM_LONG), (x + OGHAM_SLANT, y - OGHAM_LONG)
+        else:
+            a, b = (x, y - OGHAM_SHORT), (x, y + OGHAM_SHORT)
+        out.append(("seg", a[0] / 10, a[1] / 10, b[0] / 10, b[1] / 10, OGHAM_PEN))
+    return out
+
+
 def syllabic(ch, parts):
     """The shapes of one syllabic, or None if its name follows no rule here."""
     m = SYL_NAME.match(unicodedata.name(ch, ""))
@@ -194,21 +260,27 @@ def syllabic(ch, parts):
 
 def made(path=FILE):
     """{char: shapes} for every character a set of the file lists."""
-    drawn, parts, listed = read(path)
+    drawn, parts, listed, alias = read(path)
     wanted = {c for cps in listed.values() for c in cps}
     out = {}
     plain = _plain()
+    base = strokes.parse(strokes.STROKES)
     for c in sorted(wanted):
         ch = chr(c)
         if ch in drawn:
             out[ch] = drawn[ch]
+        elif ch in alias:
+            other, turned, more = alias[ch]
+            out[ch] = (_turned(base[other]) if turned else list(base[other])) + more
+        elif ogham(c) is not None:
+            out[ch] = ogham(c)
         elif ch in plain:
             out[ch] = plain[ch]
         elif 0x1400 <= c <= 0x167F and syllabic(ch, parts) is not None:
             out[ch] = syllabic(ch, parts)
         else:
             raise ValueError(f"U+{c:04X} is listed in {os.path.basename(path)} and has no drawing and no rule")
-    extra = sorted(set(drawn) - set(out))
+    extra = sorted((set(drawn) | set(alias)) - set(out))
     if extra:
         raise ValueError("drawn and in no set: " + " ".join(f"U+{ord(c):04X}" for c in extra))
     return out

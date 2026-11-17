@@ -28,9 +28,9 @@ BESIDE = 'neuronte-split-v9.nrt'
 BESIDE_SHA = '0a92f223d47f1680929b2c5d7512d1a1728d4871e6653b33cbaad060e6bb90c0'
 
 # bundle: (file name, tier of train/glyphs.py)
-BUNDLES = {'math': ('neuronte-term-math-v1', 'tmath')}
+BUNDLES = {'math': ('neuronte-term-math-v1', 'tmath'), 'symbol': ('neuronte-term-symbol-v1', 'tsym')}
 # {bundle: {(training set, group): why it is not in the bundle}}
-LEFT_OUT = {'math': {}}
+LEFT_OUT = {'math': {}, 'symbol': {}}
 # {bundle: {(training set, group): seed shipped}}: failed the declared gates, shipped by the owner's choice.
 # The owner named no seed; of each such group the seed with the lower mean error over 8x16, 16x32 and 48x96
 # ships, which is the rule declared for the groups that pass.
@@ -40,7 +40,10 @@ def _chosen(sets):
 
 OWNER_CHOSEN = {'math': _chosen({'tmath12': {0: 1, 3: 1, 4: 1, 5: 0, 6: 1, 9: 1},
                                  'tmath10': {0: 1, 1: 1, 3: 1, 4: 0, 8: 0, 9: 1, 10: 1, 11: 1},
-                                 'tmath8': {0: 1, 1: 1, 2: 0, 3: 0, 4: 0, 5: 1, 6: 1, 7: 0, 8: 1}})}
+                                 'tmath8': {0: 1, 1: 1, 2: 0, 3: 0, 4: 0, 5: 1, 6: 1, 7: 0, 8: 1}}),
+                'symbol': _chosen({'tsym12': {0: 1, 1: 1, 3: 0, 9: 0, 10: 1, 11: 0, 12: 0, 17: 1},
+                                   'tsym8': {0: 1, 1: 0, 2: 1, 3: 0, 4: 0, 5: 0, 6: 0, 7: 1, 8: 0, 9: 0, 10: 1, 11: 0,
+                                             12: 0, 13: 0, 14: 1, 15: 0, 16: 1, 17: 1, 18: 1, 19: 0}})}
 
 
 def groups(bundle):

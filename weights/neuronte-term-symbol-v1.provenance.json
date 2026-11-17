@@ -1,0 +1,1155 @@
+{
+  "schema": "neuronte.term-symbols/v1",
+  "name": "neuronte-term-symbol-v1",
+  "tier": "tsym",
+  "sha256": "5c6121177da923e9c8c05cc45960715b893db2b123712eb6c3e8891924ca2480",
+  "bytes": 2743740,
+  "groups": [
+    [
+      "tsym12",
+      22
+    ],
+    [
+      "tsym10",
+      6
+    ],
+    [
+      "tsym8",
+      20
+    ]
+  ],
+  "left_out": [],
+  "owner_chosen": [
+    {
+      "set": "tsym12",
+      "group": 0,
+      "seed": 1
+    },
+    {
+      "set": "tsym12",
+      "group": 1,
+      "seed": 1
+    },
+    {
+      "set": "tsym12",
+      "group": 3,
+      "seed": 0
+    },
+    {
+      "set": "tsym12",
+      "group": 9,
+      "seed": 0
+    },
+    {
+      "set": "tsym12",
+      "group": 10,
+      "seed": 1
+    },
+    {
+      "set": "tsym12",
+      "group": 11,
+      "seed": 0
+    },
+    {
+      "set": "tsym12",
+      "group": 12,
+      "seed": 0
+    },
+    {
+      "set": "tsym12",
+      "group": 17,
+      "seed": 1
+    },
+    {
+      "set": "tsym8",
+      "group": 0,
+      "seed": 1
+    },
+    {
+      "set": "tsym8",
+      "group": 1,
+      "seed": 0
+    },
+    {
+      "set": "tsym8",
+      "group": 2,
+      "seed": 1
+    },
+    {
+      "set": "tsym8",
+      "group": 3,
+      "seed": 0
+    },
+    {
+      "set": "tsym8",
+      "group": 4,
+      "seed": 0
+    },
+    {
+      "set": "tsym8",
+      "group": 5,
+      "seed": 0
+    },
+    {
+      "set": "tsym8",
+      "group": 6,
+      "seed": 0
+    },
+    {
+      "set": "tsym8",
+      "group": 7,
+      "seed": 1
+    },
+    {
+      "set": "tsym8",
+      "group": 8,
+      "seed": 0
+    },
+    {
+      "set": "tsym8",
+      "group": 9,
+      "seed": 0
+    },
+    {
+      "set": "tsym8",
+      "group": 10,
+      "seed": 1
+    },
+    {
+      "set": "tsym8",
+      "group": 11,
+      "seed": 0
+    },
+    {
+      "set": "tsym8",
+      "group": 12,
+      "seed": 0
+    },
+    {
+      "set": "tsym8",
+      "group": 13,
+      "seed": 0
+    },
+    {
+      "set": "tsym8",
+      "group": 14,
+      "seed": 1
+    },
+    {
+      "set": "tsym8",
+      "group": 15,
+      "seed": 0
+    },
+    {
+      "set": "tsym8",
+      "group": 16,
+      "seed": 1
+    },
+    {
+      "set": "tsym8",
+      "group": 17,
+      "seed": 1
+    },
+    {
+      "set": "tsym8",
+      "group": 18,
+      "seed": 1
+    },
+    {
+      "set": "tsym8",
+      "group": 19,
+      "seed": 0
+    }
+  ],
+  "record": {
+    "schema": "neuronte.standalone-bundle/v1",
+    "sha256": "5c6121177da923e9c8c05cc45960715b893db2b123712eb6c3e8891924ca2480",
+    "bytes": 2743740,
+    "members": 49,
+    "group_nets": 48,
+    "ranges": 417,
+    "gate": null,
+    "trained_scalars": 480,
+    "fallback": {
+      "member": 48,
+      "kind": "blank",
+      "hidden_width": 1,
+      "distance": -8.0,
+      "image_sha256": "42d4790165297c3af39d178e1396f575991d6fe4d2e3c947762ef5eaedd05bf6",
+      "bytes": 592
+    },
+    "apart_from": [
+      {
+        "file": "neuronte-split-v9.nrt",
+        "sha256": "0a92f223d47f1680929b2c5d7512d1a1728d4871e6653b33cbaad060e6bb90c0",
+        "table_scalars": 1341
+      }
+    ],
+    "nets": [
+      {
+        "member": 0,
+        "json": "neuronte-term-symbol-v1-tsym12-g0.json",
+        "json_sha256": "2ebb91521dfdb37605f36112e57622b9eba7cbe220c7b2f77c823decd9b542e2",
+        "image_sha256": "c5328c1532a9082eff02198944f75b2e98ee87846a7e8cb4c33e8c48e9676024",
+        "bytes": 57040,
+        "set": "tsym12-repertoire",
+        "scalars": [
+          "U+239B",
+          "U+239E",
+          "U+239F",
+          "U+23A1",
+          "U+23A3",
+          "U+23A5",
+          "U+23A8",
+          "U+23A9",
+          "U+23AB",
+          "U+23AD",
+          "U+23AE"
+        ]
+      },
+      {
+        "member": 1,
+        "json": "neuronte-term-symbol-v1-tsym12-g1.json",
+        "json_sha256": "01106c2a145da5da5bedb13a2b558b9fcb52893cc2785b8fe28b27d031d30774",
+        "image_sha256": "786050cb0c5ad4ce5b868003f86dd070d9b42e1d72769d23f266a0c9b4b6274b",
+        "bytes": 57040,
+        "set": "tsym12-repertoire",
+        "scalars": [
+          "U+2027",
+          "U+2031",
+          "U+2056",
+          "U+239C",
+          "U+239D",
+          "U+23A0",
+          "U+23A2",
+          "U+23A4",
+          "U+23A6",
+          "U+23A7",
+          "U+23AA",
+          "U+23AC"
+        ]
+      },
+      {
+        "member": 2,
+        "json": "neuronte-term-symbol-v1-tsym12-g2.json",
+        "json_sha256": "7383b72c7c89e8e4d1c83747d75b5c20a67fe44d4966e6d60cad2d1043e7c8c0",
+        "image_sha256": "e5a0c18c5d170d8414edee07434a9959d5408ffcaec29fc6e6855406ada8618b",
+        "bytes": 57040,
+        "set": "tsym12-repertoire",
+        "scalars": [
+          "U+2010",
+          "U+2025",
+          "U+2030",
+          "U+2032",
+          "U+2033",
+          "U+2040",
+          "U+2042",
+          "U+2045",
+          "U+204D",
+          "U+2051",
+          "U+205B",
+          "U+2E22"
+        ]
+      },
+      {
+        "member": 3,
+        "json": "neuronte-term-symbol-v1-tsym12-g3.json",
+        "json_sha256": "551cea0a675dac1b59ec0edd4f79d23159ad66d2cf2a2809500d251e4062e1da",
+        "image_sha256": "9c9825c677ca3dfa04053c1bfe739b1e318e015d1a51dee77cc538ecf1e57fd6",
+        "bytes": 57040,
+        "set": "tsym12-repertoire",
+        "scalars": [
+          "U+2012",
+          "U+2024",
+          "U+2036",
+          "U+2038",
+          "U+203C",
+          "U+2046",
+          "U+2047",
+          "U+204B",
+          "U+204F",
+          "U+2E1F",
+          "U+2E23"
+        ]
+      },
+      {
+        "member": 4,
+        "json": "neuronte-term-symbol-v1-tsym12-g4.json",
+        "json_sha256": "68f34c6529a724bb4fc52afd39630bd7f04718464f91874339d5765f3049ae13",
+        "image_sha256": "ffbab49179508ab60be10c25cbe84769d10cd15579e7bcc470980377f9548216",
+        "bytes": 57040,
+        "set": "tsym12-repertoire",
+        "scalars": [
+          "U+2011",
+          "U+201B",
+          "U+201F",
+          "U+2034",
+          "U+203E",
+          "U+204A",
+          "U+204C",
+          "U+2054",
+          "U+2057",
+          "U+205C",
+          "U+2E18",
+          "U+2E2E"
+        ]
+      },
+      {
+        "member": 5,
+        "json": "neuronte-term-symbol-v1-tsym12-g5.json",
+        "json_sha256": "60518487f6ebfacbf5b9e2562b05a7695b71bf3eb77866c32e5f9f116c5514b8",
+        "image_sha256": "8a682cc1251c14221f34964d72fdd7fd9d6f50f17cf85e2d5c9b5a7d0d5a03f6",
+        "bytes": 57040,
+        "set": "tsym12-repertoire",
+        "scalars": [
+          "U+2016",
+          "U+203D",
+          "U+203F",
+          "U+2041",
+          "U+2043",
+          "U+204E",
+          "U+2050",
+          "U+2055",
+          "U+2058",
+          "U+205A",
+          "U+205D",
+          "U+2E24"
+        ]
+      },
+      {
+        "member": 6,
+        "json": "neuronte-term-symbol-v1-tsym12-g6.json",
+        "json_sha256": "b56df03717280aa04738304cb0ac3bc3ff9c7dc569fa87ffca7363d4ee7e125f",
+        "image_sha256": "a3f37986ccf03d387c20666491874868621732c70c8ce932c11ef4642d55862c",
+        "bytes": 57040,
+        "set": "tsym12-repertoire",
+        "scalars": [
+          "U+2015",
+          "U+2017",
+          "U+201A",
+          "U+2035",
+          "U+2037",
+          "U+2044",
+          "U+2048",
+          "U+2049",
+          "U+2052",
+          "U+2053",
+          "U+205E",
+          "U+2E25"
+        ]
+      },
+      {
+        "member": 7,
+        "json": "neuronte-term-symbol-v1-tsym12-g7.json",
+        "json_sha256": "f0b7e37874f41cd6212d9d7f81390969a9deee906c8361674ad63e48ef4aa37b",
+        "image_sha256": "70eed87d3b1f86bfaf67c6242a88b37d1f007c32e7566531c0e8e163aedd5d07",
+        "bytes": 57040,
+        "set": "tsym12-repertoire",
+        "scalars": [
+          "U+25A2",
+          "U+25AD",
+          "U+25B7",
+          "U+25C5",
+          "U+25CE",
+          "U+25DF",
+          "U+25E1",
+          "U+25EC",
+          "U+25F0",
+          "U+25F6",
+          "U+2B1A"
+        ]
+      },
+      {
+        "member": 8,
+        "json": "neuronte-term-symbol-v1-tsym12-g8.json",
+        "json_sha256": "dc23dcb85079d0aa90b3460f142e50be69e224ae9f34f1af6cc72bb4adf7ad74",
+        "image_sha256": "d92a47632a977d544c32a9c50915343824067935c5a05b76cb8bf6bf0b61671a",
+        "bytes": 57040,
+        "set": "tsym12-repertoire",
+        "scalars": [
+          "U+25A5",
+          "U+25AF",
+          "U+25B3",
+          "U+25CC",
+          "U+25CD",
+          "U+25DE",
+          "U+25E0",
+          "U+25F2",
+          "U+25F5",
+          "U+25F8",
+          "U+25FB",
+          "U+2B20"
+        ]
+      },
+      {
+        "member": 9,
+        "json": "neuronte-term-symbol-v1-tsym12-g9.json",
+        "json_sha256": "46684f943f346e42aff68308f8914148147166d62a0c53b4886bb9ac9d17fb25",
+        "image_sha256": "3fa515579e4d27ec22d51fd59690cf2979297739d3c473ad1e766ccce902782d",
+        "bytes": 57040,
+        "set": "tsym12-repertoire",
+        "scalars": [
+          "U+25A6",
+          "U+25A7",
+          "U+25BB",
+          "U+25BF",
+          "U+25C1",
+          "U+25C3",
+          "U+25DD",
+          "U+25EB",
+          "U+25F1",
+          "U+25F7",
+          "U+25FF",
+          "U+2B21"
+        ]
+      },
+      {
+        "member": 10,
+        "json": "neuronte-term-symbol-v1-tsym12-g10.json",
+        "json_sha256": "4dd8f5696912566875dc16662b85b154eded4203cf591082efe95964072523b3",
+        "image_sha256": "b7cb2c6f7b3cefaaa73bdc07612e5ffc99c97a127ee612474a2b361041f48ffa",
+        "bytes": 57040,
+        "set": "tsym12-repertoire",
+        "scalars": [
+          "U+25A4",
+          "U+25A8",
+          "U+25B5",
+          "U+25B9",
+          "U+25BD",
+          "U+25CA",
+          "U+25DC",
+          "U+25F3",
+          "U+25F4",
+          "U+25F9",
+          "U+25FA",
+          "U+2B54"
+        ]
+      },
+      {
+        "member": 11,
+        "json": "neuronte-term-symbol-v1-tsym12-g11.json",
+        "json_sha256": "2fc8bc5fdc337e186c1c790eea5dcbae9efb19921d44ab70a89cafcef9006ce2",
+        "image_sha256": "a2f68f8ff2904a8b61bfe2a8774f7432535e7105d4bbb89a32c425acd1961426",
+        "bytes": 57040,
+        "set": "tsym12-repertoire",
+        "scalars": [
+          "U+25A9",
+          "U+25B0",
+          "U+25B1",
+          "U+25BA",
+          "U+25D3",
+          "U+25D9",
+          "U+25E8",
+          "U+25EA",
+          "U+25FC",
+          "U+2B13",
+          "U+2B1F"
+        ]
+      },
+      {
+        "member": 12,
+        "json": "neuronte-term-symbol-v1-tsym12-g12.json",
+        "json_sha256": "35463d58dd97b4e6df3c08a775b270f1515ed5e82a5ba8c76228f120099ba793",
+        "image_sha256": "cea377b307df52b1cddf4798b2d9528dd20db1e26fc9cb2a90afc03d4c68eeaa",
+        "bytes": 57040,
+        "set": "tsym12-repertoire",
+        "scalars": [
+          "U+25A3",
+          "U+25AE",
+          "U+25D7",
+          "U+25D8",
+          "U+25DB",
+          "U+25E2",
+          "U+25E4",
+          "U+25E7",
+          "U+25EE",
+          "U+2B14",
+          "U+2B18",
+          "U+2B22"
+        ]
+      },
+      {
+        "member": 13,
+        "json": "neuronte-term-symbol-v1-tsym12-g13.json",
+        "json_sha256": "90ff4f64ffec7b6fb01247231a09403b59f846d9f7bd3c8e6896b705124180ef",
+        "image_sha256": "e498076cbc536e1dd94a536b0a4c41d6b5f99dd06a0618adf2724ddab91ab013",
+        "bytes": 57040,
+        "set": "tsym12-repertoire",
+        "scalars": [
+          "U+25AC",
+          "U+25D2",
+          "U+25D4",
+          "U+25DA",
+          "U+25E3",
+          "U+25E5",
+          "U+25E9",
+          "U+2B12",
+          "U+2B15",
+          "U+2B17",
+          "U+2B23",
+          "U+2B53"
+        ]
+      },
+      {
+        "member": 14,
+        "json": "neuronte-term-symbol-v1-tsym12-g14.json",
+        "json_sha256": "b0cef08b71e80318b01c9527c6c8dba2e857f0376a26b68cb4caae36c6cbea03",
+        "image_sha256": "64835e46a73cf83b84bc053d620619c658174c50a1cc70ff6892dac169fd26c0",
+        "bytes": 57040,
+        "set": "tsym12-repertoire",
+        "scalars": [
+          "U+208A",
+          "U+2093",
+          "U+2099",
+          "U+20A8",
+          "U+25C4",
+          "U+25D5",
+          "U+25D6",
+          "U+25ED",
+          "U+2B16",
+          "U+2B19",
+          "U+2B24"
+        ]
+      },
+      {
+        "member": 15,
+        "json": "neuronte-term-symbol-v1-tsym12-g15.json",
+        "json_sha256": "f2b83fb84c4b39939e09db38792b7bf7a57684cc4b43b41a102a247dc33ba199",
+        "image_sha256": "8152939dc1f3ae01ad043af4e62ef5a45f38590d432f9900a8b15f297ee897dc",
+        "bytes": 57040,
+        "set": "tsym12-repertoire",
+        "scalars": [
+          "U+207B",
+          "U+207D",
+          "U+208E",
+          "U+2092",
+          "U+2095",
+          "U+2097",
+          "U+209B",
+          "U+209C",
+          "U+2101",
+          "U+2109",
+          "U+2120",
+          "U+213B"
+        ]
+      },
+      {
+        "member": 16,
+        "json": "neuronte-term-symbol-v1-tsym12-g16.json",
+        "json_sha256": "b6b8e20aac0ac4452bd4567d939d614f1906624e8021567fec96f5060ecc91d3",
+        "image_sha256": "fe638be5131ed974669bc17676d3aa8ea8d7cc879af4408dcc57cdfca633692c",
+        "bytes": 57040,
+        "set": "tsym12-repertoire",
+        "scalars": [
+          "U+2071",
+          "U+207A",
+          "U+207F",
+          "U+208C",
+          "U+208D",
+          "U+2091",
+          "U+2096",
+          "U+2098",
+          "U+209A",
+          "U+2100",
+          "U+2106",
+          "U+2121"
+        ]
+      },
+      {
+        "member": 17,
+        "json": "neuronte-term-symbol-v1-tsym12-g17.json",
+        "json_sha256": "a5274ae98c882ee1512439eb4051cc30eed4b62c3d6abc55e6648f37d0d2ace1",
+        "image_sha256": "dc6e180c6c1409d786490bf2d0f068c0d919ad5cae08281193fbe4c2d2b5cf5d",
+        "bytes": 57040,
+        "set": "tsym12-repertoire",
+        "scalars": [
+          "U+207C",
+          "U+207E",
+          "U+208B",
+          "U+2090",
+          "U+2094",
+          "U+2103",
+          "U+2105",
+          "U+230B",
+          "U+231D",
+          "U+2381",
+          "U+23E8",
+          "U+FFFC"
+        ]
+      },
+      {
+        "member": 18,
+        "json": "neuronte-term-symbol-v1-tsym12-g18.json",
+        "json_sha256": "3c50208bcdd8c3384330331bb88fc21569b41e5636976829043fdc720e696e76",
+        "image_sha256": "f06a7839d2eeb94a2af41ff20211afb84821bbeaad80800a96f48a5de5ab611b",
+        "bytes": 57040,
+        "set": "tsym12-repertoire",
+        "scalars": [
+          "U+2300",
+          "U+2301",
+          "U+2302",
+          "U+2305",
+          "U+2307",
+          "U+2308",
+          "U+231C",
+          "U+231E",
+          "U+232B",
+          "U+23E3",
+          "U+2423"
+        ]
+      },
+      {
+        "member": 19,
+        "json": "neuronte-term-symbol-v1-tsym12-g19.json",
+        "json_sha256": "cb62bb649838fb0b09625adb662e27cfaa26aee25bbd33f3d15552b97c2b8e46",
+        "image_sha256": "00f2dd1b059991af6a50a10a11ebb91c54eb9b86cd99e485152cc66547b99958",
+        "bytes": 57040,
+        "set": "tsym12-repertoire",
+        "scalars": [
+          "U+2304",
+          "U+2306",
+          "U+2309",
+          "U+230D",
+          "U+2311",
+          "U+2319",
+          "U+2321",
+          "U+2326",
+          "U+232C",
+          "U+2335",
+          "U+2383",
+          "U+23E5"
+        ]
+      },
+      {
+        "member": 20,
+        "json": "neuronte-term-symbol-v1-tsym12-g20.json",
+        "json_sha256": "55e4fecb295ae3c68f4796f7c5a281dd8c2dd029afc6c45aacc60681dc00e8b0",
+        "image_sha256": "a67c32699ac431b6122f94b4b8fa5c28b3b340674e4d895b31a124303600134c",
+        "bytes": 57040,
+        "set": "tsym12-repertoire",
+        "scalars": [
+          "U+230A",
+          "U+230E",
+          "U+230F",
+          "U+2313",
+          "U+2315",
+          "U+231F",
+          "U+2324",
+          "U+2328",
+          "U+2380",
+          "U+2388",
+          "U+2389",
+          "U+2394"
+        ]
+      },
+      {
+        "member": 21,
+        "json": "neuronte-term-symbol-v1-tsym12-g21.json",
+        "json_sha256": "76e6cee4458bd4bb5e03d671a3f7b612874e8267b066e4519893b2eaf022fd45",
+        "image_sha256": "8ed1c4f9251af10a74373ca4b59c7557ca289cfa12b86bbcca4fbe35af85e5b0",
+        "bytes": 57040,
+        "set": "tsym12-repertoire",
+        "scalars": [
+          "U+230C",
+          "U+2310",
+          "U+2312",
+          "U+2314",
+          "U+2320",
+          "U+2327",
+          "U+237D",
+          "U+2382",
+          "U+238A",
+          "U+238B",
+          "U+23CF",
+          "U+FFFD"
+        ]
+      },
+      {
+        "member": 22,
+        "json": "neuronte-term-symbol-v1-tsym10-g0.json",
+        "json_sha256": "7eb3afa753f29556094fb3a04968d3634b22451ab858517d195542e945614953",
+        "image_sha256": "f6f51ce948d43316e8dccbf785fa679dc12d2e19dc08af3c1e2148f92b63fc8f",
+        "bytes": 57040,
+        "set": "tsym10-repertoire",
+        "scalars": [
+          "U+210E",
+          "U+210F",
+          "U+2117",
+          "U+211F",
+          "U+2139",
+          "U+2144",
+          "U+2373",
+          "U+2377",
+          "U+2422"
+        ]
+      },
+      {
+        "member": 23,
+        "json": "neuronte-term-symbol-v1-tsym10-g1.json",
+        "json_sha256": "cbc92ace8e3bde0c48c32bebe19e69be77f368dd4f16203cec1230915eac4b51",
+        "image_sha256": "3b5121ea7e393e8170c08db0b87d3945b9a1a4ee5c7832f1f45b4f5a3a0afbd8",
+        "bytes": 57040,
+        "set": "tsym10-repertoire",
+        "scalars": [
+          "U+2114",
+          "U+2126",
+          "U+2141",
+          "U+2142",
+          "U+214E",
+          "U+2184",
+          "U+2374",
+          "U+2375",
+          "U+2376",
+          "U+237A"
+        ]
+      },
+      {
+        "member": 24,
+        "json": "neuronte-term-symbol-v1-tsym10-g2.json",
+        "json_sha256": "3f8578af545cb1d90d70334b33e709d7b5df27f25b8dab0cc5e9c28c434bdead",
+        "image_sha256": "0c74b4fcbd2a9ab618eb33042b6b7fff42143aa5ed08c1de229a981fa6e89f8b",
+        "bytes": 57040,
+        "set": "tsym10-repertoire",
+        "scalars": [
+          "U+211E",
+          "U+2123",
+          "U+2127",
+          "U+2129",
+          "U+212A",
+          "U+2132",
+          "U+213A",
+          "U+2143",
+          "U+2183",
+          "U+2379"
+        ]
+      },
+      {
+        "member": 25,
+        "json": "neuronte-term-symbol-v1-tsym10-g3.json",
+        "json_sha256": "6aaca9284b81f7092565bbfceaa126a3cc892f29f149be3e7cb786b1373663df",
+        "image_sha256": "d9b873fd0072b589695fbe18f17ebd1803bc6988f6a87415c9d93625e16fe684",
+        "bytes": 57040,
+        "set": "tsym10-repertoire",
+        "scalars": [
+          "U+2107",
+          "U+2108",
+          "U+210B",
+          "U+210C",
+          "U+2110",
+          "U+2131",
+          "U+2136",
+          "U+214B",
+          "U+2378"
+        ]
+      },
+      {
+        "member": 26,
+        "json": "neuronte-term-symbol-v1-tsym10-g4.json",
+        "json_sha256": "6d4359571ddb793f1680653b4109821ac8316640a4d04f95fa5d55b51da12bd6",
+        "image_sha256": "61a0667a7ee06dae08244eb7242d94d7f07935e32b486c1176f12afe22d1d3a8",
+        "bytes": 57040,
+        "set": "tsym10-repertoire",
+        "scalars": [
+          "U+2104",
+          "U+2113",
+          "U+211B",
+          "U+2125",
+          "U+212C",
+          "U+2130",
+          "U+2134",
+          "U+2135",
+          "U+2137",
+          "U+2185"
+        ]
+      },
+      {
+        "member": 27,
+        "json": "neuronte-term-symbol-v1-tsym10-g5.json",
+        "json_sha256": "fd5d079b8b0e1dfec62ee7b91eb5c662d3164331cb3fa71fef4b4d8588416c10",
+        "image_sha256": "14a0afd9818c751b68f53adb024e4b49f00a052b7992b96c3b00354b967f7d47",
+        "bytes": 57040,
+        "set": "tsym10-repertoire",
+        "scalars": [
+          "U+2111",
+          "U+2112",
+          "U+2118",
+          "U+211C",
+          "U+2128",
+          "U+212D",
+          "U+212E",
+          "U+212F",
+          "U+2133",
+          "U+2138"
+        ]
+      },
+      {
+        "member": 28,
+        "json": "neuronte-term-symbol-v1-tsym8-g0.json",
+        "json_sha256": "666d75552e974b1e204f3dbb18105c17bbad59404da28cfb1ddb1f3f5311a164",
+        "image_sha256": "e3fd68ab9de2ca8d7f246467f6141282a0955ad2128fd1227f9b02750cf5aa75",
+        "bytes": 57040,
+        "set": "tsym8-repertoire",
+        "scalars": [
+          "U+2337",
+          "U+233A",
+          "U+233C",
+          "U+234A",
+          "U+236A",
+          "U+236B",
+          "U+236C",
+          "U+2395"
+        ]
+      },
+      {
+        "member": 29,
+        "json": "neuronte-term-symbol-v1-tsym8-g1.json",
+        "json_sha256": "28c6bd8ca2b2c5588688967d61a8376e3e6e20c376b39cc0502a340199ec7d80",
+        "image_sha256": "a7e57a27acdaf34e1c68d1dc6c662ea23a8f80bb2f822201ed60928be0b5bf38",
+        "bytes": 57040,
+        "set": "tsym8-repertoire",
+        "scalars": [
+          "U+2339",
+          "U+2349",
+          "U+235E",
+          "U+2361",
+          "U+2365",
+          "U+2369",
+          "U+236D",
+          "U+236F"
+        ]
+      },
+      {
+        "member": 30,
+        "json": "neuronte-term-symbol-v1-tsym8-g2.json",
+        "json_sha256": "93048ac966b212e52bbfd4e0d767ee9598b48c3b9df739471c598c750bed23b5",
+        "image_sha256": "1f67057012422d0b3c9cad87c28335f6c634433c0c8351dab9a6972894c6cc9a",
+        "bytes": 57040,
+        "set": "tsym8-repertoire",
+        "scalars": [
+          "U+233B",
+          "U+2356",
+          "U+235B",
+          "U+235D",
+          "U+235F",
+          "U+2362",
+          "U+2364",
+          "U+2370"
+        ]
+      },
+      {
+        "member": 31,
+        "json": "neuronte-term-symbol-v1-tsym8-g3.json",
+        "json_sha256": "c6328f00cfc5af1f8ead46ece6ceae26146ea983a4ded5672134d7f1abe03fae",
+        "image_sha256": "64744590a6db87ba35a110143dc42b072fe4cce7888120b9a130578f4e381939",
+        "bytes": 57040,
+        "set": "tsym8-repertoire",
+        "scalars": [
+          "U+2336",
+          "U+2338",
+          "U+2341",
+          "U+2343",
+          "U+2351",
+          "U+2352",
+          "U+2359",
+          "U+2371"
+        ]
+      },
+      {
+        "member": 32,
+        "json": "neuronte-term-symbol-v1-tsym8-g4.json",
+        "json_sha256": "2f6270b68601faa692b1c8dc1a2eecee3c9dfd4ba890337c842421d7e3486e1b",
+        "image_sha256": "831b7ead1cb2e4760cd0394a2a6f0d5312526922719c0713242065a295bc4d63",
+        "bytes": 57040,
+        "set": "tsym8-repertoire",
+        "scalars": [
+          "U+233F",
+          "U+2344",
+          "U+2345",
+          "U+2348",
+          "U+2357",
+          "U+235C",
+          "U+2363",
+          "U+2366",
+          "U+2368"
+        ]
+      },
+      {
+        "member": 33,
+        "json": "neuronte-term-symbol-v1-tsym8-g5.json",
+        "json_sha256": "f0cdaf8e87510bda993bd83d0fce9ab1faac6bfe7058c6e7b15ab3d64e73d55e",
+        "image_sha256": "70222917c512692ea7d6d241a45280dc3b832eee549cb6ec3dcfdb79cdb20405",
+        "bytes": 57040,
+        "set": "tsym8-repertoire",
+        "scalars": [
+          "U+233E",
+          "U+234D",
+          "U+234F",
+          "U+2353",
+          "U+2355",
+          "U+2358",
+          "U+2360",
+          "U+2372"
+        ]
+      },
+      {
+        "member": 34,
+        "json": "neuronte-term-symbol-v1-tsym8-g6.json",
+        "json_sha256": "0e4f9b1bacd20f9bdde8a66547499525801b7dd504434e9093f16d70cd7bea1f",
+        "image_sha256": "b3f814180dc062968af34abfd82b0a8244de22fd38b8073c239f214bc0085df0",
+        "bytes": 57040,
+        "set": "tsym8-repertoire",
+        "scalars": [
+          "U+2342",
+          "U+234B",
+          "U+234C",
+          "U+234E",
+          "U+2354",
+          "U+235A",
+          "U+2367",
+          "U+236E"
+        ]
+      },
+      {
+        "member": 35,
+        "json": "neuronte-term-symbol-v1-tsym8-g7.json",
+        "json_sha256": "93c72ea11464b2ea7e933e87e4481cb66c592549885e6c3c070620eb89794d9d",
+        "image_sha256": "a4b1aad60c227f66ddd15b73b847cc68632b74301640032ac67958e021e87b1c",
+        "bytes": 57040,
+        "set": "tsym8-repertoire",
+        "scalars": [
+          "U+20A2",
+          "U+20AA",
+          "U+20AE",
+          "U+233D",
+          "U+2340",
+          "U+2346",
+          "U+2347",
+          "U+2350"
+        ]
+      },
+      {
+        "member": 36,
+        "json": "neuronte-term-symbol-v1-tsym8-g8.json",
+        "json_sha256": "d54fe984ded694dd4503aefa7e335662ccb18b677bf52baf62c2d383901f5b28",
+        "image_sha256": "aa223eb4f0f8982afcc150c3c61dcff6279a544367245c1b73ebdbced700353d",
+        "bytes": 57040,
+        "set": "tsym8-repertoire",
+        "scalars": [
+          "U+00A4",
+          "U+20A0",
+          "U+20A1",
+          "U+20A5",
+          "U+20B1",
+          "U+20B2",
+          "U+20B9",
+          "U+20BA"
+        ]
+      },
+      {
+        "member": 37,
+        "json": "neuronte-term-symbol-v1-tsym8-g9.json",
+        "json_sha256": "7542365762dd49b526f3c263204831453a66cefd8c62277393392e623374f835",
+        "image_sha256": "6962dd0ba677ab0b496347bf5f2f05147dcd15d8defc6ceaa7403fd2c4075b0f",
+        "bytes": 57040,
+        "set": "tsym8-repertoire",
+        "scalars": [
+          "U+20A3",
+          "U+20A4",
+          "U+20A6",
+          "U+20A7",
+          "U+20AB",
+          "U+20AD",
+          "U+20B0",
+          "U+20B5",
+          "U+20B8"
+        ]
+      },
+      {
+        "member": 38,
+        "json": "neuronte-term-symbol-v1-tsym8-g10.json",
+        "json_sha256": "1f5544c1e924979e0fc7038de5e2ca1e120b09f9dd76b581204f9f1a1c748c93",
+        "image_sha256": "6ab1ba44d4876120f9e33bab45f0a5f4ddb5b4673bb4891114556eb000d4c256",
+        "bytes": 57040,
+        "set": "tsym8-repertoire",
+        "scalars": [
+          "U+20A9",
+          "U+20AF",
+          "U+20B3",
+          "U+211A",
+          "U+211D",
+          "U+213D",
+          "U+2140",
+          "U+2147"
+        ]
+      },
+      {
+        "member": 39,
+        "json": "neuronte-term-symbol-v1-tsym8-g11.json",
+        "json_sha256": "bc3fe5c127da37309ba684a6bdd63938e88fb02ecddce052d8c06f44817f8ab9",
+        "image_sha256": "3a9fbe400b4434bfd1bd220356bd9728975953ab78a11aa76161d6dcd3490f8f",
+        "bytes": 57040,
+        "set": "tsym8-repertoire",
+        "scalars": [
+          "U+2102",
+          "U+210D",
+          "U+2115",
+          "U+2124",
+          "U+213E",
+          "U+2145",
+          "U+2148",
+          "U+2149"
+        ]
+      },
+      {
+        "member": 40,
+        "json": "neuronte-term-symbol-v1-tsym8-g12.json",
+        "json_sha256": "7af19203c917b7bfba31e681e996be380f70cf564600aaa1eda3cb48734a9cc9",
+        "image_sha256": "5f45b0c6b2926a9ab2113384f59ade580971060c1d019ff324cc1b158c0fc98f",
+        "bytes": 57040,
+        "set": "tsym8-repertoire",
+        "scalars": [
+          "U+2119",
+          "U+213C",
+          "U+213F",
+          "U+2146",
+          "U+2463",
+          "U+2464",
+          "U+2468",
+          "U+2469"
+        ]
+      },
+      {
+        "member": 41,
+        "json": "neuronte-term-symbol-v1-tsym8-g13.json",
+        "json_sha256": "5ec75be84980c075e7af168db2a4a34fd52dd434632ca7e45b437d7cf0151588",
+        "image_sha256": "41ecd903cf9b3b55796fa468207893fa1fb8d361e9b023b3359236ec19fc6c51",
+        "bytes": 57040,
+        "set": "tsym8-repertoire",
+        "scalars": [
+          "U+2159",
+          "U+215A",
+          "U+2460",
+          "U+2461",
+          "U+2462",
+          "U+2465",
+          "U+2466",
+          "U+2467"
+        ]
+      },
+      {
+        "member": 42,
+        "json": "neuronte-term-symbol-v1-tsym8-g14.json",
+        "json_sha256": "c1f51617a4f79dc71b90dff5d3879ce0d66e0ff5bce492f56e9ed8d3e1735cd3",
+        "image_sha256": "7e652cd35f7b66b475630459db91f0285075739cba197505fd853bab78204a7e",
+        "bytes": 57040,
+        "set": "tsym8-repertoire",
+        "scalars": [
+          "U+2151",
+          "U+2152",
+          "U+2153",
+          "U+2154",
+          "U+2157",
+          "U+215B",
+          "U+215C",
+          "U+215E",
+          "U+215F"
+        ]
+      },
+      {
+        "member": 43,
+        "json": "neuronte-term-symbol-v1-tsym8-g15.json",
+        "json_sha256": "76e6cbb46d5f8780c69197a379c5c5837d541421ba8db0f6f6ca6fbec3ca43bf",
+        "image_sha256": "d5ec75aa89bc2f5f93af7a726c803fe181b5e8f7c408223973cc965f38eb2516",
+        "bytes": 57040,
+        "set": "tsym8-repertoire",
+        "scalars": [
+          "U+2150",
+          "U+2155",
+          "U+2156",
+          "U+2158",
+          "U+215D",
+          "U+2160",
+          "U+2167",
+          "U+2189"
+        ]
+      },
+      {
+        "member": 44,
+        "json": "neuronte-term-symbol-v1-tsym8-g16.json",
+        "json_sha256": "2e25c7fdcf02d5e0f19038babcc1c3fb9013c33b3444216238d199d099314200",
+        "image_sha256": "5cc4062419e9228d8fe25dbd1a372f7bb4669846aa4eb4af409fd5e9281a987d",
+        "bytes": 57040,
+        "set": "tsym8-repertoire",
+        "scalars": [
+          "U+2162",
+          "U+216E",
+          "U+2174",
+          "U+2176",
+          "U+217A",
+          "U+217D",
+          "U+217E",
+          "U+2182"
+        ]
+      },
+      {
+        "member": 45,
+        "json": "neuronte-term-symbol-v1-tsym8-g17.json",
+        "json_sha256": "381e22f7c662e43fc18455b4159ec0665556f5e43d4c908a7d64b8ba7a404077",
+        "image_sha256": "d2a178be6b9d720f1a2c1e36634236dc90c2e1590ccab54a4f2ba56bc4f6e8d9",
+        "bytes": 57040,
+        "set": "tsym8-repertoire",
+        "scalars": [
+          "U+2165",
+          "U+2169",
+          "U+216B",
+          "U+2170",
+          "U+2172",
+          "U+2179",
+          "U+217B",
+          "U+217F"
+        ]
+      },
+      {
+        "member": 46,
+        "json": "neuronte-term-symbol-v1-tsym8-g18.json",
+        "json_sha256": "aa52a4e1fb98e2276ceba2f25ba583bbc2ac583c786a0a7e359251b90d546d6c",
+        "image_sha256": "7e745f7de4e5a836c1443b1deb536a4628a5ab8faeff30896a88a184c16b97cf",
+        "bytes": 57040,
+        "set": "tsym8-repertoire",
+        "scalars": [
+          "U+2161",
+          "U+2163",
+          "U+2166",
+          "U+216A",
+          "U+216C",
+          "U+216D",
+          "U+2175",
+          "U+2178"
+        ]
+      },
+      {
+        "member": 47,
+        "json": "neuronte-term-symbol-v1-tsym8-g19.json",
+        "json_sha256": "083e7365352da12376ed928a0e99a6347fa187cb16d572b8100294c49fc5d6e3",
+        "image_sha256": "2bf3ec1cc19fb4d0ae14ec8b9cd9ac9180ab1eb145529777b5b69de45938a3b1",
+        "bytes": 57040,
+        "set": "tsym8-repertoire",
+        "scalars": [
+          "U+2164",
+          "U+2168",
+          "U+216F",
+          "U+2171",
+          "U+2173",
+          "U+2177",
+          "U+217C",
+          "U+2180",
+          "U+2181"
+        ]
+      }
+    ],
+    "list": {
+      "file": "neuronte-term-symbol-v1.list.txt",
+      "sha256": "fde0648dbe7c29f4b1a57efde4daba30c194b2c3899b87c64c4170a321133f95"
+    }
+  }
+}

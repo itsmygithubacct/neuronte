@@ -12,8 +12,10 @@ It must be, at once:
    group nets packed from their JSON, in order, then the blank net; no gate.
 3. Routed exactly: every scalar 0..0x10FFFF and 0xFFFFFFFF. A listed
    character goes to the group net trained on it and is reported trained;
-   every other scalar goes to the blank net and is reported untrained. No
-   listed character is in split-v9's table.
+   every other scalar goes to the blank net and is reported untrained. A
+   surrogate or a value above U+10FFFF goes where U+FFFD goes, which is
+   what the library draws for it. No listed character is in split-v9's
+   table.
 4. Pixel-exact: each listed character draws as its group net alone at the
    19 qualification sizes, automatic sampling, and at 8x16, 16x32 and 48x96
    with one sample, with ink at 16x32; sampled other scalars, all of
@@ -177,6 +179,11 @@ def open_bytes(data, name):
     return handle
 
 
+def drawn(c):
+    """The scalar the library draws for c: U+FFFD for a surrogate or a value above U+10FFFF."""
+    return 0xFFFD if c > 0x10FFFF or 0xD800 <= c <= 0xDFFF else c
+
+
 def coverage(handle, scalars, w, h, samples=0):
     out = np.empty((len(scalars), h, w), np.float32)
     for i, c in enumerate(scalars):
@@ -192,9 +199,10 @@ try:
     blank = len(files)
     for c in list(range(0x110000)) + [0xFFFFFFFF]:
         r, u = lib.neuronte_route(bundle, c), lib.neuronte_untrained(bundle, c)
-        if c in group:
-            if r != group[c] or u != 0:
-                fail(f'U+{c:04X} routes to {r} (untrained {u}), not to its group net {group[c]}')
+        d = drawn(c)
+        if d in group:
+            if r != group[d] or u != 0:
+                fail(f'U+{c:04X} routes to {r} (untrained {u}), not to its group net {group[d]}')
         elif r != blank or u != 1:
             fail(f'U+{c:04X} routes to {r} (untrained {u}), not to the blank net')
     print(f'{TAG}: routes: {len(group)} characters to their group nets; every other scalar to the blank net, '
@@ -215,7 +223,8 @@ try:
             fail(f'{path.name}: a character has no ink at 16x32')
     rng = random.Random(20261117)
     others = sorted(({rng.randrange(0x110000) for _ in range(300)} | set(v9) | {0, 0x20, 0x41, 0xFFFD, 0x10FFFF, 0xD800,
-                                                                                 0x110000, 0xFFFFFFFF}) - set(group))
+                                                                                 0x110000, 0xFFFFFFFF}))
+    others = [c for c in others if drawn(c) not in group]
     for w, h in ((1, 2), (8, 16), (9, 17), (25, 49)):
         for s in (0, 1):
             if coverage(bundle, others, w, h, s).any():

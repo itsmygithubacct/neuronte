@@ -86,7 +86,9 @@ def notes():
 
 # The battery: an upright body x 2..8, y 5.8..15.2, a cap on top.
 
-BODY = (2.0, 5.8, 8.0, 15.2)
+# The body is tall so that a tenth of its inside is more than a pixel at 10x20
+# and the full battery still differs from the one at nine tenths at 6x12.
+BODY = (2.0, 4.4, 8.0, 16.6)
 WALL = 0.5                        # the pen of the outline
 LEVELS = {0xF007A: 1, 0xF007B: 2, 0xF007C: 3, 0xF007D: 4, 0xF007E: 5, 0xF007F: 6, 0xF0080: 7, 0xF0081: 8,
           0xF0082: 9, 0xF0079: 10}
@@ -97,15 +99,15 @@ def battery(level=0, mark=None):
     """The outline, filled from the bottom to level tenths of its inside, or with a mark in it."""
     x0, y0, x1, y1 = BODY
     out = _seg([(x0, y0), (x1, y0), (x1, y1), (x0, y1), (x0, y0)], WALL)
-    out += _poly([(3.7, y0 - 1.6), (6.3, y0 - 1.6), (6.3, y0), (3.7, y0)])
+    out += _poly([(3.7, y0 - 1.2), (6.3, y0 - 1.2), (6.3, y0), (3.7, y0)])
     if level:                         # tenths of the inside, between the walls
         top = (y1 - WALL) - (y1 - y0 - 2 * WALL) * level / 10
         out += _poly([(x0, top), (x1, top), (x1, y1), (x0, y1)])
     if mark == "!":
-        out += _seg([(5, 7.9), (5, 11.3)], 0.55) + _disc(5, 13.2, 0.7)
+        out += _seg([(5, 7.0), (5, 11.6)], 0.6) + _disc(5, 14.1, 0.8)
     elif mark == "?":
-        out += _seg([(3.7, 8.9), (4.1, 7.9), (5, 7.5), (5.9, 7.9), (6.3, 8.9), (5.9, 9.8), (5, 10.5), (5, 11.4)], 0.45)
-        out += _disc(5, 13.2, 0.7)
+        out += _seg([(3.4, 8.5), (3.9, 7.2), (5, 6.7), (6.1, 7.2), (6.6, 8.5), (6.1, 9.7), (5, 10.6), (5, 11.8)], 0.5)
+        out += _disc(5, 14.1, 0.8)
     return out
 
 

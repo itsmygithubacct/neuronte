@@ -403,3 +403,11 @@ held U+2D37 U+2D39 U+2D43 U+2D47 U+2D49 U+2D4A U+2D4E U+2D4F U+2D5C U+2D62 U+2D6
 held U+0555 U+054D U+0548 U+053C U+054F U+0553 U+0554 U+0550 U+0535
 held U+0545 U+0585 U+057D U+0578 U+0570 U+0575 U+0581 U+0566 U+0584
 held U+0580 U+057C U+056B U+0565 U+0582 U+0589 U+055A U+0559 U+055B U+055D
+#
+# ---------------------------------------------------------------------
+# Groups that failed the common gates, listed again: each is trained once
+# more as two halves, the one remedy. tscrxl2 is group 2 of tscrl, and so
+# on. These sets repeat characters and belong to no bundle of their own.
+# ---------------------------------------------------------------------
+tscrxl2 U+A4E7 U+A4EA U+A4EB U+A4EC U+A4EE U+A4F0 U+A4F2 U+A4F3
+tscrxl5 U+A4F8 U+A4F9 U+A4FA U+A4FB U+A4FC U+A4FD U+A4FE U+A4FF

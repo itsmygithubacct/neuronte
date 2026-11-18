@@ -1288,3 +1288,31 @@ test-metric-sans-faces: build/libneuronte.so
 test: test-metric-sans-faces
 
 .PHONY: test-metric-sans-faces
+
+# Neuronte Sans Metric large and scaled faces (weights/neuronte-metric-sans-v1.md).
+# They FAILED gate G-M1 as declared and ship by the owner's ruling of
+# 2026-11-18 (see the card). This target is G-M2: both files repack byte for
+# byte from the shipped members (each group's lower-error seed); the reference
+# packs, with the advances rounded to hundredths, pass check_reference and
+# check_letter_snap; the shipped files pass check_metric_sans --large.
+METRIC_SANS_LARGE = weights/neuronte-metric-sans-large-v1
+METRIC_SANS_LARGE_SEED1 = 0 1 3 4 5 6 11
+test-metric-sans-large: build/libneuronte.so
+	@set -e; mkdir -p $(METRIC_SANS_TMP); \
+	m=""; for g in 0 1 2 3 4 5 6 7 8 9 10 11; do sfx=""; for s in $(METRIC_SANS_LARGE_SEED1); do [ "$$s" = "$$g" ] && sfx=.seed1; done; \
+		m="$$m $(METRIC_SANS_LARGE)$$sfx-g$$g.json"; done; \
+	$(PYTHON) tests/check_metric_sans.py --hundredths font/metric-sans-advances.txt $(METRIC_SANS_TMP)/large-hundredths.txt; \
+	$(PYTHON) train/pack.py --drawing-bundle $(METRIC_SANS_TMP)/large.nrt font/metric-sans-advances.txt $$m > /dev/null; \
+	cmp $(METRIC_SANS_TMP)/large.nrt $(METRIC_SANS_LARGE).nrt; \
+	$(PYTHON) train/pack.py --drawing-bundle $(METRIC_SANS_TMP)/scaled.nrt font/metric-sans-advances.txt $$m --letter-edges uilargems --snap-below 33 > /dev/null; \
+	cmp $(METRIC_SANS_TMP)/scaled.nrt weights/neuronte-metric-sans-scaled-v1.nrt; \
+	$(PYTHON) train/pack.py --drawing-bundle $(METRIC_SANS_TMP)/large-ref.nrt $(METRIC_SANS_TMP)/large-hundredths.txt $$m > /dev/null; \
+	$(PYTHON) train/pack.py --drawing-bundle $(METRIC_SANS_TMP)/scaled-ref.nrt $(METRIC_SANS_TMP)/large-hundredths.txt $$m --letter-edges uilargems --snap-below 33 > /dev/null; \
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle $(METRIC_SANS_TMP)/large-ref.nrt $(METRIC_SANS_TMP)/large-hundredths.txt $$m; \
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_letter_snap.py build/libneuronte.so $(METRIC_SANS_TMP)/scaled-ref.nrt $(METRIC_SANS_TMP)/large-hundredths.txt uilargems 33 off $$m; \
+	$(PYTHON) tests/check_metric_sans.py --large build/libneuronte.so $(METRIC_SANS_LARGE).nrt $(METRIC_SANS_TMP)/large-ref.nrt font/metric-sans-advances.txt; \
+	$(PYTHON) tests/check_metric_sans.py --large build/libneuronte.so weights/neuronte-metric-sans-scaled-v1.nrt $(METRIC_SANS_TMP)/scaled-ref.nrt font/metric-sans-advances.txt
+
+test: test-metric-sans-large
+
+.PHONY: test-metric-sans-large

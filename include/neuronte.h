@@ -317,6 +317,23 @@ int neuronte_draw_text(neuronte *n, uint32_t *pixels, int stride, int width, int
                        int x, int y, int em_px, int bold, const char *text, size_t len,
                        uint32_t color);
 
+/* Text set at its exact width. The same as neuronte_draw_text(), but the
+ * pen is kept in thousandths of an em, as the advance table gives them
+ * (neuronte_advance_milli()), and each character's cell, still a
+ * whole-pixel picture, is put at the nearest pixel of its true position:
+ * the k-th character's pen is x + round(S * em_px / 1000), a half going
+ * up, where S is the sum of the thousandths before it; its shift is then
+ * applied as in neuronte_draw_text(). A line therefore ends within half a
+ * pixel of its exact length, at any em, and the gaps between letters vary
+ * by a pixel where neuronte_draw_text() would let the line drift.
+ * neuronte_text_width_exact() is that length, round(sum * em_px / 1000).
+ * For a table in hundredths of an em the thousandths are ten times the
+ * hundredths. bold is 0 or 1. Returns the width, or an error. */
+int neuronte_text_width_exact(const neuronte *n, const char *text, size_t len, int bold, int em_px);
+int neuronte_draw_text_exact(neuronte *n, uint32_t *pixels, int stride, int width, int height,
+                             int x, int y, int em_px, int bold, const char *text, size_t len,
+                             uint32_t color);
+
 /* Proportional text with explicit synthetic weight. stroke_px is 0..em_px.
  * The advance of EACH character (including spaces and replacements) is its
  * rounded regular advance plus exactly stroke_px. The ink is the maximum

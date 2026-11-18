@@ -1254,3 +1254,12 @@ test-metric-sans: build/libneuronte.so
 test: test-metric-sans
 
 .PHONY: test-metric-sans
+
+# neuronte_draw_text_exact(): every line exactly its characters at their true
+# positions, on hundredths tables, a fine table and a version 8 table with shifts.
+test-draw-exact: build/libneuronte.so
+	$(PYTHON) tests/check_draw_exact.py build/libneuronte.so weights/neuronte-ui12-v2.nrt weights/neuronte-ui1-v2.nrt weights/neuronte-ui-scaled-latin1-v1.nrt weights/neuronte-ui-large-latin1-v2.nrt weights/neuronte-ui-large-latin1-v2.nrt+font/metric-sans-advances.txt weights/neuronte-ui12-v2.nrt+font/metric-sans-12.advances.txt
+
+test: test-draw-exact
+
+.PHONY: test-draw-exact

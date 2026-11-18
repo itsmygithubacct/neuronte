@@ -542,6 +542,10 @@ optional in-process video decoder, which links FFmpeg's libraries, has
   with their tables rewritten in thousandths draw byte for byte as
   shipped, and with shifts draw each letter moved by exactly its shift
   (`tests/check_fine_advances.py`);
+- the exact-width line call draws each character exactly where
+  `neuronte_draw_text()` draws it alone at its true position, and the line
+  measures within half a pixel of its thousandths
+  (`tests/check_draw_exact.py`);
 - the C library agrees with an independent float64 numpy evaluation of
   the JSON weights to 1e-3 in coverage, and the packed file is exactly
   what `train/pack.py` makes from the JSON. For the bundle, the C router
@@ -722,6 +726,13 @@ arithmetic and every existing file draws as before.
 letter's cell that many pixels right of the pen and move the pen by the
 advance alone. A library older than these tables refuses them
 (`NEURONTE_ERR_FORMAT`).
+
+`neuronte_draw_text_exact()` sets a line at its exact width: the pen is kept
+in thousandths of an em, and each letter, still a whole-pixel picture, goes
+to the nearest pixel of its true position. A line then ends within half a
+pixel of the table's length at any em, where `neuronte_draw_text()` rounds
+each advance by itself and can drift by a few percent at small sizes.
+`neuronte_text_width_exact()` measures it.
 
 `neuronte-icon-v1` is the 167-icon net: form A, 256 wide, K = 6, trained
 for 40,000 steps on the original drawings. A uniform distance offset of

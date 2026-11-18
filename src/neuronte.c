@@ -2847,14 +2847,45 @@ int neuronte_text_width_stroke(const neuronte *n, const char *text, size_t len,
     return total;
 }
 
-/* stroke_px == -1 is the unchanged packed-bold advance policy. */
+/* The pixel at which the pen is after acc thousandths of an em at em_px,
+ * counted from x: x + round(acc * em_px / 1000), a half going up; or
+ * INT64_MAX once that is past what int64 holds. acc is never negative. */
+static int64_t exact_pen(int x, int64_t acc, int em_px)
+{
+    if (acc > (INT64_MAX - 500 - INT_MAX) / em_px)
+        return INT64_MAX;
+    return (int64_t)x + (acc * em_px + 500) / 1000;
+}
+
+int neuronte_text_width_exact(const neuronte *n, const char *text, size_t len, int bold, int em_px)
+{
+    int64_t acc = 0, w;
+    size_t off = 0;
+
+    if ((!text && len) || (bold != 0 && bold != 1) || neuronte_advance(n, 0x20, bold, em_px) < 0)
+        return NEURONTE_ERR_ARG;
+    while (off < len) {
+        uint32_t s;
+        off += neuronte_utf8_decode(text + off, len - off, &s);
+        acc += advance_of(n, s)->milli[bold];
+        if (acc > (INT64_MAX - 500) / em_px)
+            return NEURONTE_ERR_ARG;
+    }
+    w = (acc * em_px + 500) / 1000;
+    return w > INT_MAX ? NEURONTE_ERR_ARG : (int)w;
+}
+
+/* stroke_px == -1 is the unchanged packed-bold advance policy. exact == 1
+ * (neuronte_draw_text_exact, stroke_px == -1 only) keeps the pen in
+ * thousandths of an em and puts each character at the nearest pixel of
+ * its true position; exact == 0 is the unchanged whole-pixel pen. */
 static int draw_text(neuronte *n, uint32_t *pixels, int stride, int width, int height,
                      int x, int y, int em_px, int bold, int stroke_px, const char *text, size_t len,
-                     uint32_t color)
+                     uint32_t color, int exact)
 {
     float alpha = (float)(color >> 24) / 255.0f;
     int cw, ch, total, ss, px, py, stroke;
-    int64_t pen;
+    int64_t pen, acc = 0;
     size_t off = 0;
 
     /* Check em before doubling it. Past INT_MAX / 2 the height overflows. */
@@ -2863,7 +2894,8 @@ static int draw_text(neuronte *n, uint32_t *pixels, int stride, int width, int h
         return NEURONTE_ERR_ARG;
     cw = em_px;
     ch = em_px * 2;
-    total = stroke_px < 0 ? neuronte_text_width(n, text, len, bold, em_px) :
+    total = exact ? neuronte_text_width_exact(n, text, len, bold, em_px) :
+            stroke_px < 0 ? neuronte_text_width(n, text, len, bold, em_px) :
                            neuronte_text_width_stroke(n, text, len, stroke_px, em_px);
     if (total < 0 || alpha <= 0.0f)
         return total;
@@ -2911,6 +2943,11 @@ static int draw_text(neuronte *n, uint32_t *pixels, int stride, int width, int h
                     }
                 }
         }
+        if (exact) {
+            acc += a->milli[bold];
+            pen = exact_pen(x, acc, em_px);
+            continue;
+        }
         adv = stroke_px < 0 ? adv_px(n, a, bold, em_px) : adv_px(n, a, 0, em_px) + stroke_px;
         if (adv > 0 && pen > INT64_MAX - adv)
             pen = INT64_MAX;
@@ -2924,7 +2961,16 @@ int neuronte_draw_text(neuronte *n, uint32_t *pixels, int stride, int width, int
                        int x, int y, int em_px, int bold, const char *text, size_t len,
                        uint32_t color)
 {
-    return draw_text(n, pixels, stride, width, height, x, y, em_px, bold, -1, text, len, color);
+    return draw_text(n, pixels, stride, width, height, x, y, em_px, bold, -1, text, len, color, 0);
+}
+
+int neuronte_draw_text_exact(neuronte *n, uint32_t *pixels, int stride, int width, int height,
+                             int x, int y, int em_px, int bold, const char *text, size_t len,
+                             uint32_t color)
+{
+    if (bold != 0 && bold != 1)
+        return NEURONTE_ERR_ARG;
+    return draw_text(n, pixels, stride, width, height, x, y, em_px, bold, -1, text, len, color, 1);
 }
 
 int neuronte_draw_text_stroke(neuronte *n, uint32_t *pixels, int stride, int width, int height,
@@ -2933,5 +2979,5 @@ int neuronte_draw_text_stroke(neuronte *n, uint32_t *pixels, int stride, int wid
 {
     if (stroke_px < 0)
         return NEURONTE_ERR_ARG;
-    return draw_text(n, pixels, stride, width, height, x, y, em_px, 0, stroke_px, text, len, color);
+    return draw_text(n, pixels, stride, width, height, x, y, em_px, 0, stroke_px, text, len, color, 0);
 }

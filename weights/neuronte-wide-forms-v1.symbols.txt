@@ -1,0 +1,30 @@
+# The characters neuronte-wide-forms-v1.nrt was trained on, drawn for a box of two cells, in the order
+# of train/wide.py, one line group for each group net. This is not a NAME.list.txt:
+# some of these code points are drawn for one cell in a terminal bundle, and this
+# file draws them again for a box of two cells, so it is outside the rule that no
+# two listed bundles claim one character. tests/check_wide.py holds the bundle's
+# table to this list exactly.
+# twdf0 g0
+U+FF01 U+FF02 U+FF03 U+FF04 U+FF05 U+FF06 U+FF07 U+FF08 U+FF09
+# twdf0 g1
+U+FF0A U+FF0B U+FF0C U+FF0D U+FF0E U+FF0F U+FF10 U+FF11 U+FF12
+# twdf0 g2
+U+FF13 U+FF14 U+FF15 U+FF16 U+FF17 U+FF18 U+FF19 U+FF1A U+FF1B U+FF1C
+# twdf0 g3
+U+FF1D U+FF1E U+FF1F U+FF20 U+FF21 U+FF22 U+FF23 U+FF24 U+FF25
+# twdf0 g4
+U+FF26 U+FF27 U+FF28 U+FF29 U+FF2A U+FF2B U+FF2C U+FF2D U+FF2E
+# twdf0 g5
+U+FF2F U+FF30 U+FF31 U+FF32 U+FF33 U+FF34 U+FF35 U+FF36 U+FF37 U+FF38
+# twdf0 g6
+U+FF39 U+FF3A U+FF3B U+FF3C U+FF3D U+FF3E U+FF3F U+FF40 U+FF41
+# twdf0 g7
+U+FF42 U+FF43 U+FF44 U+FF45 U+FF46 U+FF47 U+FF48 U+FF49 U+FF4A
+# twdf0 g8
+U+FF4B U+FF4C U+FF4D U+FF4E U+FF4F U+FF50 U+FF51 U+FF52 U+FF53 U+FF54
+# twdf0 g9
+U+FF55 U+FF56 U+FF57 U+FF58 U+FF59 U+FF5A U+FF5B U+FF5C U+FF5D
+# twdf0r10 g0
+U+FF5E U+FF5F U+FF60 U+FFE0 U+FFE1
+# twdf0r10 g1
+U+FFE2 U+FFE3 U+FFE4 U+FFE5 U+FFE6

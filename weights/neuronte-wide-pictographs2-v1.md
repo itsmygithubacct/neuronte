@@ -344,7 +344,40 @@ bundle, each as the selected seed.
 
 ## Speed
 
-Not measured yet.
+Measured on the two x86 hosts other cards use, an Intel Core i7-6820HQ and an
+Intel Core i7-10700F, each under the shared benchmark lock, at commit 55e0fb5
+(the bundle there is byte for byte the one here). kilix-bench e21e5cd: one
+pinned core, a fresh process for every job, one warmup and ten measured
+rounds in shuffled order, medians, raw trials kept, every model checked
+against the float64 reference first. The corpus is this bundle's 266
+characters. The cells 8×16, 16×32 and 48×96 are what a program asks for
+the two-cell boxes 8×8, 16×16 and 48×48. split-v9, which was not trained
+on these characters, sends each through its gate to one of its nets and
+draws something else; this bundle looks it up in its table and runs a
+small group net.
+
+| µs per character | split-v9, i7-6820HQ | wide-pictographs2-v1, i7-6820HQ | ratio | split-v9, i7-10700F | wide-pictographs2-v1, i7-10700F | ratio |
+|---|---:|---:|---:|---:|---:|---:|
+| Coverage, uncached, 8×16 | 497.8 | 194.0 | 2.57 | 378.2 | 149.3 | 2.53 |
+| Coverage, uncached, 16×32 | 1927.9 | 743.3 | 2.59 | 1468.4 | 570.9 | 2.57 |
+| Coverage, uncached, 48×96 | 4342.9 | 1661.3 | 2.61 | 3368.2 | 1278.3 | 2.63 |
+| Draw, cold, 8×16 | 505.4 | 197.1 | 2.56 | 380.6 | 150.4 | 2.53 |
+| Draw, cold, 16×32 | 1944.1 | 752.3 | 2.58 | 1469.1 | 579.7 | 2.53 |
+| Draw, cold, 48×96 | 4349.7 | 1697.2 | 2.56 | 3301.3 | 1294.9 | 2.55 |
+| Draw, warm, 8×16 | 4.0 | 1.2 | 3.34 | 2.9 | 0.9 | 3.38 |
+| Draw, warm, 16×32 | 7.0 | 3.7 | 1.86 | 5.1 | 2.8 | 1.85 |
+| Draw, warm, 48×96 | 28.3 | 27.8 | 1.02 | 20.6 | 20.0 | 1.03 |
+
+Uncached, wide-pictographs2-v1 draws these characters 2.6 times as fast as
+split-v9 does (geometric mean over the three cells and both hosts:
+2.59 on the i7-6820HQ, 2.58 on the i7-10700F; cold draw 2.6,
+warm draw 1.9). A lookup in its table takes 14 ns and 8 ns against
+1238 ns and 908 ns for split-v9's gate. Opening the file takes 4.2 ms and
+3.3 ms against 4.6 ms and 3.7 ms for split-v9.
+
+A two-cell box costs the samples of the cell W×2H a program asks for it:
+twice those of a one-cell character of the same height. A handle caches
+1,024 drawn cells.
 
 ## Files
 

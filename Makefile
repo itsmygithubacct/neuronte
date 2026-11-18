@@ -830,6 +830,68 @@ test-ui-latin1: build/libneuronte.so
 
 .PHONY: test-ui-latin1
 
+# All of Latin-1 in the scaled (17-32 px) and large (33 px up) faces: the
+# files above and two nets for the 38 other characters
+# (font/ui-large-latin1-signs.txt, weights/neuronte-ui-latin1-signs-v0-gG.json).
+# Both seeds repack and pass the snap and reference checks; seed 0 is the
+# shipped file; its ASCII and the 58 composed letters draw byte for byte as
+# the older Latin-1 files'.
+UI_SIGNS = weights/neuronte-ui-latin1-signs-v0
+test-ui-latin1-full: build/libneuronte.so
+	@set -e; mkdir -p build/ui-latin1-full; \
+	for seed in "" .seed1; do \
+		x=""; for g in 0 1; do x="$$x $(UI_LATIN1)$$seed-g$$g.json"; done; \
+		for g in 0 1; do x="$$x $(UI_SIGNS)$$seed-g$$g.json"; done; \
+		m=""; for g in $(UI_SCALED_G); do m="$$m $(UI_SCALED)$$seed-g$$g.json"; done; \
+		$(PYTHON) train/pack.py --drawing-bundle build/ui-latin1-full/scaled$$seed.nrt font/ui-scaled-latin1-full-advances.txt $$m $$x \
+			--letter-edges uilargexx --snap-below 33 > /dev/null; \
+		OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_letter_snap.py build/libneuronte.so build/ui-latin1-full/scaled$$seed.nrt \
+			font/ui-scaled-latin1-full-advances.txt uilargexx 33 off $$m $$x; \
+		m=""; for g in 0 1 2 3; do m="$$m $(UI_LARGE_V1)$$seed-g$$g.json"; done; \
+		$(PYTHON) train/pack.py --drawing-bundle build/ui-latin1-full/large$$seed.nrt font/ui-large-latin1-full-advances.txt $$m $$x > /dev/null; \
+		$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle build/ui-latin1-full/large$$seed.nrt \
+			font/ui-large-latin1-full-advances.txt $$m $$x; \
+	done; \
+	cmp build/ui-latin1-full/scaled.nrt weights/neuronte-ui-scaled-latin1-v1.nrt; \
+	cmp build/ui-latin1-full/large.nrt weights/neuronte-ui-large-latin1-v2.nrt; \
+	$(PYTHON) tests/check_latin1_faces.py build/libneuronte.so weights/neuronte-ui-scaled-latin1-v0.nrt \
+		weights/neuronte-ui-scaled-latin1-v1.nrt ascii+58 17 20 24 28 32; \
+	$(PYTHON) tests/check_latin1_faces.py build/libneuronte.so weights/neuronte-ui-large-latin1-v1.nrt \
+		weights/neuronte-ui-large-latin1-v2.nrt ascii+58 33 48 --blended; \
+	$(PYTHON) train/pack.py --advances font/ui-scaled-latin1-full-italic-advances.txt build/ui-latin1-full/italic.nrt > /dev/null; \
+	cmp build/ui-latin1-full/italic.nrt weights/neuronte-ui-scaled-latin1-italic-advances-v1.nrt; \
+	echo "test-ui-latin1-full: passed"
+
+.PHONY: test-ui-latin1-full
+
+# All of Latin-1 in the pixel faces 1-16 px and their italics 3-16 px: each
+# -v2 face is its -v1 ASCII nets, unchanged, and the Latin-1 nets of
+# font/ui-EM-latin1(-italic).txt (weights/neuronte-FACE-latin1-v0-gG.json).
+# The drawing files are what tools/make-latin1-face.py makes; both seeds
+# pass the exact gate (every one of the 192 characters, regular and bold,
+# exactly its drawing at the native em); seed 0 is the shipped file; its
+# ASCII draws byte for byte as the -v1 file's.
+FACES_LATIN1 = $(foreach e,16 15 14 13 12 11 10 9 8 7 6 5 4 3,ui$(e) ui$(e)-italic) ui2 ui1
+test-faces-latin1: build/libneuronte.so
+	@set -e; mkdir -p build/faces-latin1; $(PYTHON) tools/make-latin1-face.py --check; \
+	for f in $(FACES_LATIN1); do \
+		em=$$(echo $$f | sed 's/^ui//; s/-italic//'); \
+		t=font/ui-$$em-latin1.txt; case $$f in *-italic) t=font/ui-$$em-latin1-italic.txt;; esac; \
+		n=weights/neuronte-$$f; \
+		for seed in "" .seed1; do \
+			if [ -e $$n-v1.json ]; then m="$$n-v1$$seed.json"; \
+			else m=$$(ls $$n-v1-g*.json | sort -V | sed "s/-v1-g/-v1$$seed-g/"); fi; \
+			x=$$(ls $$n-latin1-v0-g*.json | sort -V | sed "s/-latin1-v0-g/-latin1-v0$$seed-g/"); \
+			$(PYTHON) train/pack.py --drawing-bundle build/faces-latin1/$$f$$seed.nrt $$t $$m $$x > /dev/null; \
+			$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle build/faces-latin1/$$f$$seed.nrt $$t $$m $$x; \
+		done; \
+		cmp build/faces-latin1/$$f.nrt $$n-v2.nrt; \
+		$(PYTHON) tests/check_latin1_faces.py build/libneuronte.so $$n-v1.nrt $$n-v2.nrt ascii $$em; \
+	done; \
+	echo "test-faces-latin1: passed"
+
+.PHONY: test-faces-latin1
+
 test-split-v7-symbol: build/libneuronte.so build/test_api
 	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_split_v7_symbol.py build/libneuronte.so
 	./build/test_api weights/neuronte-split-v7-symbol-v1.nrt --full --accent --pixel
@@ -1068,7 +1130,7 @@ test-face-v0-ui43: build/libneuronte.so
 test-face-v0-uilarge: build/libneuronte.so
 	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UILARGE).nrt $(UILARGE).json font/ui-large-advances.txt
 
-test: all $(TESTS) test-cells test-bits test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7 test-face-bundle test-symbol-v1 test-split-v7-symbol test-split-v8 test-split-v9 test-term-math-v1 test-term-symbol-v1 test-term-dingbat-v1 test-faces-v1 test-faces-v1-192-256 test-known-bundle test-untrained test-standalone test-term-latin-v1 test-term-blocks-v1 test-faces-wide-v1 test-faces-v1-h512 test-colour-marks test-faces-v1-small test-emoji-v1 test-letter-snap test-ui-scaled test-ui-large-v1 test-ui-latin1 test-term-mathalpha-v1 test-term-syllabics-v1 test-term-scripts-v1 test-weather-colour-v1 test-term-rest-v1 test-kilix-chrome-v1 test-kilix-chrome-v2
+test: all $(TESTS) test-cells test-bits test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7 test-face-bundle test-symbol-v1 test-split-v7-symbol test-split-v8 test-split-v9 test-term-math-v1 test-term-symbol-v1 test-term-dingbat-v1 test-faces-v1 test-faces-v1-192-256 test-known-bundle test-untrained test-standalone test-term-latin-v1 test-term-blocks-v1 test-faces-wide-v1 test-faces-v1-h512 test-colour-marks test-faces-v1-small test-emoji-v1 test-letter-snap test-ui-scaled test-ui-large-v1 test-ui-latin1 test-term-mathalpha-v1 test-term-syllabics-v1 test-term-scripts-v1 test-weather-colour-v1 test-term-rest-v1 test-kilix-chrome-v1 test-kilix-chrome-v2 test-ui-latin1-full test-faces-latin1
 	cd weights && sha256sum -c --quiet SHA256SUMS
 	# The pointer net keeps its own list, with paths from the top of the tree.
 	sha256sum -c --quiet weights/neuronte-pointer-v0.sha256

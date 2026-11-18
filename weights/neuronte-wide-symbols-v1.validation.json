@@ -1,7 +1,7 @@
 {
  "schema": "neuronte.wide.validation/v1",
  "bundle": "neuronte-wide-symbols-v1.nrt",
- "bundle_sha256": "8b922014fb953403dd8b161bffb22299aa52aa5afc16f3d35b4a3dd4d5768478",
+ "bundle_sha256": "66074bfc548dd6f572c121d0848f38421d626b125da4c0e948346e6144fed3d1",
  "gates": "gates-v2.3.json",
  "gates_sha256": "2ccff8354eeda45e05525490b9fdee6ab13d4970a2389537c44af1504fc50fc4",
  "gates_note": "gates v2.3 (gates v2 with no limit tighter than the score of the drawing itself with 10% of room), kind symbols for every group, declared 2026-11-18T00:25Z before any net of this bundle was trained",
@@ -22,41 +22,47 @@
  "groups_trained": 54,
  "groups_passing": 21,
  "groups_halved": 33,
- "halves_passing": 23,
+ "halves_passing": 52,
  "halves_trained_not_used": [],
- "limits_eased": 208,
+ "limits_eased": 562,
  "limits_eased_what": "limits applied to a net in the bundle at the perfect drawing's own score with 10% of room, where that is looser than the declared limit; each is listed with the net (rule, declared, perfect, applied)",
  "seeds_passing_pixel_exact": 0,
- "nets_shipped": 44,
- "nets_left_out": 43,
- "nets_failed_shipped_by_owner": [],
+ "nets_shipped": 73,
+ "nets_left_out": 14,
+ "nets_failed_shipped_by_owner": [
+  "twds0r6:1",
+  "twds1r1:1",
+  "twds1r2:0",
+  "twds1r2:1",
+  "twds1r3:0",
+  "twds1r3:1",
+  "twds1r4:0",
+  "twds1r4:1",
+  "twds1r8:0",
+  "twds2r2:0",
+  "twds2r3:0",
+  "twds2r4:0",
+  "twds2r4:1",
+  "twds2r5:0",
+  "twds3r5:1",
+  "twds3r8:1",
+  "twds4r0:1",
+  "twds4r1:0",
+  "twds4r2:0",
+  "twds4r2:1",
+  "twds4r3:1",
+  "twds4r4:1",
+  "twds4r5:0",
+  "twds4r5:1",
+  "twds4r8:0",
+  "twds5r1:0",
+  "twds5r1:1",
+  "twds5r2:0",
+  "twds5r2:1"
+ ],
  "characters_drawn": 324,
- "characters_listed": 195,
+ "characters_listed": 282,
  "characters_left_untrained": [
-  "U+26F3",
-  "U+26F5",
-  "U+26FA",
-  "U+1F0CF",
-  "U+1F18E",
-  "U+1F191",
-  "U+1F192",
-  "U+1F193",
-  "U+1F194",
-  "U+1F195",
-  "U+1F196",
-  "U+1F197",
-  "U+1F198",
-  "U+1F199",
-  "U+1F19A",
-  "U+1F200",
-  "U+1F201",
-  "U+1F202",
-  "U+1F210",
-  "U+1F211",
-  "U+1F212",
-  "U+1F213",
-  "U+1F214",
-  "U+1F215",
   "U+1F216",
   "U+1F217",
   "U+1F218",
@@ -75,9 +81,6 @@
   "U+1F225",
   "U+1F226",
   "U+1F227",
-  "U+1F228",
-  "U+1F229",
-  "U+1F22A",
   "U+1F22B",
   "U+1F22C",
   "U+1F22D",
@@ -93,75 +96,15 @@
   "U+1F237",
   "U+1F238",
   "U+1F239",
-  "U+1F23A",
-  "U+1F23B",
-  "U+1F240",
-  "U+1F244",
-  "U+1F245",
-  "U+1F246",
   "U+1F247",
   "U+1F248",
   "U+1F250",
-  "U+1F251",
-  "U+1F260",
-  "U+1F261",
-  "U+1F262",
-  "U+1F263",
-  "U+1F264",
-  "U+1F265",
-  "U+1F600",
-  "U+1F601",
-  "U+1F638",
-  "U+1F639",
-  "U+1F63A",
-  "U+1F64A",
-  "U+1F64B",
-  "U+1F64C",
-  "U+1F680",
-  "U+1F681",
-  "U+1F682",
-  "U+1F683",
-  "U+1F684",
-  "U+1F685",
-  "U+1F689",
-  "U+1F68A",
-  "U+1F68B",
-  "U+1F68C",
-  "U+1F68D",
-  "U+1F68E",
   "U+1F68F",
   "U+1F690",
   "U+1F691",
-  "U+1F692",
-  "U+1F693",
-  "U+1F694",
-  "U+1F698",
-  "U+1F699",
-  "U+1F69A",
-  "U+1F69B",
-  "U+1F69C",
-  "U+1F69D",
-  "U+1F69E",
-  "U+1F69F",
-  "U+1F6A0",
-  "U+1F6AD",
-  "U+1F6AE",
-  "U+1F6AF",
   "U+1F6B3",
   "U+1F6B4",
-  "U+1F6B5",
-  "U+1F6B9",
-  "U+1F6BA",
-  "U+1F6BB",
-  "U+1F6BC",
-  "U+1F6BD",
-  "U+1F6BE",
-  "U+1F6BF",
-  "U+1F6C0",
-  "U+1F6C1",
-  "U+1F6C2",
-  "U+1F6C3",
-  "U+1F6C4"
+  "U+1F6B5"
  ],
  "selection": "a net ships when seed 0 and seed 1 both pass the declared gates, the seed with the lower mean of the mean error at 8x16, 16x32 and 48x96; a group that fails is trained once more as two nets of half its characters each; a half that fails is left out and its characters stay untrained; nothing that failed ships",
  "trainer": "train/split_expert.py train --mode repertoire --partition contiguous, width 64, 120000 steps, seeds 0,1, teacher grid 256",
@@ -7776,8 +7719,17 @@
          }
         }
        },
-       "shipped": false,
-       "failed_gates_shipped_by_owner": false
+       "shipped": true,
+       "failed_gates_shipped_by_owner": true,
+       "owner_margin": {
+        "seed": 0,
+        "passed": true,
+        "over_by": 0.0,
+        "note": "this seed passed; only the other seed failed"
+       },
+       "file": "neuronte-wide-symbols-v1-twds0r6-g1.json",
+       "shipped_seed": 0,
+       "shipped_because": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed; lower-error seed"
       }
      ]
     },
@@ -11483,8 +11435,23 @@
          }
         }
        },
-       "shipped": false,
-       "failed_gates_shipped_by_owner": false
+       "shipped": true,
+       "failed_gates_shipped_by_owner": true,
+       "owner_margin": {
+        "seed": 1,
+        "passed": false,
+        "worst_rule": "48x96 mae",
+        "value": 0.003898611292243004,
+        "limit": 0.003717931072848539,
+        "over_by": 0.0486,
+        "rules_missed": [
+         "24x48 mae",
+         "48x96 mae"
+        ]
+       },
+       "file": "neuronte-wide-symbols-v1-twds1r1-g1.json",
+       "shipped_seed": 1,
+       "shipped_because": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed; lower-error seed"
       }
      ]
     },
@@ -12913,8 +12880,23 @@
          }
         }
        },
-       "shipped": false,
-       "failed_gates_shipped_by_owner": false
+       "shipped": true,
+       "failed_gates_shipped_by_owner": true,
+       "owner_margin": {
+        "seed": 0,
+        "passed": false,
+        "worst_rule": "48x96 mae",
+        "value": 0.0035014543682336807,
+        "limit": 0.0033242351297910018,
+        "over_by": 0.0533,
+        "rules_missed": [
+         "24x48 mae",
+         "48x96 mae"
+        ]
+       },
+       "file": "neuronte-wide-symbols-v1-twds1r2-g0.json",
+       "shipped_seed": 0,
+       "shipped_because": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed; lower-error seed"
       },
       {
        "set": "twds1r2",
@@ -13601,8 +13583,25 @@
          }
         }
        },
-       "shipped": false,
-       "failed_gates_shipped_by_owner": false
+       "shipped": true,
+       "failed_gates_shipped_by_owner": true,
+       "owner_margin": {
+        "seed": 0,
+        "passed": false,
+        "worst_rule": "24x48 mae",
+        "value": 0.0076348452518383665,
+        "limit": 0.006931387803827724,
+        "over_by": 0.1015,
+        "rules_missed": [
+         "6x12 p99",
+         "12x24 p99",
+         "24x48 mae",
+         "48x96 mae"
+        ]
+       },
+       "file": "neuronte-wide-symbols-v1-twds1r2-g1.json",
+       "shipped_seed": 0,
+       "shipped_because": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed; lower-error seed"
       }
      ]
     },
@@ -15004,8 +15003,23 @@
          }
         }
        },
-       "shipped": false,
-       "failed_gates_shipped_by_owner": false
+       "shipped": true,
+       "failed_gates_shipped_by_owner": true,
+       "owner_margin": {
+        "seed": 1,
+        "passed": false,
+        "worst_rule": "24x48 mae",
+        "value": 0.007942211348563433,
+        "limit": 0.0071110840110729144,
+        "over_by": 0.1169,
+        "rules_missed": [
+         "24x48 mae",
+         "48x96 mae"
+        ]
+       },
+       "file": "neuronte-wide-symbols-v1-twds1r3-g0.json",
+       "shipped_seed": 1,
+       "shipped_because": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed; lower-error seed"
       },
       {
        "set": "twds1r3",
@@ -15689,8 +15703,24 @@
          }
         }
        },
-       "shipped": false,
-       "failed_gates_shipped_by_owner": false
+       "shipped": true,
+       "failed_gates_shipped_by_owner": true,
+       "owner_margin": {
+        "seed": 1,
+        "passed": false,
+        "worst_rule": "48x96 mae",
+        "value": 0.0035027758373568454,
+        "limit": 0.002969703065173235,
+        "over_by": 0.1795,
+        "rules_missed": [
+         "6x12 mae",
+         "6x12 glyph_mae U+1F200 0.0426",
+         "48x96 mae"
+        ]
+       },
+       "file": "neuronte-wide-symbols-v1-twds1r3-g1.json",
+       "shipped_seed": 1,
+       "shipped_because": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed; lower-error seed"
       }
      ]
     },
@@ -17037,8 +17067,24 @@
          }
         }
        },
-       "shipped": false,
-       "failed_gates_shipped_by_owner": false
+       "shipped": true,
+       "failed_gates_shipped_by_owner": true,
+       "owner_margin": {
+        "seed": 1,
+        "passed": false,
+        "worst_rule": "6x12 mae",
+        "value": 0.02316111947099368,
+        "limit": 0.020520134208103023,
+        "over_by": 0.1287,
+        "rules_missed": [
+         "6x12 mae",
+         "24x48 mae",
+         "48x96 mae"
+        ]
+       },
+       "file": "neuronte-wide-symbols-v1-twds1r4-g0.json",
+       "shipped_seed": 1,
+       "shipped_because": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed; lower-error seed"
       },
       {
        "set": "twds1r4",
@@ -17675,8 +17721,22 @@
          }
         }
        },
-       "shipped": false,
-       "failed_gates_shipped_by_owner": false
+       "shipped": true,
+       "failed_gates_shipped_by_owner": true,
+       "owner_margin": {
+        "seed": 1,
+        "passed": false,
+        "worst_rule": "6x12 mae",
+        "value": 0.019879546637336414,
+        "limit": 0.017632740107364955,
+        "over_by": 0.1274,
+        "rules_missed": [
+         "6x12 mae"
+        ]
+       },
+       "file": "neuronte-wide-symbols-v1-twds1r4-g1.json",
+       "shipped_seed": 1,
+       "shipped_because": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed; lower-error seed"
       }
      ]
     },
@@ -25396,8 +25456,23 @@
          }
         }
        },
-       "shipped": false,
-       "failed_gates_shipped_by_owner": false
+       "shipped": true,
+       "failed_gates_shipped_by_owner": true,
+       "owner_margin": {
+        "seed": 0,
+        "passed": false,
+        "worst_rule": "48x96 mae",
+        "value": 0.00327644442828993,
+        "limit": 0.002969703065173235,
+        "over_by": 0.1033,
+        "rules_missed": [
+         "6x12 mae",
+         "48x96 mae"
+        ]
+       },
+       "file": "neuronte-wide-symbols-v1-twds1r8-g0.json",
+       "shipped_seed": 0,
+       "shipped_because": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed; lower-error seed"
       },
       {
        "set": "twds1r8",
@@ -31798,8 +31873,25 @@
          }
         }
        },
-       "shipped": false,
-       "failed_gates_shipped_by_owner": false
+       "shipped": true,
+       "failed_gates_shipped_by_owner": true,
+       "owner_margin": {
+        "seed": 0,
+        "passed": false,
+        "worst_rule": "48x96 p99",
+        "value": 0.08243294805288315,
+        "limit": 0.06783333420753479,
+        "over_by": 0.2152,
+        "rules_missed": [
+         "24x48 mae",
+         "24x48 glyph_mae U+1F23B 0.0195",
+         "48x96 mae",
+         "48x96 p99"
+        ]
+       },
+       "file": "neuronte-wide-symbols-v1-twds2r2-g0.json",
+       "shipped_seed": 0,
+       "shipped_because": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed; lower-error seed"
       },
       {
        "set": "twds2r2",
@@ -33829,8 +33921,22 @@
          }
         }
        },
-       "shipped": false,
-       "failed_gates_shipped_by_owner": false
+       "shipped": true,
+       "failed_gates_shipped_by_owner": true,
+       "owner_margin": {
+        "seed": 1,
+        "passed": false,
+        "worst_rule": "48x96 p99",
+        "value": 0.06918352842330933,
+        "limit": 0.06682996675372124,
+        "over_by": 0.0352,
+        "rules_missed": [
+         "48x96 p99"
+        ]
+       },
+       "file": "neuronte-wide-symbols-v1-twds2r3-g0.json",
+       "shipped_seed": 1,
+       "shipped_because": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed; lower-error seed"
       },
       {
        "set": "twds2r3",
@@ -35997,8 +36103,24 @@
          }
         }
        },
-       "shipped": false,
-       "failed_gates_shipped_by_owner": false
+       "shipped": true,
+       "failed_gates_shipped_by_owner": true,
+       "owner_margin": {
+        "seed": 0,
+        "passed": false,
+        "worst_rule": "48x96 p99",
+        "value": 0.08034730702638626,
+        "limit": 0.06682996675372124,
+        "over_by": 0.2023,
+        "rules_missed": [
+         "16x32 p99",
+         "48x96 mae",
+         "48x96 p99"
+        ]
+       },
+       "file": "neuronte-wide-symbols-v1-twds2r4-g0.json",
+       "shipped_seed": 0,
+       "shipped_because": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed; lower-error seed"
       },
       {
        "set": "twds2r4",
@@ -36699,8 +36821,23 @@
          }
         }
        },
-       "shipped": false,
-       "failed_gates_shipped_by_owner": false
+       "shipped": true,
+       "failed_gates_shipped_by_owner": true,
+       "owner_margin": {
+        "seed": 0,
+        "passed": false,
+        "worst_rule": "48x96 p99",
+        "value": 0.08265342563390732,
+        "limit": 0.06841005310416222,
+        "over_by": 0.2082,
+        "rules_missed": [
+         "48x96 mae",
+         "48x96 p99"
+        ]
+       },
+       "file": "neuronte-wide-symbols-v1-twds2r4-g1.json",
+       "shipped_seed": 0,
+       "shipped_because": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed; lower-error seed"
       }
      ]
     },
@@ -38046,8 +38183,22 @@
          }
         }
        },
-       "shipped": false,
-       "failed_gates_shipped_by_owner": false
+       "shipped": true,
+       "failed_gates_shipped_by_owner": true,
+       "owner_margin": {
+        "seed": 1,
+        "passed": false,
+        "worst_rule": "48x96 mae",
+        "value": 0.003605446390186747,
+        "limit": 0.003545102298570176,
+        "over_by": 0.017,
+        "rules_missed": [
+         "48x96 mae"
+        ]
+       },
+       "file": "neuronte-wide-symbols-v1-twds2r5-g0.json",
+       "shipped_seed": 1,
+       "shipped_because": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed; lower-error seed"
       },
       {
        "set": "twds2r5",
@@ -46621,8 +46772,22 @@
          }
         }
        },
-       "shipped": false,
-       "failed_gates_shipped_by_owner": false
+       "shipped": true,
+       "failed_gates_shipped_by_owner": true,
+       "owner_margin": {
+        "seed": 1,
+        "passed": false,
+        "worst_rule": "10x20 p99",
+        "value": 0.09110413491725922,
+        "limit": 0.09023057222366333,
+        "over_by": 0.0097,
+        "rules_missed": [
+         "10x20 p99"
+        ]
+       },
+       "file": "neuronte-wide-symbols-v1-twds3r5-g1.json",
+       "shipped_seed": 1,
+       "shipped_because": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed; lower-error seed"
       }
      ]
     },
@@ -50941,8 +51106,22 @@
          }
         }
        },
-       "shipped": false,
-       "failed_gates_shipped_by_owner": false
+       "shipped": true,
+       "failed_gates_shipped_by_owner": true,
+       "owner_margin": {
+        "seed": 1,
+        "passed": false,
+        "worst_rule": "10x20 p99",
+        "value": 0.07998345792293549,
+        "limit": 0.0763379566371441,
+        "over_by": 0.0478,
+        "rules_missed": [
+         "10x20 p99"
+        ]
+       },
+       "file": "neuronte-wide-symbols-v1-twds3r8-g1.json",
+       "shipped_seed": 1,
+       "shipped_because": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed; lower-error seed"
       }
      ]
     }
@@ -52758,8 +52937,17 @@
          }
         }
        },
-       "shipped": false,
-       "failed_gates_shipped_by_owner": false
+       "shipped": true,
+       "failed_gates_shipped_by_owner": true,
+       "owner_margin": {
+        "seed": 0,
+        "passed": true,
+        "over_by": 0.0,
+        "note": "this seed passed; only the other seed failed"
+       },
+       "file": "neuronte-wide-symbols-v1-twds4r0-g1.json",
+       "shipped_seed": 0,
+       "shipped_because": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed; lower-error seed"
       }
      ]
     },
@@ -54028,8 +54216,23 @@
          }
         }
        },
-       "shipped": false,
-       "failed_gates_shipped_by_owner": false
+       "shipped": true,
+       "failed_gates_shipped_by_owner": true,
+       "owner_margin": {
+        "seed": 0,
+        "passed": false,
+        "worst_rule": "24x48 p99",
+        "value": 0.10933651030063629,
+        "limit": 0.09415303766727448,
+        "over_by": 0.1613,
+        "rules_missed": [
+         "24x48 mae",
+         "24x48 p99"
+        ]
+       },
+       "file": "neuronte-wide-symbols-v1-twds4r1-g0.json",
+       "shipped_seed": 0,
+       "shipped_because": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed; lower-error seed"
       },
       {
        "set": "twds4r1",
@@ -55954,8 +56157,22 @@
          }
         }
        },
-       "shipped": false,
-       "failed_gates_shipped_by_owner": false
+       "shipped": true,
+       "failed_gates_shipped_by_owner": true,
+       "owner_margin": {
+        "seed": 1,
+        "passed": false,
+        "worst_rule": "8x16 p99",
+        "value": 0.10507936030626297,
+        "limit": 0.10501715168356897,
+        "over_by": 0.0006,
+        "rules_missed": [
+         "8x16 p99"
+        ]
+       },
+       "file": "neuronte-wide-symbols-v1-twds4r2-g0.json",
+       "shipped_seed": 1,
+       "shipped_because": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed; lower-error seed"
       },
       {
        "set": "twds4r2",
@@ -56590,8 +56807,17 @@
          }
         }
        },
-       "shipped": false,
-       "failed_gates_shipped_by_owner": false
+       "shipped": true,
+       "failed_gates_shipped_by_owner": true,
+       "owner_margin": {
+        "seed": 1,
+        "passed": true,
+        "over_by": 0.0,
+        "note": "this seed passed; only the other seed failed"
+       },
+       "file": "neuronte-wide-symbols-v1-twds4r2-g1.json",
+       "shipped_seed": 1,
+       "shipped_because": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed; lower-error seed"
       }
      ]
     },
@@ -58461,8 +58687,22 @@
          }
         }
        },
-       "shipped": false,
-       "failed_gates_shipped_by_owner": false
+       "shipped": true,
+       "failed_gates_shipped_by_owner": true,
+       "owner_margin": {
+        "seed": 0,
+        "passed": false,
+        "worst_rule": "24x48 mae",
+        "value": 0.0072852786009510355,
+        "limit": 0.007258312512810032,
+        "over_by": 0.0037,
+        "rules_missed": [
+         "24x48 mae"
+        ]
+       },
+       "file": "neuronte-wide-symbols-v1-twds4r3-g1.json",
+       "shipped_seed": 0,
+       "shipped_because": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed; lower-error seed"
       }
      ]
     },
@@ -60325,8 +60565,23 @@
          }
         }
        },
-       "shipped": false,
-       "failed_gates_shipped_by_owner": false
+       "shipped": true,
+       "failed_gates_shipped_by_owner": true,
+       "owner_margin": {
+        "seed": 0,
+        "passed": false,
+        "worst_rule": "24x48 mae",
+        "value": 0.007057250322153171,
+        "limit": 0.00678235540787379,
+        "over_by": 0.0405,
+        "rules_missed": [
+         "10x20 p99",
+         "24x48 mae"
+        ]
+       },
+       "file": "neuronte-wide-symbols-v1-twds4r4-g1.json",
+       "shipped_seed": 0,
+       "shipped_because": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed; lower-error seed"
       }
      ]
     },
@@ -61578,8 +61833,23 @@
          }
         }
        },
-       "shipped": false,
-       "failed_gates_shipped_by_owner": false
+       "shipped": true,
+       "failed_gates_shipped_by_owner": true,
+       "owner_margin": {
+        "seed": 1,
+        "passed": false,
+        "worst_rule": "24x48 mae",
+        "value": 0.006890704234441121,
+        "limit": 0.00686897699100276,
+        "over_by": 0.0032,
+        "rules_missed": [
+         "24x48 mae",
+         "24x48 p99"
+        ]
+       },
+       "file": "neuronte-wide-symbols-v1-twds4r5-g0.json",
+       "shipped_seed": 1,
+       "shipped_because": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed; lower-error seed"
       },
       {
        "set": "twds4r5",
@@ -62169,8 +62439,23 @@
          }
         }
        },
-       "shipped": false,
-       "failed_gates_shipped_by_owner": false
+       "shipped": true,
+       "failed_gates_shipped_by_owner": true,
+       "owner_margin": {
+        "seed": 1,
+        "passed": false,
+        "worst_rule": "24x48 mae",
+        "value": 0.006871360819786787,
+        "limit": 0.006486378454913696,
+        "over_by": 0.0594,
+        "rules_missed": [
+         "24x48 mae",
+         "24x48 p99"
+        ]
+       },
+       "file": "neuronte-wide-symbols-v1-twds4r5-g1.json",
+       "shipped_seed": 1,
+       "shipped_because": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed; lower-error seed"
       }
      ]
     },
@@ -64631,8 +64916,22 @@
          }
         }
        },
-       "shipped": false,
-       "failed_gates_shipped_by_owner": false
+       "shipped": true,
+       "failed_gates_shipped_by_owner": true,
+       "owner_margin": {
+        "seed": 0,
+        "passed": false,
+        "worst_rule": "10x20 p99",
+        "value": 0.07478465884923935,
+        "limit": 0.07278330326080323,
+        "over_by": 0.0275,
+        "rules_missed": [
+         "10x20 p99"
+        ]
+       },
+       "file": "neuronte-wide-symbols-v1-twds4r8-g0.json",
+       "shipped_seed": 0,
+       "shipped_because": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed; lower-error seed"
       },
       {
        "set": "twds4r8",
@@ -68382,8 +68681,17 @@
          }
         }
        },
-       "shipped": false,
-       "failed_gates_shipped_by_owner": false
+       "shipped": true,
+       "failed_gates_shipped_by_owner": true,
+       "owner_margin": {
+        "seed": 0,
+        "passed": true,
+        "over_by": 0.0,
+        "note": "this seed passed; only the other seed failed"
+       },
+       "file": "neuronte-wide-symbols-v1-twds5r1-g0.json",
+       "shipped_seed": 0,
+       "shipped_because": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed; lower-error seed"
       },
       {
        "set": "twds5r1",
@@ -69005,8 +69313,17 @@
          }
         }
        },
-       "shipped": false,
-       "failed_gates_shipped_by_owner": false
+       "shipped": true,
+       "failed_gates_shipped_by_owner": true,
+       "owner_margin": {
+        "seed": 1,
+        "passed": true,
+        "over_by": 0.0,
+        "note": "this seed passed; only the other seed failed"
+       },
+       "file": "neuronte-wide-symbols-v1-twds5r1-g1.json",
+       "shipped_seed": 1,
+       "shipped_because": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed; lower-error seed"
       }
      ]
     },
@@ -70228,8 +70545,17 @@
          }
         }
        },
-       "shipped": false,
-       "failed_gates_shipped_by_owner": false
+       "shipped": true,
+       "failed_gates_shipped_by_owner": true,
+       "owner_margin": {
+        "seed": 0,
+        "passed": true,
+        "over_by": 0.0,
+        "note": "this seed passed; only the other seed failed"
+       },
+       "file": "neuronte-wide-symbols-v1-twds5r2-g0.json",
+       "shipped_seed": 0,
+       "shipped_because": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed; lower-error seed"
       },
       {
        "set": "twds5r2",
@@ -70838,8 +71164,22 @@
          }
         }
        },
-       "shipped": false,
-       "failed_gates_shipped_by_owner": false
+       "shipped": true,
+       "failed_gates_shipped_by_owner": true,
+       "owner_margin": {
+        "seed": 1,
+        "passed": false,
+        "worst_rule": "8x16 p99",
+        "value": 0.09838590770959854,
+        "limit": 0.09472220838069917,
+        "over_by": 0.0387,
+        "rules_missed": [
+         "8x16 p99"
+        ]
+       },
+       "file": "neuronte-wide-symbols-v1-twds5r2-g1.json",
+       "shipped_seed": 1,
+       "shipped_because": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed; lower-error seed"
       }
      ]
     },

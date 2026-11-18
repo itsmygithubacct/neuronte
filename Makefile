@@ -1168,14 +1168,17 @@ build/test_video_portable: tests/test_video.c build/video-portable.o
 
 # neuronte-wide: the wide pictographs, symbols and fullwidth forms, drawn
 # for a box of two cells (asked as W x 2H, each pair of rows averaged).
-# Four standalone bundles, each checked by tests/check_wide.py; INK is a
-# listed character that has ink, for test_api.
+# Five standalone bundles, each checked by tests/check_wide.py; INK is a
+# listed character that has ink, for test_api. The pictographs are two
+# files because one bundle holds at most 127 group nets.
 WIDE_FORMS_V1 = $(shell $(PYTHON) train/build_wide_forms_v1.py --files)
 WIDE_FORMS_V1_INK = FF21
 WIDE_SYMBOLS_V1 = $(shell $(PYTHON) train/build_wide_symbols_v1.py --files)
 WIDE_SYMBOLS_V1_INK = 2B1B
 WIDE_PICTOGRAPHS_V1 = $(shell $(PYTHON) train/build_wide_pictographs_v1.py --files)
 WIDE_PICTOGRAPHS_V1_INK = 1F31F
+WIDE_PICTOGRAPHS2_V1 = $(shell $(PYTHON) train/build_wide_pictographs2_v1.py --files)
+WIDE_PICTOGRAPHS2_V1_INK = 1F534
 WIDE_SUPPLEMENT_V1 = $(shell $(PYTHON) train/build_wide_supplement_v1.py --files)
 WIDE_SUPPLEMENT_V1_INK = 1F9E0
 
@@ -1203,6 +1206,14 @@ test-wide-pictographs-v1: build/libneuronte.so build/test_api
 	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_wide.py build/libneuronte.so neuronte-wide-pictographs-v1
 	./build/test_api weights/neuronte-wide-pictographs-v1.nrt --standalone $(WIDE_PICTOGRAPHS_V1_INK)
 
+test-wide-pictographs2-v1: build/libneuronte.so build/test_api
+	@set -e; for n in $(WIDE_PICTOGRAPHS2_V1); do \
+		$(PYTHON) train/pack.py $$n.json build/$$(basename $$n).nrt; \
+		$(PYTHON) tests/check_reference.py build/libneuronte.so $$n.json build/$$(basename $$n).nrt; \
+	done
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_wide.py build/libneuronte.so neuronte-wide-pictographs2-v1
+	./build/test_api weights/neuronte-wide-pictographs2-v1.nrt --standalone $(WIDE_PICTOGRAPHS2_V1_INK)
+
 test-wide-supplement-v1: build/libneuronte.so build/test_api
 	@set -e; for n in $(WIDE_SUPPLEMENT_V1); do \
 		$(PYTHON) train/pack.py $$n.json build/$$(basename $$n).nrt; \
@@ -1215,8 +1226,9 @@ pack-wide:
 	$(PYTHON) train/build_wide_forms_v1.py
 	$(PYTHON) train/build_wide_symbols_v1.py
 	$(PYTHON) train/build_wide_pictographs_v1.py
+	$(PYTHON) train/build_wide_pictographs2_v1.py
 	$(PYTHON) train/build_wide_supplement_v1.py
 
-test: test-wide-forms-v1 test-wide-symbols-v1 test-wide-pictographs-v1 test-wide-supplement-v1
+test: test-wide-forms-v1 test-wide-symbols-v1 test-wide-pictographs-v1 test-wide-pictographs2-v1 test-wide-supplement-v1
 
-.PHONY: test-wide-forms-v1 test-wide-symbols-v1 test-wide-pictographs-v1 test-wide-supplement-v1 pack-wide
+.PHONY: test-wide-forms-v1 test-wide-symbols-v1 test-wide-pictographs-v1 test-wide-pictographs2-v1 test-wide-supplement-v1 pack-wide

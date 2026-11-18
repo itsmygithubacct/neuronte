@@ -1,7 +1,7 @@
 # wide-forms-v1: 103 wide characters drawn for a box of two cells
 
 `neuronte-wide-forms-v1.nrt` draws the fullwidth forms of Halfwidth and Fullwidth Forms (U+FF01..FF60, U+FFE0..FFE6): characters that a terminal gives two cells
-(East Asian Width W or F), 103 of the 1,335 that the four neuronte-wide
+(East Asian Width W or F), 103 of the 1,335 that the five neuronte-wide
 bundles draw between them, with no character in two of them. Each is this
 project's own drawing for the **box of two cells**, made from its Unicode
 name and the charts' description of it in words, on a grid of 18 by 18
@@ -33,7 +33,7 @@ one cell in a terminal bundle (for instance by `neuronte-term-rest-v1`), and
 this file draws them again for another box, so the rule that no two listed
 bundles claim one character (`tests/check_bundle_lists.py`) cannot hold for
 it. Its list is `neuronte-wide-forms-v1.symbols.txt`; `tests/check_wide.py` holds the table
-to it exactly and holds the four wide bundles apart from each other.
+to it exactly and holds the five wide bundles apart from each other.
 
 ## Gates
 
@@ -134,7 +134,7 @@ make test-wide-forms-v1
 
 `make test-wide-forms-v1` (part of `make test`): every group net against
 the float64 reference; the bundle rebuilt byte for byte; its table exactly
-`neuronte-wide-forms-v1.symbols.txt`; no character in two of the four wide bundles, 1,335 in
+`neuronte-wide-forms-v1.symbols.txt`; no character in two of the five wide bundles, 1,335 in
 all; every scalar from U+0000 to U+10FFFF routed as the table says; pixels
 through the bundle equal to each group net alone at 19 cell sizes, at the
 five cells asked for two-cell boxes and with one sample a pixel; every
@@ -144,40 +144,7 @@ bundle, each as the selected seed.
 
 ## Speed
 
-Measured on the two x86 hosts other cards use, an Intel Core i7-6820HQ and an
-Intel Core i7-10700F, each under the shared benchmark lock, at commit 2938cbc
-(the bundle there is byte for byte the one here). kilix-bench e21e5cd: one
-pinned core, a fresh process for every job, one warmup and ten measured
-rounds in shuffled order, medians, raw trials kept, every model checked
-against the float64 reference first. The corpus is this bundle's 103
-characters. The cells 8×16, 16×32 and 48×96 are what a program asks for
-the two-cell boxes 8×8, 16×16 and 48×48. split-v9, which was not trained
-on these characters, sends each through its gate to one of its nets and
-draws something else; this bundle looks it up in its table and runs a
-small group net.
-
-| µs per character | split-v9, i7-6820HQ | wide-forms-v1, i7-6820HQ | ratio | split-v9, i7-10700F | wide-forms-v1, i7-10700F | ratio |
-|---|---:|---:|---:|---:|---:|---:|
-| Coverage, uncached, 8×16 | 518.6 | 180.6 | 2.87 | 390.2 | 138.5 | 2.82 |
-| Coverage, uncached, 16×32 | 1995.6 | 691.1 | 2.89 | 1520.3 | 539.2 | 2.82 |
-| Coverage, uncached, 48×96 | 4468.8 | 1533.3 | 2.91 | 3442.1 | 1186.9 | 2.90 |
-| Draw, cold, 8×16 | 523.6 | 182.3 | 2.87 | 398.6 | 141.2 | 2.82 |
-| Draw, cold, 16×32 | 2021.1 | 698.8 | 2.89 | 1564.0 | 537.3 | 2.91 |
-| Draw, cold, 48×96 | 4497.1 | 1566.6 | 2.87 | 3385.9 | 1203.4 | 2.81 |
-| Draw, warm, 8×16 | 4.0 | 0.7 | 5.49 | 3.0 | 0.5 | 5.53 |
-| Draw, warm, 16×32 | 7.0 | 2.3 | 3.10 | 5.2 | 1.6 | 3.17 |
-| Draw, warm, 48×96 | 28.6 | 17.9 | 1.60 | 21.2 | 12.5 | 1.69 |
-
-Uncached, wide-forms-v1 draws these characters 2.9 times as fast as
-split-v9 does (geometric mean over the three cells and both hosts:
-2.89 on the i7-6820HQ, 2.85 on the i7-10700F; cold draw 2.9,
-warm draw 3.1). A lookup in its table takes 10 ns and 6 ns against
-1185 ns and 873 ns for split-v9's gate. Opening the file takes 1.0 ms and
-0.6 ms against 4.9 ms and 3.6 ms for split-v9.
-
-A two-cell box costs the samples of the cell W×2H a program asks for it:
-twice those of a one-cell character of the same height. A handle caches
-1,024 drawn cells.
+Not measured yet.
 
 ## Files
 

@@ -21,7 +21,8 @@ Each module has DRAWN {code point: box shapes} and NOTES {code point: what
 is not sure}. No font file was opened or rasterised; each drawing is made
 from the character's Unicode name and this project's own drawings.
 
-    bundles()       {bundle: [set names]}
+    bundles()       {bundle: [set names]}: the sets each bundle teacher is made of
+    file_sets()     {bundle file: [set names]}: the sets each .nrt file holds
     primary()       {set: (group nets, [code points])}
     sets()          the sets and, for each group net of a set, the set NAMErI
     made()          {char: shapes} in cell units, for every character
@@ -273,6 +274,26 @@ def primary():
         for i, run in enumerate(r for r in runs if r):
             out[f"{prefix}{i}"] = (max(1, math.ceil(len(run) / per)), list(run))
     _CACHE["primary"] = out
+    return out
+
+
+# A bundle file holds at most 127 group nets (train/standalone_bundle.py). The pictographs,
+# with the failed halves the owner chose to ship, need 146, so their sets are put in two files,
+# the second neuronte-wide-pictographs2-v1; the teacher widepict stays one.
+FILE_SPLIT = {"neuronte-wide-pictographs-v1": ("neuronte-wide-pictographs-v1", 0, 5),
+              "neuronte-wide-pictographs2-v1": ("neuronte-wide-pictographs-v1", 5, 10)}
+
+
+def file_sets():
+    out = {}
+    for b, names in bundles().items():
+        parts = [(f, lo, hi) for f, (src, lo, hi) in FILE_SPLIT.items() if src == b]
+        if not parts:
+            out[b] = list(names)
+            continue
+        for f, lo, hi in parts:
+            out[f] = [n for n in names if lo <= int(n[len(BUNDLES[b][0]):]) < hi]
+        assert sorted(sum((out[f] for f, _, _ in parts), [])) == sorted(names)
     return out
 
 

@@ -41,7 +41,7 @@ class Bundle:
     def sets(self):
         """{set: (group nets, [code points])} of this bundle, in order."""
         prim = wide.primary()
-        return {s: prim[s] for s in wide.bundles()[self.name]}
+        return {s: prim[s] for s in wide.file_sets()[self.name]}
 
     def nets(self):
         """Every net trained to the end of the rule, in order: [(set, group, [code points])]."""

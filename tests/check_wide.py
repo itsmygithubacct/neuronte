@@ -3,7 +3,9 @@
 usage: python3 tests/check_wide.py LIB.so NAME
 
 NAME is one of neuronte-wide-forms-v1, neuronte-wide-symbols-v1,
-neuronte-wide-pictographs-v1, neuronte-wide-supplement-v1. It must be, at once:
+neuronte-wide-pictographs-v1, neuronte-wide-pictographs2-v1 (the
+pictographs are two files: one holds at most 127 group nets),
+neuronte-wide-supplement-v1. It must be, at once:
 
 1. Reproducible: rebuilt byte for byte by its build script from the group
    JSON and its list, its provenance exactly the rebuild's.
@@ -14,7 +16,7 @@ neuronte-wide-pictographs-v1, neuronte-wide-supplement-v1. It must be, at once:
 3. Apart from the other wide bundles and outside the listed-bundle rule, and
    no wider: no NAME.list.txt (some of its code points are drawn for one cell
    in a terminal bundle, and this file draws them for another box); no
-   character in two of the four wide bundles; the four drawn together are
+   character in two of the five wide bundles; the five drawn together are
    1,335 characters.
 4. Routed exactly: every scalar 0..0x10FFFF and 0xFFFFFFFF. A listed
    character goes to the group net trained on it and is reported trained;
@@ -53,7 +55,8 @@ import wide  # noqa: E402
 
 W = ROOT / 'weights'
 SCRIPTS = {'neuronte-wide-forms-v1': 'build_wide_forms_v1', 'neuronte-wide-symbols-v1': 'build_wide_symbols_v1',
-           'neuronte-wide-pictographs-v1': 'build_wide_pictographs_v1', 'neuronte-wide-supplement-v1': 'build_wide_supplement_v1'}
+           'neuronte-wide-pictographs-v1': 'build_wide_pictographs_v1',
+           'neuronte-wide-pictographs2-v1': 'build_wide_pictographs2_v1', 'neuronte-wide-supplement-v1': 'build_wide_supplement_v1'}
 SIZES = ((3, 6), (4, 8), (5, 10), (6, 12), (7, 13), (8, 16), (9, 17), (12, 24), (13, 27), (16, 32), (17, 35),
          (23, 47), (24, 48), (25, 49), (31, 63), (32, 64), (33, 61), (48, 96), (64, 128))
 BOX_CELLS = ((16, 34), (18, 36), (20, 38), (20, 40), (36, 72))       # the cell asked for a two-cell box W x H: W x 2H
@@ -128,12 +131,12 @@ if (W / f'{NAME}.list.txt').exists():
 drawn = {b: [c for _, (_, cps) in importlib.import_module(s).BUNDLE.sets().items() for c in cps] for b, s in SCRIPTS.items()}
 every = [c for cps in drawn.values() for c in cps]
 if len(every) != len(set(every)) or len(every) != WIDE_COUNT:
-    fail(f'the four wide bundles draw {len(set(every))} characters ({len(every)} with repeats), not {WIDE_COUNT} apart')
+    fail(f'the five wide bundles draw {len(set(every))} characters ({len(every)} with repeats), not {WIDE_COUNT} apart')
 left = [c for name, i, part in build.nets() if (name, i) in build.left_out for c in part]
 if sorted(listed + left) != sorted(drawn[NAME]):
     fail('the list and the characters left out are not the bundle\'s characters')
 print(f'{TAG}: characters: {len(listed)} of its {len(drawn[NAME])}' + (f', {len(left)} left out' if left else '') +
-      f'; none in another of the four wide bundles ({WIDE_COUNT} drawn in all)')
+      f'; none in another of the five wide bundles ({WIDE_COUNT} drawn in all)')
 
 # 6. The validation record.
 validation = json.loads((W / f'{NAME}.validation.json').read_text())

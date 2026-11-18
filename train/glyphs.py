@@ -174,6 +174,7 @@ PENS["uilargel1"] = PENS["uilarge"]  # those letters alone, to train beside uila
 UI_LARGE_SIGNS = os.path.join(strokes.ROOT, "font", "ui-large-latin1-signs.txt")  # the other 38 of Latin-1
 PENS["uilargel1s"] = PENS["uilarge"]  # those 38 alone, to train beside the nets above
 PENS["uilargexx"] = PENS["uilarge"]  # uilarge, its composed letters and the 38: all of Latin-1
+PENS["uilargems"] = PENS["uilarge"]  # Neuronte Sans Metric's strokes (train/metric_sans.py), the same pen
 # Latin-1 of the pixel faces 1-16 px (font/ui-EM-latin1.txt, italic 3-16 px
 # font/ui-EM-latin1-italic.txt): set uiEMl1 / uiEMl1i is U+00A0..U+00FF alone,
 # to train beside the face's unchanged ASCII nets.
@@ -181,6 +182,13 @@ UI_LATIN1 = {em: os.path.join(strokes.ROOT, "font", f"ui-{em}-latin1.txt") for e
 UI_LATIN1_ITALIC = {em: os.path.join(strokes.ROOT, "font", f"ui-{em}-latin1-italic.txt") for em in range(3, 17)}
 PENS.update({f"ui{em}l1": 0.55 / em for em in UI_LATIN1})
 PENS.update({f"ui{em}l1i": 0.55 / em for em in UI_LATIN1_ITALIC})
+# Neuronte Sans Metric (lane metric-sans): Helvetica's advances, the faces redrawn
+# to its proportions. uilargems is train/metric_sans.py's strokes (33 px up and
+# the scaled 17-32 px face); uiEMms and uiEMmsi are font/metric-sans-EM(-italic).txt.
+UI_METRIC = {em: os.path.join(strokes.ROOT, "font", f"metric-sans-{em}.txt") for em in range(1, 17)}
+UI_METRIC_ITALIC = {em: os.path.join(strokes.ROOT, "font", f"metric-sans-{em}-italic.txt") for em in range(3, 17)}
+PENS.update({f"ui{em}ms": 0.55 / em for em in UI_METRIC})
+PENS.update({f"ui{em}msi": 0.55 / em for em in UI_METRIC_ITALIC})
 PAD = 0.25                  # how far edge lines and blocks run past the cell
 LIGHT, HEAVY = 0.06, 0.12   # half widths of box lines, in cell widths
 DOUBLE = 0.19               # offset of each line of a double line from its centre line
@@ -1416,6 +1424,9 @@ SETS = {
     "uilargel1": ["uilargelatin1"],
     "uilargel1s": ["uilargesigns"],
     "uilargexx": ["uilarge", "uilargelatin1", "uilargesigns"],
+    "uilargems": ["uilargems"],
+    **{f"ui{em}ms": [f"ui{em}ms"] for em in UI_METRIC},
+    **{f"ui{em}msi": [f"ui{em}msi"] for em in UI_METRIC_ITALIC},
     **{f"ui{em}l1": [f"ui{em}l1"] for em in UI_LATIN1},
     **{f"ui{em}l1i": [f"ui{em}l1i"] for em in UI_LATIN1_ITALIC},
 }
@@ -1498,6 +1509,17 @@ def tier(name):
     if name.startswith(kilix_chrome2.PREFIX) and name in kilix_chrome2.sets():
         made = kilix_chrome2.made()
         return [(chr(c), made[chr(c)]) for c in kilix_chrome2.sets()[name]]
+    if name == "uilargems":
+        import metric_sans
+        return metric_sans.tier()
+    if re.fullmatch(r"ui\d+msi?", name) and name in PENS:
+        italic = name.endswith("i")
+        em = int(name[2:].removesuffix("i").removesuffix("ms"))
+        g = pixel_face(em, (UI_METRIC_ITALIC if italic else UI_METRIC)[em])
+        want = [chr(c) for c in range(32, 127)] + ["\u2026"] + [chr(c) for c in range(0xA0, 0x100)]
+        if sorted(g) != sorted(want):
+            raise ValueError(f"metric-sans-{em}{'-italic' if italic else ''}.txt must hold ASCII, U+2026 and U+00A0..U+00FF")
+        return [(c, traced(g[c][1], em)) for c in sorted(want, key=ord)]
     if name == "uilargesigns":
         return [(c, g) for c, g in sorted(large_signs().items())]
     if name == "uilargelatin1":

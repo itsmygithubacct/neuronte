@@ -51,6 +51,20 @@ A line with one number takes the bold advance as that number plus
 which a character with no line is measured and drawn as, must have a
 line.
 
+ADVANCES.txt may instead be a fine advances file, whose first line is
+"#! neuronte fine advances" and each of whose other lines (but comments) is
+U+XXXX, then the regular and the bold advance in thousandths of an em (100
+to 2000) and the regular and the bold shift in thousandths (-500 to 500, +
+moves the drawing right; the pen is not moved):
+
+    #! neuronte fine advances
+    U+0020 278 278 0 0
+    U+006A 222 278 -18 -18
+
+It is packed as an advance table at 100 units per em: version 4 when every
+shift is 0, version 8 otherwise (below). The fallback character must have a
+line; --bold-add is not used.
+
 ADVANCES.txt may instead be a pixel face, such as font/ui-10.txt: a
 face drawn as rows of pixels for one em, each character's line giving
 its advance in pixels. The table then holds, for each character, steps
@@ -144,6 +158,15 @@ a design unit:
 32 + 8 N bytes in all. An advance of a steps is (a * e + 50) // 100
 pixels at an em of e pixels: the nearest pixel, a tie going up.
 
+A version 4 table whose header gives 100 design units per em holds
+thousandths of an em, 100 to 2000, and an advance of m thousandths is
+(m * e + 500) // 1000 pixels. Version 8 is the same header and fine
+records of 12 bytes: u32 scalar, u16 regular and bold advance in
+thousandths, then i16 regular and bold shift in thousandths, -500 to 500.
+A shift of s moves the drawing, not the pen, by s * e / 1000 pixels
+rounded to the nearest, a half away from zero. The library reads both
+from commit eceab4f on; an older one refuses them.
+
 A drawing file, version 5:
 
     0   8 bytes   "NEURONTE"
@@ -152,8 +175,8 @@ A drawing file, version 5:
     16  M x 2 u32 each member's offset from the start of the file, and
                   its length
         the M members, in that order with nothing between them, each a
-                  whole version 1, 2, 3, 4, 6 or 7 file; at most one is
-                  version 4, at most one is version 7, at most one is
+                  whole version 1, 2, 3, 4, 6, 7 or 8 file; at most one is
+                  version 4 or 8, at most one is version 7, at most one is
                   version 2, and a version 2 member is the only one of
                   version 1, 2, 3 or 6
 
@@ -846,6 +869,72 @@ def read_face(path):
     return out, em
 
 
+FINE_MAGIC = "#! neuronte fine advances"
+FINE_MILLI = (100, 2000)
+FINE_SHIFT = 500
+
+
+def read_fine(path):
+    """{scalar: (regular, bold, regular shift, bold shift)} in thousandths
+    from a fine advances file, or None if the file is not one."""
+    with open(path, encoding="utf-8") as fh:
+        raw = fh.read().split("\n")
+    if raw[0] != FINE_MAGIC:
+        return None
+    out = {}
+    for num, line in enumerate(raw[1:], 2):
+        where = f"{path}:{num}"
+        if line.startswith("# ") or line == "#" or not line.strip():
+            continue
+        tok = line.split()
+        if len(tok) != 5 or not tok[0].startswith("U+"):
+            raise SystemExit(f"{where}: a line is U+XXXX, two advances and two shifts")
+        v = _scalar(tok[0], where)
+        try:
+            r, b, rs, bs = map(int, tok[1:])
+        except ValueError:
+            raise SystemExit(f"{where}: advances and shifts are whole thousandths") from None
+        if not (FINE_MILLI[0] <= r <= FINE_MILLI[1] and FINE_MILLI[0] <= b <= FINE_MILLI[1]):
+            raise SystemExit(f"{where}: an advance is {FINE_MILLI[0]} to {FINE_MILLI[1]} thousandths")
+        if abs(rs) > FINE_SHIFT or abs(bs) > FINE_SHIFT:
+            raise SystemExit(f"{where}: a shift is -{FINE_SHIFT} to {FINE_SHIFT} thousandths")
+        if v in out:
+            raise SystemExit(f"{where}: U+{v:04X} has a line already")
+        out[v] = (r, b, rs, bs)
+    return out
+
+
+def fine_advances(table, fallback=0x3F):
+    """The version 4 (no shifts) or 8 image of a fine table, 100 units per em."""
+    if not 1 <= len(table) <= ADV_RECORDS:
+        raise SystemExit(f"an advance table holds 1 to {ADV_RECORDS} characters, not {len(table)}")
+    if fallback not in table:
+        raise SystemExit(f"the fallback U+{fallback:04X} has no advance")
+    shifted = any(t[2] or t[3] for t in table.values())
+    version = 8 if shifted else 4
+    out = bytearray(b"NEURONTE")
+    out += struct.pack("<6I", version, 100, 10, 2, len(table), fallback)
+    for v in sorted(table):
+        if not (0 <= v <= 0x10FFFF) or 0xD800 <= v <= 0xDFFF:
+            raise SystemExit(f"{v:#x} is not a Unicode scalar")
+        r, b, rs, bs = table[v]
+        out += struct.pack("<I2H", v, r, b)
+        if shifted:
+            out += struct.pack("<2h", rs, bs)
+    assert len(out) == 32 + (12 if shifted else 8) * len(table), len(out)
+    return bytes(out)
+
+
+def table_image(path, fallback=0x3F, bold_add=None):
+    """(version, image) of the advance table of an advances file, a fine
+    advances file or a pixel face."""
+    fine = read_fine(path)
+    if fine is not None:
+        image = fine_advances(fine, fallback)
+        return struct.unpack_from("<I", image, 8)[0], image
+    return 4, advances(read_table(path, bold_add), fallback)
+
+
 def read_table(path, bold_add=None):
     """{scalar: (regular, bold)} in steps, from an advances file or a
     pixel face."""
@@ -907,10 +996,10 @@ def member(path, fallback=0x3F, bold_add=None):
             h = struct.unpack_from("<I", raw, 20)[0] if len(raw) >= 24 else 0
             if not (1 <= h <= 1024) or len(raw) != length(h):
                 raise SystemExit(f"{path}: not a whole version 1 net")
-        elif version == 4:
+        elif version in (4, 8):
             n = struct.unpack_from("<I", raw, 24)[0] if len(raw) >= 32 else 0
-            if not 1 <= n <= ADV_RECORDS or len(raw) != 32 + 8 * n:
-                raise SystemExit(f"{path}: not a whole version 4 advance table")
+            if not 1 <= n <= ADV_RECORDS or len(raw) != 32 + (8 if version == 4 else 12) * n:
+                raise SystemExit(f"{path}: not a whole version {version} advance table")
         elif version == 2:
             if len(raw) != _bundle_len(raw):
                 raise SystemExit(f"{path}: not a whole version 2 bundle")
@@ -925,7 +1014,7 @@ def member(path, fallback=0x3F, bold_add=None):
         if len(image) < 12 or image[:8] != b"NEURONTE":
             raise SystemExit(f"{path}: pack did not make a Neuronte file")
         return struct.unpack_from("<I", image, 8)[0], image
-    return 4, advances(read_table(path, bold_add), fallback)
+    return table_image(path, fallback, bold_add)
 
 
 MAX_MEMBER = 32 * 1024 * 1024  # the library's cap on one bundle or tiled member
@@ -943,7 +1032,7 @@ def drawing_images(members, names=None):
     names = names or [f"member {i}" for i in range(len(members))]
     if not 1 <= len(members) <= MEMBERS:
         raise SystemExit(f"a drawing file holds 1 to {MEMBERS} members")
-    if sum(v == 4 for v, _ in members) > 1:
+    if sum(v in (4, 8) for v, _ in members) > 1:
         raise SystemExit("a drawing file holds at most one advance table")
     if sum(v == 7 for v, _ in members) > 1:
         raise SystemExit("a drawing file holds at most one letter edge table")
@@ -1011,8 +1100,7 @@ def face_bundle(face, nets, gate=None, fallback=0, fallback_char=0x3F, bold_add=
     """(version 5 image, ranges) of a face cut into nets: their bundle,
     then the advance table of face, then edges (a version 7 image) if given."""
     image, ranges = bundle(nets, gate, fallback)
-    table = advances(read_table(face, bold_add), fallback_char)
-    members, names = [(2, image), (4, table)], ["bundle", face]
+    members, names = [(2, image), table_image(face, fallback_char, bold_add)], ["bundle", face]
     if edges is not None:
         members.append((7, edges))
         names.append("letter edges")
@@ -1054,16 +1142,17 @@ if __name__ == "__main__":
         rest, fallback, bold_add = _options(args[1:])
         if len(rest) != 2:
             raise SystemExit(__doc__)
-        table = read_table(rest[0], bold_add)
-        data, out = advances(table, fallback), rest[1]
-        print(out, len(data), "bytes,", len(table), f"advances, fallback U+{fallback:04X}")
+        version, data = table_image(rest[0], fallback, bold_add)
+        out = rest[1]
+        n = struct.unpack_from("<I", data, 24)[0]
+        print(out, len(data), f"bytes, version {version},", n, f"advances, fallback U+{fallback:04X}")
     elif args[:1] == ["--drawing"]:
         rest, fallback, bold_add = _options(args[1:])
         if len(rest) < 2:
             raise SystemExit(__doc__)
         out = rest[0]
         data, versions = drawing(rest[1:], fallback, bold_add)
-        kind = {1: "net", 2: "bundle", 3: "colour net", 4: "advance table", 6: "tiled net"}
+        kind = {1: "net", 2: "bundle", 3: "colour net", 4: "advance table", 6: "tiled net", 8: "advance table with shifts"}
         print(out, len(data), "bytes, members:", ", ".join(kind[v] for v in versions))
     elif args[:1] == ["--drawing-bundle"]:
         keep = ("--gate", "--fallback", "--letter-edges", "--snap-below", "--edge-pen", "--edge-extremes")

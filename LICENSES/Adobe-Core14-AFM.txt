@@ -1,0 +1,25 @@
+Adobe Core 14 AFM font metrics: the notice under which font/metric-sans-widths.txt
+copies numbers from Helvetica.afm and Helvetica-Bold.afm (Version 002.000).
+
+The AFM files themselves are not in this repository. They carry these notices:
+
+  Copyright (c) 1985, 1987, 1989, 1990, 1997 Adobe Systems Incorporated.
+  All Rights Reserved. Helvetica is a trademark of Linotype-Hell AG and/or its
+  subsidiaries.
+
+The notice that accompanies the 14 AFM files, unmodified:
+
+  This file and the 14 PostScript(R) AFM files it accompanies may be used, copied,
+  and distributed for any purpose and without charge, with or without modification,
+  provided that all copyright notices are retained; that the AFM files are not
+  distributed without this file; that all modifications to this file or any of
+  the AFM files are prominently noted in the modified file(s); and that this
+  paragraph is not modified. Adobe Systems has no responsibility or obligation
+  to support the use of the AFM files.
+
+What is copied, and how it was changed: font/metric-sans-widths.txt holds, for
+192 characters, the glyph name, the width in Helvetica and in Helvetica-Bold, and
+the bounding box in Helvetica, and the fonts' CapHeight, XHeight, Ascender,
+Descender and StdVW, as written by tools/make-metric-sans-widths.py. Nothing else
+from the AFM files is copied. Neuronte Sans Metric is not Helvetica and does not
+use the name as its own.

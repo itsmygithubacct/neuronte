@@ -1237,3 +1237,20 @@ test-fine-advances: build/libneuronte.so
 test: test-fine-advances
 
 .PHONY: test-fine-advances
+
+# Neuronte Sans Metric (lane metric-sans): its drawings and tables are current,
+# fine advance tables pack and read back exactly, and they set the groff
+# Helvetica page (tests/fixtures/metric-helvetica.pdf) to the line.
+METRIC_SANS_TMP = build/metric-sans
+test-metric-sans: build/libneuronte.so
+	$(PYTHON) tools/make-metric-sans-face.py --check
+	cd train && $(PYTHON) metric_sans.py --check
+	if command -v groff >/dev/null 2>&1; then $(PYTHON) tools/make-metric-pdf.py --check; else echo 'groff not installed: the PDF fixture is not rebuilt'; fi
+	mkdir -p $(METRIC_SANS_TMP)
+	$(PYTHON) train/pack.py --advances font/metric-sans-advances.txt $(METRIC_SANS_TMP)/advances-large.nrt
+	for e in 1 2 9 12 16; do $(PYTHON) train/pack.py --advances font/metric-sans-$$e.advances.txt $(METRIC_SANS_TMP)/advances-$$e.nrt || exit 1; done
+	$(PYTHON) tests/check_metric_pdf.py build/libneuronte.so $(METRIC_SANS_TMP)/advances-large.nrt $(METRIC_SANS_TMP)/advances-9.nrt $(METRIC_SANS_TMP)/advances-12.nrt $(METRIC_SANS_TMP)/advances-16.nrt
+
+test: test-metric-sans
+
+.PHONY: test-metric-sans

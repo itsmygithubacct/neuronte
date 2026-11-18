@@ -1227,3 +1227,13 @@ build/video-portable.o: src/video.c include/neuronte.h | build
 
 build/test_video_portable: tests/test_video.c build/video-portable.o
 	$(CC) $(NRT_CFLAGS) -o $@ $^ $(LDLIBS)
+
+# Fine advance tables (lane metric-sans): version 4 in thousandths of an em and
+# version 8 with a shift of each letter's drawing. Shipped faces rewritten in
+# thousandths must draw byte for byte as they are.
+test-fine-advances: build/libneuronte.so
+	$(PYTHON) tests/check_fine_advances.py build/libneuronte.so weights/neuronte-ui16-v2.nrt weights/neuronte-ui9-v2.nrt weights/neuronte-ui1-v2.nrt weights/neuronte-ui-scaled-latin1-v1.nrt weights/neuronte-ui-large-latin1-v2.nrt
+
+test: test-fine-advances
+
+.PHONY: test-fine-advances

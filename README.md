@@ -535,6 +535,13 @@ optional in-process video decoder, which links FFmpeg's libraries, has
   table's width, and every em with snapping off is byte for byte the
   file without the table, and nine damaged or misplaced tables are
   refused (`tests/check_letter_snap.py`);
+- a fine advance table (version 4 in thousandths of an em, or version 8
+  with a shift of each letter's drawing) gives each advance and shift by
+  the stated rounding at every em tried, 16 damaged or out-of-bounds tables are
+  refused, a table in hundredths reads as before, five shipped faces
+  with their tables rewritten in thousandths draw byte for byte as
+  shipped, and with shifts draw each letter moved by exactly its shift
+  (`tests/check_fine_advances.py`);
 - the C library agrees with an independent float64 numpy evaluation of
   the JSON weights to 1e-3 in coverage, and the packed file is exactly
   what `train/pack.py` makes from the JSON. For the bundle, the C router
@@ -701,6 +708,20 @@ and `neuronte_set_snap()` works on them too. A library older than the
 table refuses such a file whole (`NEURONTE_ERR_FORMAT`), and a file
 without one draws exactly as before. `train/pack.py --drawing-bundle
 ... --letter-edges SET --snap-below PX` writes it.
+
+An advance table may also be fine: a version 4 table whose header says
+100 units per em holds each advance in thousandths of an em (100 to
+2000), and a version 8 table, laid out the same with 12-byte records,
+adds after the two advances a signed shift of the letter's drawing for
+each weight (-500 to 500 thousandths). `neuronte_advance()` is then
+`(thousandths * em + 500) / 1000`; a table in hundredths keeps its own
+arithmetic and every existing file draws as before.
+`neuronte_advance_milli()` gives the thousandths of either kind and
+`neuronte_advance_shift()` the shift, in thousandths and in pixels
+(nearest, a tie away from zero). The proportional draw calls draw each
+letter's cell that many pixels right of the pen and move the pen by the
+advance alone. A library older than these tables refuses them
+(`NEURONTE_ERR_FORMAT`).
 
 `neuronte-icon-v1` is the 167-icon net: form A, 256 wide, K = 6, trained
 for 40,000 steps on the original drawings. A uniform distance offset of

@@ -74,7 +74,7 @@ def digest(path):
 
 
 def face_em(name):
-    em = name[2:].removesuffix("i")
+    em = name[2:].removesuffix("i").removesuffix("l1")  # uiEMl1(i): a face's Latin-1 alone
     return int(em) if name.startswith("ui") and em.isdigit() else None
 
 
@@ -87,7 +87,7 @@ def band(name):
     em = face_em(name)
     if em is not None:
         return f32(glyphs.UI_TOP[em] / em), f32((glyphs.UI_TOP[em] + em) / em)
-    if name in ("uilarge", "uilargex", "uilargel1"):  # the composed Latin-1 letters keep uilarge's ink rows
+    if name in ("uilarge", "uilargex", "uilargel1", "uilargel1s", "uilargexx"):  # the composed Latin-1 letters keep uilarge's ink rows
         return BAND_LARGE
     raise ValueError(f"no ink band for set {name}")
 

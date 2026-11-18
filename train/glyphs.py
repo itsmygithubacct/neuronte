@@ -125,6 +125,7 @@ python3 train/glyphs.py lists the full set and checks it.
 """
 import math
 import os
+import re
 import sys
 import unicodedata
 
@@ -170,6 +171,16 @@ LARGE_BASELINE = 1.35       # the centre of uilarge's baseline strokes, in em do
 PENS["uilarge"] = 3 / 64    # 3/32 em wide, three pixels at 32
 PENS["uilargex"] = PENS["uilarge"]  # uilarge and its composed Latin-1 letters
 PENS["uilargel1"] = PENS["uilarge"]  # those letters alone, to train beside uilarge's nets
+UI_LARGE_SIGNS = os.path.join(strokes.ROOT, "font", "ui-large-latin1-signs.txt")  # the other 38 of Latin-1
+PENS["uilargel1s"] = PENS["uilarge"]  # those 38 alone, to train beside the nets above
+PENS["uilargexx"] = PENS["uilarge"]  # uilarge, its composed letters and the 38: all of Latin-1
+# Latin-1 of the pixel faces 1-16 px (font/ui-EM-latin1.txt, italic 3-16 px
+# font/ui-EM-latin1-italic.txt): set uiEMl1 / uiEMl1i is U+00A0..U+00FF alone,
+# to train beside the face's unchanged ASCII nets.
+UI_LATIN1 = {em: os.path.join(strokes.ROOT, "font", f"ui-{em}-latin1.txt") for em in range(1, 17)}
+UI_LATIN1_ITALIC = {em: os.path.join(strokes.ROOT, "font", f"ui-{em}-latin1-italic.txt") for em in range(3, 17)}
+PENS.update({f"ui{em}l1": 0.55 / em for em in UI_LATIN1})
+PENS.update({f"ui{em}l1i": 0.55 / em for em in UI_LATIN1_ITALIC})
 PAD = 0.25                  # how far edge lines and blocks run past the cell
 LIGHT, HEAVY = 0.06, 0.12   # half widths of box lines, in cell widths
 DOUBLE = 0.19               # offset of each line of a double line from its centre line
@@ -1097,6 +1108,19 @@ def large_latin1(mark_pen=None):
 
 LARGE_SPACING_X = 0.235  # the middle of the grave accent's advance, 4.7 / 10 em
 
+# The 38 Latin-1 characters that are not a letter and a mark: U+00A1..U+00FF
+# less those large_latin1 composes and U+00A0. Each is drawn as strokes in
+# font/ui-large-latin1-signs.txt (set uilargel1s; uilargexx is all of Latin-1).
+LATIN1_SIGNS = "¡¢£¤¥¦§©ª«¬\u00ad®°±²³µ¶·¹º»¼½¾¿ÆÐ×ØÞßæð÷øþ"
+
+
+def large_signs():
+    """{char: shapes} of font/ui-large-latin1-signs.txt, which must hold exactly LATIN1_SIGNS."""
+    g = strokes.parse(UI_LARGE_SIGNS)
+    if sorted(g) != sorted(LATIN1_SIGNS):
+        raise ValueError("ui-large-latin1-signs.txt must hold exactly the 38 Latin-1 signs")
+    return g
+
 
 # Powerline and progress. One foreground layer each. Straight edges sit on
 # 1/16 of the cell, one pixel when the cell is 16 wide. R is that stroke
@@ -1390,6 +1414,10 @@ SETS = {
     "uilarge": ["uilarge"],
     "uilargex": ["uilarge", "uilargelatin1"],
     "uilargel1": ["uilargelatin1"],
+    "uilargel1s": ["uilargesigns"],
+    "uilargexx": ["uilarge", "uilargelatin1", "uilargesigns"],
+    **{f"ui{em}l1": [f"ui{em}l1"] for em in UI_LATIN1},
+    **{f"ui{em}l1i": [f"ui{em}l1i"] for em in UI_LATIN1_ITALIC},
 }
 SETS.update({name: [name] for name in term_latin_sets()})
 SETS["termlatin"] = list(term_latin_sets())  # every set of font/term-latin.txt
@@ -1470,6 +1498,8 @@ def tier(name):
     if name.startswith(kilix_chrome2.PREFIX) and name in kilix_chrome2.sets():
         made = kilix_chrome2.made()
         return [(chr(c), made[chr(c)]) for c in kilix_chrome2.sets()[name]]
+    if name == "uilargesigns":
+        return [(c, g) for c, g in sorted(large_signs().items())]
     if name == "uilargelatin1":
         g = large_latin1()
         return [(c, g[c][0]) for c in sorted(g)]
@@ -1478,6 +1508,14 @@ def tier(name):
         if sorted(g) != [chr(c) for c in range(32, 127)] + ["\u2026"]:
             raise ValueError("ui-large.txt must hold exactly U+0020..U+007E and U+2026")
         return [(c, g[c]) for c in sorted(g)]
+    if re.fullmatch(r"ui\d+l1i?", name) and name in PENS:
+        italic = name.endswith("i")
+        em = int(name[2:].removesuffix("i").removesuffix("l1"))
+        g = pixel_face(em, (UI_LATIN1_ITALIC if italic else UI_LATIN1)[em])
+        want = [chr(c) for c in range(32, 127)] + ["\u2026"] + [chr(c) for c in range(0xA0, 0x100)]
+        if sorted(g) != sorted(want):
+            raise ValueError(f"ui-{em}-latin1{'-italic' if italic else ''}.txt must hold ASCII, U+2026 and U+00A0..U+00FF")
+        return [(chr(c), traced(g[chr(c)][1], em)) for c in range(0xA0, 0x100)]
     if name in PENS:
         body = name[2:]
         italic = body.endswith("i")
@@ -1623,6 +1661,13 @@ def sources(name):
             files.append(f"font/ui-{em}-italic.txt")
     if "uilarge" in tiers:
         files.append("font/ui-large.txt")
+    for em in UI_LATIN1:
+        if f"ui{em}l1" in tiers:
+            files.append(f"font/ui-{em}-latin1.txt")
+        if f"ui{em}l1i" in tiers:
+            files.append(f"font/ui-{em}-latin1-italic.txt")
+    if "uilargesigns" in tiers:
+        files.append("font/ui-large-latin1-signs.txt")
     return files + ["train/strokes.py", "train/glyphs.py"]
 
 

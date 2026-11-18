@@ -1,0 +1,52 @@
+# The marks of the Latin-1 pixel faces (font/ui-EM-latin1.txt), drawn for
+# this project, one pixel wide like the faces' strokes. No font was read.
+# A block is a mark's name and the ems it is drawn for (LO-HI), then its
+# rows, # for ink. A name may have several variants; over a small letter
+# tools/make-latin1-face.py takes the first, in file order, that fits
+# above the x-height. NAME.cap, where drawn for the em, is used over a
+# capital instead of NAME. The cedilla hangs below the baseline.
+grave 6-16
+#.
+.#
+grave 3-5
+#.
+acute 6-16
+.#
+#.
+acute 3-5
+.#
+circumflex 6-16
+.#.
+#.#
+circumflex 3-5
+.#.
+tilde 9-16
+.#.#
+#.#.
+tilde 6-8
+##.
+..#
+tilde 3-5
+##
+diaeresis 12-16
+#..#
+diaeresis 3-11
+#.#
+ring 12-16
+.#.
+#.#
+.#.
+ring 6-11
+##
+##
+ring 3-5
+#
+macron 9-16
+####
+macron 3-8
+##
+cedilla 9-16
+.#
+##
+cedilla 3-8
+#

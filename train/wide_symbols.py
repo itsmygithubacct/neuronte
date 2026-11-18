@@ -18,7 +18,7 @@ from wide_parts import _from_rest
 
 NOTES = {}
 DRAWN = {}
-HELD = set(range(0x1F7E0, 0x1F7EC))   # told apart only by colour: held for the owner's decision
+HELD = set()                        # the colour twins are drawn (owner's decision 2026-11-18: identical twins)
 
 
 def d(cp, shapes, note=None):
@@ -773,6 +773,13 @@ d(0x1F6FB, F((1.5, 9.0), (8.6, 9.0), (8.6, 4.4), (12.6, 4.4), (15.0, 8.4), (16.5
   K(F((9.6, 5.4), (12.0, 5.4), (13.6, 8.2), (9.6, 8.2))) + wheel(4.6, 13.4) + wheel(13.2, 13.4))
 d(0x1F6FC, F((5.0, 1.8), (10.0, 1.8), (10.0, 7.6), (15.6, 9.4), (15.6, 12.4), (3.6, 12.4)) + K(L((6.2, 4.2), (8.8, 4.2), w=0.7) +
   L((6.2, 6.4), (8.8, 6.4), w=0.7)) + wheel(5.0, 14.4, 1.6) + wheel(9.6, 14.4, 1.6) + wheel(14.0, 14.4, 1.6))
+
+# Told apart only by colour. The owner chose identical twins (2026-11-18): each shape once, every colour the same.
+TWIN = "told apart from its siblings only by colour: drawn the same as them, twins by the owner's choice"
+for cp in range(0x1F7E0, 0x1F7E5):
+    d(cp, D(9, 9, 7.0), "large coloured circle, " + TWIN)
+for cp in range(0x1F7E5, 0x1F7EC):
+    d(cp, R(2.6, 2.6, 15.4, 15.4), "large coloured square, the same as U+2B1B; " + TWIN)
 
 def drawn():
     return {cp: sh for cp, sh in DRAWN.items() if cp not in HELD}

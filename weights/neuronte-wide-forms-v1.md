@@ -58,8 +58,7 @@ perfect drawing's score and the limit applied.
 
 A group whose two seeds pass ships the seed with the lower mean error at
 8×16, 16×32 and 48×96. A group that fails is trained once more as two nets
-of half its characters each; a half that fails is left out. Nothing that
-failed ships.
+of half its characters each; a half that fails is left out. Nothing that failed ships.
 
 - 11 groups trained; 10 passed with both seeds.
 - 1 failed and was halved; of the 2 halves 2 passed.
@@ -145,7 +144,40 @@ bundle, each as the selected seed.
 
 ## Speed
 
-Not measured yet.
+Measured on the two x86 hosts other cards use, an Intel Core i7-6820HQ and an
+Intel Core i7-10700F, each under the shared benchmark lock, at commit 2938cbc
+(the bundle there is byte for byte the one here). kilix-bench e21e5cd: one
+pinned core, a fresh process for every job, one warmup and ten measured
+rounds in shuffled order, medians, raw trials kept, every model checked
+against the float64 reference first. The corpus is this bundle's 103
+characters. The cells 8×16, 16×32 and 48×96 are what a program asks for
+the two-cell boxes 8×8, 16×16 and 48×48. split-v9, which was not trained
+on these characters, sends each through its gate to one of its nets and
+draws something else; this bundle looks it up in its table and runs a
+small group net.
+
+| µs per character | split-v9, i7-6820HQ | wide-forms-v1, i7-6820HQ | ratio | split-v9, i7-10700F | wide-forms-v1, i7-10700F | ratio |
+|---|---:|---:|---:|---:|---:|---:|
+| Coverage, uncached, 8×16 | 518.6 | 180.6 | 2.87 | 390.2 | 138.5 | 2.82 |
+| Coverage, uncached, 16×32 | 1995.6 | 691.1 | 2.89 | 1520.3 | 539.2 | 2.82 |
+| Coverage, uncached, 48×96 | 4468.8 | 1533.3 | 2.91 | 3442.1 | 1186.9 | 2.90 |
+| Draw, cold, 8×16 | 523.6 | 182.3 | 2.87 | 398.6 | 141.2 | 2.82 |
+| Draw, cold, 16×32 | 2021.1 | 698.8 | 2.89 | 1564.0 | 537.3 | 2.91 |
+| Draw, cold, 48×96 | 4497.1 | 1566.6 | 2.87 | 3385.9 | 1203.4 | 2.81 |
+| Draw, warm, 8×16 | 4.0 | 0.7 | 5.49 | 3.0 | 0.5 | 5.53 |
+| Draw, warm, 16×32 | 7.0 | 2.3 | 3.10 | 5.2 | 1.6 | 3.17 |
+| Draw, warm, 48×96 | 28.6 | 17.9 | 1.60 | 21.2 | 12.5 | 1.69 |
+
+Uncached, wide-forms-v1 draws these characters 2.9 times as fast as
+split-v9 does (geometric mean over the three cells and both hosts:
+2.89 on the i7-6820HQ, 2.85 on the i7-10700F; cold draw 2.9,
+warm draw 3.1). A lookup in its table takes 10 ns and 6 ns against
+1185 ns and 873 ns for split-v9's gate. Opening the file takes 1.0 ms and
+0.6 ms against 4.9 ms and 3.6 ms for split-v9.
+
+A two-cell box costs the samples of the cell W×2H a program asks for it:
+twice those of a one-cell character of the same height. A handle caches
+1,024 drawn cells.
 
 ## Files
 

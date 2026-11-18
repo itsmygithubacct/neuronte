@@ -64,7 +64,10 @@ LEFT_OUT = {
     ('twdp9r4', 0): 'failed the declared gates with both seeds, as half of a group that had failed',
 }
 
-BUNDLE = wide_build.Bundle(NAME, HALVED, LEFT_OUT)
+# {(set, group): why} halves that failed the gates again, in the bundle by the owner's word
+FAILED_SHIPPED = {}
+
+BUNDLE = wide_build.Bundle(NAME, HALVED, LEFT_OUT, FAILED_SHIPPED)
 
 if __name__ == '__main__':
     sys.exit(BUNDLE.main(sys.argv[1:]))

@@ -29,6 +29,7 @@
  "seeds_passing_pixel_exact": 0,
  "nets_shipped": 103,
  "nets_left_out": 50,
+ "nets_failed_shipped_by_owner": [],
  "characters_drawn": 559,
  "characters_listed": 416,
  "characters_left_untrained": [
@@ -1376,6 +1377,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp0r0-g0.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -1993,6 +1995,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp0r0-g1.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -3247,7 +3250,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twdp0r1",
@@ -3865,7 +3869,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -5700,6 +5705,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp0r3-g0.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -6265,6 +6271,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp0r3-g1.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -7992,6 +7999,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp0r5-g0.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -8573,6 +8581,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp0r5-g1.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -10954,7 +10963,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twdp0r8",
@@ -11581,7 +11591,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -12753,6 +12764,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp0r9-g0.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -13341,7 +13353,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     }
@@ -14546,6 +14559,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp1r0-g0.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -15154,7 +15168,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -16294,6 +16309,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp1r1-g0.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -16889,6 +16905,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp1r1-g1.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -19287,6 +19304,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp1r4-g0.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -19887,7 +19905,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -22261,7 +22280,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twdp1r7",
@@ -22860,7 +22880,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -25960,7 +25981,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twdp2r1",
@@ -26650,7 +26672,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -28419,6 +28442,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp2r3-g0.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -28986,7 +29010,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -30330,6 +30355,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp2r4-g0.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -30939,6 +30965,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp2r4-g1.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -32246,7 +32273,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twdp2r5",
@@ -32840,7 +32868,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -34105,6 +34134,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp2r6-g0.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -34698,6 +34728,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp2r6-g1.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -35920,6 +35951,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp2r7-g0.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -36541,6 +36573,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp2r7-g1.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -37751,6 +37784,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp2r8-g0.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -38424,7 +38458,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -39705,6 +39740,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp2r9-g0.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -40345,7 +40381,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     }
@@ -41611,6 +41648,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp3r0-g0.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -42198,7 +42236,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -43373,6 +43412,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp3r1-g0.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -43963,7 +44003,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -45910,7 +45951,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twdp3r3",
@@ -46600,7 +46642,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -48077,7 +48120,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twdp3r4",
@@ -48781,7 +48825,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -50099,7 +50144,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twdp3r5",
@@ -50802,6 +50848,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp3r5-g1.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -52101,6 +52148,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp3r6-g0.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -52762,6 +52810,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp3r6-g1.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -54675,6 +54724,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp3r8-g0.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -55303,7 +55353,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -57707,7 +57758,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twdp4r1",
@@ -58293,7 +58345,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -59537,7 +59590,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twdp4r2",
@@ -60152,6 +60206,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp4r2-g1.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -61946,6 +62001,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp4r4-g0.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -62533,6 +62589,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp4r4-g1.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -63734,6 +63791,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp4r5-g0.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -64348,7 +64406,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -66263,6 +66322,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp4r7-g0.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -66880,7 +66940,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -69212,6 +69273,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp5r0-g0.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -69811,6 +69873,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp5r0-g1.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -75789,7 +75852,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twdp5r9",
@@ -76492,7 +76556,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     }
@@ -80668,6 +80733,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp6r5-g0.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -81269,6 +81335,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp6r5-g1.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -82449,7 +82516,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twdp6r6",
@@ -83045,7 +83113,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -84957,6 +85026,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp6r8-g0.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -85558,6 +85628,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp6r8-g1.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -86802,7 +86873,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twdp6r9",
@@ -87438,7 +87510,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     }
@@ -88696,6 +88769,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp7r0-g0.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -89297,6 +89371,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp7r0-g1.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -91186,6 +91261,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp7r2-g0.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -91834,7 +91910,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -93050,6 +93127,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp7r3-g0.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -93643,7 +93721,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -94968,6 +95047,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp7r4-g0.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -95613,6 +95693,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp7r4-g1.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -97473,6 +97554,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp7r6-g0.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -98031,6 +98113,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp7r6-g1.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -99357,7 +99440,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twdp7r7",
@@ -99932,6 +100016,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp7r7-g1.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -101195,7 +101280,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twdp7r8",
@@ -101800,6 +101886,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp7r8-g1.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -103092,6 +103179,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp7r9-g0.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -103687,6 +103775,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp7r9-g1.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -104973,6 +105062,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp8r0-g0.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -105637,7 +105727,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -106949,7 +107040,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twdp8r1",
@@ -107562,7 +107654,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -108836,6 +108929,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp8r2-g0.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -109438,7 +109532,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -111219,6 +111314,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp8r4-g0.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -111784,6 +111880,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp8r4-g1.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -112980,7 +113077,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twdp8r5",
@@ -113547,7 +113645,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -114701,6 +114800,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp8r6-g0.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -115331,7 +115431,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -116646,6 +116747,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp8r7-g0.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -117300,7 +117402,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -118651,7 +118754,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twdp8r8",
@@ -119320,7 +119424,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -123570,7 +123675,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twdp9r4",
@@ -124147,6 +124253,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-pictographs-v1-twdp9r4-g1.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"

@@ -29,6 +29,7 @@
  "seeds_passing_pixel_exact": 0,
  "nets_shipped": 68,
  "nets_left_out": 27,
+ "nets_failed_shipped_by_owner": [],
  "characters_drawn": 349,
  "characters_listed": 269,
  "characters_left_untrained": [
@@ -1991,7 +1992,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twdu0r1",
@@ -2630,6 +2632,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-supplement-v1-twdu0r1-g1.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -4432,6 +4435,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-supplement-v1-twdu0r3-g0.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -5075,6 +5079,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-supplement-v1-twdu0r3-g1.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -6316,6 +6321,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-supplement-v1-twdu0r4-g0.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -6949,6 +6955,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-supplement-v1-twdu0r4-g1.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -8249,7 +8256,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twdu0r5",
@@ -8906,6 +8914,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-supplement-v1-twdu0r5-g1.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -10113,6 +10122,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-supplement-v1-twdu0r6-g0.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -10691,7 +10701,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -13165,7 +13176,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twdu0r9",
@@ -13834,7 +13846,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     }
@@ -16139,6 +16152,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-supplement-v1-twdu1r2-g0.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -16697,6 +16711,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-supplement-v1-twdu1r2-g1.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -19632,6 +19647,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-supplement-v1-twdu1r6-g0.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -20194,6 +20210,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-supplement-v1-twdu1r6-g1.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -21447,6 +21464,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-supplement-v1-twdu1r7-g0.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -22054,6 +22072,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-supplement-v1-twdu1r7-g1.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -23322,6 +23341,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-supplement-v1-twdu1r8-g0.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -23933,6 +23953,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-supplement-v1-twdu1r8-g1.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -25217,6 +25238,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-supplement-v1-twdu1r9-g0.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -25834,6 +25856,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-supplement-v1-twdu1r9-g1.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -27070,6 +27093,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-supplement-v1-twdu2r0-g0.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -27692,6 +27716,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-supplement-v1-twdu2r0-g1.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -28908,7 +28933,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twdu2r1",
@@ -29532,7 +29558,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -31386,7 +31413,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twdu2r3",
@@ -31965,6 +31993,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-supplement-v1-twdu2r3-g1.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -33210,7 +33239,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twdu2r4",
@@ -33798,7 +33828,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -35027,6 +35058,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-supplement-v1-twdu2r5-g0.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -35656,7 +35688,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -36872,7 +36905,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twdu2r6",
@@ -37462,7 +37496,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -38705,6 +38740,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-supplement-v1-twdu2r7-g0.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -39344,6 +39380,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-supplement-v1-twdu2r7-g1.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -42934,7 +42971,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twdu3r2",
@@ -43538,7 +43576,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -44682,6 +44721,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-supplement-v1-twdu3r3-g0.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -45273,6 +45313,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-supplement-v1-twdu3r3-g1.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -46426,6 +46467,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-supplement-v1-twdu3r4-g0.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -46995,6 +47037,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-supplement-v1-twdu3r4-g1.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -49488,7 +49531,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twdu3r7",
@@ -50105,7 +50149,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -51380,7 +51425,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twdu3r8",
@@ -52038,7 +52084,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -53321,6 +53368,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-supplement-v1-twdu3r9-g0.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -53968,6 +54016,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-supplement-v1-twdu3r9-g1.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -55784,7 +55833,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twdu4r1",
@@ -56340,6 +56390,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-supplement-v1-twdu4r1-g1.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -58079,6 +58130,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-supplement-v1-twdu4r3-g0.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -58716,7 +58768,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -59903,6 +59956,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-supplement-v1-twdu4r4-g0.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -60474,6 +60528,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-supplement-v1-twdu4r4-g1.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -62299,6 +62354,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-supplement-v1-twdu4r6-g0.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -62958,6 +63014,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-supplement-v1-twdu4r6-g1.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -64232,7 +64289,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twdu4r7",
@@ -64827,6 +64885,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-supplement-v1-twdu4r7-g1.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -66733,7 +66792,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twdu4r9",
@@ -67424,6 +67484,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-supplement-v1-twdu4r9-g1.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -68731,6 +68792,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-supplement-v1-twdu5r0-g0.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -69398,7 +69460,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -70658,7 +70721,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twdu5r1",
@@ -71260,7 +71324,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -73028,6 +73093,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-supplement-v1-twdu5r3-g0.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -73600,7 +73666,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -77232,6 +77299,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-supplement-v1-twdu5r8-g0.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -77797,6 +77865,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-supplement-v1-twdu5r8-g1.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -78974,6 +79043,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-supplement-v1-twdu5r9-g0.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -79567,6 +79637,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-supplement-v1-twdu5r9-g1.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"

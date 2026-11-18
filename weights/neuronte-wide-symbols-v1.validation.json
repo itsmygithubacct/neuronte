@@ -29,6 +29,7 @@
  "seeds_passing_pixel_exact": 0,
  "nets_shipped": 44,
  "nets_left_out": 43,
+ "nets_failed_shipped_by_owner": [],
  "characters_drawn": 324,
  "characters_listed": 195,
  "characters_left_untrained": [
@@ -2496,6 +2497,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-symbols-v1-twds0r2-g0.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -3075,6 +3077,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-symbols-v1-twds0r2-g1.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -4233,6 +4236,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-symbols-v1-twds0r3-g0.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -4832,6 +4836,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-symbols-v1-twds0r3-g1.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -7156,6 +7161,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-symbols-v1-twds0r6-g0.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -7770,7 +7776,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -10801,6 +10808,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-symbols-v1-twds1r1-g0.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -11475,7 +11483,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -12904,7 +12913,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twds1r2",
@@ -13591,7 +13601,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -14993,7 +15004,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twds1r3",
@@ -15677,7 +15689,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -17024,7 +17037,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twds1r4",
@@ -17661,7 +17675,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -19087,7 +19102,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twds1r5",
@@ -19783,7 +19799,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -21211,7 +21228,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twds1r6",
@@ -21917,7 +21935,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -23354,7 +23373,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twds1r7",
@@ -24029,7 +24049,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -25375,7 +25396,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twds1r8",
@@ -26046,7 +26068,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     }
@@ -27478,7 +27501,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twds2r0",
@@ -28175,7 +28199,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -29614,7 +29639,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twds2r1",
@@ -30309,7 +30335,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -31771,7 +31798,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twds2r2",
@@ -32386,6 +32414,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-symbols-v1-twds2r2-g1.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -33800,7 +33829,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twds2r3",
@@ -34502,7 +34532,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -35966,7 +35997,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twds2r4",
@@ -36667,7 +36699,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -38013,7 +38046,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twds2r5",
@@ -38596,6 +38630,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-symbols-v1-twds2r5-g1.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -43504,6 +43539,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-symbols-v1-twds3r3-g0.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -44129,6 +44165,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-symbols-v1-twds3r3-g1.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -45969,6 +46006,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-symbols-v1-twds3r5-g0.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -46583,7 +46621,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -48418,6 +48457,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-symbols-v1-twds3r7-g0.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -49033,6 +49073,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-symbols-v1-twds3r7-g1.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -50293,6 +50334,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-symbols-v1-twds3r8-g0.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -50899,7 +50941,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     }
@@ -52104,6 +52147,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-symbols-v1-twds4r0-g0.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -52714,7 +52758,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -53983,7 +54028,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twds4r1",
@@ -54599,6 +54645,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-symbols-v1-twds4r1-g1.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -55907,7 +55954,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twds4r2",
@@ -56542,7 +56590,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -57789,7 +57838,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twds4r3",
@@ -58411,7 +58461,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -59649,6 +59700,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-symbols-v1-twds4r4-g0.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -60273,7 +60325,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -61525,7 +61578,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twds4r5",
@@ -62115,7 +62169,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -64576,7 +64631,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twds4r8",
@@ -65199,6 +65255,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-symbols-v1-twds4r8-g1.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -66519,7 +66576,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twds5r0",
@@ -67098,6 +67156,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-symbols-v1-twds5r0-g1.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -68323,7 +68382,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twds5r1",
@@ -68945,7 +69005,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -70167,7 +70228,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       },
       {
        "set": "twds5r2",
@@ -70776,7 +70838,8 @@
          }
         }
        },
-       "shipped": false
+       "shipped": false,
+       "failed_gates_shipped_by_owner": false
       }
      ]
     },
@@ -72111,6 +72174,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-symbols-v1-twds5r3-g0.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -72756,6 +72820,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-symbols-v1-twds5r3-g1.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -75044,6 +75109,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-symbols-v1-twds5r6-g0.json",
        "shipped_seed": 1,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -75609,6 +75675,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-symbols-v1-twds5r6-g1.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"

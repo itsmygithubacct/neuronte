@@ -29,6 +29,7 @@
  "seeds_passing_pixel_exact": 0,
  "nets_shipped": 12,
  "nets_left_out": 0,
+ "nets_failed_shipped_by_owner": [],
  "characters_drawn": 103,
  "characters_listed": 103,
  "characters_left_untrained": [],
@@ -7024,6 +7025,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-forms-v1-twdf0r10-g0.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"
@@ -7592,6 +7594,7 @@
         }
        },
        "shipped": true,
+       "failed_gates_shipped_by_owner": false,
        "file": "neuronte-wide-forms-v1-twdf0r10-g1.json",
        "shipped_seed": 0,
        "shipped_because": "both seeds passed the declared gates; lower-error seed"

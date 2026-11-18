@@ -52,6 +52,14 @@ gates twice (as a group, then as a half) and were left out by rule; the
 characters stay untrained:
 U+26F3 U+26F5 U+26FA U+1F0CF U+1F18E U+1F191 U+1F192 U+1F193 U+1F194 U+1F195 U+1F196 U+1F197 U+1F198 U+1F199 U+1F19A U+1F200 U+1F201 U+1F202 U+1F210 U+1F211 U+1F212 U+1F213 U+1F214 U+1F215 U+1F216 U+1F217 U+1F218 U+1F219 U+1F21A U+1F21B U+1F21C U+1F21D U+1F21E U+1F21F U+1F220 U+1F221 U+1F222 U+1F223 U+1F224 U+1F225 U+1F226 U+1F227 U+1F228 U+1F229 U+1F22A U+1F22B U+1F22C U+1F22D U+1F22E U+1F22F U+1F230 U+1F231 U+1F232 U+1F233 U+1F234 U+1F235 U+1F236 U+1F237 U+1F238 U+1F239 U+1F23A U+1F23B U+1F240 U+1F244 U+1F245 U+1F246 U+1F247 U+1F248 U+1F250 U+1F251 U+1F260 U+1F261 U+1F262 U+1F263 U+1F264 U+1F265 U+1F600 U+1F601 U+1F638 U+1F639 U+1F63A U+1F64A U+1F64B U+1F64C U+1F680 U+1F681 U+1F682 U+1F683 U+1F684 U+1F685 U+1F689 U+1F68A U+1F68B U+1F68C U+1F68D U+1F68E U+1F68F U+1F690 U+1F691 U+1F692 U+1F693 U+1F694 U+1F698 U+1F699 U+1F69A U+1F69B U+1F69C U+1F69D U+1F69E U+1F69F U+1F6A0 U+1F6AD U+1F6AE U+1F6AF U+1F6B3 U+1F6B4 U+1F6B5 U+1F6B9 U+1F6BA U+1F6BB U+1F6BC U+1F6BD U+1F6BE U+1F6BF U+1F6C0 U+1F6C1 U+1F6C2 U+1F6C3 U+1F6C4.
 
+Across the four wide bundles, the halves that failed again missed
+error-amount rules (the 99th percentile, the mean error, firm wrong pixels),
+mostly at 24×48 and 48×96. No group or half failed the rule that each
+character is nearest its own drawing, and none vanished. These width-64
+nets draw the detailed pictographs recognisably but not exactly enough at
+the large boxes. Whether to ship them as failed, or to train them again
+wider, is the owner's decision; it was not made for this version.
+
 ## Gates
 
 Declared before any net of this bundle was trained (2026-11-18T00:25Z):
@@ -75,8 +83,7 @@ perfect drawing's score and the limit applied.
 
 A group whose two seeds pass ships the seed with the lower mean error at
 8×16, 16×32 and 48×96. A group that fails is trained once more as two nets
-of half its characters each; a half that fails is left out. Nothing that
-failed ships.
+of half its characters each; a half that fails is left out. Nothing that failed ships.
 
 - 54 groups trained; 21 passed with both seeds.
 - 33 failed and were halved; of the 66 halves 23 passed.
@@ -301,7 +308,40 @@ bundle, each as the selected seed.
 
 ## Speed
 
-Not measured yet.
+Measured on the two x86 hosts other cards use, an Intel Core i7-6820HQ and an
+Intel Core i7-10700F, each under the shared benchmark lock, at commit 2938cbc
+(the bundle there is byte for byte the one here). kilix-bench e21e5cd: one
+pinned core, a fresh process for every job, one warmup and ten measured
+rounds in shuffled order, medians, raw trials kept, every model checked
+against the float64 reference first. The corpus is this bundle's 195
+characters. The cells 8×16, 16×32 and 48×96 are what a program asks for
+the two-cell boxes 8×8, 16×16 and 48×48. split-v9, which was not trained
+on these characters, sends each through its gate to one of its nets and
+draws something else; this bundle looks it up in its table and runs a
+small group net.
+
+| µs per character | split-v9, i7-6820HQ | wide-symbols-v1, i7-6820HQ | ratio | split-v9, i7-10700F | wide-symbols-v1, i7-10700F | ratio |
+|---|---:|---:|---:|---:|---:|---:|
+| Coverage, uncached, 8×16 | 504.2 | 181.4 | 2.78 | 390.1 | 140.9 | 2.77 |
+| Coverage, uncached, 16×32 | 1968.3 | 692.0 | 2.84 | 1524.4 | 563.9 | 2.70 |
+| Coverage, uncached, 48×96 | 4373.2 | 1533.8 | 2.85 | 3956.9 | 1206.8 | 3.28 |
+| Draw, cold, 8×16 | 511.0 | 184.4 | 2.77 | 405.1 | 142.4 | 2.84 |
+| Draw, cold, 16×32 | 1966.0 | 701.3 | 2.80 | 1504.1 | 540.4 | 2.78 |
+| Draw, cold, 48×96 | 4399.5 | 1583.0 | 2.78 | 3373.9 | 1219.3 | 2.77 |
+| Draw, warm, 8×16 | 3.9 | 1.2 | 3.33 | 2.9 | 0.9 | 3.35 |
+| Draw, warm, 16×32 | 6.7 | 3.8 | 1.78 | 5.0 | 2.8 | 1.78 |
+| Draw, warm, 48×96 | 27.4 | 27.9 | 0.98 | 20.0 | 20.3 | 0.99 |
+
+Uncached, wide-symbols-v1 draws these characters 2.9 times as fast as
+split-v9 does (geometric mean over the three cells and both hosts:
+2.83 on the i7-6820HQ, 2.91 on the i7-10700F; cold draw 2.8,
+warm draw 1.8). A lookup in its table takes 13 ns and 8 ns against
+1241 ns and 919 ns for split-v9's gate. Opening the file takes 2.9 ms and
+2.2 ms against 4.7 ms and 3.4 ms for split-v9.
+
+A two-cell box costs the samples of the cell W×2H a program asks for it:
+twice those of a one-cell character of the same height. A handle caches
+1,024 drawn cells.
 
 ## Files
 

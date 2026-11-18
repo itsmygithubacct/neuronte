@@ -13,7 +13,10 @@ HALVED = (('twdf0', 10),)
 # {(set, group): why it is not in the bundle}
 LEFT_OUT = {}
 
-BUNDLE = wide_build.Bundle(NAME, HALVED, LEFT_OUT)
+# {(set, group): why} halves that failed the gates again, in the bundle by the owner's word
+FAILED_SHIPPED = {}
+
+BUNDLE = wide_build.Bundle(NAME, HALVED, LEFT_OUT, FAILED_SHIPPED)
 
 if __name__ == '__main__':
     sys.exit(BUNDLE.main(sys.argv[1:]))

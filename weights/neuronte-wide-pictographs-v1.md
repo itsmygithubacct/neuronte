@@ -52,6 +52,14 @@ gates twice (as a group, then as a half) and were left out by rule; the
 characters stay untrained:
 U+1F305 U+1F306 U+1F307 U+1F308 U+1F309 U+1F30A U+1F339 U+1F33A U+1F33B U+1F33C U+1F33D U+1F341 U+1F342 U+1F343 U+1F346 U+1F347 U+1F348 U+1F35D U+1F35E U+1F35F U+1F36B U+1F36C U+1F36D U+1F36E U+1F36F U+1F382 U+1F383 U+1F384 U+1F385 U+1F386 U+1F387 U+1F390 U+1F391 U+1F392 U+1F3A5 U+1F3A6 U+1F3A7 U+1F3A8 U+1F3A9 U+1F3B8 U+1F3B9 U+1F3BA U+1F3BE U+1F3BF U+1F3C0 U+1F3C3 U+1F3C4 U+1F3C5 U+1F3C9 U+1F3CA U+1F3CF U+1F3E1 U+1F3E2 U+1F3E3 U+1F3E4 U+1F3E5 U+1F3E6 U+1F3E7 U+1F3E8 U+1F3E9 U+1F3EA U+1F3EB U+1F3EC U+1F3ED U+1F3EE U+1F406 U+1F407 U+1F408 U+1F414 U+1F415 U+1F416 U+1F417 U+1F418 U+1F419 U+1F41A U+1F41B U+1F42D U+1F42E U+1F42F U+1F438 U+1F439 U+1F43A U+1F47B U+1F47C U+1F47D U+1F47E U+1F47F U+1F480 U+1F4A2 U+1F4A3 U+1F4A4 U+1F4A5 U+1F4A6 U+1F4A7 U+1F4B3 U+1F4B4 U+1F4B5 U+1F4B6 U+1F4B7 U+1F4B8 U+1F4C6 U+1F4C7 U+1F4C8 U+1F4CC U+1F4CD U+1F4CE U+1F4E0 U+1F4E1 U+1F4E5 U+1F4E6 U+1F4E7 U+1F4F3 U+1F4F4 U+1F4F5 U+1F4F6 U+1F4F7 U+1F4F8 U+1F4F9 U+1F4FA U+1F4FB U+1F500 U+1F501 U+1F502 U+1F50F U+1F510 U+1F511 U+1F512 U+1F513 U+1F517 U+1F518 U+1F519 U+1F51C U+1F51D U+1F51E U+1F51F U+1F520 U+1F521 U+1F522 U+1F523 U+1F524 U+1F54E U+1F550 U+1F551.
 
+Across the four wide bundles, the halves that failed again missed
+error-amount rules (the 99th percentile, the mean error, firm wrong pixels),
+mostly at 24×48 and 48×96. No group or half failed the rule that each
+character is nearest its own drawing, and none vanished. These width-64
+nets draw the detailed pictographs recognisably but not exactly enough at
+the large boxes. Whether to ship them as failed, or to train them again
+wider, is the owner's decision; it was not made for this version.
+
 ## Gates
 
 Declared before any net of this bundle was trained (2026-11-18T00:25Z):
@@ -75,8 +83,7 @@ perfect drawing's score and the limit applied.
 
 A group whose two seeds pass ships the seed with the lower mean error at
 8×16, 16×32 and 48×96. A group that fails is trained once more as two nets
-of half its characters each; a half that fails is left out. Nothing that
-failed ships.
+of half its characters each; a half that fails is left out. Nothing that failed ships.
 
 - 100 groups trained; 47 passed with both seeds.
 - 53 failed and were halved; of the 106 halves 56 passed.
@@ -295,6 +302,120 @@ Mean error against the teacher and mean overlap at counted cells, for the shippe
 | `twdp9` g8 | U+1F565..U+1F596 (6) | passed | 0 / 0 | 1 | seed 1 | 0.0051 0.0030 0.0042 0.0018 | 0.993 | 0.971 |
 | `twdp9` g9 | U+1F5A4..U+1F5FF (6) | passed | 0 / 0 | 5 | seed 1 | 0.0039 0.0034 0.0038 0.0017 | 0.990 | 0.979 |
 
+## The boxes in use that the gates do not count (information)
+
+The shipped seed of each net at the cell a program asks for the boxes
+18×18, 20×20 and 36×36, by the scorer's own metric code against the bundle
+teacher, and in the box itself (each pair of rows averaged) against the
+teacher's area coverage of the box. Declared as information before
+training; it decides nothing.
+
+| Net | 18×36: error, 99th pct | 20×40 | 36×72 | Box 18×18: error | Box 20×20 | Box 36×36 | Not nearest or vanished |
+|---|---|---|---|---:|---:|---:|---|
+| `twdp0r0` g0 | 0.0048, 0.051 | 0.0043, 0.044 | 0.0034, 0.053 | 0.0043 | 0.0039 | 0.0029 | none |
+| `twdp0r0` g1 | 0.0039, 0.055 | 0.0054, 0.057 | 0.0027, 0.047 | 0.0037 | 0.0050 | 0.0026 | none |
+| `twdp0` g2 | 0.0032, 0.041 | 0.0043, 0.048 | 0.0034, 0.064 | 0.0027 | 0.0037 | 0.0029 | none |
+| `twdp0r3` g0 | 0.0038, 0.057 | 0.0033, 0.053 | 0.0030, 0.050 | 0.0030 | 0.0028 | 0.0025 | none |
+| `twdp0r3` g1 | 0.0024, 0.031 | 0.0020, 0.029 | 0.0021, 0.043 | 0.0019 | 0.0017 | 0.0017 | none |
+| `twdp0` g4 | 0.0020, 0.028 | 0.0020, 0.032 | 0.0019, 0.045 | 0.0017 | 0.0017 | 0.0015 | none |
+| `twdp0r5` g0 | 0.0024, 0.031 | 0.0024, 0.035 | 0.0023, 0.045 | 0.0019 | 0.0019 | 0.0019 | none |
+| `twdp0r5` g1 | 0.0040, 0.048 | 0.0032, 0.038 | 0.0036, 0.061 | 0.0032 | 0.0026 | 0.0032 | none |
+| `twdp0` g6 | 0.0034, 0.052 | 0.0024, 0.043 | 0.0024, 0.047 | 0.0031 | 0.0022 | 0.0021 | none |
+| `twdp0` g7 | 0.0035, 0.053 | 0.0025, 0.047 | 0.0023, 0.045 | 0.0032 | 0.0022 | 0.0020 | none |
+| `twdp0r9` g0 | 0.0038, 0.049 | 0.0044, 0.056 | 0.0035, 0.057 | 0.0033 | 0.0038 | 0.0032 | none |
+| `twdp1r0` g0 | 0.0029, 0.053 | 0.0029, 0.045 | 0.0025, 0.054 | 0.0024 | 0.0026 | 0.0022 | none |
+| `twdp1r1` g0 | 0.0022, 0.039 | 0.0017, 0.030 | 0.0018, 0.041 | 0.0017 | 0.0013 | 0.0016 | none |
+| `twdp1r1` g1 | 0.0032, 0.059 | 0.0030, 0.058 | 0.0032, 0.054 | 0.0027 | 0.0026 | 0.0027 | none |
+| `twdp1` g2 | 0.0021, 0.032 | 0.0022, 0.041 | 0.0019, 0.040 | 0.0016 | 0.0018 | 0.0016 | none |
+| `twdp1` g3 | 0.0032, 0.051 | 0.0028, 0.051 | 0.0022, 0.048 | 0.0030 | 0.0026 | 0.0019 | none |
+| `twdp1r4` g0 | 0.0046, 0.065 | 0.0041, 0.069 | 0.0040, 0.060 | 0.0041 | 0.0037 | 0.0037 | none |
+| `twdp1` g5 | 0.0026, 0.050 | 0.0021, 0.053 | 0.0021, 0.050 | 0.0022 | 0.0018 | 0.0018 | none |
+| `twdp1` g6 | 0.0028, 0.049 | 0.0027, 0.041 | 0.0024, 0.050 | 0.0024 | 0.0022 | 0.0021 | none |
+| `twdp1` g8 | 0.0048, 0.053 | 0.0047, 0.053 | 0.0037, 0.062 | 0.0043 | 0.0043 | 0.0034 | none |
+| `twdp1` g9 | 0.0035, 0.053 | 0.0040, 0.057 | 0.0030, 0.062 | 0.0032 | 0.0036 | 0.0027 | none |
+| `twdp2` g0 | 0.0043, 0.060 | 0.0037, 0.054 | 0.0035, 0.065 | 0.0037 | 0.0031 | 0.0031 | none |
+| `twdp2` g2 | 0.0038, 0.053 | 0.0034, 0.050 | 0.0029, 0.052 | 0.0034 | 0.0031 | 0.0027 | none |
+| `twdp2r3` g0 | 0.0064, 0.055 | 0.0051, 0.057 | 0.0034, 0.055 | 0.0061 | 0.0048 | 0.0032 | none |
+| `twdp2r4` g0 | 0.0046, 0.052 | 0.0055, 0.059 | 0.0041, 0.068 | 0.0041 | 0.0050 | 0.0037 | none |
+| `twdp2r4` g1 | 0.0045, 0.051 | 0.0046, 0.057 | 0.0033, 0.051 | 0.0040 | 0.0041 | 0.0029 | none |
+| `twdp2r6` g0 | 0.0061, 0.067 | 0.0070, 0.061 | 0.0050, 0.062 | 0.0059 | 0.0067 | 0.0048 | none |
+| `twdp2r6` g1 | 0.0033, 0.044 | 0.0031, 0.035 | 0.0033, 0.057 | 0.0027 | 0.0024 | 0.0028 | none |
+| `twdp2r7` g0 | 0.0038, 0.050 | 0.0047, 0.057 | 0.0033, 0.053 | 0.0033 | 0.0043 | 0.0029 | none |
+| `twdp2r7` g1 | 0.0057, 0.054 | 0.0042, 0.047 | 0.0043, 0.061 | 0.0052 | 0.0037 | 0.0039 | none |
+| `twdp2r8` g0 | 0.0032, 0.050 | 0.0029, 0.056 | 0.0023, 0.053 | 0.0029 | 0.0027 | 0.0021 | none |
+| `twdp2r9` g0 | 0.0047, 0.049 | 0.0045, 0.060 | 0.0046, 0.072 | 0.0040 | 0.0040 | 0.0042 | none |
+| `twdp3r0` g0 | 0.0054, 0.054 | 0.0055, 0.058 | 0.0034, 0.053 | 0.0049 | 0.0052 | 0.0033 | none |
+| `twdp3r1` g0 | 0.0032, 0.050 | 0.0023, 0.052 | 0.0025, 0.051 | 0.0027 | 0.0020 | 0.0021 | none |
+| `twdp3` g2 | 0.0029, 0.050 | 0.0026, 0.045 | 0.0024, 0.050 | 0.0025 | 0.0022 | 0.0020 | none |
+| `twdp3r5` g1 | 0.0091, 0.195 | 0.0072, 0.112 | 0.0074, 0.192 | 0.0089 | 0.0069 | 0.0072 | none |
+| `twdp3r6` g0 | 0.0040, 0.058 | 0.0040, 0.057 | 0.0038, 0.065 | 0.0035 | 0.0036 | 0.0034 | none |
+| `twdp3r6` g1 | 0.0055, 0.051 | 0.0071, 0.077 | 0.0037, 0.052 | 0.0055 | 0.0071 | 0.0037 | none |
+| `twdp3` g7 | 0.0038, 0.053 | 0.0028, 0.052 | 0.0028, 0.055 | 0.0036 | 0.0026 | 0.0026 | none |
+| `twdp3r8` g0 | 0.0059, 0.074 | 0.0054, 0.061 | 0.0043, 0.065 | 0.0052 | 0.0048 | 0.0039 | none |
+| `twdp3` g9 | 0.0037, 0.059 | 0.0030, 0.045 | 0.0031, 0.067 | 0.0033 | 0.0025 | 0.0029 | none |
+| `twdp4` g0 | 0.0034, 0.054 | 0.0031, 0.052 | 0.0030, 0.062 | 0.0030 | 0.0028 | 0.0027 | none |
+| `twdp4r2` g1 | 0.0037, 0.052 | 0.0039, 0.053 | 0.0027, 0.053 | 0.0033 | 0.0034 | 0.0025 | none |
+| `twdp4` g3 | 0.0037, 0.055 | 0.0032, 0.049 | 0.0036, 0.073 | 0.0032 | 0.0028 | 0.0031 | none |
+| `twdp4r4` g0 | 0.0027, 0.050 | 0.0027, 0.046 | 0.0023, 0.046 | 0.0023 | 0.0022 | 0.0020 | none |
+| `twdp4r4` g1 | 0.0033, 0.048 | 0.0029, 0.041 | 0.0031, 0.059 | 0.0029 | 0.0024 | 0.0028 | none |
+| `twdp4r5` g0 | 0.0028, 0.050 | 0.0022, 0.040 | 0.0026, 0.054 | 0.0024 | 0.0020 | 0.0023 | none |
+| `twdp4` g6 | 0.0042, 0.052 | 0.0035, 0.048 | 0.0038, 0.068 | 0.0034 | 0.0029 | 0.0032 | none |
+| `twdp4r7` g0 | 0.0047, 0.051 | 0.0041, 0.059 | 0.0046, 0.079 | 0.0037 | 0.0035 | 0.0039 | none |
+| `twdp4` g8 | 0.0028, 0.041 | 0.0024, 0.033 | 0.0028, 0.052 | 0.0022 | 0.0019 | 0.0023 | none |
+| `twdp4` g9 | 0.0028, 0.053 | 0.0025, 0.051 | 0.0022, 0.052 | 0.0026 | 0.0022 | 0.0020 | none |
+| `twdp5r0` g0 | 0.0028, 0.051 | 0.0028, 0.055 | 0.0019, 0.051 | 0.0027 | 0.0027 | 0.0018 | none |
+| `twdp5r0` g1 | 0.0050, 0.060 | 0.0040, 0.058 | 0.0029, 0.055 | 0.0046 | 0.0038 | 0.0027 | none |
+| `twdp5` g1 | 0.0034, 0.052 | 0.0027, 0.044 | 0.0027, 0.055 | 0.0030 | 0.0023 | 0.0024 | none |
+| `twdp5` g2 | 0.0035, 0.053 | 0.0036, 0.057 | 0.0022, 0.046 | 0.0028 | 0.0031 | 0.0018 | none |
+| `twdp5` g3 | 0.0035, 0.052 | 0.0035, 0.056 | 0.0022, 0.049 | 0.0032 | 0.0032 | 0.0020 | none |
+| `twdp5` g4 | 0.0025, 0.050 | 0.0028, 0.050 | 0.0017, 0.043 | 0.0022 | 0.0023 | 0.0015 | none |
+| `twdp5` g5 | 0.0032, 0.051 | 0.0028, 0.052 | 0.0025, 0.052 | 0.0028 | 0.0025 | 0.0022 | none |
+| `twdp5` g6 | 0.0038, 0.054 | 0.0035, 0.052 | 0.0027, 0.055 | 0.0032 | 0.0031 | 0.0025 | none |
+| `twdp5` g7 | 0.0035, 0.055 | 0.0028, 0.054 | 0.0029, 0.054 | 0.0031 | 0.0026 | 0.0026 | none |
+| `twdp5` g8 | 0.0031, 0.043 | 0.0031, 0.053 | 0.0031, 0.059 | 0.0026 | 0.0027 | 0.0027 | none |
+| `twdp6` g0 | 0.0030, 0.049 | 0.0030, 0.055 | 0.0024, 0.054 | 0.0028 | 0.0028 | 0.0022 | none |
+| `twdp6` g1 | 0.0022, 0.035 | 0.0024, 0.039 | 0.0023, 0.047 | 0.0019 | 0.0020 | 0.0019 | none |
+| `twdp6` g2 | 0.0042, 0.054 | 0.0035, 0.055 | 0.0035, 0.060 | 0.0038 | 0.0031 | 0.0031 | none |
+| `twdp6` g3 | 0.0025, 0.038 | 0.0025, 0.040 | 0.0024, 0.050 | 0.0020 | 0.0020 | 0.0020 | none |
+| `twdp6` g4 | 0.0020, 0.028 | 0.0018, 0.024 | 0.0020, 0.039 | 0.0015 | 0.0013 | 0.0016 | none |
+| `twdp6r5` g0 | 0.0034, 0.047 | 0.0041, 0.048 | 0.0036, 0.060 | 0.0031 | 0.0038 | 0.0032 | none |
+| `twdp6r5` g1 | 0.0063, 0.064 | 0.0047, 0.059 | 0.0039, 0.059 | 0.0060 | 0.0045 | 0.0034 | none |
+| `twdp6` g7 | 0.0027, 0.051 | 0.0024, 0.052 | 0.0022, 0.052 | 0.0024 | 0.0022 | 0.0019 | none |
+| `twdp6r8` g0 | 0.0066, 0.078 | 0.0048, 0.058 | 0.0052, 0.116 | 0.0063 | 0.0045 | 0.0047 | none |
+| `twdp6r8` g1 | 0.0038, 0.058 | 0.0037, 0.064 | 0.0034, 0.067 | 0.0033 | 0.0034 | 0.0030 | none |
+| `twdp7r0` g0 | 0.0053, 0.052 | 0.0049, 0.057 | 0.0034, 0.054 | 0.0051 | 0.0047 | 0.0032 | none |
+| `twdp7r0` g1 | 0.0054, 0.052 | 0.0057, 0.056 | 0.0037, 0.058 | 0.0051 | 0.0054 | 0.0035 | none |
+| `twdp7` g1 | 0.0045, 0.054 | 0.0043, 0.057 | 0.0035, 0.060 | 0.0043 | 0.0041 | 0.0033 | none |
+| `twdp7r2` g0 | 0.0050, 0.053 | 0.0087, 0.060 | 0.0036, 0.061 | 0.0048 | 0.0086 | 0.0034 | none |
+| `twdp7r3` g0 | 0.0067, 0.055 | 0.0080, 0.059 | 0.0044, 0.060 | 0.0066 | 0.0077 | 0.0043 | none |
+| `twdp7r4` g0 | 0.0036, 0.052 | 0.0055, 0.064 | 0.0034, 0.062 | 0.0035 | 0.0054 | 0.0029 | none |
+| `twdp7r4` g1 | 0.0076, 0.059 | 0.0083, 0.060 | 0.0062, 0.061 | 0.0073 | 0.0082 | 0.0060 | none |
+| `twdp7` g5 | 0.0054, 0.051 | 0.0056, 0.056 | 0.0045, 0.052 | 0.0054 | 0.0054 | 0.0043 | none |
+| `twdp7r6` g0 | 0.0049, 0.052 | 0.0060, 0.060 | 0.0037, 0.060 | 0.0049 | 0.0057 | 0.0035 | none |
+| `twdp7r6` g1 | 0.0036, 0.051 | 0.0034, 0.047 | 0.0029, 0.053 | 0.0034 | 0.0032 | 0.0025 | none |
+| `twdp7r7` g1 | 0.0031, 0.049 | 0.0038, 0.057 | 0.0027, 0.053 | 0.0028 | 0.0035 | 0.0025 | none |
+| `twdp7r8` g1 | 0.0055, 0.054 | 0.0052, 0.058 | 0.0038, 0.058 | 0.0051 | 0.0049 | 0.0036 | none |
+| `twdp7r9` g0 | 0.0088, 0.172 | 0.0073, 0.094 | 0.0063, 0.092 | 0.0085 | 0.0066 | 0.0061 | none |
+| `twdp7r9` g1 | 0.0055, 0.053 | 0.0055, 0.052 | 0.0034, 0.058 | 0.0054 | 0.0053 | 0.0032 | none |
+| `twdp8r0` g0 | 0.0053, 0.051 | 0.0050, 0.056 | 0.0045, 0.054 | 0.0052 | 0.0049 | 0.0044 | none |
+| `twdp8r2` g0 | 0.0057, 0.075 | 0.0058, 0.080 | 0.0052, 0.087 | 0.0053 | 0.0052 | 0.0048 | none |
+| `twdp8` g3 | 0.0027, 0.048 | 0.0030, 0.055 | 0.0025, 0.054 | 0.0023 | 0.0026 | 0.0021 | none |
+| `twdp8r4` g0 | 0.0052, 0.052 | 0.0056, 0.058 | 0.0038, 0.055 | 0.0048 | 0.0053 | 0.0034 | none |
+| `twdp8r4` g1 | 0.0021, 0.033 | 0.0027, 0.044 | 0.0018, 0.042 | 0.0019 | 0.0023 | 0.0016 | none |
+| `twdp8r6` g0 | 0.0022, 0.030 | 0.0026, 0.043 | 0.0023, 0.051 | 0.0019 | 0.0023 | 0.0018 | none |
+| `twdp8r7` g0 | 0.0050, 0.058 | 0.0053, 0.062 | 0.0040, 0.062 | 0.0047 | 0.0050 | 0.0036 | none |
+| `twdp8` g9 | 0.0021, 0.036 | 0.0023, 0.042 | 0.0022, 0.047 | 0.0018 | 0.0020 | 0.0019 | none |
+| `twdp9` g0 | 0.0037, 0.058 | 0.0031, 0.055 | 0.0028, 0.058 | 0.0034 | 0.0029 | 0.0026 | none |
+| `twdp9` g1 | 0.0056, 0.054 | 0.0049, 0.057 | 0.0036, 0.058 | 0.0054 | 0.0047 | 0.0035 | none |
+| `twdp9` g2 | 0.0008, 0.013 | 0.0009, 0.014 | 0.0008, 0.028 | 0.0006 | 0.0008 | 0.0005 | none |
+| `twdp9` g3 | 0.0028, 0.051 | 0.0037, 0.055 | 0.0022, 0.049 | 0.0026 | 0.0035 | 0.0021 | none |
+| `twdp9r4` g1 | 0.0035, 0.050 | 0.0033, 0.039 | 0.0026, 0.040 | 0.0032 | 0.0029 | 0.0023 | none |
+| `twdp9` g5 | 0.0036, 0.050 | 0.0034, 0.040 | 0.0027, 0.041 | 0.0033 | 0.0030 | 0.0024 | none |
+| `twdp9` g6 | 0.0033, 0.050 | 0.0033, 0.041 | 0.0026, 0.041 | 0.0031 | 0.0029 | 0.0024 | none |
+| `twdp9` g7 | 0.0033, 0.050 | 0.0031, 0.041 | 0.0026, 0.040 | 0.0031 | 0.0027 | 0.0023 | none |
+| `twdp9` g8 | 0.0032, 0.050 | 0.0031, 0.045 | 0.0024, 0.048 | 0.0027 | 0.0026 | 0.0021 | none |
+| `twdp9` g9 | 0.0023, 0.049 | 0.0026, 0.055 | 0.0018, 0.043 | 0.0020 | 0.0023 | 0.0016 | none |
+
 ## Recipe
 
 - **Drawings.** `train/wide.py` and its parts put each drawing of the
@@ -332,7 +453,40 @@ bundle, each as the selected seed.
 
 ## Speed
 
-Not measured yet.
+Measured on the two x86 hosts other cards use, an Intel Core i7-6820HQ and an
+Intel Core i7-10700F, each under the shared benchmark lock, at commit 2938cbc
+(the bundle there is byte for byte the one here). kilix-bench e21e5cd: one
+pinned core, a fresh process for every job, one warmup and ten measured
+rounds in shuffled order, medians, raw trials kept, every model checked
+against the float64 reference first. The corpus is this bundle's 416
+characters. The cells 8×16, 16×32 and 48×96 are what a program asks for
+the two-cell boxes 8×8, 16×16 and 48×48. split-v9, which was not trained
+on these characters, sends each through its gate to one of its nets and
+draws something else; this bundle looks it up in its table and runs a
+small group net.
+
+| µs per character | split-v9, i7-6820HQ | wide-pictographs-v1, i7-6820HQ | ratio | split-v9, i7-10700F | wide-pictographs-v1, i7-10700F | ratio |
+|---|---:|---:|---:|---:|---:|---:|
+| Coverage, uncached, 8×16 | 505.3 | 183.1 | 2.76 | 417.2 | 147.3 | 2.83 |
+| Coverage, uncached, 16×32 | 1963.7 | 699.9 | 2.81 | 1550.6 | 547.0 | 2.83 |
+| Coverage, uncached, 48×96 | 4352.1 | 1561.1 | 2.79 | 3450.3 | 1234.1 | 2.80 |
+| Draw, cold, 8×16 | 508.9 | 186.0 | 2.74 | 397.6 | 145.3 | 2.74 |
+| Draw, cold, 16×32 | 1953.7 | 708.1 | 2.76 | 1694.6 | 552.9 | 3.07 |
+| Draw, cold, 48×96 | 4369.8 | 1598.1 | 2.73 | 3564.7 | 1255.5 | 2.84 |
+| Draw, warm, 8×16 | 4.0 | 1.2 | 3.31 | 3.1 | 0.9 | 3.27 |
+| Draw, warm, 16×32 | 7.0 | 3.8 | 1.85 | 5.2 | 2.9 | 1.78 |
+| Draw, warm, 48×96 | 28.5 | 27.7 | 1.03 | 21.7 | 21.2 | 1.03 |
+
+Uncached, wide-pictographs-v1 draws these characters 2.8 times as fast as
+split-v9 does (geometric mean over the three cells and both hosts:
+2.78 on the i7-6820HQ, 2.82 on the i7-10700F; cold draw 2.8,
+warm draw 1.8). A lookup in its table takes 24 ns and 18 ns against
+1247 ns and 918 ns for split-v9's gate. Opening the file takes 6.2 ms and
+5.3 ms against 4.7 ms and 3.9 ms for split-v9.
+
+A two-cell box costs the samples of the cell W×2H a program asks for it:
+twice those of a one-cell character of the same height. A handle caches
+1,024 drawn cells.
 
 ## Files
 

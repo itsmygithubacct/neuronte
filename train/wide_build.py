@@ -16,7 +16,10 @@ to its list.
 The build script of each bundle (train/build_wide_*_v1.py) names its
 HALVED groups, those that failed the declared gates and were trained again
 as two nets of half the characters each (the set NAMErI of train/wide.py),
-and its LEFT_OUT nets with the reason. A net is (set, group).
+and its LEFT_OUT nets with the reason. A net is (set, group). Its
+FAILED_SHIPPED nets are halves that failed the gates again and are in the
+bundle all the same, by the owner's word after looking at them, as the
+lower-error seed; the card and the validation record say they failed.
 """
 import hashlib
 import json
@@ -29,8 +32,10 @@ from term_rest import groups
 
 
 class Bundle:
-    def __init__(self, name, halved, left_out):
+    def __init__(self, name, halved, left_out, failed_shipped=None):
         self.name, self.halved, self.left_out = name, tuple(halved), dict(left_out)
+        self.failed_shipped = dict(failed_shipped or {})
+        assert not set(self.left_out) & set(self.failed_shipped)
         self.list = f'{name}.symbols.txt'
 
     def sets(self):
@@ -68,6 +73,8 @@ class Bundle:
                        'sets': [[name, count] for name, (count, _) in self.sets().items()],
                        'halved': [list(g) for g in self.halved],
                        'left_out': [{'set': s, 'group': g, 'why': why} for (s, g), why in sorted(self.left_out.items())],
+                       **({'failed_shipped': [{'set': s, 'group': g, 'why': why} for (s, g), why in sorted(self.failed_shipped.items())]}
+                          if self.failed_shipped else {}),
                        'record': record}
 
     def main(self, argv):

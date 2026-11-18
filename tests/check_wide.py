@@ -29,7 +29,9 @@ neuronte-wide-pictographs-v1, neuronte-wide-supplement-v1. It must be, at once:
    declared gates (v2.3, kind symbols) and, for each group, the hashes of
    both seeds and whether both passed. Only a net whose two seeds passed is
    in the bundle, as the seed the rule selects; a group is halved exactly
-   when it failed; a half that failed is left out.
+   when it failed; a half that failed is left out, unless the owner named it
+   to ship after looking at it (FAILED_SHIPPED): then it is in the bundle as
+   its lower-error seed and the record says it failed.
 """
 import ctypes as C
 import hashlib
@@ -158,8 +160,11 @@ if list(records) != [(name, i) for name, i, _ in build.nets()]:
     fail('the validation record does not cover the nets of the rule, in order')
 seen = []
 for key, g in records.items():
-    if g['shipped'] != (key not in build.left_out) or g['shipped'] != g['both_seeds_pass']:
-        fail(f'{key}: in the bundle exactly when both seeds passed, and LEFT_OUT says the same')
+    owner = key in build.failed_shipped
+    if g['shipped'] != (key not in build.left_out) or g['shipped'] != (g['both_seeds_pass'] or owner):
+        fail(f'{key}: in the bundle exactly when both seeds passed or the owner named it, and LEFT_OUT says the same')
+    if bool(g.get('failed_gates_shipped_by_owner')) != (owner and not g['both_seeds_pass']):
+        fail(f'{key}: the record does not say it failed and ships by the owner\'s word')
     if g['both_seeds_pass'] != all(s['gates_passed'] for s in g['seeds'].values()):
         fail(f'{key}: both_seeds_pass is not what the seeds say')
     if not g['shipped']:
@@ -170,15 +175,18 @@ for key, g in records.items():
         fail(f'{key}: the shipped file is not the seed the record names')
     if json.loads(path.read_text())['training']['seed'] != g['shipped_seed']:
         fail(f'{key}: the shipped file is not seed {g["shipped_seed"]}')
-    if g['shipped_seed'] != g['selected_seed']:
+    if g['shipped_seed'] != (g['lower_error_seed'] if owner and not g['both_seeds_pass'] else g['selected_seed']):
         fail(f'{key}: ships the seed the rule did not select')
     seen.append(path)
 if seen != files:
     fail('the validation record does not cover the shipped group nets, in order')
 if validation['nets_shipped'] != len(files) or validation['nets_left_out'] != len(build.left_out) or \
-        validation['groups_halved'] != len(build.halved):
+        validation['groups_halved'] != len(build.halved) or \
+        validation.get('nets_failed_shipped_by_owner', []) != [f'{a}:{b}' for a, b in sorted(build.failed_shipped)]:
     fail('the validation record miscounts its nets')
-print(f'{TAG}: record: {len(files)} nets in the bundle, each with both seeds passing the declared gates; '
+nf = len(build.failed_shipped)
+print(f'{TAG}: record: {len(files)} nets in the bundle, ' + (f'{len(files) - nf} with both seeds passing the declared gates and '
+      f'{nf} that failed them, in by the owner\'s word; ' if nf else 'each with both seeds passing the declared gates; ') +
       f'{len(build.halved)} groups halved, {len(build.left_out)} nets left out')
 
 handles = []

@@ -3,6 +3,8 @@
 at Helvetica's advances.
 
     python3 tests/check_metric_sans.py LIB.so FACE.nrt FACE.txt ADVANCES.txt
+    python3 tests/check_metric_sans.py --large LIB.so FACE.nrt REF.nrt ADVANCES.txt
+    python3 tests/check_metric_sans.py --hundredths ADVANCES.txt OUT.txt
 
 FACE.nrt is a drawing file of the face's nets and its fine advance table
 (train/pack.py --drawing-bundle FACE.nrt ADVANCES.txt NET.json...). FACE.txt
@@ -19,6 +21,22 @@ at the face's em with neuronte_set_binary() on:
 Then one line of all the characters is drawn and must be the characters'
 drawings side by side at those advances. The nets themselves are checked
 against numpy by tests/check_reference.py.
+
+--large checks the large or scaled face, FACE.nrt, whose table is the
+version 8 table of ADVANCES.txt (font/metric-sans-advances.txt), against
+REF.nrt, a drawing file of the same nets (and letter edges) with any table,
+which tests/check_reference.py or tests/check_letter_snap.py has checked:
+- at every em from 1 to 128 and at 4096, every character's advance and
+  shift, regular and bold, are the file's thousandths and their pixels
+  ((m * em + 500) // 1000; shifts to the nearest, a half away from zero);
+- at 17, 24, 32, 33, 48 and 64 px, blended and binary, regular and bold,
+  every character drawn alone is REF.nrt's drawing moved by its shift, and
+  a line of all of them is those drawings at the advances.
+
+--hundredths writes ADVANCES.txt's advances rounded to hundredths of an em
+as an advances file for train/pack.py, so that REF.nrt can be packed and
+checked by tests/check_reference.py and tests/check_letter_snap.py, which
+read only hundredths. REF.nrt is a test file, never shipped.
 """
 import ctypes
 import os
@@ -32,7 +50,103 @@ import glyphs  # noqa: E402
 import pack  # noqa: E402
 
 
+def shift_pixels(s, em):
+    r = (abs(s) * em + 500) // 1000
+    return r if s >= 0 else -r
+
+
+def large(lib_path, nrt, ref, adv_path):
+    table = pack.read_fine(adv_path)
+    if table is None:
+        raise SystemExit(f"FAIL {adv_path} is not a fine advances file")
+    lib = ctypes.CDLL(lib_path)
+    P = ctypes.c_void_p
+    lib.neuronte_open_file.argtypes = [ctypes.c_char_p, ctypes.POINTER(P)]
+    lib.neuronte_close.argtypes = [P]
+    lib.neuronte_set_binary.argtypes = [P, ctypes.c_int]
+    lib.neuronte_draw_text.argtypes = [P, P] + [ctypes.c_int] * 7 + [ctypes.c_char_p, ctypes.c_size_t, ctypes.c_uint32]
+    lib.neuronte_advance.argtypes = [P, ctypes.c_uint32, ctypes.c_int, ctypes.c_int]
+    lib.neuronte_advance_milli.argtypes = [P, ctypes.c_uint32, ctypes.c_int]
+    lib.neuronte_advance_shift.argtypes = [P, ctypes.c_uint32, ctypes.c_int, ctypes.c_int,
+                                           ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int)]
+    lib.neuronte_advances.argtypes = [P]
+    h, r = P(), P()
+    for path, handle in ((nrt, h), (ref, r)):
+        if lib.neuronte_open_file(path.encode(), ctypes.byref(handle)) != 0 or not handle:
+            raise SystemExit(f"FAIL cannot open {path}")
+    fails = []
+    if lib.neuronte_advances(h) != len(table):
+        fails.append(f"the file has {lib.neuronte_advances(h)} advances, the table {len(table)}")
+    sm, sp = ctypes.c_int(), ctypes.c_int()
+    for cp, rec in sorted(table.items()):
+        for bold in (0, 1):
+            m, s = rec[bold], rec[2 + bold]
+            if lib.neuronte_advance_milli(h, cp, bold) != m:
+                fails.append(f"U+{cp:04X} weight {bold}: thousandths {lib.neuronte_advance_milli(h, cp, bold)}, want {m}")
+            for em in list(range(1, 129)) + [4096]:
+                got = lib.neuronte_advance(h, cp, bold, em)
+                lib.neuronte_advance_shift(h, cp, bold, em, ctypes.byref(sm), ctypes.byref(sp))
+                if got != (m * em + 500) // 1000 or sm.value != s or sp.value != shift_pixels(s, em):
+                    fails.append(f"U+{cp:04X} weight {bold} at {em} px: advance {got}, shift {sm.value}/{sp.value}")
+                    break
+    chars = [chr(c) for c in sorted(table)]
+    drawn = 0
+    for em in (17, 24, 32, 33, 48, 64):
+        for binary in (0, 1):
+            lib.neuronte_set_binary(h, binary)
+            lib.neuronte_set_binary(r, binary)
+            for bold in (0, 1):
+                pad = 2 * em + 4
+                H = 2 * em + 4
+                total = sum((table[ord(c)][bold] * em + 500) // 1000 for c in chars)
+                W = total + 2 * pad
+                line_ref = np.zeros((H, W), np.uint32)
+                pen = pad
+                for c in chars:
+                    b = c.encode()
+                    dx = shift_pixels(table[ord(c)][2 + bold], em)
+                    one = np.zeros((H, 3 * pad), np.uint32)
+                    lib.neuronte_draw_text(h, one.ctypes.data, 3 * pad, 3 * pad, H, pad, 2, em, bold, b, len(b), 0xFFFFFFFF)
+                    want = np.zeros((H, 3 * pad), np.uint32)
+                    lib.neuronte_draw_text(r, want.ctypes.data, 3 * pad, 3 * pad, H, pad + dx, 2, em, bold, b, len(b), 0xFFFFFFFF)
+                    if (one != want).any():
+                        fails.append(f"U+{ord(c):04X} at {em} px weight {bold} binary {binary}: "
+                                     f"{int((one != want).sum())} pixels differ from the reference moved {dx}")
+                    lib.neuronte_draw_text(r, line_ref.ctypes.data, W, W, H, pen + dx, 2, em, bold, b, len(b), 0xFFFFFFFF)
+                    pen += (table[ord(c)][bold] * em + 500) // 1000
+                    drawn += 1
+                line = np.zeros((H, W), np.uint32)
+                t = "".join(chars).encode()
+                rc = lib.neuronte_draw_text(h, line.ctypes.data, W, W, H, pad, 2, em, bold, t, len(t), 0xFFFFFFFF)
+                if rc != total or (line != line_ref).any():
+                    fails.append(f"the line at {em} px weight {bold} binary {binary}: pen {rc} (want {total}), "
+                                 f"{int((line != line_ref).sum())} pixels differ")
+    lib.neuronte_close(h)
+    lib.neuronte_close(r)
+    name = os.path.basename(nrt)
+    if fails:
+        for f in fails[:20]:
+            print("FAIL", name, f)
+        raise SystemExit(f"check_metric_sans: {name}: {len(fails)} failures")
+    print(f"check_metric_sans: {name}: {len(table)} advances and shifts at 129 ems, regular and bold; "
+          f"{drawn} letters drawn alone and in lines, each the reference's moved by its shift")
+
+
+def hundredths(adv_path, out):
+    table = pack.read_fine(adv_path)
+    if table is None:
+        raise SystemExit(f"FAIL {adv_path} is not a fine advances file")
+    lines = [f"# {os.path.basename(adv_path)} rounded to hundredths, for the reference checks only"]
+    for cp, (r, b, _, _) in sorted(table.items()):
+        lines.append(f"U+{cp:04X} {(r + 5) // 10 / 10:.1f} {(b + 5) // 10 / 10:.1f}")
+    open(out, "w").write("\n".join(lines) + "\n")
+
+
 def main():
+    if sys.argv[1:2] == ["--hundredths"] and len(sys.argv) == 4:
+        return hundredths(*sys.argv[2:])
+    if sys.argv[1:2] == ["--large"] and len(sys.argv) == 6:
+        return large(*sys.argv[2:])
     if len(sys.argv) != 5:
         raise SystemExit(__doc__)
     lib_path, nrt, face_path, adv_path = sys.argv[1:]

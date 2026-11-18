@@ -2886,8 +2886,9 @@ static int draw_text(neuronte *n, uint32_t *pixels, int stride, int width, int h
         dx = a->shift[stroke_px < 0 ? bold : 0] ? shift_px(a->shift[stroke_px < 0 ? bold : 0], em_px) : 0;
         /* Room for every offset of the rightward stroke.
          * The pen is wider than int: a clipped character may start at
-         * INT_MAX, and its advance still has to be added. */
-        at = pen + dx;
+         * INT_MAX, and its advance still has to be added. The pen
+         * saturates at INT64_MAX, so the shifted position does too. */
+        at = dx > 0 && pen > INT64_MAX - dx ? INT64_MAX : pen + dx;
         ix = at > INT_MAX ? INT_MAX : at < INT_MIN ? INT_MIN : (int)at;
         if (at <= INT_MAX && at >= INT_MIN && (int64_t)ix < width && (int64_t)y < height &&
             at + (int64_t)cw + stroke > 0 && (int64_t)y + ch > 0) {

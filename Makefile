@@ -1263,3 +1263,28 @@ test-draw-exact: build/libneuronte.so
 test: test-draw-exact
 
 .PHONY: test-draw-exact
+
+# Neuronte Sans Metric pixel faces (weights/neuronte-metric-sans-v1.md): each
+# shipped file repacks byte for byte from its members, every letter is exact
+# against its drawing (check_reference, on a pack with the pixel face as its
+# table), and every letter is exact at Helvetica's advances in the shipped
+# file (check_metric_sans). Italic 14 and 16 px ship seed 1.
+METRIC_SANS_FACES = 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 3i 4i 5i 6i 7i 8i 9i 10i 11i 12i 13i 14i 15i 16i
+METRIC_SANS_SEED1 = 14i 16i
+test-metric-sans-faces: build/libneuronte.so
+	@set -e; mkdir -p $(METRIC_SANS_TMP); \
+	for f in $(METRIC_SANS_FACES); do \
+		em=$${f%i}; it=""; [ "$$f" = "$$em" ] || it=-italic; \
+		sfx=""; for s in $(METRIC_SANS_SEED1); do [ "$$s" = "$$f" ] && sfx=.seed1; done; \
+		n=weights/neuronte-metric-sans$$em$$it-v1; m=$$(ls $$n$$sfx-g*.json | sort -V); \
+		$(PYTHON) train/pack.py --drawing-bundle $(METRIC_SANS_TMP)/face-$$f.nrt font/metric-sans-$$em.advances.txt $$m > /dev/null; \
+		cmp $(METRIC_SANS_TMP)/face-$$f.nrt $$n.nrt; \
+		$(PYTHON) train/pack.py --drawing-bundle $(METRIC_SANS_TMP)/face-$$f-ref.nrt font/metric-sans-$$em$$it.txt $$m > /dev/null; \
+		OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle $(METRIC_SANS_TMP)/face-$$f-ref.nrt font/metric-sans-$$em$$it.txt $$m > /dev/null; \
+		$(PYTHON) tests/check_metric_sans.py build/libneuronte.so $$n.nrt font/metric-sans-$$em$$it.txt font/metric-sans-$$em.advances.txt > /dev/null; \
+		echo "metric-sans $$f: repacks, reference exact, metric exact"; \
+	done
+
+test: test-metric-sans-faces
+
+.PHONY: test-metric-sans-faces

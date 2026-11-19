@@ -1244,6 +1244,7 @@ test: test-fine-advances
 METRIC_SANS_TMP = build/metric-sans
 test-metric-sans: build/libneuronte.so
 	$(PYTHON) tools/make-metric-sans-face.py --check
+	$(PYTHON) tools/make-metric-sans-bold.py --check
 	cd train && $(PYTHON) metric_sans.py --check
 	if command -v groff >/dev/null 2>&1; then $(PYTHON) tools/make-metric-pdf.py --check; else echo 'groff not installed: the PDF fixture is not rebuilt'; fi
 	mkdir -p $(METRIC_SANS_TMP)
@@ -1268,20 +1269,28 @@ test: test-draw-exact
 # shipped file repacks byte for byte from its members, every letter is exact
 # against its drawing (check_reference, on a pack with the pixel face as its
 # table), and every letter is exact at Helvetica's advances in the shipped
-# file (check_metric_sans). Italic 14 and 16 px ship seed 1.
-METRIC_SANS_FACES = 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 3i 4i 5i 6i 7i 8i 9i 10i 11i 12i 13i 14i 15i 16i
-METRIC_SANS_SEED1 = 14i 16i
+# file (check_metric_sans). A face is EM, EMi (italic), EMb (the drawn bold,
+# 9 to 16 px) or EMbi (the drawn bold italic). The members of a face are the
+# shipping seed's: seed 1 where listed in METRIC_SANS_SEED1. A halved group's
+# members are g72 and g73 in place of g36 (15 px bold, 15 px bold italic and
+# 16 px bold italic: seed 0's group 36 failed, and its two halves pass); they
+# sort last, which fixes the member order the files are packed in.
+METRIC_SANS_FACES = 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 \
+	3i 4i 5i 6i 7i 8i 9i 10i 11i 12i 13i 14i 15i 16i \
+	9b 10b 11b 12b 13b 14b 15b 16b 9bi 10bi 11bi 12bi 13bi 14bi 15bi 16bi
+METRIC_SANS_SEED1 = 12i 16i
 test-metric-sans-faces: build/libneuronte.so
 	@set -e; mkdir -p $(METRIC_SANS_TMP); \
 	for f in $(METRIC_SANS_FACES); do \
-		em=$${f%i}; it=""; [ "$$f" = "$$em" ] || it=-italic; \
+		em=`echo $$f | sed 's/[bi]*$$//'`; kind=`echo $$f | sed "s/^$$em//"`; bd=""; it=""; \
+		case $$kind in b*) bd=-bold;; esac; case $$kind in *i) it=-italic;; esac; \
 		sfx=""; for s in $(METRIC_SANS_SEED1); do [ "$$s" = "$$f" ] && sfx=.seed1; done; \
-		n=weights/neuronte-metric-sans$$em$$it-v1; m=$$(ls $$n$$sfx-g*.json | sort -V); \
-		$(PYTHON) train/pack.py --drawing-bundle $(METRIC_SANS_TMP)/face-$$f.nrt font/metric-sans-$$em.advances.txt $$m > /dev/null; \
+		n=weights/neuronte-metric-sans$$em$$bd$$it-v1; m=`ls $$n$$sfx-g*.json | sort -V`; \
+		$(PYTHON) train/pack.py --drawing-bundle $(METRIC_SANS_TMP)/face-$$f.nrt font/metric-sans-$$em$$bd.advances.txt $$m > /dev/null; \
 		cmp $(METRIC_SANS_TMP)/face-$$f.nrt $$n.nrt; \
-		$(PYTHON) train/pack.py --drawing-bundle $(METRIC_SANS_TMP)/face-$$f-ref.nrt font/metric-sans-$$em$$it.txt $$m > /dev/null; \
-		OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle $(METRIC_SANS_TMP)/face-$$f-ref.nrt font/metric-sans-$$em$$it.txt $$m > /dev/null; \
-		$(PYTHON) tests/check_metric_sans.py build/libneuronte.so $$n.nrt font/metric-sans-$$em$$it.txt font/metric-sans-$$em.advances.txt > /dev/null; \
+		$(PYTHON) train/pack.py --drawing-bundle $(METRIC_SANS_TMP)/face-$$f-ref.nrt font/metric-sans-$$em$$bd$$it.txt $$m > /dev/null; \
+		OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_reference.py build/libneuronte.so --drawing-bundle $(METRIC_SANS_TMP)/face-$$f-ref.nrt font/metric-sans-$$em$$bd$$it.txt $$m > /dev/null; \
+		$(PYTHON) tests/check_metric_sans.py build/libneuronte.so $$n.nrt font/metric-sans-$$em$$bd$$it.txt font/metric-sans-$$em$$bd.advances.txt > /dev/null; \
 		echo "metric-sans $$f: repacks, reference exact, metric exact"; \
 	done
 
@@ -1316,3 +1325,13 @@ test-metric-sans-large: build/libneuronte.so
 test: test-metric-sans-large
 
 .PHONY: test-metric-sans-large
+
+# Letters that touch in the Neuronte Sans Metric faces: the counts of the shipped
+# faces are the limits (tests/metric-sans-touching.txt), so a drawing that makes
+# more letters touch fails.
+test-metric-sans-touching: build/libneuronte.so
+	$(PYTHON) tests/check_touching.py --table tests/metric-sans-touching.txt build/libneuronte.so
+
+test: test-metric-sans-touching
+
+.PHONY: test-metric-sans-touching

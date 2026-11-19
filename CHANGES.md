@@ -1,5 +1,43 @@
 # Changes
 
+## 0.1.7
+
+Every file of 0.1.6 is still here byte for byte and draws the same pixels
+and advances. No default changes. The library gains calls and two advance
+table forms (below) and keeps every existing call as it was.
+
+### All of Latin-1 in every desktop face
+
+The 1 to 16 px faces (`neuronte-uiN-v2`, `neuronte-uiN-italic-v2`), the
+scaled face (`neuronte-ui-scaled-latin1-v1` with its italic advances) and
+the large face (`neuronte-ui-large-latin1-v2`) draw printable ASCII, the
+ellipsis and all 96 characters from U+00A0 to U+00FF. ASCII draws byte for
+byte as before. Drawings: `font/ui-N-latin1.txt`, `font/ui-N-latin1-italic.txt`;
+cards in `weights/`.
+
+### Wide characters
+
+Five bundles, `neuronte-wide-{forms,symbols,pictographs,pictographs2,supplement}-v1`,
+draw 1,261 of the 1,335 East Asian Wide pictographs, symbols and fullwidth
+forms for a box of two cells (a drawing twice as tall, the engine asks
+W x 2H and averages row pairs, as `neuronte-kilix-chrome-v2`). 95 of their
+322 nets failed the gates and ship by the owner's choice, marked FAILED on
+their cards; 74 characters are left out and listed. Their sets are in
+`weights/NAME.symbols.txt`. The pictographs are two files because a bundle
+holds at most 127 group nets.
+
+### Neuronte Sans Metric
+
+A desktop face drawn to Helvetica's advances (`neuronte-metric-sansN-v1`,
+1 to 16 px with italics and a drawn bold from 9 px; `-scaled-v1`;
+`-large-v1`), with the library's new support: advance tables in
+thousandths of an em (version 4 at 100 units, or version 8 with a shift of
+each letter's drawing), `neuronte_advance_milli()`, `neuronte_advance_shift()`,
+`neuronte_text_width_exact()` and `neuronte_draw_text_exact()`. The large
+and scaled faces failed one gate (G-M1) and ship by the owner's ruling. Its
+advances are numbers copied from Adobe's AFM files; see
+[PROVENANCE.md](PROVENANCE.md) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
 ## 0.1.6
 
 Every file of 0.1.5 is still here byte for byte and draws the same pixels

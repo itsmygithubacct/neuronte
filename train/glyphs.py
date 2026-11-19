@@ -79,6 +79,12 @@ Tiers:
              set of font/kilix-chrome-2.txt: the same symbols and the sun
              and the cloud, drawn for a box of two cells (the bell for
              one), put in the cell by train/kilix_chrome2.py.
+    twd...   the wide characters of the neuronte-wide bundles, drawn for a
+             box of two cells by train/wide.py: twdf the fullwidth forms,
+             twds the signs, emoticons and transport, twdp Miscellaneous
+             Symbols and Pictographs, twdu the supplements. One tier for
+             each set; NAMErI is group net I of set NAME alone; wideforms,
+             widesymbols, widepict and widesupp are the four bundles.
     ui1      the desktop face, printable ASCII and U+2026, from
     ...      font/ui-EM.txt, one file for every em from 1 to 128 except
     ui128    44. Stems are one pixel wide through 16, two from 17
@@ -1456,6 +1462,9 @@ SETS["kilixchrome"] = list(kilix_chrome.primary())
 import kilix_chrome2  # noqa: E402
 SETS.update({name: [name] for name in kilix_chrome2.sets()})  # the sets of font/kilix-chrome-2.txt and each one's groups
 SETS["kilixchrome2"] = list(kilix_chrome2.primary())
+import wide  # noqa: E402
+SETS.update({name: [name] for name in wide.sets()})  # the sets of the neuronte-wide bundles and each one's groups
+SETS.update({wide.TEACHER[b]: names for b, names in wide.bundles().items()})
 
 
 def tier(name):
@@ -1533,6 +1542,8 @@ def tier(name):
         return [(c, traced(g[c][1], em)) for c in sorted(want, key=ord)]
     if name == "uilargesigns":
         return [(c, g) for c, g in sorted(large_signs().items())]
+    if name.startswith(wide.PREFIX) and name in wide.sets():
+        return wide.tier(name)
     if name == "uilargelatin1":
         g = large_latin1()
         return [(c, g[c][0]) for c in sorted(g)]
@@ -1684,6 +1695,8 @@ def sources(name):
         files += ["font/term-rest.txt", "train/term_rest.py"]
     if any(t.startswith(kilix_chrome.PREFIX) for t in tiers):
         files += ["font/kilix-chrome.txt", "train/kilix_chrome.py", "train/term_rest.py"]
+    if any(t.startswith(wide.PREFIX) for t in tiers):
+        files += [f for f in wide.sources(tiers) if f not in files]
     if any(t.startswith(kilix_chrome2.PREFIX) for t in tiers):
         files += ["font/kilix-chrome-2.txt", "train/kilix_chrome2.py", "font/kilix-chrome.txt", "train/kilix_chrome.py",
                   "train/term_rest.py"]

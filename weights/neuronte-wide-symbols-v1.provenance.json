@@ -1,0 +1,1423 @@
+{
+  "schema": "neuronte.wide/v1",
+  "name": "neuronte-wide-symbols-v1",
+  "sha256": "66074bfc548dd6f572c121d0848f38421d626b125da4c0e948346e6144fed3d1",
+  "bytes": 4166204,
+  "box": "two cells: asked W x 2H for a box W x H, each pair of rows averaged",
+  "sets": [
+    [
+      "twds0",
+      9
+    ],
+    [
+      "twds1",
+      9
+    ],
+    [
+      "twds2",
+      9
+    ],
+    [
+      "twds3",
+      9
+    ],
+    [
+      "twds4",
+      9
+    ],
+    [
+      "twds5",
+      9
+    ]
+  ],
+  "halved": [
+    [
+      "twds0",
+      2
+    ],
+    [
+      "twds0",
+      3
+    ],
+    [
+      "twds0",
+      6
+    ],
+    [
+      "twds1",
+      1
+    ],
+    [
+      "twds1",
+      2
+    ],
+    [
+      "twds1",
+      3
+    ],
+    [
+      "twds1",
+      4
+    ],
+    [
+      "twds1",
+      5
+    ],
+    [
+      "twds1",
+      6
+    ],
+    [
+      "twds1",
+      7
+    ],
+    [
+      "twds1",
+      8
+    ],
+    [
+      "twds2",
+      0
+    ],
+    [
+      "twds2",
+      1
+    ],
+    [
+      "twds2",
+      2
+    ],
+    [
+      "twds2",
+      3
+    ],
+    [
+      "twds2",
+      4
+    ],
+    [
+      "twds2",
+      5
+    ],
+    [
+      "twds3",
+      3
+    ],
+    [
+      "twds3",
+      5
+    ],
+    [
+      "twds3",
+      7
+    ],
+    [
+      "twds3",
+      8
+    ],
+    [
+      "twds4",
+      0
+    ],
+    [
+      "twds4",
+      1
+    ],
+    [
+      "twds4",
+      2
+    ],
+    [
+      "twds4",
+      3
+    ],
+    [
+      "twds4",
+      4
+    ],
+    [
+      "twds4",
+      5
+    ],
+    [
+      "twds4",
+      8
+    ],
+    [
+      "twds5",
+      0
+    ],
+    [
+      "twds5",
+      1
+    ],
+    [
+      "twds5",
+      2
+    ],
+    [
+      "twds5",
+      3
+    ],
+    [
+      "twds5",
+      6
+    ]
+  ],
+  "left_out": [
+    {
+      "set": "twds1r5",
+      "group": 0,
+      "why": "failed the declared gates with both seeds, as half of a group that had failed"
+    },
+    {
+      "set": "twds1r5",
+      "group": 1,
+      "why": "failed the declared gates with both seeds, as half of a group that had failed"
+    },
+    {
+      "set": "twds1r6",
+      "group": 0,
+      "why": "failed the declared gates with both seeds, as half of a group that had failed"
+    },
+    {
+      "set": "twds1r6",
+      "group": 1,
+      "why": "failed the declared gates with both seeds, as half of a group that had failed"
+    },
+    {
+      "set": "twds1r7",
+      "group": 0,
+      "why": "failed the declared gates with both seeds, as half of a group that had failed"
+    },
+    {
+      "set": "twds1r7",
+      "group": 1,
+      "why": "failed the declared gates with both seeds, as half of a group that had failed"
+    },
+    {
+      "set": "twds1r8",
+      "group": 1,
+      "why": "failed the declared gates with both seeds, as half of a group that had failed"
+    },
+    {
+      "set": "twds2r0",
+      "group": 0,
+      "why": "failed the declared gates with both seeds, as half of a group that had failed"
+    },
+    {
+      "set": "twds2r0",
+      "group": 1,
+      "why": "failed the declared gates with both seeds, as half of a group that had failed"
+    },
+    {
+      "set": "twds2r1",
+      "group": 0,
+      "why": "failed the declared gates with both seeds, as half of a group that had failed"
+    },
+    {
+      "set": "twds2r1",
+      "group": 1,
+      "why": "failed the declared gates with both seeds, as half of a group that had failed"
+    },
+    {
+      "set": "twds2r3",
+      "group": 1,
+      "why": "failed the declared gates with both seeds, as half of a group that had failed"
+    },
+    {
+      "set": "twds4r3",
+      "group": 0,
+      "why": "failed the declared gates with both seeds, as half of a group that had failed"
+    },
+    {
+      "set": "twds5r0",
+      "group": 0,
+      "why": "failed the declared gates with both seeds, as half of a group that had failed"
+    }
+  ],
+  "failed_shipped": [
+    {
+      "set": "twds0r6",
+      "group": 1,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    },
+    {
+      "set": "twds1r1",
+      "group": 1,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    },
+    {
+      "set": "twds1r2",
+      "group": 0,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    },
+    {
+      "set": "twds1r2",
+      "group": 1,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    },
+    {
+      "set": "twds1r3",
+      "group": 0,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    },
+    {
+      "set": "twds1r3",
+      "group": 1,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    },
+    {
+      "set": "twds1r4",
+      "group": 0,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    },
+    {
+      "set": "twds1r4",
+      "group": 1,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    },
+    {
+      "set": "twds1r8",
+      "group": 0,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    },
+    {
+      "set": "twds2r2",
+      "group": 0,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    },
+    {
+      "set": "twds2r3",
+      "group": 0,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    },
+    {
+      "set": "twds2r4",
+      "group": 0,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    },
+    {
+      "set": "twds2r4",
+      "group": 1,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    },
+    {
+      "set": "twds2r5",
+      "group": 0,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    },
+    {
+      "set": "twds3r5",
+      "group": 1,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    },
+    {
+      "set": "twds3r8",
+      "group": 1,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    },
+    {
+      "set": "twds4r0",
+      "group": 1,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    },
+    {
+      "set": "twds4r1",
+      "group": 0,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    },
+    {
+      "set": "twds4r2",
+      "group": 0,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    },
+    {
+      "set": "twds4r2",
+      "group": 1,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    },
+    {
+      "set": "twds4r3",
+      "group": 1,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    },
+    {
+      "set": "twds4r4",
+      "group": 1,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    },
+    {
+      "set": "twds4r5",
+      "group": 0,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    },
+    {
+      "set": "twds4r5",
+      "group": 1,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    },
+    {
+      "set": "twds4r8",
+      "group": 0,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    },
+    {
+      "set": "twds5r1",
+      "group": 0,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    },
+    {
+      "set": "twds5r1",
+      "group": 1,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    },
+    {
+      "set": "twds5r2",
+      "group": 0,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    },
+    {
+      "set": "twds5r2",
+      "group": 1,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    }
+  ],
+  "record": {
+    "schema": "neuronte.standalone-bundle/v1",
+    "sha256": "66074bfc548dd6f572c121d0848f38421d626b125da4c0e948346e6144fed3d1",
+    "bytes": 4166204,
+    "members": 74,
+    "group_nets": 73,
+    "ranges": 114,
+    "gate": null,
+    "trained_scalars": 282,
+    "fallback": {
+      "member": 73,
+      "kind": "blank",
+      "hidden_width": 1,
+      "distance": -8.0,
+      "image_sha256": "42d4790165297c3af39d178e1396f575991d6fe4d2e3c947762ef5eaedd05bf6",
+      "bytes": 592
+    },
+    "apart_from": [],
+    "nets": [
+      {
+        "member": 0,
+        "json": "neuronte-wide-symbols-v1-twds0-g0.json",
+        "json_sha256": "5c589de9e5e30ecdae6b99a8e7ba6ce28ffabaaae853d5145960c034aa863d9f",
+        "image_sha256": "e0bca343625f7e893519169d5a6a56c1daab8a5912d0c3806447cef4d85d2d74",
+        "bytes": 57040,
+        "set": "twds0-repertoire",
+        "scalars": [
+          "U+231A",
+          "U+231B",
+          "U+2329",
+          "U+232A",
+          "U+23E9",
+          "U+23EA"
+        ]
+      },
+      {
+        "member": 1,
+        "json": "neuronte-wide-symbols-v1-twds0-g1.json",
+        "json_sha256": "daff5801b1bc4d77a2a027bbb8223bf3e7bbcfd18c77fd7294f4a7bde4e03f9a",
+        "image_sha256": "ae66c2b81f66951b09e49eeae5092dbe9766319c98b471318f024437902b0ccf",
+        "bytes": 57040,
+        "set": "twds0-repertoire",
+        "scalars": [
+          "U+23EB",
+          "U+23EC",
+          "U+23F0",
+          "U+23F3",
+          "U+25FD",
+          "U+25FE"
+        ]
+      },
+      {
+        "member": 2,
+        "json": "neuronte-wide-symbols-v1-twds0r2-g0.json",
+        "json_sha256": "47a61e8bc4f8b0b4e6ff5bade7ef9ad6fdeee27d40153b41b47e743c70b61809",
+        "image_sha256": "3a2272bdbb7c498c8f54da78b660df37d261a8d07f141addc0d405860b9097b1",
+        "bytes": 57040,
+        "set": "twds0r2-repertoire",
+        "scalars": [
+          "U+2614",
+          "U+2615",
+          "U+2648"
+        ]
+      },
+      {
+        "member": 3,
+        "json": "neuronte-wide-symbols-v1-twds0r2-g1.json",
+        "json_sha256": "702c8915c2373f443cb2f4fad954f2b72ff305b0bc2f3a917d21210cb5f7673b",
+        "image_sha256": "bfa88c39248caf754bb2269ab0a277bf2826a0fee5a98f4aa5f360994bf2b2eb",
+        "bytes": 57040,
+        "set": "twds0r2-repertoire",
+        "scalars": [
+          "U+2649",
+          "U+264A",
+          "U+264B"
+        ]
+      },
+      {
+        "member": 4,
+        "json": "neuronte-wide-symbols-v1-twds0r3-g0.json",
+        "json_sha256": "0ff61e0e1cc0eda76c35419b9e8ff13e1f31a02ae608e002d01c5bd903df35d0",
+        "image_sha256": "f50f17fb2d64db744166bed14c824c421859074791f6c968da422c71364ce002",
+        "bytes": 57040,
+        "set": "twds0r3-repertoire",
+        "scalars": [
+          "U+264C",
+          "U+264D",
+          "U+264E"
+        ]
+      },
+      {
+        "member": 5,
+        "json": "neuronte-wide-symbols-v1-twds0r3-g1.json",
+        "json_sha256": "34085ca06b17e4bd1a5c195379e2cfb0103f7b20469db97d1e84e66b4c9205c2",
+        "image_sha256": "b40a001f744bc74362b60f824dc0ea8de394a41719fe036d517c6d010d84f639",
+        "bytes": 57040,
+        "set": "twds0r3-repertoire",
+        "scalars": [
+          "U+264F",
+          "U+2650",
+          "U+2651"
+        ]
+      },
+      {
+        "member": 6,
+        "json": "neuronte-wide-symbols-v1-twds0-g4.json",
+        "json_sha256": "ed534ecbff6ec0d8c2f3aa1de7e71120e0a1903dba5681e70824a911eca60c31",
+        "image_sha256": "35b426a88b73db7c1c8b40f21ebb8cfe381a577b201d5df6b0065769c47963a1",
+        "bytes": 57040,
+        "set": "twds0-repertoire",
+        "scalars": [
+          "U+2652",
+          "U+2653",
+          "U+267F",
+          "U+2693",
+          "U+26A1",
+          "U+26AA"
+        ]
+      },
+      {
+        "member": 7,
+        "json": "neuronte-wide-symbols-v1-twds0-g5.json",
+        "json_sha256": "173251b132614017e045063ed107f7101ab946087c97cee0bb60f0253c371197",
+        "image_sha256": "63b38fa30b263d2a60c73c5f55828f2106d5ad8380fc9c54a281742db0ff022a",
+        "bytes": 57040,
+        "set": "twds0-repertoire",
+        "scalars": [
+          "U+26AB",
+          "U+26BD",
+          "U+26BE",
+          "U+26C4",
+          "U+26C5",
+          "U+26CE"
+        ]
+      },
+      {
+        "member": 8,
+        "json": "neuronte-wide-symbols-v1-twds0r6-g0.json",
+        "json_sha256": "282138689fd172c3c7f68d4729a035902962769257362a65b072af1aeca9da55",
+        "image_sha256": "45dce572c7b3530d49bb7bfe104ce88347548096807f0d15cf9922436afb07e3",
+        "bytes": 57040,
+        "set": "twds0r6-repertoire",
+        "scalars": [
+          "U+26D4",
+          "U+26EA",
+          "U+26F2"
+        ]
+      },
+      {
+        "member": 9,
+        "json": "neuronte-wide-symbols-v1-twds0r6-g1.json",
+        "json_sha256": "4c1dddf0bf588924818cb53d8b7dfa5ac2e83680ab1aed5e96b36cc7cec5f1d2",
+        "image_sha256": "a03bc694a21e8dc2c5d95785f01bd994d5f262eebef310314770dbb8e399515e",
+        "bytes": 57040,
+        "set": "twds0r6-repertoire",
+        "scalars": [
+          "U+26F3",
+          "U+26F5",
+          "U+26FA"
+        ]
+      },
+      {
+        "member": 10,
+        "json": "neuronte-wide-symbols-v1-twds0-g7.json",
+        "json_sha256": "ff98b6f12b6c791ddd071e98c134576736780a634c50cda4e4b0404536f66438",
+        "image_sha256": "7a2b45bf7710f74bada083fd2b6eea8e54fe9f4d53c722cb7636e2288eedf843",
+        "bytes": 57040,
+        "set": "twds0-repertoire",
+        "scalars": [
+          "U+26FD",
+          "U+2705",
+          "U+270A",
+          "U+270B",
+          "U+2728",
+          "U+274C"
+        ]
+      },
+      {
+        "member": 11,
+        "json": "neuronte-wide-symbols-v1-twds0-g8.json",
+        "json_sha256": "8b323e8388fa99f94cfe505577745a13eecb850aadd51cd36632b1cfe7761813",
+        "image_sha256": "432238ba1da54d43cd495131c63fdba1caec03acfa1e766c7d1a0631fa88653b",
+        "bytes": 57040,
+        "set": "twds0-repertoire",
+        "scalars": [
+          "U+274E",
+          "U+2753",
+          "U+2754",
+          "U+2755",
+          "U+2757",
+          "U+2795"
+        ]
+      },
+      {
+        "member": 12,
+        "json": "neuronte-wide-symbols-v1-twds1-g0.json",
+        "json_sha256": "89b19ec8ba2f02862bc06a1980ff72cf48333db179a5b2cb7b59da16fd193596",
+        "image_sha256": "c6646bd36c46368244850a55d38d2070b28eb9df6347ca2721cac3e5952d1cde",
+        "bytes": 57040,
+        "set": "twds1-repertoire",
+        "scalars": [
+          "U+2796",
+          "U+2797",
+          "U+27B0",
+          "U+27BF",
+          "U+2B1B",
+          "U+2B1C"
+        ]
+      },
+      {
+        "member": 13,
+        "json": "neuronte-wide-symbols-v1-twds1r1-g0.json",
+        "json_sha256": "099ba0081d07c24821a4d18433dc011cf82666be6e2272661f5f8e523db523a9",
+        "image_sha256": "3f47cbe1ba174e892f48127bf6f0371fc5693cc7367c67bcf1f3759a0d2ed435",
+        "bytes": 57040,
+        "set": "twds1r1-repertoire",
+        "scalars": [
+          "U+2B50",
+          "U+2B55",
+          "U+1F004"
+        ]
+      },
+      {
+        "member": 14,
+        "json": "neuronte-wide-symbols-v1-twds1r1-g1.json",
+        "json_sha256": "a33515f6f689cf5a823621b7057c8079d2e8fff56506f8601966ec05d0ea83fe",
+        "image_sha256": "789bf0da5a91868b62f0020f6b23d10bf542be6b5794919a86c2de3a71c8a3eb",
+        "bytes": 57040,
+        "set": "twds1r1-repertoire",
+        "scalars": [
+          "U+1F0CF",
+          "U+1F18E",
+          "U+1F191"
+        ]
+      },
+      {
+        "member": 15,
+        "json": "neuronte-wide-symbols-v1-twds1r2-g0.json",
+        "json_sha256": "4409859a10772d592011799e332dbd9faffef10207e1c252600469aefe571f4d",
+        "image_sha256": "e75a4ebef6e2f554e5b84b3a4aaa406557c0dc6ac8329ddc4b0dc8c5e36dfd15",
+        "bytes": 57040,
+        "set": "twds1r2-repertoire",
+        "scalars": [
+          "U+1F192",
+          "U+1F193",
+          "U+1F194"
+        ]
+      },
+      {
+        "member": 16,
+        "json": "neuronte-wide-symbols-v1-twds1r2-g1.json",
+        "json_sha256": "a52435bd2410d6893e96977183fa33bb0926b9da4e2ea8af2d00c421e805c897",
+        "image_sha256": "c78421df3284e3d95ca4fdd8014dd9dbea164943b1ade436c5183dc18832ba44",
+        "bytes": 57040,
+        "set": "twds1r2-repertoire",
+        "scalars": [
+          "U+1F195",
+          "U+1F196",
+          "U+1F197"
+        ]
+      },
+      {
+        "member": 17,
+        "json": "neuronte-wide-symbols-v1-twds1r3-g0.json",
+        "json_sha256": "1648703677f309b21b6c875afcc40637afe8169410074f204f70fcaf57808741",
+        "image_sha256": "0d46a28f40ff9103e2674db42f2e19cdbe13671cbb7f69a6fef3a16f1147b087",
+        "bytes": 57040,
+        "set": "twds1r3-repertoire",
+        "scalars": [
+          "U+1F198",
+          "U+1F199",
+          "U+1F19A"
+        ]
+      },
+      {
+        "member": 18,
+        "json": "neuronte-wide-symbols-v1-twds1r3-g1.json",
+        "json_sha256": "9cf9b6f65dba7f89671113037d3c7acd7af0c9f378c2a005178a70922106569c",
+        "image_sha256": "a0838d3fb9b9a852ae4716281986d8c4f85bf2537371719401bebbcf7cefc7b0",
+        "bytes": 57040,
+        "set": "twds1r3-repertoire",
+        "scalars": [
+          "U+1F200",
+          "U+1F201",
+          "U+1F202"
+        ]
+      },
+      {
+        "member": 19,
+        "json": "neuronte-wide-symbols-v1-twds1r4-g0.json",
+        "json_sha256": "50ca9441a11c4d4336a6f67c5d809f0290558231f4d549c622d2bc1561f67c2c",
+        "image_sha256": "aff011abacdad46b871cfd2a37b1601610fb4988942f342c84f3df6fd032577b",
+        "bytes": 57040,
+        "set": "twds1r4-repertoire",
+        "scalars": [
+          "U+1F210",
+          "U+1F211",
+          "U+1F212"
+        ]
+      },
+      {
+        "member": 20,
+        "json": "neuronte-wide-symbols-v1-twds1r4-g1.json",
+        "json_sha256": "6b93ad76cb14c30fc44d72fc76c0eadad60faa7f09c746ffbdc45b572c2a2ac9",
+        "image_sha256": "727f33593f7c5e56cabc28cd5022e7e94e9032128e256f7acafe880004b92728",
+        "bytes": 57040,
+        "set": "twds1r4-repertoire",
+        "scalars": [
+          "U+1F213",
+          "U+1F214",
+          "U+1F215"
+        ]
+      },
+      {
+        "member": 21,
+        "json": "neuronte-wide-symbols-v1-twds1r8-g0.json",
+        "json_sha256": "eccda94f7a89ce2dbe62f379f43570fbc75940ab5aa8592ba643abcf611589aa",
+        "image_sha256": "9c47713fbe7fa6d100060e692c5f945deb896182343355a91c725fbce4c96a47",
+        "bytes": 57040,
+        "set": "twds1r8-repertoire",
+        "scalars": [
+          "U+1F228",
+          "U+1F229",
+          "U+1F22A"
+        ]
+      },
+      {
+        "member": 22,
+        "json": "neuronte-wide-symbols-v1-twds2r2-g0.json",
+        "json_sha256": "9356249da6af500e704097cf39d3ff202b65eeca4dd7cb68fa11c45e6a5a9e54",
+        "image_sha256": "b7641d57d1e103357c4b8a9f70ffb8bc209a0cc2f172061a78bf1ecdbf7fbd2e",
+        "bytes": 57040,
+        "set": "twds2r2-repertoire",
+        "scalars": [
+          "U+1F23A",
+          "U+1F23B",
+          "U+1F240"
+        ]
+      },
+      {
+        "member": 23,
+        "json": "neuronte-wide-symbols-v1-twds2r2-g1.json",
+        "json_sha256": "5bc128c465f65155ca46845f38b38326563b2d3e543845888ed503f0d3fbd860",
+        "image_sha256": "c4abd9d13ed9b595e8b79b563f252f9320902c82eb60fb17d6587e76408fb5e8",
+        "bytes": 57040,
+        "set": "twds2r2-repertoire",
+        "scalars": [
+          "U+1F241",
+          "U+1F242",
+          "U+1F243"
+        ]
+      },
+      {
+        "member": 24,
+        "json": "neuronte-wide-symbols-v1-twds2r3-g0.json",
+        "json_sha256": "0a874d4fa69811506803b654034a6a34e02d5683c56a57adb975cc83d7607181",
+        "image_sha256": "641901cc8cf9f53e17bf9efda3bf520c58ad923134a7feb888dd2b4f4de8601d",
+        "bytes": 57040,
+        "set": "twds2r3-repertoire",
+        "scalars": [
+          "U+1F244",
+          "U+1F245",
+          "U+1F246"
+        ]
+      },
+      {
+        "member": 25,
+        "json": "neuronte-wide-symbols-v1-twds2r4-g0.json",
+        "json_sha256": "d7860ba498b37baf8b66e0fb7665adf7036316877983a4c45ae6933e072b0d08",
+        "image_sha256": "3a726c123fe8586136dcfbde604963f9d9be1b8475df8f1ec9f5679bf48333b6",
+        "bytes": 57040,
+        "set": "twds2r4-repertoire",
+        "scalars": [
+          "U+1F251",
+          "U+1F260",
+          "U+1F261"
+        ]
+      },
+      {
+        "member": 26,
+        "json": "neuronte-wide-symbols-v1-twds2r4-g1.json",
+        "json_sha256": "79a037a056cc2e9b9ed504b24cda348d72ea04d7e34f2f061b78d2ce2d90121d",
+        "image_sha256": "e9017819f40e015e578aac03e8e2149bcc7cebaac9b3fb086cc48cacdfc27411",
+        "bytes": 57040,
+        "set": "twds2r4-repertoire",
+        "scalars": [
+          "U+1F262",
+          "U+1F263",
+          "U+1F264"
+        ]
+      },
+      {
+        "member": 27,
+        "json": "neuronte-wide-symbols-v1-twds2r5-g0.json",
+        "json_sha256": "221f2be258ff6af035b51c6ff9f8fb880b256501819549fd06e91c5fb3147626",
+        "image_sha256": "d6b5ee73c1b5e9880da0d6a181e607e3354b93ed588950177d0c01780fe6f7f4",
+        "bytes": 57040,
+        "set": "twds2r5-repertoire",
+        "scalars": [
+          "U+1F265",
+          "U+1F600",
+          "U+1F601"
+        ]
+      },
+      {
+        "member": 28,
+        "json": "neuronte-wide-symbols-v1-twds2r5-g1.json",
+        "json_sha256": "0ae80b15afeda9061c08fc484399bd3db410336bd254d7e7198b123b1cb7c34e",
+        "image_sha256": "6e9cdd31b988bb4f217c682fee1d707bc344e6187ac4f1dc3fe7b10680994751",
+        "bytes": 57040,
+        "set": "twds2r5-repertoire",
+        "scalars": [
+          "U+1F602",
+          "U+1F603",
+          "U+1F604"
+        ]
+      },
+      {
+        "member": 29,
+        "json": "neuronte-wide-symbols-v1-twds2-g6.json",
+        "json_sha256": "87195226dbabbc01d7813076d8554496eadb600249b4f283bb41b757c2c0ff6c",
+        "image_sha256": "cfc6217bf535043330500c9d170eb97c478d0c6e9d76b197e14db5298c1b786a",
+        "bytes": 57040,
+        "set": "twds2-repertoire",
+        "scalars": [
+          "U+1F605",
+          "U+1F606",
+          "U+1F607",
+          "U+1F608",
+          "U+1F609",
+          "U+1F60A"
+        ]
+      },
+      {
+        "member": 30,
+        "json": "neuronte-wide-symbols-v1-twds2-g7.json",
+        "json_sha256": "b03df13e244c83968c5b4c331089eec16ac20d6694576544ac808c30d3a22de8",
+        "image_sha256": "c7360c16150879fbc78217ce94271b0ea518021bce94458b1acb8854c7c42344",
+        "bytes": 57040,
+        "set": "twds2-repertoire",
+        "scalars": [
+          "U+1F60B",
+          "U+1F60C",
+          "U+1F60D",
+          "U+1F60E",
+          "U+1F60F",
+          "U+1F610"
+        ]
+      },
+      {
+        "member": 31,
+        "json": "neuronte-wide-symbols-v1-twds2-g8.json",
+        "json_sha256": "c4cd1a1d6271a89ec0f599d4b37e4a40260aecfe7ad408470f2ff49ec3a535a5",
+        "image_sha256": "4f8bfe67f1785a4184f55c59cf43ca8a84178a3ba37f2f35000aac8269d24b51",
+        "bytes": 57040,
+        "set": "twds2-repertoire",
+        "scalars": [
+          "U+1F611",
+          "U+1F612",
+          "U+1F613",
+          "U+1F614",
+          "U+1F615",
+          "U+1F616"
+        ]
+      },
+      {
+        "member": 32,
+        "json": "neuronte-wide-symbols-v1-twds3-g0.json",
+        "json_sha256": "705d6317e7f85c92487d4d5a5b3bb114b7718a364c727149fd201a920fb4b609",
+        "image_sha256": "a788e0bedc4a25b48e0cb851cb82a0d948ad4e3e0782cf005281d17642ebb68b",
+        "bytes": 57040,
+        "set": "twds3-repertoire",
+        "scalars": [
+          "U+1F617",
+          "U+1F618",
+          "U+1F619",
+          "U+1F61A",
+          "U+1F61B",
+          "U+1F61C"
+        ]
+      },
+      {
+        "member": 33,
+        "json": "neuronte-wide-symbols-v1-twds3-g1.json",
+        "json_sha256": "543725e5c6e93edaa44dc4fc3c4a71c11fa511b42ba9e3d8c8bb0ae5001c2307",
+        "image_sha256": "4b7edb1d212d5fb7e675b2304203fba3fa28ccf57bf4d346a214012834e48950",
+        "bytes": 57040,
+        "set": "twds3-repertoire",
+        "scalars": [
+          "U+1F61D",
+          "U+1F61E",
+          "U+1F61F",
+          "U+1F620",
+          "U+1F621",
+          "U+1F622"
+        ]
+      },
+      {
+        "member": 34,
+        "json": "neuronte-wide-symbols-v1-twds3-g2.json",
+        "json_sha256": "2e252fe38229d1bb15ee0329fdc149ed45d91464b8fc6f414c89f806f9c62492",
+        "image_sha256": "cb094b1045d83789fd8bea42da1299cc2f4e88775c8fe7ee27861e51c83ca4a6",
+        "bytes": 57040,
+        "set": "twds3-repertoire",
+        "scalars": [
+          "U+1F623",
+          "U+1F624",
+          "U+1F625",
+          "U+1F626",
+          "U+1F627",
+          "U+1F628"
+        ]
+      },
+      {
+        "member": 35,
+        "json": "neuronte-wide-symbols-v1-twds3r3-g0.json",
+        "json_sha256": "ef4715f8c1e0619cb1493196ee51cb4192bea9c8c1e6b5dfbaa6269ab1758e68",
+        "image_sha256": "7460d24738e6b4d765e4ae81559cd0511f14b05ba3e84b1359acf02820d31f7c",
+        "bytes": 57040,
+        "set": "twds3r3-repertoire",
+        "scalars": [
+          "U+1F629",
+          "U+1F62A",
+          "U+1F62B"
+        ]
+      },
+      {
+        "member": 36,
+        "json": "neuronte-wide-symbols-v1-twds3r3-g1.json",
+        "json_sha256": "03c9e192a10466ac517b8dc5af1a18d21e740a046431e39c764e884541299b49",
+        "image_sha256": "fba7e35fda6ae1ac5a1c56801808ceecc6ebc1037aa2f759317fcad71ab9c751",
+        "bytes": 57040,
+        "set": "twds3r3-repertoire",
+        "scalars": [
+          "U+1F62C",
+          "U+1F62D",
+          "U+1F62E"
+        ]
+      },
+      {
+        "member": 37,
+        "json": "neuronte-wide-symbols-v1-twds3-g4.json",
+        "json_sha256": "b46cfda9012d63a4e931659c446332883a9d282a237651d814c9bb8986883071",
+        "image_sha256": "98ed14326c1be6eade01c732260301a99c430894c28c6aef1177ab1d81ed98ec",
+        "bytes": 57040,
+        "set": "twds3-repertoire",
+        "scalars": [
+          "U+1F62F",
+          "U+1F630",
+          "U+1F631",
+          "U+1F632",
+          "U+1F633",
+          "U+1F634"
+        ]
+      },
+      {
+        "member": 38,
+        "json": "neuronte-wide-symbols-v1-twds3r5-g0.json",
+        "json_sha256": "c66bdce73998566d48264cd9287d6f03cad37d9fc98b26cd1021ac88ab145e1f",
+        "image_sha256": "04dec95325c172859dca9bf63da30433dd963dc409a6f5d3d2e17dedc611b1f5",
+        "bytes": 57040,
+        "set": "twds3r5-repertoire",
+        "scalars": [
+          "U+1F635",
+          "U+1F636",
+          "U+1F637"
+        ]
+      },
+      {
+        "member": 39,
+        "json": "neuronte-wide-symbols-v1-twds3r5-g1.json",
+        "json_sha256": "fa4e09147227c9b029c993113817ae94a76e7a6e109c2f6762b6f18894929cb1",
+        "image_sha256": "2e16a60123a6eb7a44ef6f7c73297d11bfab0a19b55b6a19718901e8004ad2a2",
+        "bytes": 57040,
+        "set": "twds3r5-repertoire",
+        "scalars": [
+          "U+1F638",
+          "U+1F639",
+          "U+1F63A"
+        ]
+      },
+      {
+        "member": 40,
+        "json": "neuronte-wide-symbols-v1-twds3-g6.json",
+        "json_sha256": "0eb6ea2b2d8b5db43e717d3a6dcd3c76062b186d52a3bcded6b7b06fe5bd278c",
+        "image_sha256": "f510f38ee7fbd4a3d16c40b917a53594d7b17333704837559bcef78898ccc6a1",
+        "bytes": 57040,
+        "set": "twds3-repertoire",
+        "scalars": [
+          "U+1F63B",
+          "U+1F63C",
+          "U+1F63D",
+          "U+1F63E",
+          "U+1F63F",
+          "U+1F640"
+        ]
+      },
+      {
+        "member": 41,
+        "json": "neuronte-wide-symbols-v1-twds3r7-g0.json",
+        "json_sha256": "b27d9c9201391d35243ffa00bf1bf044719f071f63e1a31d19257691924d54ed",
+        "image_sha256": "b5a501d65c4e87a177a7261a72b72db23a44593ece8da7f184d829d620f4ef1e",
+        "bytes": 57040,
+        "set": "twds3r7-repertoire",
+        "scalars": [
+          "U+1F641",
+          "U+1F642",
+          "U+1F643"
+        ]
+      },
+      {
+        "member": 42,
+        "json": "neuronte-wide-symbols-v1-twds3r7-g1.json",
+        "json_sha256": "fda89d85a9fb2e20179e598ff516eadd592f1ef9fed9fdb7eb5c3b282c9cb614",
+        "image_sha256": "f16066ebeb63329da8d5a610931d88807c77ca687bd5c0edbb36679b0b496b79",
+        "bytes": 57040,
+        "set": "twds3r7-repertoire",
+        "scalars": [
+          "U+1F644",
+          "U+1F645",
+          "U+1F646"
+        ]
+      },
+      {
+        "member": 43,
+        "json": "neuronte-wide-symbols-v1-twds3r8-g0.json",
+        "json_sha256": "0853b73c6d76189f0a5f91b97c2797ef51b587db79de74e10e6025da5f8e04be",
+        "image_sha256": "a71b9ea6bcc8122d2fd21c5c10305f70801214d6bb7ae4e86439fd21b01d4f4f",
+        "bytes": 57040,
+        "set": "twds3r8-repertoire",
+        "scalars": [
+          "U+1F647",
+          "U+1F648",
+          "U+1F649"
+        ]
+      },
+      {
+        "member": 44,
+        "json": "neuronte-wide-symbols-v1-twds3r8-g1.json",
+        "json_sha256": "6f0d0cf06e7bfa9ddb48b014bd72eccaa8044dc43962e9f8f9f74df57aa40121",
+        "image_sha256": "0098e8c099f3be96fe6b6431423e86b06e37f23de2841abe42dd85e34c1fff37",
+        "bytes": 57040,
+        "set": "twds3r8-repertoire",
+        "scalars": [
+          "U+1F64A",
+          "U+1F64B",
+          "U+1F64C"
+        ]
+      },
+      {
+        "member": 45,
+        "json": "neuronte-wide-symbols-v1-twds4r0-g0.json",
+        "json_sha256": "42d6365be8dd859c37adcacb4c4e7c1e062c45db8f55cb56ac326f7b0cdc0561",
+        "image_sha256": "58f9c80c3174f3f37867a47140dfcf159fd303e64dcd651b75bcd1b3c4666b7a",
+        "bytes": 57040,
+        "set": "twds4r0-repertoire",
+        "scalars": [
+          "U+1F64D",
+          "U+1F64E",
+          "U+1F64F"
+        ]
+      },
+      {
+        "member": 46,
+        "json": "neuronte-wide-symbols-v1-twds4r0-g1.json",
+        "json_sha256": "f90f47da1c07831618bc316a7633a11c60adf1f88ad9027244352f6bf44379c6",
+        "image_sha256": "b8d6ad65ace87a529f316eb9c09884f54c0dbeaa28544c868c5f7b74ec96821e",
+        "bytes": 57040,
+        "set": "twds4r0-repertoire",
+        "scalars": [
+          "U+1F680",
+          "U+1F681",
+          "U+1F682"
+        ]
+      },
+      {
+        "member": 47,
+        "json": "neuronte-wide-symbols-v1-twds4r1-g0.json",
+        "json_sha256": "8cb76cdd829317b639dd69eede275f944f7462e0dc84b8f19c82cb8ac64d39b1",
+        "image_sha256": "4d96f1cae6f20b6f94f798653ee07410d7c7616a18c506fe130be62150863e81",
+        "bytes": 57040,
+        "set": "twds4r1-repertoire",
+        "scalars": [
+          "U+1F683",
+          "U+1F684",
+          "U+1F685"
+        ]
+      },
+      {
+        "member": 48,
+        "json": "neuronte-wide-symbols-v1-twds4r1-g1.json",
+        "json_sha256": "4a47f584b86a25bab66255403c3436325c62c9430734676c900e6b59b1bba635",
+        "image_sha256": "1874f223f5041a1bb54ae41b546166e48666ad043514d2091719b55ca23aec2c",
+        "bytes": 57040,
+        "set": "twds4r1-repertoire",
+        "scalars": [
+          "U+1F686",
+          "U+1F687",
+          "U+1F688"
+        ]
+      },
+      {
+        "member": 49,
+        "json": "neuronte-wide-symbols-v1-twds4r2-g0.json",
+        "json_sha256": "d8dbe72e9cf3498beeac28ae788da5711b3d21b568e2151f8ec466d9a513da99",
+        "image_sha256": "735bcd17a52fb1e758fc2201577eaeef4127e72d5ed0625fb283c2308cba0fb2",
+        "bytes": 57040,
+        "set": "twds4r2-repertoire",
+        "scalars": [
+          "U+1F689",
+          "U+1F68A",
+          "U+1F68B"
+        ]
+      },
+      {
+        "member": 50,
+        "json": "neuronte-wide-symbols-v1-twds4r2-g1.json",
+        "json_sha256": "6b179fb2a24be2bcd62f97c5fd5299b8e89192db7e4885f5594664f235471cf4",
+        "image_sha256": "e5efcbbac8b68e52e8c6fffe80cc262d34b5cc54e1142f81f6a6c970d0a18784",
+        "bytes": 57040,
+        "set": "twds4r2-repertoire",
+        "scalars": [
+          "U+1F68C",
+          "U+1F68D",
+          "U+1F68E"
+        ]
+      },
+      {
+        "member": 51,
+        "json": "neuronte-wide-symbols-v1-twds4r3-g1.json",
+        "json_sha256": "e6777a8496357fa5703df50d710416dc4cc61c3215c3d4645fa48b4555ca2e4e",
+        "image_sha256": "6588a9e20d2367394d068c72581ec28a97bd432c8be790db21f227b2186f79ec",
+        "bytes": 57040,
+        "set": "twds4r3-repertoire",
+        "scalars": [
+          "U+1F692",
+          "U+1F693",
+          "U+1F694"
+        ]
+      },
+      {
+        "member": 52,
+        "json": "neuronte-wide-symbols-v1-twds4r4-g0.json",
+        "json_sha256": "0e6f517e7312676eafa11524ac5f79e996305b3ffb72526d3bb8d4d8ba3874f3",
+        "image_sha256": "3ece3c9684619014fda8620f9e741ae0c57e59151fabebb96e4bccee90efca12",
+        "bytes": 57040,
+        "set": "twds4r4-repertoire",
+        "scalars": [
+          "U+1F695",
+          "U+1F696",
+          "U+1F697"
+        ]
+      },
+      {
+        "member": 53,
+        "json": "neuronte-wide-symbols-v1-twds4r4-g1.json",
+        "json_sha256": "71eac5f8ee54588e5d44d2bc28fde2217321c2a572f09d242df71ce8a0083063",
+        "image_sha256": "5954639b96b570a4f502804560de9dd8405220d5fbed5021507d658ec401c809",
+        "bytes": 57040,
+        "set": "twds4r4-repertoire",
+        "scalars": [
+          "U+1F698",
+          "U+1F699",
+          "U+1F69A"
+        ]
+      },
+      {
+        "member": 54,
+        "json": "neuronte-wide-symbols-v1-twds4r5-g0.json",
+        "json_sha256": "b3881edf3e1b8f135e5304c05949b861a80124de7d2990e8081cd2a3ed1cd0dd",
+        "image_sha256": "fbd61ffa072458958cb932afc3747d6d5079170c569937ceafd194c898ef9c75",
+        "bytes": 57040,
+        "set": "twds4r5-repertoire",
+        "scalars": [
+          "U+1F69B",
+          "U+1F69C",
+          "U+1F69D"
+        ]
+      },
+      {
+        "member": 55,
+        "json": "neuronte-wide-symbols-v1-twds4r5-g1.json",
+        "json_sha256": "e2996944a6f485fc05783c93ea0ac4c9f4cdae29d5fbf76a96e875d9235e5931",
+        "image_sha256": "7ff33da6743c2ff6c2edbbb8d84dc81e16f35e29005e8e05316122b82c0e437a",
+        "bytes": 57040,
+        "set": "twds4r5-repertoire",
+        "scalars": [
+          "U+1F69E",
+          "U+1F69F",
+          "U+1F6A0"
+        ]
+      },
+      {
+        "member": 56,
+        "json": "neuronte-wide-symbols-v1-twds4-g6.json",
+        "json_sha256": "1ffb81bc6930d31751702bcbcf5dc978465ed54bc7f3e946c5054823c25664b5",
+        "image_sha256": "aa9f8c9b5e52b766eca3ad1f0b6e367eca814770a2365595a33b31aaf387b576",
+        "bytes": 57040,
+        "set": "twds4-repertoire",
+        "scalars": [
+          "U+1F6A1",
+          "U+1F6A2",
+          "U+1F6A3",
+          "U+1F6A4",
+          "U+1F6A5",
+          "U+1F6A6"
+        ]
+      },
+      {
+        "member": 57,
+        "json": "neuronte-wide-symbols-v1-twds4-g7.json",
+        "json_sha256": "da14e56c7a5a4bd298fc88a427006dfee4838f7848f946dc442d9dcea7e9e5a2",
+        "image_sha256": "095f7a2e13ea01af62f0b671ebada78fd03dea1fc32ba8285089435bf8f3184b",
+        "bytes": 57040,
+        "set": "twds4-repertoire",
+        "scalars": [
+          "U+1F6A7",
+          "U+1F6A8",
+          "U+1F6A9",
+          "U+1F6AA",
+          "U+1F6AB",
+          "U+1F6AC"
+        ]
+      },
+      {
+        "member": 58,
+        "json": "neuronte-wide-symbols-v1-twds4r8-g0.json",
+        "json_sha256": "05815050d11b59f7845990976b69a339d0096594bcec2351d4f8b15edefb1861",
+        "image_sha256": "684d41162b3dfe7fdf803e9a4ce4319917d6e033f9c870fc2d4f73fe2e89fa23",
+        "bytes": 57040,
+        "set": "twds4r8-repertoire",
+        "scalars": [
+          "U+1F6AD",
+          "U+1F6AE",
+          "U+1F6AF"
+        ]
+      },
+      {
+        "member": 59,
+        "json": "neuronte-wide-symbols-v1-twds4r8-g1.json",
+        "json_sha256": "baf1f95d50dfd8e24863c86dcef7c4e4837e47678147befa34da67683188dfda",
+        "image_sha256": "b12e3c81685dcd6e0727b31ee375a942813cc93fe2637c9ba738efaca735b136",
+        "bytes": 57040,
+        "set": "twds4r8-repertoire",
+        "scalars": [
+          "U+1F6B0",
+          "U+1F6B1",
+          "U+1F6B2"
+        ]
+      },
+      {
+        "member": 60,
+        "json": "neuronte-wide-symbols-v1-twds5r0-g1.json",
+        "json_sha256": "f2f1a97db47ea38aa1b3c912d480f617844ae8f96f3bd3561638ae5603ee6aa3",
+        "image_sha256": "394781c6bbdc02d7b337a245b6afc9cb4c887eda1cbbfa354fc53d1866ae1db4",
+        "bytes": 57040,
+        "set": "twds5r0-repertoire",
+        "scalars": [
+          "U+1F6B6",
+          "U+1F6B7",
+          "U+1F6B8"
+        ]
+      },
+      {
+        "member": 61,
+        "json": "neuronte-wide-symbols-v1-twds5r1-g0.json",
+        "json_sha256": "c642c8b82965be99d2aa40b9b8721cb276b184ea31ee5ac2dea0ae029fe6c845",
+        "image_sha256": "45443f2883008324f4ea8c1a27f534e56d517db468915ce432bdc1bf48dc9d4d",
+        "bytes": 57040,
+        "set": "twds5r1-repertoire",
+        "scalars": [
+          "U+1F6B9",
+          "U+1F6BA",
+          "U+1F6BB"
+        ]
+      },
+      {
+        "member": 62,
+        "json": "neuronte-wide-symbols-v1-twds5r1-g1.json",
+        "json_sha256": "222d09b882000be37770bf871fdcdd860a9a8a207aa7e7d78d5521b019175d1a",
+        "image_sha256": "74f2d27468a70879a2ebb7149f1028a30641adca7356fcc8fcb439b9829c9641",
+        "bytes": 57040,
+        "set": "twds5r1-repertoire",
+        "scalars": [
+          "U+1F6BC",
+          "U+1F6BD",
+          "U+1F6BE"
+        ]
+      },
+      {
+        "member": 63,
+        "json": "neuronte-wide-symbols-v1-twds5r2-g0.json",
+        "json_sha256": "b902f13cf47db50e9cdbb7867dd3ddb58806e01e3c02c15653399cfaa8fb72b0",
+        "image_sha256": "607d9cbbab7449efa4bc9f544c66033c2565cd2777a2c5d058166ccdf020837b",
+        "bytes": 57040,
+        "set": "twds5r2-repertoire",
+        "scalars": [
+          "U+1F6BF",
+          "U+1F6C0",
+          "U+1F6C1"
+        ]
+      },
+      {
+        "member": 64,
+        "json": "neuronte-wide-symbols-v1-twds5r2-g1.json",
+        "json_sha256": "88e0888ff015ceb6c3fd00aa092637fe46c25929d3b606f31e43b992d2f899af",
+        "image_sha256": "1f014f1c5caa9a8578aaf8c2657eb6b817f0db7d866b8803ce220018459a6e5e",
+        "bytes": 57040,
+        "set": "twds5r2-repertoire",
+        "scalars": [
+          "U+1F6C2",
+          "U+1F6C3",
+          "U+1F6C4"
+        ]
+      },
+      {
+        "member": 65,
+        "json": "neuronte-wide-symbols-v1-twds5r3-g0.json",
+        "json_sha256": "7a8d9ecd975f93b0652aa6217e7a5bfbd200fbe7590502b3f3f9d3f93207fcca",
+        "image_sha256": "bac1d253ac996040881e077779c67fe9369c2f236d853fc8749b723c11e58e0d",
+        "bytes": 57040,
+        "set": "twds5r3-repertoire",
+        "scalars": [
+          "U+1F6C5",
+          "U+1F6CC",
+          "U+1F6D0"
+        ]
+      },
+      {
+        "member": 66,
+        "json": "neuronte-wide-symbols-v1-twds5r3-g1.json",
+        "json_sha256": "eb7a69a51f6307bb446b9c2237be4b79377c3c5eeae8d9ba29c2ff15b904ed5f",
+        "image_sha256": "33d998af5f42dbdc06377af98ad6218c6e32abdd6d519e57828636abc68a54c0",
+        "bytes": 57040,
+        "set": "twds5r3-repertoire",
+        "scalars": [
+          "U+1F6D1",
+          "U+1F6D2",
+          "U+1F6D5"
+        ]
+      },
+      {
+        "member": 67,
+        "json": "neuronte-wide-symbols-v1-twds5-g4.json",
+        "json_sha256": "14d4c11629a12cb4b47c9d93601594576fe4d650679a7f84fded6de0e7e37f0d",
+        "image_sha256": "96e8355cf70b66eb8d52926eb20403fd08b248e0380a81f7f0ee420a6bbef927",
+        "bytes": 57040,
+        "set": "twds5-repertoire",
+        "scalars": [
+          "U+1F6D6",
+          "U+1F6D7",
+          "U+1F6DC",
+          "U+1F6DD",
+          "U+1F6DE",
+          "U+1F6DF"
+        ]
+      },
+      {
+        "member": 68,
+        "json": "neuronte-wide-symbols-v1-twds5-g5.json",
+        "json_sha256": "8cbfdf8bb83d749dcd38e298284a2915aa4bcf8ba9276a785df7ab9ae933592d",
+        "image_sha256": "55adaaa0b7e297facfd68f61cd204f9edca24ce1170d446b618a2b1a17790904",
+        "bytes": 57040,
+        "set": "twds5-repertoire",
+        "scalars": [
+          "U+1F6EB",
+          "U+1F6EC",
+          "U+1F6F4",
+          "U+1F6F5",
+          "U+1F6F6",
+          "U+1F6F7"
+        ]
+      },
+      {
+        "member": 69,
+        "json": "neuronte-wide-symbols-v1-twds5r6-g0.json",
+        "json_sha256": "18cde9c3a65c9a9f5e4329c926f35bb789258bdb4bea6992fe5cb158feedc519",
+        "image_sha256": "83a0260330589ec244de6fe97bf120bd20719c0a6e0752e8816fb3d10bb1fa8d",
+        "bytes": 57040,
+        "set": "twds5r6-repertoire",
+        "scalars": [
+          "U+1F6F8",
+          "U+1F6F9",
+          "U+1F6FA"
+        ]
+      },
+      {
+        "member": 70,
+        "json": "neuronte-wide-symbols-v1-twds5r6-g1.json",
+        "json_sha256": "127cb6195319d37c275d79f8bea7286eae172a5614006c6319743c6287f8915b",
+        "image_sha256": "62cd6d5d67cc462a3acf1be61831b43fcec3a1abd087e54cfcc630a646f597c0",
+        "bytes": 57040,
+        "set": "twds5r6-repertoire",
+        "scalars": [
+          "U+1F6FB",
+          "U+1F6FC",
+          "U+1F7E0"
+        ]
+      },
+      {
+        "member": 71,
+        "json": "neuronte-wide-symbols-v1-twds5-g7.json",
+        "json_sha256": "eb5fe3b896918d041d623ea8fd7d4a1a4e79753ffc63a9b177b47d76803aadde",
+        "image_sha256": "820b898c63efb0f33c844c8467ed0b481f06a6bac9771218f0ccd167b774c135",
+        "bytes": 57040,
+        "set": "twds5-repertoire",
+        "scalars": [
+          "U+1F7E1",
+          "U+1F7E2",
+          "U+1F7E3",
+          "U+1F7E4",
+          "U+1F7E5",
+          "U+1F7E6"
+        ]
+      },
+      {
+        "member": 72,
+        "json": "neuronte-wide-symbols-v1-twds5-g8.json",
+        "json_sha256": "ea6c78a730fe987110c9aa0dbda5e42e9a0d5da9e1fdaab83315e2be575894c9",
+        "image_sha256": "78973d64e518ae8be2ed0c97483698f7fffbd107eeb17c4742d0bc9dae07a486",
+        "bytes": 57040,
+        "set": "twds5-repertoire",
+        "scalars": [
+          "U+1F7E7",
+          "U+1F7E8",
+          "U+1F7E9",
+          "U+1F7EA",
+          "U+1F7EB",
+          "U+1F7F0"
+        ]
+      }
+    ],
+    "list": {
+      "file": "neuronte-wide-symbols-v1.symbols.txt",
+      "sha256": "387c2fd257752c624d866f404f4d7f6b3605cc35415a571d6ceff3bdde316af8"
+    }
+  }
+}

@@ -1,0 +1,152 @@
+# The characters neuronte-wide-symbols-v1.nrt was trained on, drawn for a box of two cells, in the order
+# of train/wide.py, one line group for each group net. This is not a NAME.list.txt:
+# some of these code points are drawn for one cell in a terminal bundle, and this
+# file draws them again for a box of two cells, so it is outside the rule that no
+# two listed bundles claim one character. tests/check_wide.py holds the bundle's
+# table to this list exactly.
+# twds0 g0
+U+231A U+231B U+2329 U+232A U+23E9 U+23EA
+# twds0 g1
+U+23EB U+23EC U+23F0 U+23F3 U+25FD U+25FE
+# twds0r2 g0
+U+2614 U+2615 U+2648
+# twds0r2 g1
+U+2649 U+264A U+264B
+# twds0r3 g0
+U+264C U+264D U+264E
+# twds0r3 g1
+U+264F U+2650 U+2651
+# twds0 g4
+U+2652 U+2653 U+267F U+2693 U+26A1 U+26AA
+# twds0 g5
+U+26AB U+26BD U+26BE U+26C4 U+26C5 U+26CE
+# twds0r6 g0
+U+26D4 U+26EA U+26F2
+# twds0r6 g1
+U+26F3 U+26F5 U+26FA
+# twds0 g7
+U+26FD U+2705 U+270A U+270B U+2728 U+274C
+# twds0 g8
+U+274E U+2753 U+2754 U+2755 U+2757 U+2795
+# twds1 g0
+U+2796 U+2797 U+27B0 U+27BF U+2B1B U+2B1C
+# twds1r1 g0
+U+2B50 U+2B55 U+1F004
+# twds1r1 g1
+U+1F0CF U+1F18E U+1F191
+# twds1r2 g0
+U+1F192 U+1F193 U+1F194
+# twds1r2 g1
+U+1F195 U+1F196 U+1F197
+# twds1r3 g0
+U+1F198 U+1F199 U+1F19A
+# twds1r3 g1
+U+1F200 U+1F201 U+1F202
+# twds1r4 g0
+U+1F210 U+1F211 U+1F212
+# twds1r4 g1
+U+1F213 U+1F214 U+1F215
+# twds1r8 g0
+U+1F228 U+1F229 U+1F22A
+# twds2r2 g0
+U+1F23A U+1F23B U+1F240
+# twds2r2 g1
+U+1F241 U+1F242 U+1F243
+# twds2r3 g0
+U+1F244 U+1F245 U+1F246
+# twds2r4 g0
+U+1F251 U+1F260 U+1F261
+# twds2r4 g1
+U+1F262 U+1F263 U+1F264
+# twds2r5 g0
+U+1F265 U+1F600 U+1F601
+# twds2r5 g1
+U+1F602 U+1F603 U+1F604
+# twds2 g6
+U+1F605 U+1F606 U+1F607 U+1F608 U+1F609 U+1F60A
+# twds2 g7
+U+1F60B U+1F60C U+1F60D U+1F60E U+1F60F U+1F610
+# twds2 g8
+U+1F611 U+1F612 U+1F613 U+1F614 U+1F615 U+1F616
+# twds3 g0
+U+1F617 U+1F618 U+1F619 U+1F61A U+1F61B U+1F61C
+# twds3 g1
+U+1F61D U+1F61E U+1F61F U+1F620 U+1F621 U+1F622
+# twds3 g2
+U+1F623 U+1F624 U+1F625 U+1F626 U+1F627 U+1F628
+# twds3r3 g0
+U+1F629 U+1F62A U+1F62B
+# twds3r3 g1
+U+1F62C U+1F62D U+1F62E
+# twds3 g4
+U+1F62F U+1F630 U+1F631 U+1F632 U+1F633 U+1F634
+# twds3r5 g0
+U+1F635 U+1F636 U+1F637
+# twds3r5 g1
+U+1F638 U+1F639 U+1F63A
+# twds3 g6
+U+1F63B U+1F63C U+1F63D U+1F63E U+1F63F U+1F640
+# twds3r7 g0
+U+1F641 U+1F642 U+1F643
+# twds3r7 g1
+U+1F644 U+1F645 U+1F646
+# twds3r8 g0
+U+1F647 U+1F648 U+1F649
+# twds3r8 g1
+U+1F64A U+1F64B U+1F64C
+# twds4r0 g0
+U+1F64D U+1F64E U+1F64F
+# twds4r0 g1
+U+1F680 U+1F681 U+1F682
+# twds4r1 g0
+U+1F683 U+1F684 U+1F685
+# twds4r1 g1
+U+1F686 U+1F687 U+1F688
+# twds4r2 g0
+U+1F689 U+1F68A U+1F68B
+# twds4r2 g1
+U+1F68C U+1F68D U+1F68E
+# twds4r3 g1
+U+1F692 U+1F693 U+1F694
+# twds4r4 g0
+U+1F695 U+1F696 U+1F697
+# twds4r4 g1
+U+1F698 U+1F699 U+1F69A
+# twds4r5 g0
+U+1F69B U+1F69C U+1F69D
+# twds4r5 g1
+U+1F69E U+1F69F U+1F6A0
+# twds4 g6
+U+1F6A1 U+1F6A2 U+1F6A3 U+1F6A4 U+1F6A5 U+1F6A6
+# twds4 g7
+U+1F6A7 U+1F6A8 U+1F6A9 U+1F6AA U+1F6AB U+1F6AC
+# twds4r8 g0
+U+1F6AD U+1F6AE U+1F6AF
+# twds4r8 g1
+U+1F6B0 U+1F6B1 U+1F6B2
+# twds5r0 g1
+U+1F6B6 U+1F6B7 U+1F6B8
+# twds5r1 g0
+U+1F6B9 U+1F6BA U+1F6BB
+# twds5r1 g1
+U+1F6BC U+1F6BD U+1F6BE
+# twds5r2 g0
+U+1F6BF U+1F6C0 U+1F6C1
+# twds5r2 g1
+U+1F6C2 U+1F6C3 U+1F6C4
+# twds5r3 g0
+U+1F6C5 U+1F6CC U+1F6D0
+# twds5r3 g1
+U+1F6D1 U+1F6D2 U+1F6D5
+# twds5 g4
+U+1F6D6 U+1F6D7 U+1F6DC U+1F6DD U+1F6DE U+1F6DF
+# twds5 g5
+U+1F6EB U+1F6EC U+1F6F4 U+1F6F5 U+1F6F6 U+1F6F7
+# twds5r6 g0
+U+1F6F8 U+1F6F9 U+1F6FA
+# twds5r6 g1
+U+1F6FB U+1F6FC U+1F7E0
+# twds5 g7
+U+1F7E1 U+1F7E2 U+1F7E3 U+1F7E4 U+1F7E5 U+1F7E6
+# twds5 g8
+U+1F7E7 U+1F7E8 U+1F7E9 U+1F7EA U+1F7EB U+1F7F0

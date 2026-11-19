@@ -1,0 +1,1203 @@
+{
+  "schema": "neuronte.wide/v1",
+  "name": "neuronte-wide-pictographs2-v1",
+  "sha256": "692fe8a5a4928ebcc1130f376dcfef401e72fba81d50e5fa1abbfcfd6a87999e",
+  "bytes": 3880504,
+  "box": "two cells: asked W x 2H for a box W x H, each pair of rows averaged",
+  "sets": [
+    [
+      "twdp5",
+      10
+    ],
+    [
+      "twdp6",
+      10
+    ],
+    [
+      "twdp7",
+      10
+    ],
+    [
+      "twdp8",
+      10
+    ],
+    [
+      "twdp9",
+      10
+    ]
+  ],
+  "halved": [
+    [
+      "twdp5",
+      0
+    ],
+    [
+      "twdp5",
+      9
+    ],
+    [
+      "twdp6",
+      5
+    ],
+    [
+      "twdp6",
+      6
+    ],
+    [
+      "twdp6",
+      8
+    ],
+    [
+      "twdp6",
+      9
+    ],
+    [
+      "twdp7",
+      0
+    ],
+    [
+      "twdp7",
+      2
+    ],
+    [
+      "twdp7",
+      3
+    ],
+    [
+      "twdp7",
+      4
+    ],
+    [
+      "twdp7",
+      6
+    ],
+    [
+      "twdp7",
+      7
+    ],
+    [
+      "twdp7",
+      8
+    ],
+    [
+      "twdp7",
+      9
+    ],
+    [
+      "twdp8",
+      0
+    ],
+    [
+      "twdp8",
+      1
+    ],
+    [
+      "twdp8",
+      2
+    ],
+    [
+      "twdp8",
+      4
+    ],
+    [
+      "twdp8",
+      5
+    ],
+    [
+      "twdp8",
+      6
+    ],
+    [
+      "twdp8",
+      7
+    ],
+    [
+      "twdp8",
+      8
+    ],
+    [
+      "twdp9",
+      4
+    ]
+  ],
+  "left_out": [
+    {
+      "set": "twdp7r3",
+      "group": 1,
+      "why": "failed the declared gates with both seeds, as half of a group that had failed"
+    },
+    {
+      "set": "twdp7r7",
+      "group": 0,
+      "why": "failed the declared gates with both seeds, as half of a group that had failed"
+    },
+    {
+      "set": "twdp8r1",
+      "group": 1,
+      "why": "failed the declared gates with both seeds, as half of a group that had failed"
+    },
+    {
+      "set": "twdp8r6",
+      "group": 1,
+      "why": "failed the declared gates with both seeds, as half of a group that had failed"
+    },
+    {
+      "set": "twdp8r7",
+      "group": 1,
+      "why": "failed the declared gates with both seeds, as half of a group that had failed"
+    }
+  ],
+  "failed_shipped": [
+    {
+      "set": "twdp5r9",
+      "group": 0,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    },
+    {
+      "set": "twdp5r9",
+      "group": 1,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    },
+    {
+      "set": "twdp6r6",
+      "group": 0,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    },
+    {
+      "set": "twdp6r6",
+      "group": 1,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    },
+    {
+      "set": "twdp6r9",
+      "group": 0,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    },
+    {
+      "set": "twdp6r9",
+      "group": 1,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    },
+    {
+      "set": "twdp7r2",
+      "group": 1,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    },
+    {
+      "set": "twdp7r8",
+      "group": 0,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    },
+    {
+      "set": "twdp8r0",
+      "group": 1,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    },
+    {
+      "set": "twdp8r1",
+      "group": 0,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    },
+    {
+      "set": "twdp8r2",
+      "group": 1,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    },
+    {
+      "set": "twdp8r5",
+      "group": 0,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    },
+    {
+      "set": "twdp8r5",
+      "group": 1,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    },
+    {
+      "set": "twdp8r8",
+      "group": 0,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    },
+    {
+      "set": "twdp8r8",
+      "group": 1,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    },
+    {
+      "set": "twdp9r4",
+      "group": 0,
+      "why": "failed the declared gates; shipped by the owner's word after looking at the sheet of failed halves (2026-11-18): the owner's choice \"Within 25%\", every failed half whose lower-error seed misses its limits by at most 25%; described as failed"
+    }
+  ],
+  "record": {
+    "schema": "neuronte.standalone-bundle/v1",
+    "sha256": "692fe8a5a4928ebcc1130f376dcfef401e72fba81d50e5fa1abbfcfd6a87999e",
+    "bytes": 3880504,
+    "members": 69,
+    "group_nets": 68,
+    "ranges": 74,
+    "gate": null,
+    "trained_scalars": 266,
+    "fallback": {
+      "member": 68,
+      "kind": "blank",
+      "hidden_width": 1,
+      "distance": -8.0,
+      "image_sha256": "42d4790165297c3af39d178e1396f575991d6fe4d2e3c947762ef5eaedd05bf6",
+      "bytes": 592
+    },
+    "apart_from": [],
+    "nets": [
+      {
+        "member": 0,
+        "json": "neuronte-wide-pictographs2-v1-twdp5r0-g0.json",
+        "json_sha256": "d24d5a8c7a1c2c68fb084c6bb99bae13e49aec1bfbe58d19840e06ea919a6f73",
+        "image_sha256": "0729857a8c51501683cb22f5f0b2fc8ca7827e237c12edfff761184beeb6460f",
+        "bytes": 57040,
+        "set": "twdp5r0-repertoire",
+        "scalars": [
+          "U+1F449",
+          "U+1F44A"
+        ]
+      },
+      {
+        "member": 1,
+        "json": "neuronte-wide-pictographs2-v1-twdp5r0-g1.json",
+        "json_sha256": "5599752e780e98a30b4bdda53d9139983e167dfd5e8eb2e9b0c51bf20f40c9c9",
+        "image_sha256": "ae9e0dd5ee2f349b20cdffb01352fdbf7796e103e29b8c90abe97708a71fde02",
+        "bytes": 57040,
+        "set": "twdp5r0-repertoire",
+        "scalars": [
+          "U+1F44B",
+          "U+1F44C",
+          "U+1F44D"
+        ]
+      },
+      {
+        "member": 2,
+        "json": "neuronte-wide-pictographs2-v1-twdp5-g1.json",
+        "json_sha256": "18f0bbe273c66b821993d726f317342b46c7dedbe90d1a50a7007a73fec4b95f",
+        "image_sha256": "cb04377b904aadedd12a21b09b2b4ae4dce9c8144282b607882d08cf3058a0bc",
+        "bytes": 57040,
+        "set": "twdp5-repertoire",
+        "scalars": [
+          "U+1F44E",
+          "U+1F44F",
+          "U+1F450",
+          "U+1F451",
+          "U+1F452",
+          "U+1F453"
+        ]
+      },
+      {
+        "member": 3,
+        "json": "neuronte-wide-pictographs2-v1-twdp5-g2.json",
+        "json_sha256": "3f0ec2005ae4e57870346963901bf48a379daf11c011b1d001c389a6b3a58436",
+        "image_sha256": "23b4cb0d8aa9206b86207d549af69952f1289fed2cdaa1247f65c2869ffba6b7",
+        "bytes": 57040,
+        "set": "twdp5-repertoire",
+        "scalars": [
+          "U+1F454",
+          "U+1F455",
+          "U+1F456",
+          "U+1F457",
+          "U+1F458"
+        ]
+      },
+      {
+        "member": 4,
+        "json": "neuronte-wide-pictographs2-v1-twdp5-g3.json",
+        "json_sha256": "12fbe9af800e3f21836dc62b7f5f68111d1e832af00dc69142a6e7fde46010cb",
+        "image_sha256": "f77db08c70029e9cbe7f24ff3228fa735c1524e06d55df4d2e4dc97e7b495b8f",
+        "bytes": 57040,
+        "set": "twdp5-repertoire",
+        "scalars": [
+          "U+1F459",
+          "U+1F45A",
+          "U+1F45B",
+          "U+1F45C",
+          "U+1F45D",
+          "U+1F45E"
+        ]
+      },
+      {
+        "member": 5,
+        "json": "neuronte-wide-pictographs2-v1-twdp5-g4.json",
+        "json_sha256": "b21f754e3e4b9aa3122fe81a94363409a6957c31629f6692f34434d0117caa05",
+        "image_sha256": "53cade859c9901f8803b76b4cee6c922db69ed15ccbfb39ef57ed559c533adf0",
+        "bytes": 57040,
+        "set": "twdp5-repertoire",
+        "scalars": [
+          "U+1F45F",
+          "U+1F460",
+          "U+1F461",
+          "U+1F462",
+          "U+1F463",
+          "U+1F464"
+        ]
+      },
+      {
+        "member": 6,
+        "json": "neuronte-wide-pictographs2-v1-twdp5-g5.json",
+        "json_sha256": "d0d77b59f20bfb8e388086d841262837087f06e9db994f4d0dbb9c757cf7371d",
+        "image_sha256": "9604fd8c6a803cd5afa1efa593bedb782cf9f9188fd0018459d8adb13b9f41e9",
+        "bytes": 57040,
+        "set": "twdp5-repertoire",
+        "scalars": [
+          "U+1F465",
+          "U+1F466",
+          "U+1F467",
+          "U+1F468",
+          "U+1F469"
+        ]
+      },
+      {
+        "member": 7,
+        "json": "neuronte-wide-pictographs2-v1-twdp5-g6.json",
+        "json_sha256": "6d93e386dcd9a594d62b408e2574952845478aa732ed52c102c8eb931f1b796d",
+        "image_sha256": "734dcc6d93810c6c0367bf962c30b7e75e908f7ca6a4399326107baf4cfef7b8",
+        "bytes": 57040,
+        "set": "twdp5-repertoire",
+        "scalars": [
+          "U+1F46A",
+          "U+1F46B",
+          "U+1F46C",
+          "U+1F46D",
+          "U+1F46E",
+          "U+1F46F"
+        ]
+      },
+      {
+        "member": 8,
+        "json": "neuronte-wide-pictographs2-v1-twdp5-g7.json",
+        "json_sha256": "a01a847f523dc6dc5d6d0f548bec621566b387cc4d60d1f9e1252c9022d28aa5",
+        "image_sha256": "eb7e0b59d6d5c6125c763931c327bdc9ef014e46e9776c15a6549e118faca84b",
+        "bytes": 57040,
+        "set": "twdp5-repertoire",
+        "scalars": [
+          "U+1F470",
+          "U+1F471",
+          "U+1F472",
+          "U+1F473",
+          "U+1F474"
+        ]
+      },
+      {
+        "member": 9,
+        "json": "neuronte-wide-pictographs2-v1-twdp5-g8.json",
+        "json_sha256": "ffd2c64bbe0233cb1e4003f3fb3a79e7b61413c67a99c39f301b819a36547dbb",
+        "image_sha256": "1ee0e28fce9b9aeef98a4ba666d896db26f912426f5a8d0e6721f3249b9ed634",
+        "bytes": 57040,
+        "set": "twdp5-repertoire",
+        "scalars": [
+          "U+1F475",
+          "U+1F476",
+          "U+1F477",
+          "U+1F478",
+          "U+1F479",
+          "U+1F47A"
+        ]
+      },
+      {
+        "member": 10,
+        "json": "neuronte-wide-pictographs2-v1-twdp5r9-g0.json",
+        "json_sha256": "e62ab2845f204a58ab922b7e39cb958d0e1827a7a899dcf3b6d7a3ae2cb794e9",
+        "image_sha256": "e49c2361fcf2a6951ff78d8d6b86519677b374dc21c256734f344d081341baac",
+        "bytes": 57040,
+        "set": "twdp5r9-repertoire",
+        "scalars": [
+          "U+1F47B",
+          "U+1F47C",
+          "U+1F47D"
+        ]
+      },
+      {
+        "member": 11,
+        "json": "neuronte-wide-pictographs2-v1-twdp5r9-g1.json",
+        "json_sha256": "5a16eb8c9b2ef4ef7cf2e7205279ae0425d62c583e3ce2c04a6da1f71ceccb81",
+        "image_sha256": "72f1e4b832deb3625264626aa62aac81789c4674289fc07fddd496395ef1d663",
+        "bytes": 57040,
+        "set": "twdp5r9-repertoire",
+        "scalars": [
+          "U+1F47E",
+          "U+1F47F",
+          "U+1F480"
+        ]
+      },
+      {
+        "member": 12,
+        "json": "neuronte-wide-pictographs2-v1-twdp6-g0.json",
+        "json_sha256": "25fd7cb8c8fce5221bdbe60d49fa5ebda2afbbd6bb6cf797d7e3097b35db0d5c",
+        "image_sha256": "ca61d3d0feb65bd5cbb955cd2fdf1ce57ec42cf4233df15e7f82b9fb1522a623",
+        "bytes": 57040,
+        "set": "twdp6-repertoire",
+        "scalars": [
+          "U+1F481",
+          "U+1F482",
+          "U+1F483",
+          "U+1F484",
+          "U+1F485"
+        ]
+      },
+      {
+        "member": 13,
+        "json": "neuronte-wide-pictographs2-v1-twdp6-g1.json",
+        "json_sha256": "8ecaf26243c7dd438e9825ff992b9d30c5ef7bf3b4d906995b64acd34ecfd4a2",
+        "image_sha256": "a74b28bdfb5b248a16c6b2d08f015e466488aaf83501ff42be3791355d87cb92",
+        "bytes": 57040,
+        "set": "twdp6-repertoire",
+        "scalars": [
+          "U+1F486",
+          "U+1F487",
+          "U+1F488",
+          "U+1F489",
+          "U+1F48A",
+          "U+1F48B"
+        ]
+      },
+      {
+        "member": 14,
+        "json": "neuronte-wide-pictographs2-v1-twdp6-g2.json",
+        "json_sha256": "5a2beac0bc681b8e42f5da2ef7a5936c9d07c59460c196bad091483fedca506e",
+        "image_sha256": "6cadadd7ea6b00be7b26318f4de02e5e8af9364fdb8255463e7e99d137997cdc",
+        "bytes": 57040,
+        "set": "twdp6-repertoire",
+        "scalars": [
+          "U+1F48C",
+          "U+1F48D",
+          "U+1F48E",
+          "U+1F48F",
+          "U+1F490"
+        ]
+      },
+      {
+        "member": 15,
+        "json": "neuronte-wide-pictographs2-v1-twdp6-g3.json",
+        "json_sha256": "bf6054bb33196bde585512fca808ddab36501de5e15e7a591c1077aeb3062011",
+        "image_sha256": "052f61bfd1c19bb9c5d333d4721dfc498f3287cf5a8e940178d0edac94f2808d",
+        "bytes": 57040,
+        "set": "twdp6-repertoire",
+        "scalars": [
+          "U+1F491",
+          "U+1F492",
+          "U+1F493",
+          "U+1F494",
+          "U+1F495",
+          "U+1F496"
+        ]
+      },
+      {
+        "member": 16,
+        "json": "neuronte-wide-pictographs2-v1-twdp6-g4.json",
+        "json_sha256": "736d5408175007eee9c2a2191eb22d9957cc279481708c28436062070395734c",
+        "image_sha256": "ba224b15c16eb8bf18cb4b49a88481071c2c9a3b6ad8e48c4fa7eab7d1bd6b6f",
+        "bytes": 57040,
+        "set": "twdp6-repertoire",
+        "scalars": [
+          "U+1F497",
+          "U+1F498",
+          "U+1F499",
+          "U+1F49A",
+          "U+1F49B",
+          "U+1F49C"
+        ]
+      },
+      {
+        "member": 17,
+        "json": "neuronte-wide-pictographs2-v1-twdp6r5-g0.json",
+        "json_sha256": "7a032bd5cea022adc1bd843c9c1d3502306da327e04299eba82a9694f5049d44",
+        "image_sha256": "a43eadc594a822ef569f6d945b09389ca97ddbf35530706e854756013aaca2f6",
+        "bytes": 57040,
+        "set": "twdp6r5-repertoire",
+        "scalars": [
+          "U+1F49D",
+          "U+1F49E"
+        ]
+      },
+      {
+        "member": 18,
+        "json": "neuronte-wide-pictographs2-v1-twdp6r5-g1.json",
+        "json_sha256": "1b4abd70569d8c4bfbea3f7eae95ed6e86984460b95f0053d9e729c0a339c903",
+        "image_sha256": "b5d1c9f1f9963e1d48ccbeacf89d85dca466133cb6a51366d94c9e2239d79d7b",
+        "bytes": 57040,
+        "set": "twdp6r5-repertoire",
+        "scalars": [
+          "U+1F49F",
+          "U+1F4A0",
+          "U+1F4A1"
+        ]
+      },
+      {
+        "member": 19,
+        "json": "neuronte-wide-pictographs2-v1-twdp6r6-g0.json",
+        "json_sha256": "7870cd4fda2a1e142415ea9456a670d49dbab740cf890f84bf815476d0e3f52e",
+        "image_sha256": "a11c2fab7b3cf19f68c5947811f82a9b2ee67076ebb071f0473457e308a1d668",
+        "bytes": 57040,
+        "set": "twdp6r6-repertoire",
+        "scalars": [
+          "U+1F4A2",
+          "U+1F4A3",
+          "U+1F4A4"
+        ]
+      },
+      {
+        "member": 20,
+        "json": "neuronte-wide-pictographs2-v1-twdp6r6-g1.json",
+        "json_sha256": "824faf5a907f61c16678d2bfcebacbf038c4cadc39bad9d253854f8619dad0b5",
+        "image_sha256": "e8ee24a6a806a18d202ee17cf3dbfe045df095b4f6b88471cce34d974508d8a4",
+        "bytes": 57040,
+        "set": "twdp6r6-repertoire",
+        "scalars": [
+          "U+1F4A5",
+          "U+1F4A6",
+          "U+1F4A7"
+        ]
+      },
+      {
+        "member": 21,
+        "json": "neuronte-wide-pictographs2-v1-twdp6-g7.json",
+        "json_sha256": "279e76bdc16f73eeb1b4c6c4ab577f12a7910132894884407300349e60602186",
+        "image_sha256": "0971d9e376f5980ee35164143bba0d2756916baa9411d95b0ffcc5102475f7d9",
+        "bytes": 57040,
+        "set": "twdp6-repertoire",
+        "scalars": [
+          "U+1F4A8",
+          "U+1F4A9",
+          "U+1F4AA",
+          "U+1F4AB",
+          "U+1F4AC"
+        ]
+      },
+      {
+        "member": 22,
+        "json": "neuronte-wide-pictographs2-v1-twdp6r8-g0.json",
+        "json_sha256": "a9ca845bf9c31d73afc6f1af0a4f23e8bab7a55920541122b10fe2b7752b1b0c",
+        "image_sha256": "ccc5f6f79a74647b03d168694634c384fd13bf24565a1a5e5e099ae0cf465daf",
+        "bytes": 57040,
+        "set": "twdp6r8-repertoire",
+        "scalars": [
+          "U+1F4AD",
+          "U+1F4AE",
+          "U+1F4AF"
+        ]
+      },
+      {
+        "member": 23,
+        "json": "neuronte-wide-pictographs2-v1-twdp6r8-g1.json",
+        "json_sha256": "ccb8cba594d9dd74ccbf6776b72b045efcca377143526d28ab29fa51db5bad76",
+        "image_sha256": "6602f08b7c01a6d78dfc0d176a4c2a20b753aeb4ca59840c53a8ec05603c3c2d",
+        "bytes": 57040,
+        "set": "twdp6r8-repertoire",
+        "scalars": [
+          "U+1F4B0",
+          "U+1F4B1",
+          "U+1F4B2"
+        ]
+      },
+      {
+        "member": 24,
+        "json": "neuronte-wide-pictographs2-v1-twdp6r9-g0.json",
+        "json_sha256": "eff2e3ba455b5a76862d97bc4a948e52717869f7cc21c01618f3beac22ad5c85",
+        "image_sha256": "9fac0be28b292583e878983e605ba2fb3ff04912ae14d7c55f6a1eebd6a5f6b7",
+        "bytes": 57040,
+        "set": "twdp6r9-repertoire",
+        "scalars": [
+          "U+1F4B3",
+          "U+1F4B4",
+          "U+1F4B5"
+        ]
+      },
+      {
+        "member": 25,
+        "json": "neuronte-wide-pictographs2-v1-twdp6r9-g1.json",
+        "json_sha256": "d00c03e5cb3a66870ea3cd7286872ae6a594b42fd380ff2be4e65f9ff4a3ae09",
+        "image_sha256": "de0e59ce0facc30913c16f02a7e2fd56593ea02dac40b3ce94319661efde8365",
+        "bytes": 57040,
+        "set": "twdp6r9-repertoire",
+        "scalars": [
+          "U+1F4B6",
+          "U+1F4B7",
+          "U+1F4B8"
+        ]
+      },
+      {
+        "member": 26,
+        "json": "neuronte-wide-pictographs2-v1-twdp7r0-g0.json",
+        "json_sha256": "232cbe03d808f2493c84332d09c66f956264c36550c557aad7d428154b53e87c",
+        "image_sha256": "d019f3f30de2e4c1204edac72f6a55069bb649982a963665f6bafeac3d185c37",
+        "bytes": 57040,
+        "set": "twdp7r0-repertoire",
+        "scalars": [
+          "U+1F4B9",
+          "U+1F4BA"
+        ]
+      },
+      {
+        "member": 27,
+        "json": "neuronte-wide-pictographs2-v1-twdp7r0-g1.json",
+        "json_sha256": "b066cdbacdaf77e723086314dbfbe7495c9dae2af424b3855be9a28bb5ac8c54",
+        "image_sha256": "43070e7b0f1b3e1abe42c65420dccf352f6bcc13940ae2cc2dd7a40644334b5d",
+        "bytes": 57040,
+        "set": "twdp7r0-repertoire",
+        "scalars": [
+          "U+1F4BB",
+          "U+1F4BC",
+          "U+1F4BD"
+        ]
+      },
+      {
+        "member": 28,
+        "json": "neuronte-wide-pictographs2-v1-twdp7-g1.json",
+        "json_sha256": "881e1088b3aa938df7ec5cc629f5ae8c739ca3b249530b4e2c7e292fad8a626d",
+        "image_sha256": "bacb606d9b673f4a77dffe9216670cc81bdd87a31bbff383fbfa81286db599e7",
+        "bytes": 57040,
+        "set": "twdp7-repertoire",
+        "scalars": [
+          "U+1F4BE",
+          "U+1F4BF",
+          "U+1F4C0",
+          "U+1F4C1",
+          "U+1F4C2",
+          "U+1F4C3"
+        ]
+      },
+      {
+        "member": 29,
+        "json": "neuronte-wide-pictographs2-v1-twdp7r2-g0.json",
+        "json_sha256": "617053844b87aa8e373da3a79807c304e930c7785ac5bee873734a759cb02cd8",
+        "image_sha256": "51b7c73a7e6dcd4471be9000acb7a72dccffd9ae118ca5e32c065e8333bd7a56",
+        "bytes": 57040,
+        "set": "twdp7r2-repertoire",
+        "scalars": [
+          "U+1F4C4",
+          "U+1F4C5"
+        ]
+      },
+      {
+        "member": 30,
+        "json": "neuronte-wide-pictographs2-v1-twdp7r2-g1.json",
+        "json_sha256": "e01aa54d23f3f828be71efc093a214763d7ee63d0cc46073d0f04101a854a029",
+        "image_sha256": "a22261d455e95ef0862fdf327b1449c550b1b5afd91c0925a6393499ef5bdc55",
+        "bytes": 57040,
+        "set": "twdp7r2-repertoire",
+        "scalars": [
+          "U+1F4C6",
+          "U+1F4C7",
+          "U+1F4C8"
+        ]
+      },
+      {
+        "member": 31,
+        "json": "neuronte-wide-pictographs2-v1-twdp7r3-g0.json",
+        "json_sha256": "d920c313a5a30f8b8ba9a34cb5f285e1b00c63fd25cd88e3686528903b313d7e",
+        "image_sha256": "59386af892bd1bd1f328aacba1805b061a18a259de4dd51bc23fb01b476dd9db",
+        "bytes": 57040,
+        "set": "twdp7r3-repertoire",
+        "scalars": [
+          "U+1F4C9",
+          "U+1F4CA",
+          "U+1F4CB"
+        ]
+      },
+      {
+        "member": 32,
+        "json": "neuronte-wide-pictographs2-v1-twdp7r4-g0.json",
+        "json_sha256": "d5e8ea72e95c5eb893c82e32c9c5cb7460de7d369f9e32162341b928fee66b00",
+        "image_sha256": "30a5db10fb65e23d51af88befd52c8b41f49a886ac33fe3d49cc5a7b9891137d",
+        "bytes": 57040,
+        "set": "twdp7r4-repertoire",
+        "scalars": [
+          "U+1F4CF",
+          "U+1F4D0",
+          "U+1F4D1"
+        ]
+      },
+      {
+        "member": 33,
+        "json": "neuronte-wide-pictographs2-v1-twdp7r4-g1.json",
+        "json_sha256": "9299f393d82f8929c9dd1efa7c41e6f24396b87b880c1742e039202cbded53f8",
+        "image_sha256": "539aac0ab8f02854ec7792bcd2a68a4be7514ca94fa326c7ddae0762f652c248",
+        "bytes": 57040,
+        "set": "twdp7r4-repertoire",
+        "scalars": [
+          "U+1F4D2",
+          "U+1F4D3",
+          "U+1F4D4"
+        ]
+      },
+      {
+        "member": 34,
+        "json": "neuronte-wide-pictographs2-v1-twdp7-g5.json",
+        "json_sha256": "d678dbb520eb696b119cf0f9114436cdd3f0ad0f390c6b794b858ac688eb296e",
+        "image_sha256": "2c7db303571dd03281be924d79b927ffb420c7e57542160625c351848841e067",
+        "bytes": 57040,
+        "set": "twdp7-repertoire",
+        "scalars": [
+          "U+1F4D5",
+          "U+1F4D6",
+          "U+1F4D7",
+          "U+1F4D8",
+          "U+1F4D9"
+        ]
+      },
+      {
+        "member": 35,
+        "json": "neuronte-wide-pictographs2-v1-twdp7r6-g0.json",
+        "json_sha256": "7d0e65a4ac893234d1b4867789b420186247e3037ada30b22f26163c1c6fe370",
+        "image_sha256": "649c04f94f1521d4c7c44fb7bf5089867c7bcbcfd6d5994fb0f7560b90bf8d94",
+        "bytes": 57040,
+        "set": "twdp7r6-repertoire",
+        "scalars": [
+          "U+1F4DA",
+          "U+1F4DB",
+          "U+1F4DC"
+        ]
+      },
+      {
+        "member": 36,
+        "json": "neuronte-wide-pictographs2-v1-twdp7r6-g1.json",
+        "json_sha256": "b8abb00fc290d7f0978c72ceea1c1074d99c30e56a7691ec9d463685bdafe0c5",
+        "image_sha256": "d72835c2da0f9d422a683074de6fc8d6342c9e2cd9fb895a66601e091b8900f5",
+        "bytes": 57040,
+        "set": "twdp7r6-repertoire",
+        "scalars": [
+          "U+1F4DD",
+          "U+1F4DE",
+          "U+1F4DF"
+        ]
+      },
+      {
+        "member": 37,
+        "json": "neuronte-wide-pictographs2-v1-twdp7r7-g1.json",
+        "json_sha256": "dfa3a5c590128e8c2e8ed2a597b430207c816b2e1be0471e62adfca2bfc2cc5c",
+        "image_sha256": "0b7c0232f5e8905a0bcb59eaa3021bd61dad05f63625170d4081f23b316f0373",
+        "bytes": 57040,
+        "set": "twdp7r7-repertoire",
+        "scalars": [
+          "U+1F4E2",
+          "U+1F4E3",
+          "U+1F4E4"
+        ]
+      },
+      {
+        "member": 38,
+        "json": "neuronte-wide-pictographs2-v1-twdp7r8-g0.json",
+        "json_sha256": "e703f21735323884ed923fcb0b315992ab2b5cf22e2ca4f2a686c99acd8be4bf",
+        "image_sha256": "de61302d8b62ef04a39d95f3a1768f360a5bcd73137dd2085be50228478b171f",
+        "bytes": 57040,
+        "set": "twdp7r8-repertoire",
+        "scalars": [
+          "U+1F4E5",
+          "U+1F4E6",
+          "U+1F4E7"
+        ]
+      },
+      {
+        "member": 39,
+        "json": "neuronte-wide-pictographs2-v1-twdp7r8-g1.json",
+        "json_sha256": "6706383da28c71ca53d142651eb1fbf5eb15e5d4961f7f61899e3d2c3b85a778",
+        "image_sha256": "46527248972441ad1cde119284a5d6ca5c8d3a14e11d1a81c8733c75589b65ef",
+        "bytes": 57040,
+        "set": "twdp7r8-repertoire",
+        "scalars": [
+          "U+1F4E8",
+          "U+1F4E9",
+          "U+1F4EA"
+        ]
+      },
+      {
+        "member": 40,
+        "json": "neuronte-wide-pictographs2-v1-twdp7r9-g0.json",
+        "json_sha256": "5162dd4b0072e3f4178384290e7924bfb8ccc0cdc01c1463491cea8076295be8",
+        "image_sha256": "f1b537a642ad112ec930223d82616cff5eee512b42d8fe1dea1c4e8bb41018e7",
+        "bytes": 57040,
+        "set": "twdp7r9-repertoire",
+        "scalars": [
+          "U+1F4EB",
+          "U+1F4EC",
+          "U+1F4ED"
+        ]
+      },
+      {
+        "member": 41,
+        "json": "neuronte-wide-pictographs2-v1-twdp7r9-g1.json",
+        "json_sha256": "e87749e9d4fafeacf1d4795faeaf3be751f49831cfd15d557404232b850af1cc",
+        "image_sha256": "570bd49fd2c6d7ce38a8e32e33481ba05ca755f293727f403997636ded87ffc2",
+        "bytes": 57040,
+        "set": "twdp7r9-repertoire",
+        "scalars": [
+          "U+1F4EE",
+          "U+1F4EF",
+          "U+1F4F0"
+        ]
+      },
+      {
+        "member": 42,
+        "json": "neuronte-wide-pictographs2-v1-twdp8r0-g0.json",
+        "json_sha256": "d3bb1f6c92bad0febf9bd7e96c6bbfd4702865dfdcf1b6d03c414e9225c65fa4",
+        "image_sha256": "7290106cadda8071e07dd2eaf99f247b67451cb5f4ffe7658ae65b7abef4cfe4",
+        "bytes": 57040,
+        "set": "twdp8r0-repertoire",
+        "scalars": [
+          "U+1F4F1",
+          "U+1F4F2"
+        ]
+      },
+      {
+        "member": 43,
+        "json": "neuronte-wide-pictographs2-v1-twdp8r0-g1.json",
+        "json_sha256": "6eab664dc85c257a1e078a96649c315f15aa940c016491566a3b4b390a6eeca1",
+        "image_sha256": "6770be862ecc489e2f6a536bc30f7fac5e91f84364193b5c716cbd6b4d6a20b0",
+        "bytes": 57040,
+        "set": "twdp8r0-repertoire",
+        "scalars": [
+          "U+1F4F3",
+          "U+1F4F4",
+          "U+1F4F5"
+        ]
+      },
+      {
+        "member": 44,
+        "json": "neuronte-wide-pictographs2-v1-twdp8r1-g0.json",
+        "json_sha256": "f4e263f691f7d9bd68bc0da386ec7c41947779fe6f2e82ccfcfa2dd9aaeb49a7",
+        "image_sha256": "21dc39ca90f1571cbd633fe0937dca7f2f3443b4c2c9c933e55cdcc98d6434ef",
+        "bytes": 57040,
+        "set": "twdp8r1-repertoire",
+        "scalars": [
+          "U+1F4F6",
+          "U+1F4F7",
+          "U+1F4F8"
+        ]
+      },
+      {
+        "member": 45,
+        "json": "neuronte-wide-pictographs2-v1-twdp8r2-g0.json",
+        "json_sha256": "fdc644cad707317f134fe14f870208063306e70fe53d7fa1a6905fff59e9da95",
+        "image_sha256": "72ae76e1301448745c1e720a9dd0fee32d3cf86d18b7e2602d3a17a5c8379b1c",
+        "bytes": 57040,
+        "set": "twdp8r2-repertoire",
+        "scalars": [
+          "U+1F4FC",
+          "U+1F4FF"
+        ]
+      },
+      {
+        "member": 46,
+        "json": "neuronte-wide-pictographs2-v1-twdp8r2-g1.json",
+        "json_sha256": "5f60019d9e3136c15e40a0d3ddc83fb3e2aeeb56bbc6891bbe42a8f5970d7c35",
+        "image_sha256": "d0ee894347873eb650c1c4539eb497bc250e744642c6feeff0444954281920cf",
+        "bytes": 57040,
+        "set": "twdp8r2-repertoire",
+        "scalars": [
+          "U+1F500",
+          "U+1F501",
+          "U+1F502"
+        ]
+      },
+      {
+        "member": 47,
+        "json": "neuronte-wide-pictographs2-v1-twdp8-g3.json",
+        "json_sha256": "f448b6602bcf941848e1321a99cd719cc39fd2464d9d451f6a6fac9b02ad8811",
+        "image_sha256": "9233995014cb6f242db69537ed32dba6446f5b959c3fa419bb962077a0116de4",
+        "bytes": 57040,
+        "set": "twdp8-repertoire",
+        "scalars": [
+          "U+1F503",
+          "U+1F504",
+          "U+1F505",
+          "U+1F506",
+          "U+1F507",
+          "U+1F508"
+        ]
+      },
+      {
+        "member": 48,
+        "json": "neuronte-wide-pictographs2-v1-twdp8r4-g0.json",
+        "json_sha256": "dbfc955de608a7cac1f4e7ecb58f86f84360873579af5d3d7c93423e6ae4f21b",
+        "image_sha256": "81f5ec92fdf966a5f1fa864f4a7f47f82624f00d4628d3e874d269b3f7a50ffc",
+        "bytes": 57040,
+        "set": "twdp8r4-repertoire",
+        "scalars": [
+          "U+1F509",
+          "U+1F50A",
+          "U+1F50B"
+        ]
+      },
+      {
+        "member": 49,
+        "json": "neuronte-wide-pictographs2-v1-twdp8r4-g1.json",
+        "json_sha256": "7fcb1641fda1224316377b1d7a50533a4edd0a1dc79c5732955512d593f14f70",
+        "image_sha256": "31b2eabd5756f946e37ae90d49c08518beb2ad17de58e2f4b58db2c27268de13",
+        "bytes": 57040,
+        "set": "twdp8r4-repertoire",
+        "scalars": [
+          "U+1F50C",
+          "U+1F50D",
+          "U+1F50E"
+        ]
+      },
+      {
+        "member": 50,
+        "json": "neuronte-wide-pictographs2-v1-twdp8r5-g0.json",
+        "json_sha256": "c6e0aacae142bb9493ef2f4ebe97791ed8b24d7953c7e1d8dc3ed66ae2b60c1e",
+        "image_sha256": "ff03b1e34e1ed360abdb2865a93e564f1f55d544eb76ae35cf402798cde8ac75",
+        "bytes": 57040,
+        "set": "twdp8r5-repertoire",
+        "scalars": [
+          "U+1F50F",
+          "U+1F510"
+        ]
+      },
+      {
+        "member": 51,
+        "json": "neuronte-wide-pictographs2-v1-twdp8r5-g1.json",
+        "json_sha256": "1d291eaa6bdc5c07c3a13174ffeafbe3c93fdbbcb93c5fcf60cda5c8b6f67729",
+        "image_sha256": "5b1017a3a901b6510fa4c650d995b45c2aec050f58dd8993f242b6c743241956",
+        "bytes": 57040,
+        "set": "twdp8r5-repertoire",
+        "scalars": [
+          "U+1F511",
+          "U+1F512",
+          "U+1F513"
+        ]
+      },
+      {
+        "member": 52,
+        "json": "neuronte-wide-pictographs2-v1-twdp8r6-g0.json",
+        "json_sha256": "710d3441c4a4bb35de384725d5ea3267523a032388ba4bb142de996a45c52b05",
+        "image_sha256": "8b69e88094258bed9259941973073b80906c424fe15bf019199864ca549a81c1",
+        "bytes": 57040,
+        "set": "twdp8r6-repertoire",
+        "scalars": [
+          "U+1F514",
+          "U+1F515",
+          "U+1F516"
+        ]
+      },
+      {
+        "member": 53,
+        "json": "neuronte-wide-pictographs2-v1-twdp8r7-g0.json",
+        "json_sha256": "094c1ef8c6bc81f34831946965e552f65902f425bf174967483b08cb63dc836c",
+        "image_sha256": "71357ef1724f2ba63b192b52d6097eb25fa414ab3153847b49542deb8d630cef",
+        "bytes": 57040,
+        "set": "twdp8r7-repertoire",
+        "scalars": [
+          "U+1F51A",
+          "U+1F51B"
+        ]
+      },
+      {
+        "member": 54,
+        "json": "neuronte-wide-pictographs2-v1-twdp8r8-g0.json",
+        "json_sha256": "2e97a0743bd71d40941453c3bd45553f13e1fd9dbfbdddfa2b8181cf7e4b4728",
+        "image_sha256": "cdb20c2fa7ab02b2705404f63b44beeb04598b01772c6726ce36438c1f0245d3",
+        "bytes": 57040,
+        "set": "twdp8r8-repertoire",
+        "scalars": [
+          "U+1F51F",
+          "U+1F520",
+          "U+1F521"
+        ]
+      },
+      {
+        "member": 55,
+        "json": "neuronte-wide-pictographs2-v1-twdp8r8-g1.json",
+        "json_sha256": "27c25b41829088a8cb48a9d63ede0661356a705d9bbc3509d3682bdf81f93b75",
+        "image_sha256": "ab675839e64966f50e26cfc6543457a258369d68004638926d93b9f4ac4cc2cc",
+        "bytes": 57040,
+        "set": "twdp8r8-repertoire",
+        "scalars": [
+          "U+1F522",
+          "U+1F523",
+          "U+1F524"
+        ]
+      },
+      {
+        "member": 56,
+        "json": "neuronte-wide-pictographs2-v1-twdp8-g9.json",
+        "json_sha256": "9516e0e295a8e5b6ceeef1bb1cb4f62ff84f46db57f304c91f09b1e8183ca1e9",
+        "image_sha256": "83ddd4a2013f6a3ccc3a9af414591c5b7e2c325987f80cdfa6eda14a36e6e07e",
+        "bytes": 57040,
+        "set": "twdp8-repertoire",
+        "scalars": [
+          "U+1F525",
+          "U+1F526",
+          "U+1F527",
+          "U+1F528",
+          "U+1F529",
+          "U+1F52A"
+        ]
+      },
+      {
+        "member": 57,
+        "json": "neuronte-wide-pictographs2-v1-twdp9-g0.json",
+        "json_sha256": "8667d684fb195e3189ce046e3bc7872a2671802892a36792e73f64fbf72bb064",
+        "image_sha256": "0d2dc2824c9d4d8496c359577dc8ec84898fc6d59b18b414bfaadefdb18d1df8",
+        "bytes": 57040,
+        "set": "twdp9-repertoire",
+        "scalars": [
+          "U+1F52B",
+          "U+1F52C",
+          "U+1F52D",
+          "U+1F52E",
+          "U+1F52F"
+        ]
+      },
+      {
+        "member": 58,
+        "json": "neuronte-wide-pictographs2-v1-twdp9-g1.json",
+        "json_sha256": "bdc96f96b4e9b01e894fb982f28c4d8cf673d49e1abaa9b7d3666010cba44580",
+        "image_sha256": "2b4838d88e8770a6068a927a535ffc1a53c7fb3e0088ab875d9e75de61bf11f6",
+        "bytes": 57040,
+        "set": "twdp9-repertoire",
+        "scalars": [
+          "U+1F530",
+          "U+1F531",
+          "U+1F532",
+          "U+1F533",
+          "U+1F534",
+          "U+1F535"
+        ]
+      },
+      {
+        "member": 59,
+        "json": "neuronte-wide-pictographs2-v1-twdp9-g2.json",
+        "json_sha256": "becdc780743c4f9500c43b977bcd38132581694a7986e7e758a043c29777077c",
+        "image_sha256": "4d60c609dbb3a665a4bbad212567cc4b1d2cd39d09a32f4b33f98645269acd00",
+        "bytes": 57040,
+        "set": "twdp9-repertoire",
+        "scalars": [
+          "U+1F536",
+          "U+1F537",
+          "U+1F538",
+          "U+1F539",
+          "U+1F53A"
+        ]
+      },
+      {
+        "member": 60,
+        "json": "neuronte-wide-pictographs2-v1-twdp9-g3.json",
+        "json_sha256": "57317d14b03726493b91ecb34a4bb0f6fba06b44a87d92c331618b9c565eb87d",
+        "image_sha256": "33bb09296b665dd3e8b74c35fc183e1762d61a785109151bb385c8516f3f8743",
+        "bytes": 57040,
+        "set": "twdp9-repertoire",
+        "scalars": [
+          "U+1F53B",
+          "U+1F53C",
+          "U+1F53D",
+          "U+1F54B",
+          "U+1F54C",
+          "U+1F54D"
+        ]
+      },
+      {
+        "member": 61,
+        "json": "neuronte-wide-pictographs2-v1-twdp9r4-g0.json",
+        "json_sha256": "be5273fcc16673368dd0de5dba9379eab9008f8fa1f518bed644b2afba600b0e",
+        "image_sha256": "c562955191b0909a1dcbe999eb87365f1991b6de5229db24c3ab2bcefc374ea7",
+        "bytes": 57040,
+        "set": "twdp9r4-repertoire",
+        "scalars": [
+          "U+1F54E",
+          "U+1F550",
+          "U+1F551"
+        ]
+      },
+      {
+        "member": 62,
+        "json": "neuronte-wide-pictographs2-v1-twdp9r4-g1.json",
+        "json_sha256": "e45208ff3f5319c9306350b44bf88a6e652a85774f55aba271a4628e8da6aeac",
+        "image_sha256": "562fdf118c8f488d61e1b18817ec2039a5a77f3d6075564207c35f8f54d2ec88",
+        "bytes": 57040,
+        "set": "twdp9r4-repertoire",
+        "scalars": [
+          "U+1F552",
+          "U+1F553",
+          "U+1F554"
+        ]
+      },
+      {
+        "member": 63,
+        "json": "neuronte-wide-pictographs2-v1-twdp9-g5.json",
+        "json_sha256": "3e7bd5831af015e1107a23daaeaddf7bebfb587d475538e44639dcee00cfd9ac",
+        "image_sha256": "c6cead6798e0817686b4c3dd025b4e7e004c5cdf64b6a201029ee96c5e8b476a",
+        "bytes": 57040,
+        "set": "twdp9-repertoire",
+        "scalars": [
+          "U+1F555",
+          "U+1F556",
+          "U+1F557",
+          "U+1F558",
+          "U+1F559"
+        ]
+      },
+      {
+        "member": 64,
+        "json": "neuronte-wide-pictographs2-v1-twdp9-g6.json",
+        "json_sha256": "097098440f5c93ce9df5aaf94fcd833f2304895043b23e3b7d46dd3142bf2965",
+        "image_sha256": "74f6f5ab804a71ebbbedeecaabeb15551bce0698263d4eacabf00bb52eeba873",
+        "bytes": 57040,
+        "set": "twdp9-repertoire",
+        "scalars": [
+          "U+1F55A",
+          "U+1F55B",
+          "U+1F55C",
+          "U+1F55D",
+          "U+1F55E",
+          "U+1F55F"
+        ]
+      },
+      {
+        "member": 65,
+        "json": "neuronte-wide-pictographs2-v1-twdp9-g7.json",
+        "json_sha256": "63957f66fc0955df58c3351bcbd6380e383b2981c2e70139652c54001e9b4f45",
+        "image_sha256": "a7b275ba7f4a68aa12e52821232af9c0a91e0ddb15c8297f5eb76b84a53e9d99",
+        "bytes": 57040,
+        "set": "twdp9-repertoire",
+        "scalars": [
+          "U+1F560",
+          "U+1F561",
+          "U+1F562",
+          "U+1F563",
+          "U+1F564"
+        ]
+      },
+      {
+        "member": 66,
+        "json": "neuronte-wide-pictographs2-v1-twdp9-g8.json",
+        "json_sha256": "1fb21a1a15c9eab6f43102a45b16344490e4e94ac2a2faff4336e9a54afa1ab8",
+        "image_sha256": "431be0b2adcaddb5bf2716e6b28553620b7d1f3596a481e2ba572809b9c0fcf6",
+        "bytes": 57040,
+        "set": "twdp9-repertoire",
+        "scalars": [
+          "U+1F565",
+          "U+1F566",
+          "U+1F567",
+          "U+1F57A",
+          "U+1F595",
+          "U+1F596"
+        ]
+      },
+      {
+        "member": 67,
+        "json": "neuronte-wide-pictographs2-v1-twdp9-g9.json",
+        "json_sha256": "d4141c07da498a4679ba94ac0393f0dc22aefdc4cd77a92492b5d10beeeb3488",
+        "image_sha256": "96d8083eafbc8176c37d1048e6468806edf62769dff457fc08e0e8f3dbe6e0ed",
+        "bytes": 57040,
+        "set": "twdp9-repertoire",
+        "scalars": [
+          "U+1F5A4",
+          "U+1F5FB",
+          "U+1F5FC",
+          "U+1F5FD",
+          "U+1F5FE",
+          "U+1F5FF"
+        ]
+      }
+    ],
+    "list": {
+      "file": "neuronte-wide-pictographs2-v1.symbols.txt",
+      "sha256": "ac0e63e659735e40749624673d4146df3e2ec902d4de1f63450f926fdef8e61a"
+    }
+  }
+}

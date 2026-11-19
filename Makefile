@@ -1278,7 +1278,7 @@ test: test-draw-exact
 METRIC_SANS_FACES = 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 \
 	3i 4i 5i 6i 7i 8i 9i 10i 11i 12i 13i 14i 15i 16i \
 	9b 10b 11b 12b 13b 14b 15b 16b 9bi 10bi 11bi 12bi 13bi 14bi 15bi 16bi
-METRIC_SANS_SEED1 = 12i 16i
+METRIC_SANS_SEED1 = 10b 12i 16 16i
 test-metric-sans-faces: build/libneuronte.so
 	@set -e; mkdir -p $(METRIC_SANS_TMP); \
 	for f in $(METRIC_SANS_FACES); do \

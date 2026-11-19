@@ -233,18 +233,24 @@ Two checks were run, on both seeds of every face:
 - `tests/check_metric_sans.py`: the shipped file with its thousandths table.
 
 A face ships its lower-error seed: seed 0 if it is exact, else seed 1. Seed 1
-ships for two faces, the italics at 12 and 16 px. A seed fails on at most 3
-pixels of one or two letters with a mark.
+ships for four faces. For the italics at 12 and 16 px, seed 0 is off. For the
+upright face at 16 px and the drawn bold at 10 px both seeds are exact, and
+seed 1 ships as a tie-break: seed 0's file happens to hold the byte sequence
+0x70 0x35 0x30 inside its net data, which the repository's leak scan reads as
+a machine name (a byte coincidence, the same as in three older files), and
+seed 1's does not. A seed fails on at most 3 pixels of one or two letters with a mark.
 
 | face | seed 0 | seed 1 | ships |
 |---|---|---|---|
-| upright, 1 to 16 px | exact | exact | seed 0 |
+| upright, 1 to 15 px | exact | exact | seed 0 |
+| upright 16 px | exact | exact | **seed 1**, by the tie-break above |
 | italic, 3 to 11 px, 14 px | exact | exact | seed 0 |
 | italic 12 px | Ê off by 1 px | exact | **seed 1** |
 | italic 13 px | exact | Ó off by 3 px | seed 0 |
 | italic 15 px | exact | Â off by 1 px | seed 0 |
 | italic 16 px | Ù off by 2 px | exact | **seed 1** |
-| drawn bold, 9 to 14 px and 16 px | exact | exact | seed 0 |
+| drawn bold, 9 px, 11 to 14 px and 16 px | exact | exact | seed 0 |
+| drawn bold 10 px | exact | exact | **seed 1**, by the tie-break above |
 | drawn bold 15 px | Ò off by 2 px | ó and ô off by 1 px each | **halved**, seed 0 |
 | drawn bold italic, 9 to 12 px | exact | exact | seed 0 |
 | drawn bold italic 13 px | exact | Ã off by 1 px | seed 0 |
@@ -275,6 +281,10 @@ First use is in milliseconds. Cached is the two lines drawn again on the
 same handle, in microseconds. ASCII is the line of 96 ASCII characters, and
 Latin-1 the line of U+00A0 to U+00FF. The two passes agree to a median of
 1.1% (Intel i7-10700F) and 0.4% (Intel i7-6820HQ) per figure.
+
+The upright 16 px face and the drawn bold 10 px face were timed with their
+seed 0 files; the shipped seed 1 files have the same nets' sizes and routes,
+so the same cost, but were not timed themselves.
 
 Machines: an Intel i7-10700F, and an Intel i7-6820HQ on a fresh Debian 13
 install (with Kilix 0.2.3, kernel 6.12.117+deb13-amd64, before its NVIDIA

@@ -74,7 +74,7 @@ def digest(path):
 
 
 def face_em(name):
-    em = name[2:].removesuffix("i").removesuffix("l1").removesuffix("ms")  # uiEMl1(i): a face's Latin-1 alone; uiEMms(i): metric-sans
+    em = name[2:].removesuffix("i").removesuffix("l1").removesuffix("msb").removesuffix("ms")  # uiEMl1(i): a face's Latin-1 alone; uiEMms(i), uiEMmsb(i): metric-sans
     return int(em) if name.startswith("ui") and em.isdigit() else None
 
 

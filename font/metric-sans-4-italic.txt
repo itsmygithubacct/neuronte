@@ -1,7 +1,7 @@
 # Neuronte Sans Metric, italic pixel face at an em of 4 pixels: the 192
 # characters of the desktop faces (printable ASCII, U+2026, U+00A0..U+00FF).
 # Redrawn by tools/make-metric-sans-face.py from font/ui-4-latin1.txt, this
-# Then sheared by tools/make-italic.py's rule; the advances stay upright's.
+# Then sheared about the baseline (pure_shear()); the advances stay upright's.
 # project's own drawing, to the widths and ink boxes in font/metric-sans-widths.txt.
 # THE ADVANCES ARE COPIED from Adobe's Core 14 AFM metric files for Helvetica
 # (notice in LICENSES/Adobe-Core14-AFM.txt). No font file was opened. TeX Gyre
@@ -333,10 +333,10 @@ _ 2
 .
 #
 ` 1
-#
-.
-.
-.
+.#
+..
+..
+..
 a 2
 .
 #
@@ -528,10 +528,10 @@ U+00A0 1
 #.
 ..
 ¨ 1
-#.#
-...
-...
-...
+.#.#
+....
+....
+....
 © 3
 ..#
 ##.
@@ -563,10 +563,10 @@ U+00AD 1
 ##.
 ...
 ¯ 1
-##
-..
-..
-..
+.##
+...
+...
+...
 ° 2
 .#
 #.
@@ -588,10 +588,10 @@ U+00AD 1
 #.
 ..
 ´ 1
-.#
-..
-..
-..
+..#
+...
+...
+...
 µ 2
 .
 #

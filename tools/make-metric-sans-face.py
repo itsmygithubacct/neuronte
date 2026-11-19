@@ -34,8 +34,11 @@ opened here):
   replaces what the rules made (its advance is still Helvetica's); the file
   header lists them.
 
-The italic face is the upright face sheared by tools/make-italic.py's rule,
-with the upright advance: Helvetica-Oblique's widths are Helvetica's.
+The italic face is the upright face sheared about the baseline by
+tools/make-italic.py's slope, but without that tool's move to keep each
+letter's left side bearing (pure_shear()), with the upright advance:
+Helvetica-Oblique's widths are Helvetica's. The move would slide a round
+letter into the one before it, because these advances have no room for it.
 
 Bold, as in every desktop face, is the letter struck twice, one pixel apart.
 The bold advance is round(bold width * EM / 1000); the bold shift centres the
@@ -145,6 +148,34 @@ def rowmap(rows, lo, hi, n):
     return [''.join('#' if c in out[y] else '.' for c in range(n)) for y in range(em)]
 
 
+def pure_shear(rows, baseline, em):
+    """The metric italic: the upright pixels sheared about the baseline by the
+    slope of tools/make-italic.py (one column per four rows, the slope reduced
+    only where the letter would not fit in the em), with NO move to keep the
+    left side bearing: every letter of a line is slanted alike, so the gap
+    between two letters stays where it was in every row. Only a letter whose
+    ink would then start left of the pen (a descender) moves right, just
+    enough. tools/make-italic.py's own rule, which keeps the left bearing and
+    widens the advance, is unchanged; it is not used here, because these
+    faces keep Helvetica-Oblique's advances, which are the upright's."""
+    pts = {(x, y) for y, r in enumerate(rows) for x, c in enumerate(r) if c == '#'}
+    if not pts:
+        return rows
+    for divisor in range(4, 4 * em + 1):
+        def shift(y):
+            d = baseline - y
+            return (1 if d >= 0 else -1) * ((2 * abs(d) + divisor) // (2 * divisor))
+        sl = {(x + shift(y), y) for x, y in pts}
+        lo, hi = min(x for x, _ in sl), max(x for x, _ in sl)
+        if hi - min(0, lo) < em:
+            break
+    move = -lo if lo < 0 else 0
+    sl = {(x + move, y) for x, y in sl}
+    w = max(len(rows[0]), max(x for x, _ in sl) + 1)
+    assert w <= em and len(sl) == len(pts)
+    return [''.join('#' if (x, y) in sl else '.' for x in range(w)) for y in range(len(rows))]
+
+
 def fixes():
     """{em: {char: rows}} from font/metric-sans-fixes.txt: blocks 'EM CHAR' then EM rows."""
     out, cur = {}, None
@@ -234,7 +265,7 @@ def header(em, hand, italic_face=False):
         f'# its advances and shifts are in font/metric-sans-{em}.advances.txt.',
     ]
     if italic_face:
-        lines.insert(3, "# Then sheared by tools/make-italic.py's rule; the advances stay upright's.")
+        lines.insert(3, "# Then sheared about the baseline (pure_shear()); the advances stay upright's.")
     if hand:
         lines.append('# Drawn by hand in font/metric-sans-fixes.txt: ' + ' '.join(latin1.label(c) for c in hand) + '.')
     return lines
@@ -262,7 +293,7 @@ def texts(em):
     out = {path(em): up, path(em, '.advances'): '\n'.join(sh) + '\n'}
     if em in ITALIC_EMS:
         base_row, _ = latin1.metrics(em)
-        slanted = {ch: (adv, italic.shear(rows, adv, base_row, em)[1]) for ch, (adv, rows) in body.items()}
+        slanted = {ch: (adv, pure_shear(rows, base_row, em)) for ch, (adv, rows) in body.items()}
         out[path(em, '-italic')] = latin1.render(header(em, hand, True), slanted)
     return out
 

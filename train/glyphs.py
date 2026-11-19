@@ -189,6 +189,12 @@ UI_METRIC = {em: os.path.join(strokes.ROOT, "font", f"metric-sans-{em}.txt") for
 UI_METRIC_ITALIC = {em: os.path.join(strokes.ROOT, "font", f"metric-sans-{em}-italic.txt") for em in range(3, 17)}
 PENS.update({f"ui{em}ms": 0.55 / em for em in UI_METRIC})
 PENS.update({f"ui{em}msi": 0.55 / em for em in UI_METRIC_ITALIC})
+# Its drawn bold 9-16 px (font/metric-sans-EM-bold(-italic).txt, tools/make-metric-sans-bold.py):
+# sets uiEMmsb and uiEMmsbi, drawn with bold = 0 from their own files.
+UI_METRIC_BOLD = {em: os.path.join(strokes.ROOT, "font", f"metric-sans-{em}-bold.txt") for em in range(9, 17)}
+UI_METRIC_BOLD_ITALIC = {em: os.path.join(strokes.ROOT, "font", f"metric-sans-{em}-bold-italic.txt") for em in range(9, 17)}
+PENS.update({f"ui{em}msb": 0.55 / em for em in UI_METRIC_BOLD})
+PENS.update({f"ui{em}msbi": 0.55 / em for em in UI_METRIC_BOLD_ITALIC})
 PAD = 0.25                  # how far edge lines and blocks run past the cell
 LIGHT, HEAVY = 0.06, 0.12   # half widths of box lines, in cell widths
 DOUBLE = 0.19               # offset of each line of a double line from its centre line
@@ -1427,6 +1433,8 @@ SETS = {
     "uilargems": ["uilargems"],
     **{f"ui{em}ms": [f"ui{em}ms"] for em in UI_METRIC},
     **{f"ui{em}msi": [f"ui{em}msi"] for em in UI_METRIC_ITALIC},
+    **{f"ui{em}msb": [f"ui{em}msb"] for em in UI_METRIC_BOLD},
+    **{f"ui{em}msbi": [f"ui{em}msbi"] for em in UI_METRIC_BOLD_ITALIC},
     **{f"ui{em}l1": [f"ui{em}l1"] for em in UI_LATIN1},
     **{f"ui{em}l1i": [f"ui{em}l1i"] for em in UI_LATIN1_ITALIC},
 }
@@ -1512,10 +1520,13 @@ def tier(name):
     if name == "uilargems":
         import metric_sans
         return metric_sans.tier()
-    if re.fullmatch(r"ui\d+msi?", name) and name in PENS:
+    if re.fullmatch(r"ui\d+msb?i?", name) and name in PENS:
         italic = name.endswith("i")
-        em = int(name[2:].removesuffix("i").removesuffix("ms"))
-        g = pixel_face(em, (UI_METRIC_ITALIC if italic else UI_METRIC)[em])
+        bold = name.removesuffix("i").endswith("msb")
+        em = int(name[2:].removesuffix("i").removesuffix("msb").removesuffix("ms"))
+        files = ((UI_METRIC_BOLD_ITALIC if italic else UI_METRIC_BOLD) if bold
+                 else (UI_METRIC_ITALIC if italic else UI_METRIC))
+        g = pixel_face(em, files[em])
         want = [chr(c) for c in range(32, 127)] + ["\u2026"] + [chr(c) for c in range(0xA0, 0x100)]
         if sorted(g) != sorted(want):
             raise ValueError(f"metric-sans-{em}{'-italic' if italic else ''}.txt must hold ASCII, U+2026 and U+00A0..U+00FF")

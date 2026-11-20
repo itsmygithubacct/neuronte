@@ -202,6 +202,21 @@ build/libneuronte.a: $(OBJS)
 build/libneuronte.so: $(OBJS)
 	$(CC) $(LDFLAGS) -shared -o $@ $^ $(LDLIBS)
 
+PREFIX ?= /usr/local
+DESTDIR ?=
+INSTALL ?= install
+# Weight files the image carries. Training JSON is not installed.
+LIB_WEIGHTS = weights/neuronte-split-v4.nrt weights/neuronte-split-v9.nrt \
+	weights/neuronte-emoji-v1.nrt $(wildcard weights/neuronte-term-*-v1.nrt)
+
+.PHONY: install
+install: build/libneuronte.a build/libneuronte.so
+	$(INSTALL) -d $(DESTDIR)$(PREFIX)/include $(DESTDIR)$(PREFIX)/lib \
+		$(DESTDIR)$(PREFIX)/share/neuronte/weights
+	$(INSTALL) -m 0644 include/neuronte.h $(DESTDIR)$(PREFIX)/include/neuronte.h
+	$(INSTALL) -m 0644 build/libneuronte.a build/libneuronte.so $(DESTDIR)$(PREFIX)/lib/
+	$(INSTALL) -m 0644 $(LIB_WEIGHTS) $(DESTDIR)$(PREFIX)/share/neuronte/weights/
+
 build/%: tools/%.c build/libneuronte.a
 	$(CC) $(NRT_CFLAGS) -o $@ $< build/libneuronte.a $(LDLIBS)
 

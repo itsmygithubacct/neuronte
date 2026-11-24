@@ -1,7 +1,7 @@
 # The characters of neuronte-term-marks-v1: the combining diacritical
 # marks (U+0300 to U+036F), the Lao vowel signs and tone marks that sit
 # over or under a letter, four modifier letters, the soft hyphen, the
-# typographic spaces, the interlinear annotation characters, and 23 signs
+# typographic spaces, the interlinear annotation characters, and 19 signs
 # from Miscellaneous Symbols and Geometric Shapes drawn for one cell.
 # Written for this project. No font was read: each drawing is made from
 # the character's Unicode name and what its shape is known to be, with the

@@ -32,7 +32,6 @@ Shapes are glyphs.py's, in cell units. No font was read.
 """
 import os
 
-import glyphs
 import strokes
 import term_rest
 from term_rest import groups
@@ -53,6 +52,7 @@ SOFT_HYPHEN = 0xAD
 SIGNS = frozenset([0x25FD, 0x25FE, 0x2614, 0x2615, *range(0x2648, 0x2654), 0x267F, 0x2693, 0x26A1])
 SIGN_K = 0.92 / 18          # the 18-unit box to 0.92 of the cell's width
 SIGN_MIN_PEN = 0.05
+SIGN_CY = 0.975             # glyphs.CENTRE, the maths line, where the asterisks sit
 
 
 def read(path=FILE):
@@ -115,8 +115,8 @@ def blanks():
 
 
 def _sign(shapes):
-    """A wide sign's box shapes (18 x 18 units, x right, y down) in one cell, on the maths line."""
-    cy = glyphs.CENTRE if hasattr(glyphs, "CENTRE") else 0.975
+    """A wide sign's box shapes (18 x 18 units, x right, y down) in one cell, its centre at SIGN_CY."""
+    cy = SIGN_CY
     f = lambda x, y: (0.5 + (x - 9.0) * SIGN_K, cy + (y - 9.0) * SIGN_K)  # noqa: E731
     out = []
     for sh in shapes:
@@ -135,6 +135,7 @@ def _sign(shapes):
 
 def made():
     """{char: shapes} for every character of font/term-marks.txt."""
+    import glyphs   # here, not at the top: glyphs.py imports this module to register its sets
     _, drawn, _ = read()
     marks = strokes.parse(os.path.join(strokes.ROOT, "font", "marks.txt"))
     small = strokes.parse(strokes.STROKES)

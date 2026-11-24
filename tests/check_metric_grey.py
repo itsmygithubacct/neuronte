@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Gate a greyscale Neuronte Sans Metric face (sets uiEMmsg, uiEMmsgi) against its drawing.
 
-usage: check_metric_grey.py LIBNEURONTE FACE.nrt SET ADVANCES.txt [--json OUT]
+usage: check_metric_grey.py LIBNEURONTE FACE.nrt SET ADVANCES.txt [--left-out U+XXXX,...] [--json OUT]
 
 G-GC (coverage): every one of the set's 192 characters is drawn by the library at the face's em
 (neuronte_coverage, automatic samples) and compared with the teacher: the set's own strokes
@@ -9,6 +9,10 @@ G-GC (coverage): every one of the set's 192 characters is drawn by the library a
 one sample wide at the library's sample positions. ink-MAE is the mean |error| over the pixels where
 either side has any coverage. Pass: every character ink-MAE <= 0.010 and worst pixel <= 0.15; the face's
 mean ink-MAE <= 0.004.
+
+--left-out lists the characters of a group the Method left out (it failed G-GC, was halved once, and a half
+still failed): each must be untrained in the file (neuronte_untrained() = 1), so that a consumer can tell
+and draw it from the binary face of that em. They are not measured, and the face mean is over the rest.
 
 G-GW (widths): every advance, regular and bold, in thousandths, equals ADVANCES.txt's (the binary face's
 fine advances file of that em).
@@ -58,6 +62,7 @@ def main():
     p.add_argument("face")
     p.add_argument("set")
     p.add_argument("advances")
+    p.add_argument("--left-out", default="")
     p.add_argument("--json")
     a = p.parse_args()
     em = face_parts.face_em(a.set)
@@ -70,6 +75,8 @@ def main():
     lib.neuronte_coverage.argtypes = [P, ctypes.c_uint32, ctypes.c_int, ctypes.c_int, ctypes.c_int,
                                       ctypes.POINTER(ctypes.c_float)]
     lib.neuronte_advance_milli.argtypes = [P, ctypes.c_uint32, ctypes.c_int]
+    lib.neuronte_untrained.argtypes = [P, ctypes.c_uint32]
+    left_out = {int(c.removeprefix("U+"), 16) for c in a.left_out.split(",") if c}
     h = P()
     if lib.neuronte_open_file(a.face.encode(), ctypes.byref(h)) != 0 or not h:
         raise SystemExit(f"cannot open {a.face}")
@@ -78,6 +85,10 @@ def main():
     buf = (ctypes.c_float * (2 * em * em))()
     rows, fails = [], []
     for ch, _, shapes in glyphs.charset(a.set):
+        if ord(ch) in left_out:
+            if lib.neuronte_untrained(h, ord(ch)) != 1:
+                fails.append(f"U+{ord(ch):04X} is listed as left out but is trained in the file")
+            continue
         if lib.neuronte_coverage(h, ord(ch), em, 2 * em, 0, buf) != 0:
             raise SystemExit(f"coverage failed for U+{ord(ch):04X}")
         net = np.frombuffer(buf, np.float32).reshape(2 * em, em).astype(np.float64)
@@ -100,7 +111,7 @@ def main():
     lib.neuronte_close(h)
     gc = not fails and face_mae <= FACE_MAE
     gw = not width_fails
-    summary = {"set": a.set, "face": os.path.basename(a.face), "em": em, "characters": len(rows),
+    summary = {"set": a.set, "face": os.path.basename(a.face), "em": em, "characters": len(rows), "left_out": [f"U+{c:04X}" for c in sorted(left_out)],
                "face_ink_mae": round(face_mae, 6), "worst_char_ink_mae": max(r["ink_mae"] for r in rows),
                "worst_pixel": max(r["worst"] for r in rows), "G-GC": "PASS" if gc else "FAIL",
                "G-GW": "PASS" if gw else "FAIL", "char_fails": fails, "width_fails": width_fails}

@@ -1335,6 +1335,35 @@ test-metric-sans-touching: build/libneuronte.so
 test: test-metric-sans-touching
 
 .PHONY: test-metric-sans-touching
+
+# Greyscale Neuronte Sans Metric, 8 to 16 px (weights/neuronte-metric-sans-grey-v1.md):
+# each shipped file repacks byte for byte from its members (whole groups gK,
+# then the halves hH of a halved group, each in -V order) at the binary face's
+# advances, and passes G-GC (coverage against its drawing) and G-GW (widths)
+# in tests/check_metric_grey.py. A face is EM or EMi (italic); its members are
+# seed 1's where listed in METRIC_GREY_SEED1. 8 px upright leaves out Æ and Ç
+# (a half that failed after halving): they must be untrained in the file.
+METRIC_GREY_FACES = 8 9 10 11 12 13 14 15 16 8i 9i 10i 11i 12i 13i 14i 15i 16i
+METRIC_GREY_SEED1 = 9 10 11 12 13 14 15 16 9i 10i 11i 12i 13i 14i 15i 16i
+METRIC_GREY_LEFT_OUT_8 = U+00C6,U+00C7
+test-metric-sans-grey: build/libneuronte.so
+	@set -e; mkdir -p $(METRIC_SANS_TMP); \
+	for f in $(METRIC_GREY_FACES); do \
+		em=`echo $$f | sed 's/i$$//'`; it=""; set=ui$${em}msg; \
+		case $$f in *i) it=-italic; set=ui$${em}msgi;; esac; \
+		sfx=""; for s in $(METRIC_GREY_SEED1); do [ "$$s" = "$$f" ] && sfx=.seed1; done; \
+		lo=""; [ "$$f" = 8 ] && lo="--left-out $(METRIC_GREY_LEFT_OUT_8)"; \
+		n=weights/neuronte-metric-sans$$em-grey$$it-v1; \
+		m="`ls $$n$$sfx-g*.json | sort -V` `ls $$n$$sfx-h*.json 2>/dev/null | sort -V`"; \
+		$(PYTHON) train/pack.py --drawing-bundle $(METRIC_SANS_TMP)/grey-$$f.nrt font/metric-sans-$$em.advances.txt $$m > /dev/null; \
+		cmp $(METRIC_SANS_TMP)/grey-$$f.nrt $$n.nrt; \
+		OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_metric_grey.py build/libneuronte.so $$n.nrt $$set font/metric-sans-$$em.advances.txt $$lo > /dev/null; \
+		echo "metric-sans grey $$f: repacks, G-GC and G-GW pass"; \
+	done
+
+test: test-metric-sans-grey
+
+.PHONY: test-metric-sans-grey
 # neuronte-wide: the wide pictographs, symbols and fullwidth forms, drawn
 # for a box of two cells (asked as W x 2H, each pair of rows averaged).
 # Five standalone bundles, each checked by tests/check_wide.py; INK is a

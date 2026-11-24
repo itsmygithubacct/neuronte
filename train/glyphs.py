@@ -1456,6 +1456,9 @@ SETS.update(term_scripts.bundles())  # termmathalpha, termsyllabics, termscripts
 import term_rest  # noqa: E402
 SETS.update({name: [name] for name in term_rest.sets()})  # the sets of font/term-rest.txt and each one's groups
 SETS["termrest"] = list(term_rest.primary())
+import term_marks  # noqa: E402
+SETS.update({name: [name] for name in term_marks.sets()})  # the sets of font/term-marks.txt and each one's groups
+SETS["termmarks"] = list(term_marks.primary())
 import kilix_chrome  # noqa: E402
 SETS.update({name: [name] for name in kilix_chrome.sets()})  # the sets of font/kilix-chrome.txt and each one's groups
 SETS["kilixchrome"] = list(kilix_chrome.primary())
@@ -1520,6 +1523,9 @@ def tier(name):
     if name.startswith(term_rest.PREFIX) and name in term_rest.sets():
         made = term_rest.made()
         return [(chr(c), made[chr(c)]) for c in term_rest.sets()[name]]
+    if name.startswith(term_marks.PREFIX) and name in term_marks.sets():
+        made = term_marks.made()
+        return [(chr(c), made[chr(c)]) for c in term_marks.sets()[name]]
     if name.startswith(kilix_chrome.PREFIX) and name in kilix_chrome.sets():
         made = kilix_chrome.made()
         return [(chr(c), made[chr(c)]) for c in kilix_chrome.sets()[name]]
@@ -1693,6 +1699,10 @@ def sources(name):
                      "train/strokes.py", "train/glyphs.py"])
     if any(t.startswith(term_rest.PREFIX) for t in tiers):
         files += ["font/term-rest.txt", "train/term_rest.py"]
+    if any(t.startswith(term_marks.PREFIX) for t in tiers):
+        files += ["font/term-marks.txt", "train/term_marks.py", "font/marks.txt", "font/strokes.txt",
+                  "font/term-letters.txt", "train/term_letters.py", "font/term-rest.txt", "train/term_rest.py",
+                  "train/wide_symbols.py", "train/wide_parts.py", "train/wide.py"]
     if any(t.startswith(kilix_chrome.PREFIX) for t in tiers):
         files += ["font/kilix-chrome.txt", "train/kilix_chrome.py", "train/term_rest.py"]
     if any(t.startswith(wide.PREFIX) for t in tiers):

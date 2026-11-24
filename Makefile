@@ -684,7 +684,7 @@ pack-term-rest-v1:
 # term-marks-v1: the combining marks, the Lao marks and the small gaps, a
 # standalone bundle of group nets used beside split-v9.
 TERM_MARKS_V1 = $(shell $(PYTHON) train/build_term_marks_v1.py --files)
-TERM_MARKS_V1_INK = 301
+TERM_MARKS_V1_INK = 2693
 
 test-term-marks-v1: build/libneuronte.so build/test_api
 	@set -e; for n in $(TERM_MARKS_V1); do \

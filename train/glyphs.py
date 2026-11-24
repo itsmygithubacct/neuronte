@@ -201,6 +201,11 @@ UI_METRIC_BOLD = {em: os.path.join(strokes.ROOT, "font", f"metric-sans-{em}-bold
 UI_METRIC_BOLD_ITALIC = {em: os.path.join(strokes.ROOT, "font", f"metric-sans-{em}-bold-italic.txt") for em in range(9, 17)}
 PENS.update({f"ui{em}msb": 0.55 / em for em in UI_METRIC_BOLD})
 PENS.update({f"ui{em}msbi": 0.55 / em for em in UI_METRIC_BOLD_ITALIC})
+# Its greyscale faces at 8-16 px (train/metric_sans_grey.py): the large strokes hinted
+# onto each binary face, drawn with a one-pixel pen. Sets uiEMmsg and uiEMmsgi.
+UI_METRIC_GREY = range(8, 17)
+PENS.update({f"ui{em}msg": 0.5 / em for em in UI_METRIC_GREY})
+PENS.update({f"ui{em}msgi": 0.5 / em for em in UI_METRIC_GREY})
 PAD = 0.25                  # how far edge lines and blocks run past the cell
 LIGHT, HEAVY = 0.06, 0.12   # half widths of box lines, in cell widths
 DOUBLE = 0.19               # offset of each line of a double line from its centre line
@@ -1441,6 +1446,8 @@ SETS = {
     **{f"ui{em}msi": [f"ui{em}msi"] for em in UI_METRIC_ITALIC},
     **{f"ui{em}msb": [f"ui{em}msb"] for em in UI_METRIC_BOLD},
     **{f"ui{em}msbi": [f"ui{em}msbi"] for em in UI_METRIC_BOLD_ITALIC},
+    **{f"ui{em}msg": [f"ui{em}msg"] for em in UI_METRIC_GREY},
+    **{f"ui{em}msgi": [f"ui{em}msgi"] for em in UI_METRIC_GREY},
     **{f"ui{em}l1": [f"ui{em}l1"] for em in UI_LATIN1},
     **{f"ui{em}l1i": [f"ui{em}l1i"] for em in UI_LATIN1_ITALIC},
 }
@@ -1529,6 +1536,9 @@ def tier(name):
     if name == "uilargems":
         import metric_sans
         return metric_sans.tier()
+    if re.fullmatch(r"ui\d+msgi?", name) and name in PENS:
+        import metric_sans_grey
+        return metric_sans_grey.tier(int(name[2:].removesuffix("i").removesuffix("msg")), name.endswith("i"))
     if re.fullmatch(r"ui\d+msb?i?", name) and name in PENS:
         italic = name.endswith("i")
         bold = name.removesuffix("i").endswith("msb")

@@ -1,0 +1,498 @@
+{
+  "schema": "neuronte.term-marks/v1",
+  "name": "neuronte-term-marks-v1",
+  "sha256": "ae6979c3b0177bc0900a03f2d7b9e2105e72310f420f5195abf2083b6bffc6af",
+  "bytes": 1484368,
+  "sets": [
+    [
+      "tmkA",
+      7
+    ],
+    [
+      "tmkB",
+      7
+    ],
+    [
+      "tmkJ",
+      5
+    ],
+    [
+      "tmkL",
+      3
+    ],
+    [
+      "tmkS",
+      4
+    ]
+  ],
+  "halved": [
+    [
+      "tmkJ",
+      0
+    ]
+  ],
+  "left_out": [
+    {
+      "set": "tmkJr0",
+      "group": 1,
+      "why": "failed the declared gates with both seeds, as half of a group that had failed"
+    }
+  ],
+  "record": {
+    "schema": "neuronte.standalone-bundle/v1",
+    "sha256": "ae6979c3b0177bc0900a03f2d7b9e2105e72310f420f5195abf2083b6bffc6af",
+    "bytes": 1484368,
+    "members": 27,
+    "group_nets": 26,
+    "ranges": 50,
+    "gate": null,
+    "trained_scalars": 166,
+    "fallback": {
+      "member": 26,
+      "kind": "blank",
+      "hidden_width": 1,
+      "distance": -8.0,
+      "image_sha256": "42d4790165297c3af39d178e1396f575991d6fe4d2e3c947762ef5eaedd05bf6",
+      "bytes": 592
+    },
+    "apart_from": [
+      {
+        "file": "neuronte-split-v9.nrt",
+        "sha256": "0a92f223d47f1680929b2c5d7512d1a1728d4871e6653b33cbaad060e6bb90c0",
+        "table_scalars": 1341
+      }
+    ],
+    "nets": [
+      {
+        "member": 0,
+        "json": "neuronte-term-marks-v1-tmkA-g0.json",
+        "json_sha256": "bb74fb98493eead8840c6dd0f2bc4da3af2792b9fb78523afa291ec6226bb087",
+        "image_sha256": "77ef8150c29cd4f557a43531b7a61be66809a0426e43ec20a2f991abe15a438f",
+        "bytes": 57040,
+        "set": "tmkA-repertoire",
+        "scalars": [
+          "U+0300",
+          "U+0301",
+          "U+0302",
+          "U+0303",
+          "U+0304",
+          "U+0305"
+        ]
+      },
+      {
+        "member": 1,
+        "json": "neuronte-term-marks-v1-tmkA-g1.json",
+        "json_sha256": "85abb6e09b6108d0513c5834fca84478a5908c38505da042b9b43a6c1bfe2fa6",
+        "image_sha256": "2bef6bd3c77f0a5ec4e776e6c01aa4a8a0ede7c353c2c39663fca62588ca18d8",
+        "bytes": 57040,
+        "set": "tmkA-repertoire",
+        "scalars": [
+          "U+0306",
+          "U+0307",
+          "U+0308",
+          "U+0309",
+          "U+030A",
+          "U+030B"
+        ]
+      },
+      {
+        "member": 2,
+        "json": "neuronte-term-marks-v1-tmkA-g2.json",
+        "json_sha256": "3bfe325f3bba288a85c3784eea1841fd96fc3cad92dab35b284c85ac7b07392d",
+        "image_sha256": "c9287a0dc2baeafa231931dbc2b18258c84db645d6658bb8ae8a1f49cd3ef6db",
+        "bytes": 57040,
+        "set": "tmkA-repertoire",
+        "scalars": [
+          "U+030C",
+          "U+030D",
+          "U+030E",
+          "U+030F",
+          "U+0310",
+          "U+0311"
+        ]
+      },
+      {
+        "member": 3,
+        "json": "neuronte-term-marks-v1-tmkA-g3.json",
+        "json_sha256": "50e5d0e0b381974c71f010faef2c27b85c82c9b7913d92c99493af9b6f685472",
+        "image_sha256": "5d488b4dd86eb41af81147a9a93f060674e3229bac0243611384b43b9eb051d7",
+        "bytes": 57040,
+        "set": "tmkA-repertoire",
+        "scalars": [
+          "U+0312",
+          "U+0313",
+          "U+0314",
+          "U+0315",
+          "U+031A",
+          "U+031B"
+        ]
+      },
+      {
+        "member": 4,
+        "json": "neuronte-term-marks-v1-tmkA-g4.json",
+        "json_sha256": "8e2ad2db06d85f59f0512f7b5637b989ccfafadb7010374f14e2cf5b21ef2d33",
+        "image_sha256": "ef0cfa2f6eb4a5b0c8a6190b5d72d7dfb2685277e09503efef2b9bd86f8ff971",
+        "bytes": 57040,
+        "set": "tmkA-repertoire",
+        "scalars": [
+          "U+033D",
+          "U+033E",
+          "U+033F",
+          "U+0340",
+          "U+0341",
+          "U+0342"
+        ]
+      },
+      {
+        "member": 5,
+        "json": "neuronte-term-marks-v1-tmkA-g5.json",
+        "json_sha256": "8f50263e8e8c30e555f5cbb2889ddb94438eeef1347492b93cd208e10f970122",
+        "image_sha256": "bcb6d3ec8e30447924bfc39167eaef3a7642cedbcebbf01096eb7e0d9ca23b6a",
+        "bytes": 57040,
+        "set": "tmkA-repertoire",
+        "scalars": [
+          "U+0343",
+          "U+0344",
+          "U+0346",
+          "U+034A",
+          "U+034B",
+          "U+034C"
+        ]
+      },
+      {
+        "member": 6,
+        "json": "neuronte-term-marks-v1-tmkA-g6.json",
+        "json_sha256": "b596b6403c5a24729a27b0eb76919cb3289751cab49dacf2ab78598fdb2afd38",
+        "image_sha256": "54406fb8430773cb64b6cd1b8a356da1b1c09de4b8ec7cfa6af504bd80947a9e",
+        "bytes": 57040,
+        "set": "tmkA-repertoire",
+        "scalars": [
+          "U+0350",
+          "U+0351",
+          "U+0352",
+          "U+0357",
+          "U+0358",
+          "U+035B"
+        ]
+      },
+      {
+        "member": 7,
+        "json": "neuronte-term-marks-v1-tmkB-g0.json",
+        "json_sha256": "9901925c49af6fb9cc3939d40e727dbe579c4f2ee0e8a7e142f95c159c3f9351",
+        "image_sha256": "a2ec0ca2283613bc2bced85a0ed5ea265a8619668c73dcd456a1e18fbe06bec9",
+        "bytes": 57040,
+        "set": "tmkB-repertoire",
+        "scalars": [
+          "U+0316",
+          "U+0317",
+          "U+0318",
+          "U+0319",
+          "U+031C",
+          "U+031D",
+          "U+031E"
+        ]
+      },
+      {
+        "member": 8,
+        "json": "neuronte-term-marks-v1-tmkB-g1.json",
+        "json_sha256": "28524a3fdef9efb346fa52c55a56a7f679f6a3bd1ec9da831914446f42995171",
+        "image_sha256": "2bcd5d433586292ddc1bd3a34797212c650491da4ce45987152a46d17f23f931",
+        "bytes": 57040,
+        "set": "tmkB-repertoire",
+        "scalars": [
+          "U+031F",
+          "U+0320",
+          "U+0321",
+          "U+0322",
+          "U+0323",
+          "U+0324",
+          "U+0325"
+        ]
+      },
+      {
+        "member": 9,
+        "json": "neuronte-term-marks-v1-tmkB-g2.json",
+        "json_sha256": "9f2ffa505c8394407ddd4a51287d97b9c62f0a74ec9a163676acddb24f4b9a57",
+        "image_sha256": "e2a1ef3d282a56203cd110b22ace940e740e1fa303d9cd4779d6d9f2639237bc",
+        "bytes": 57040,
+        "set": "tmkB-repertoire",
+        "scalars": [
+          "U+0326",
+          "U+0327",
+          "U+0328",
+          "U+0329",
+          "U+032A",
+          "U+032B",
+          "U+032C"
+        ]
+      },
+      {
+        "member": 10,
+        "json": "neuronte-term-marks-v1-tmkB-g3.json",
+        "json_sha256": "4c3d0b4f2656cdabc8722100ee6992d13ad6caf14cc59528bb3b8c08681be0d4",
+        "image_sha256": "8645a0f048aea55dea09f5abb5980e11b7b8a2da093c77beb5d0d2d68e09add1",
+        "bytes": 57040,
+        "set": "tmkB-repertoire",
+        "scalars": [
+          "U+032D",
+          "U+032E",
+          "U+032F",
+          "U+0330",
+          "U+0331",
+          "U+0332",
+          "U+0333"
+        ]
+      },
+      {
+        "member": 11,
+        "json": "neuronte-term-marks-v1-tmkB-g4.json",
+        "json_sha256": "d4665e72e5073fe46b46fa0e6d125452d1cffe4f4d8823d46c3a2bba2b19e43b",
+        "image_sha256": "987e353bbd16a2de3a2f4abd261217f69ff8bd56374185aba65df8e501e80185",
+        "bytes": 57040,
+        "set": "tmkB-repertoire",
+        "scalars": [
+          "U+0334",
+          "U+0335",
+          "U+0336",
+          "U+0337",
+          "U+0338",
+          "U+0339",
+          "U+033A"
+        ]
+      },
+      {
+        "member": 12,
+        "json": "neuronte-term-marks-v1-tmkB-g5.json",
+        "json_sha256": "bd2a4ddc2e14e42799e4d862f0b9fb4ecfed5f38254354164167d312a44f752b",
+        "image_sha256": "d3dc4726e9fcbff1156217ae5ba44dcef96cdc1d3980aa1c8b5d1ef9a4b168f1",
+        "bytes": 57040,
+        "set": "tmkB-repertoire",
+        "scalars": [
+          "U+033B",
+          "U+033C",
+          "U+0345",
+          "U+0347",
+          "U+0348",
+          "U+0349",
+          "U+034D"
+        ]
+      },
+      {
+        "member": 13,
+        "json": "neuronte-term-marks-v1-tmkB-g6.json",
+        "json_sha256": "de7c7cc3399f79dad3f127f569e24d03da6bcfd4640ebdd400784eab1426aec8",
+        "image_sha256": "38fed414dc7bff25ae3db02b2f05c09a7a06bf7ed4acbcd500696d8cfb24c524",
+        "bytes": 57040,
+        "set": "tmkB-repertoire",
+        "scalars": [
+          "U+034E",
+          "U+0353",
+          "U+0354",
+          "U+0355",
+          "U+0356",
+          "U+0359",
+          "U+035A"
+        ]
+      },
+      {
+        "member": 14,
+        "json": "neuronte-term-marks-v1-tmkJr0-g0.json",
+        "json_sha256": "241e7db5ba42f7660c25111cb342a06695b098de64a1dae773c94ac79b2709b6",
+        "image_sha256": "5a0d957f874433186aa190891c01e6de4f00614c299aed75c2393884c180a67b",
+        "bytes": 57040,
+        "set": "tmkJr0-repertoire",
+        "scalars": [
+          "U+035C",
+          "U+035D",
+          "U+035E",
+          "U+035F"
+        ]
+      },
+      {
+        "member": 15,
+        "json": "neuronte-term-marks-v1-tmkJ-g1.json",
+        "json_sha256": "7b4ef6b3f9c832459c4c241801ad8d564693631a49e8ecac3afb30dfaab55886",
+        "image_sha256": "ef9563e33c72a5f7ddbe33f6f21d649db6a4e0a0937669116e935ab247077632",
+        "bytes": 57040,
+        "set": "tmkJ-repertoire",
+        "scalars": [
+          "U+0364",
+          "U+0365",
+          "U+0366",
+          "U+0367",
+          "U+0368",
+          "U+0369",
+          "U+036A",
+          "U+036B"
+        ]
+      },
+      {
+        "member": 16,
+        "json": "neuronte-term-marks-v1-tmkJ-g2.json",
+        "json_sha256": "35e8a63ae53eaf7ef02c44855c6c8e16b5419f18853b9d5a297d54859fe16512",
+        "image_sha256": "4bc874c43279ca929c8ab3fd45746e7768f8db2bcac1a168d3d6a83d3fdccda3",
+        "bytes": 57040,
+        "set": "tmkJ-repertoire",
+        "scalars": [
+          "U+00AD",
+          "U+036C",
+          "U+036D",
+          "U+036E",
+          "U+036F",
+          "U+1DB4",
+          "U+1DB5",
+          "U+1DB6",
+          "U+1DB7"
+        ]
+      },
+      {
+        "member": 17,
+        "json": "neuronte-term-marks-v1-tmkJ-g3.json",
+        "json_sha256": "da3198b81f7fcf34ab783de0040798fcb97ea24dd91a6c50e173d7c7e86fab7b",
+        "image_sha256": "ade50ec16f296cc8845b65835755f51d3ae515386d4db172c15e8229a88cc8bc",
+        "bytes": 57040,
+        "set": "tmkJ-repertoire",
+        "scalars": [
+          "U+034F",
+          "U+2000",
+          "U+2001",
+          "U+2002",
+          "U+2003",
+          "U+2004",
+          "U+2005",
+          "U+2006"
+        ]
+      },
+      {
+        "member": 18,
+        "json": "neuronte-term-marks-v1-tmkJ-g4.json",
+        "json_sha256": "a49fae060b77bb9e4c29f7fe377f2008253865bd7fe832cd46792aab55afe0a9",
+        "image_sha256": "dd4836174ed51176047769f89b5cc4aa3d5d6760de986120e0c199517beb8f02",
+        "bytes": 57040,
+        "set": "tmkJ-repertoire",
+        "scalars": [
+          "U+2007",
+          "U+2008",
+          "U+2009",
+          "U+200A",
+          "U+202F",
+          "U+205F",
+          "U+FFF9",
+          "U+FFFA",
+          "U+FFFB"
+        ]
+      },
+      {
+        "member": 19,
+        "json": "neuronte-term-marks-v1-tmkL-g0.json",
+        "json_sha256": "e5aad51bd727be4fa736cb51e3516ad4867e189c3d16d4536c1844380491a0b1",
+        "image_sha256": "dab9d8ee5d8cb1cf40b0be8645928e2cda0a532b82298c28c61b98c247eaa358",
+        "bytes": 57040,
+        "set": "tmkL-repertoire",
+        "scalars": [
+          "U+0EAF",
+          "U+0EB1",
+          "U+0EB4",
+          "U+0EB5",
+          "U+0EB6",
+          "U+0EB7"
+        ]
+      },
+      {
+        "member": 20,
+        "json": "neuronte-term-marks-v1-tmkL-g1.json",
+        "json_sha256": "09677cd1594a640faf8192f1b09a12bebda8687c49fdfbe7586bb425d78d2572",
+        "image_sha256": "496f1bd06e89d441a6ead3f3f67d83308d832cc1acab6d6d6f3a8668a6063134",
+        "bytes": 57040,
+        "set": "tmkL-repertoire",
+        "scalars": [
+          "U+0EB8",
+          "U+0EB9",
+          "U+0EBA",
+          "U+0EBB",
+          "U+0EBC",
+          "U+0EC8"
+        ]
+      },
+      {
+        "member": 21,
+        "json": "neuronte-term-marks-v1-tmkL-g2.json",
+        "json_sha256": "b0a2d824a1ac82aba305ff9e473d4fffec9634a1c9a23cebb06c605937d2250a",
+        "image_sha256": "e1657c9dd01ffa39714c79281801a389c204b3ad87edb2e434ec9c2567714553",
+        "bytes": 57040,
+        "set": "tmkL-repertoire",
+        "scalars": [
+          "U+0EC9",
+          "U+0ECA",
+          "U+0ECB",
+          "U+0ECC",
+          "U+0ECD",
+          "U+0ECE"
+        ]
+      },
+      {
+        "member": 22,
+        "json": "neuronte-term-marks-v1-tmkS-g0.json",
+        "json_sha256": "21ffe4d11de396012eb85af3afc8fd4d5716f782a8772ea991a7dad7b3d6b537",
+        "image_sha256": "1f529d63a3057587a3b352014dc0687b2be671b4aa157f30a8943a0fd34300b7",
+        "bytes": 57040,
+        "set": "tmkS-repertoire",
+        "scalars": [
+          "U+25FD",
+          "U+25FE",
+          "U+2614",
+          "U+2615"
+        ]
+      },
+      {
+        "member": 23,
+        "json": "neuronte-term-marks-v1-tmkS-g1.json",
+        "json_sha256": "fc901b7224d6ecb8cc81200ac9b49dff5bd05d6a1fea4444a165be0e4b70f913",
+        "image_sha256": "a02b0be1a2c0ffc1c6389689ae18313c00056cacb7951792a5350f441e416609",
+        "bytes": 57040,
+        "set": "tmkS-repertoire",
+        "scalars": [
+          "U+2648",
+          "U+2649",
+          "U+264A",
+          "U+264B",
+          "U+264C"
+        ]
+      },
+      {
+        "member": 24,
+        "json": "neuronte-term-marks-v1-tmkS-g2.json",
+        "json_sha256": "969822b1e470b6314a53cf449bcbf1f6a7b3c3af33f71977f947e25f3bd407c3",
+        "image_sha256": "1632a2b2d8e3b1526e8bfe2ecacdde1ac3f1a1e55faa3fda59d3d3450b8e7b28",
+        "bytes": 57040,
+        "set": "tmkS-repertoire",
+        "scalars": [
+          "U+264D",
+          "U+264E",
+          "U+264F",
+          "U+2650",
+          "U+2651"
+        ]
+      },
+      {
+        "member": 25,
+        "json": "neuronte-term-marks-v1-tmkS-g3.json",
+        "json_sha256": "e849c9b2fe9ffb8338c06b5e61ce79cbca31c200b79e0bd2a6758bc05900c947",
+        "image_sha256": "f7dc7fde6f4058d71c9387422aa7dc3498d79db5ddb40077c905ca5c7cd58006",
+        "bytes": 57040,
+        "set": "tmkS-repertoire",
+        "scalars": [
+          "U+2652",
+          "U+2653",
+          "U+267F",
+          "U+2693",
+          "U+26A1"
+        ]
+      }
+    ],
+    "list": {
+      "file": "neuronte-term-marks-v1.list.txt",
+      "sha256": "06f9756462916bbc6d7668e051374a9dd2cea7e4cdab6ba8737a63271b19ed9e"
+    }
+  }
+}

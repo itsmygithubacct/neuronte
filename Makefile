@@ -681,6 +681,24 @@ pack-term-rest-v1:
 
 .PHONY: test-term-rest-v1 pack-term-rest-v1
 
+# term-marks-v1: the combining marks, the Lao marks and the small gaps, a
+# standalone bundle of group nets used beside split-v9.
+TERM_MARKS_V1 = $(shell $(PYTHON) train/build_term_marks_v1.py --files)
+TERM_MARKS_V1_INK = 301
+
+test-term-marks-v1: build/libneuronte.so build/test_api
+	@set -e; for n in $(TERM_MARKS_V1); do \
+		$(PYTHON) train/pack.py $$n.json build/$$(basename $$n).nrt; \
+		$(PYTHON) tests/check_reference.py build/libneuronte.so $$n.json build/$$(basename $$n).nrt; \
+	done
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) tests/check_term_marks_v1.py build/libneuronte.so
+	./build/test_api weights/neuronte-term-marks-v1.nrt --standalone $(TERM_MARKS_V1_INK)
+
+pack-term-marks-v1:
+	$(PYTHON) train/build_term_marks_v1.py
+
+.PHONY: test-term-marks-v1 pack-term-marks-v1
+
 # kilix-chrome-v1: the symbols Kilix prints on its bars, a standalone
 # bundle of group nets opened before the terminal bundles.
 KILIX_CHROME_V1 = $(shell $(PYTHON) train/build_kilix_chrome_v1.py --files)
@@ -1130,7 +1148,7 @@ test-face-v0-ui43: build/libneuronte.so
 test-face-v0-uilarge: build/libneuronte.so
 	$(PYTHON) tests/check_reference.py build/libneuronte.so --drawing $(UILARGE).nrt $(UILARGE).json font/ui-large-advances.txt
 
-test: all $(TESTS) test-cells test-bits test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7 test-face-bundle test-symbol-v1 test-split-v7-symbol test-split-v8 test-split-v9 test-term-math-v1 test-term-symbol-v1 test-term-dingbat-v1 test-faces-v1 test-faces-v1-192-256 test-known-bundle test-untrained test-standalone test-term-latin-v1 test-term-blocks-v1 test-faces-wide-v1 test-faces-v1-h512 test-colour-marks test-faces-v1-small test-emoji-v1 test-letter-snap test-ui-scaled test-ui-large-v1 test-ui-latin1 test-term-mathalpha-v1 test-term-syllabics-v1 test-term-scripts-v1 test-weather-colour-v1 test-term-rest-v1 test-kilix-chrome-v1 test-kilix-chrome-v2 test-ui-latin1-full test-faces-latin1
+test: all $(TESTS) test-cells test-bits test-widths test-tiled test-rc9 test-rc9-quality test-ui-metadata test-bench-errors test-ascii-next test-split-v7 test-face-bundle test-symbol-v1 test-split-v7-symbol test-split-v8 test-split-v9 test-term-math-v1 test-term-symbol-v1 test-term-dingbat-v1 test-faces-v1 test-faces-v1-192-256 test-known-bundle test-untrained test-standalone test-term-latin-v1 test-term-blocks-v1 test-faces-wide-v1 test-faces-v1-h512 test-colour-marks test-faces-v1-small test-emoji-v1 test-letter-snap test-ui-scaled test-ui-large-v1 test-ui-latin1 test-term-mathalpha-v1 test-term-syllabics-v1 test-term-scripts-v1 test-weather-colour-v1 test-term-rest-v1 test-term-marks-v1 test-kilix-chrome-v1 test-kilix-chrome-v2 test-ui-latin1-full test-faces-latin1
 	cd weights && sha256sum -c --quiet SHA256SUMS
 	# The pointer net keeps its own list, with paths from the top of the tree.
 	sha256sum -c --quiet weights/neuronte-pointer-v0.sha256

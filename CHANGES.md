@@ -1,5 +1,15 @@
 # Changes
 
+## Unreleased
+
+- `neuronte-term-marks-v1`: 166 characters: the combining diacritical
+  marks U+0300 to U+036F (less U+0360 to U+0363, which failed the gates
+  twice and are left untrained), the Lao vowel signs and tone marks, four
+  raised modifier letters, the soft hyphen, the typographic spaces and
+  annotation characters (drawn blank), and 19 signs in one cell. 26 group
+  nets, 1,484,368 bytes, standalone beside split-v9; not a default. The Lao
+  marks are drawn from memory. [Card](weights/neuronte-term-marks-v1.md).
+
 ## 0.1.7
 
 Every file of 0.1.6 is still here byte for byte and draws the same pixels
